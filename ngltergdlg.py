@@ -20,14 +20,13 @@ class NgLteResGridDlg(QDialog):
     def __init__(self):
         super().__init__()
         self.params = dict()
+        self.initResGridMapper()
         self.initUi()
         
     def onOkBtnClicked(self):
         self.accept()
     
     def initUi(self):
-        self.initResGridMapper()
-        
         self.fsLabel = QLabel('Frame Structure:')
         self.fsCombo = QComboBox()
         self.fsCombo.addItem('Type 1(FDD)')
@@ -240,6 +239,3 @@ class NgLteResGridDlg(QDialog):
         
         self.params['dlmap'] = dlMap
         self.params['ulmap'] = ulMap
-        
-        
-        

@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import QMainWindow, QAction, QMenu, QTabWidget, QTextEdit, 
 from PyQt5.QtWidgets import qApp, QApplication
 from PyQt5.QtCore import Qt
 from PyQt5.QtSql import QSqlDatabase
-
+#-->import plugins
 from ngltergdlg import NgLteResGridDlg
 
 class NgMainWin(QMainWindow):

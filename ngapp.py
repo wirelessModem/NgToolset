@@ -2,10 +2,12 @@
 # -*- encoding: utf-8 -*-
 
 '''
-File: ng_app.py
-Description: The main routine.
+File:
+    ng_app.py
+Description:
+    The main routine.
 Change History:
-2018-1-19   v0.1    created by github/zhenggao2
+    2018-1-19   v0.1    created by github/zhenggao2
 '''
 
 import sys
