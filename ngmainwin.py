@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import qApp, QApplication
 from PyQt5.QtCore import Qt
 from PyQt5.QtSql import QSqlDatabase
 #-->import plugins
-from ngltergdlg import NgLteResGridDlg
+from ngltegridui import NgLteGridUi
 
 class NgMainWin(QMainWindow):
     def __init__(self):
@@ -42,20 +42,20 @@ class NgMainWin(QMainWindow):
         widget = self.tabWidget.widget(index)
         self.tabWidget.removeTab(index)
         
-    def onAboutTriggered(self):
+    def onAbout(self):
         QMessageBox.information(self, 'About', '<h1>NG Toolset</h1><p>NG toolset is set of useful NPO tools for 4G and 5G.</p>'
                                 + '<p>Author: zhengwei.gao@yahoo.com</p>')
         
-    def onEnableDebugTriggered(self, checked):
-        enableDebug = checked
+    def onEnableDebug(self, checked):
+        self.enableDebug = checked
         
-    def onChkSqlTriggered(self):
+    def onChkSqlPlugin(self):
         drivers = QSqlDatabase().drivers()
         for e in drivers:
             self.logEdit.append('Found SQL driver: %s' % e)
             
     def onExecLteResGrid(self):
-        dlg = NgLteResGridDlg()
+        dlg = NgLteGridUi(self)
         dlg.exec_()
     
     def onExecNbiotResGrid(self):
@@ -81,17 +81,17 @@ class NgMainWin(QMainWindow):
         
         #Misc menu
         self.chkSqlAction = QAction('Check SQL Plugin')
-        self.chkSqlAction.triggered.connect(self.onChkSqlTriggered)
+        self.chkSqlAction.triggered.connect(self.onChkSqlPlugin)
         
         #Options menu
         self.enableDebugAction = QAction('Enable Debug')
         self.enableDebugAction.setCheckable(True)
         self.enableDebugAction.setChecked(False)
-        self.enableDebugAction.triggered.connect(self.onEnableDebugTriggered)
+        self.enableDebugAction.triggered[bool].connect(self.onEnableDebug)
         
         #Help menu
         self.aboutAction = QAction('About')
-        self.aboutAction.triggered.connect(self.onAboutTriggered)
+        self.aboutAction.triggered.connect(self.onAbout)
         self.aboutQtAction = QAction('About Qt')
         self.aboutQtAction.triggered.connect(qApp.aboutQt)
     

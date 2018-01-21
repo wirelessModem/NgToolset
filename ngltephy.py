@@ -12,18 +12,56 @@ Change History:
 
 from enum import Enum
 
-class LtePhy(object):
-    def __init__(self):
-        self.bw = (6, 15, 25, 50, 75, 100)
-        self.cp = ('normal', 'extended')
-        self.phichDur = ('normal', 'extended')
-        self.phichRes = ('oneSixth', 'half', 'one', 'two')
-        self.fs = ('type1', 'type2')
-        self.tddSa = ('sa0', 'sa1', 'sa2', 'sa3', 'sa4', 'sa5', 'sa6')
-        self.tddSsp = ('ssp0', 'ssp1', 'ssp2', 'ssp3', 'ssp4', 'ssp5', 'ssp6', 'ssp7', 'ssp8')
-        self.tddAckMode = ('bundling', 'multiplexing')
-        self.prachSfn = ('even', 'any')
-        self.dlAp = (1, 2, 4)
+class LtePhy(Enum):
+    #frame structure
+    LTE_FS_TYPE1 = 0
+    LTE_FS_TYPE2 = 1
+    #sysmtem bandwidth
+    LTE_BW_6 = 0
+    LTE_BW_15 = 1
+    LTE_BW_25 = 2
+    LTE_BW_50 = 3
+    LTE_BW_75 = 4
+    LTE_BW_100 = 5
+    #cyclic prefix
+    LTE_CP_NORMAL = 0
+    LTE_CP_EXTENDED = 1
+    #PHICH duration
+    LTE_PHICH_DUR_NORMAL = 0
+    LTE_PHICH_DUR_EXTENDED = 1
+    #phich resource
+    LTE_PHICH_RES_ONE_SIXTH = 0
+    LTE_PHICH_RES_HALF = 1
+    LTE_PHICH_RES_ONE = 2
+    LTE_PHICH_RES_TWO = 3
+    #TDD only, subframe assignment
+    LTE_TDD_SA0 = 0
+    LTE_TDD_SA1 = 1
+    LTE_TDD_SA2 = 2
+    LTE_TDD_SA3 = 3
+    LTE_TDD_SA4 = 4
+    LTE_TDD_SA5 = 5
+    LTE_TDD_SA6 = 6
+    #TDD only, special subframe pattern
+    LTE_TDD_SSP0 = 0
+    LTE_TDD_SSP1 = 1
+    LTE_TDD_SSP2 = 2
+    LTE_TDD_SSP3 = 3
+    LTE_TDD_SSP4 = 4
+    LTE_TDD_SSP5 = 5
+    LTE_TDD_SSP6 = 6
+    LTE_TDD_SSP7 = 7
+    LTE_TDD_SSP8 = 8
+    #TDD only, HARQ-ACK feedback mode in uplink
+    LTE_TDD_AN_BUNDLING = 0
+    LTE_TDD_AN_MULTIPLEXING = 1
+    #PRACH pattern
+    LTE_PRACH_SFN_EVEN = 0
+    LTE_PRACH_SFN_ANY = 1
+    #downlink antenna port(s)
+    LTE_DL_AP_ONE = 0
+    LTE_DL_AP_TWO = 1
+    LTE_DL_AP_FOUR = 2
         
 class LteResType(Enum):
     #downlink
