@@ -130,11 +130,19 @@ class NgLteGrid(object):
                         self.gridUl[0][isf * self.rePerSubf + ire] = LteResType.LTE_RES_DL.value
         
         if self.fs == LtePhy.LTE_FS_TYPE1.value:
-            self.initPrachFdd()
-            self.initSrsFdd()
+            if not self.initPrachFdd():
+                self.ngwin.logEdit.append('NgLteGrid::initPrachFdd failed.')
+                return
+            if not self.initSrsFdd():
+                self.ngwin.logEdit.append('NgLteGrid::initSrsFdd failed.')
+                return
         else:
-            self.initPrachTdd()
-            self.initSrsTdd()
+            if not self.initPrachTdd():
+                self.ngwin.logEdit.append('NgLteGrid::initPrachTdd failed.')
+                return
+            if not self.initSrsTdd():
+                self.ngwin.logEdit.append('NgLteGrid::initSrsTdd failed.')
+                return
         
         self.crsOk= False
         self.pcfichOk= False
@@ -145,83 +153,143 @@ class NgLteGrid(object):
         self.isOk = True
         
     def initPrachFdd(self):
-        _prachconffdd = [{'id' : 0, 'format' : 0, 'sfn' : 'even', 'subf' : (1,)}, 
-                         {'id' : 1, 'format' : 0, 'sfn' : 'even', 'subf' : (4,)},
-                         {'id' : 2, 'format' : 0, 'sfn' : 'even', 'subf' : (7,)}, 
-                         {'id' : 3, 'format' : 0, 'sfn' : 'any', 'subf' : (1,)}, 
-                         {'id' : 4, 'format' : 0, 'sfn' : 'any', 'subf' : (4,)}, 
-                         {'id' : 5, 'format' : 0, 'sfn' : 'any', 'subf' : (7,)}, 
-                         {'id' : 6, 'format' : 0, 'sfn' : 'any', 'subf' : (1, 6)}, 
-                         {'id' : 7, 'format' : 0, 'sfn' : 'any', 'subf' : (2, 7)},
-                         {'id' : 8, 'format' : 0, 'sfn' : 'any', 'subf' : (3, 8)}, 
-                         {'id' : 9, 'format' : 0, 'sfn' : 'any', 'subf' : (1, 4, 7)}, 
-                         {'id' : 10, 'format' : 0, 'sfn' : 'any', 'subf' : (2, 5, 8)}, 
-                         {'id' : 11, 'format' : 0, 'sfn' : 'any', 'subf' : (3, 6, 9)}, 
-                         {'id' : 12, 'format' : 0, 'sfn' : 'any', 'subf' : (0, 2, 4, 6, 8)}, 
-                         {'id' : 13, 'format' : 0, 'sfn' : 'any', 'subf' : (1, 3, 5, 7, 9)}, 
-                         {'id' : 14, 'format' : 0, 'sfn' : 'any', 'subf' : (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)}, 
-                         {'id' : 15, 'format' : 0, 'sfn' : 'even', 'subf' : (9,)}, 
-                         {'id' : 16, 'format' : 1, 'sfn' : 'even', 'subf' : (1,)}, 
-                         {'id' : 17, 'format' : 1, 'sfn' : 'even', 'subf' : (4,)}, 
-                         {'id' : 18, 'format' : 1, 'sfn' : 'even', 'subf' : (7,)}, 
-                         {'id' : 19, 'format' : 1, 'sfn' : 'any', 'subf' : (1,)}, 
-                         {'id' : 20, 'format' : 1, 'sfn' : 'any', 'subf' : (4,)}, 
-                         {'id' : 21, 'format' : 1, 'sfn' : 'any', 'subf' : (7,)}, 
-                         {'id' : 22, 'format' : 1, 'sfn' : 'any', 'subf' : (1, 6)}, 
-                         {'id' : 23, 'format' : 1, 'sfn' : 'any', 'subf' : (2, 7)},
-                         {'id' : 24, 'format' : 1, 'sfn' : 'any', 'subf' : (3, 8)}, 
-                         {'id' : 25, 'format' : 1, 'sfn' : 'any', 'subf' : (1, 4, 7)}, 
-                         {'id' : 26, 'format' : 1, 'sfn' : 'any', 'subf' : (2, 5, 8)}, 
-                         {'id' : 27, 'format' : 1, 'sfn' : 'any', 'subf' : (3, 6, 9)}, 
-                         {'id' : 28, 'format' : 1, 'sfn' : 'any', 'subf' : (0, 2, 4, 6, 8)}, 
-                         {'id' : 29, 'format' : 1, 'sfn' : 'any', 'subf' : (1, 3, 5, 7, 9)}, 
-                         #invalid config index = 30
-                         {'id' : 30, 'format' : -1},
-                         {'id' : 31, 'format' : 1, 'sfn' : 'any', 'subf' : (9,)}, 
-                         {'id' : 32, 'format' : 2, 'sfn' : 'even', 'subf' : (1,)}, 
-                         {'id' : 33, 'format' : 2, 'sfn' : 'even', 'subf' : (4,)}, 
-                         {'id' : 34, 'format' : 2, 'sfn' : 'even', 'subf' : (7,)}, 
-                         {'id' : 35, 'format' : 2, 'sfn' : 'any', 'subf' : (1,)}, 
-                         {'id' : 36, 'format' : 2, 'sfn' : 'any', 'subf' : (4,)}, 
-                         {'id' : 37, 'format' : 2, 'sfn' : 'any', 'subf' : (7,)},
-                         {'id' : 38, 'format' : 2, 'sfn' : 'any', 'subf' : (1, 6)}, 
-                         {'id' : 39, 'format' : 2, 'sfn' : 'any', 'subf' : (2, 7)},
-                         {'id' : 40, 'format' : 2, 'sfn' : 'any', 'subf' : (3, 8)}, 
-                         {'id' : 41, 'format' : 2, 'sfn' : 'any', 'subf' : (1, 4, 7)}, 
-                         {'id' : 42, 'format' : 2, 'sfn' : 'any', 'subf' : (2, 5, 8)}, 
-                         {'id' : 43, 'format' : 2, 'sfn' : 'any', 'subf' : (3, 6, 9)}, 
-                         {'id' : 44, 'format' : 2, 'sfn' : 'any', 'subf' : (0, 2, 4, 6, 8)}, 
-                         {'id' : 45, 'format' : 2, 'sfn' : 'any', 'subf' : (1, 3, 5, 7, 9)}, 
-                         #invalid config index = 46 
-                         {'id' : 46, 'format' : -1},
-                         {'id' : 47, 'format' : 2, 'sfn' : 'any', 'subf' : (9,)}, 
-                         {'id' : 48, 'format' : 3, 'sfn' : 'even', 'subf' : (1,)}, 
-                         {'id' : 49, 'format' : 3, 'sfn' : 'even', 'subf' : (4,)}, 
-                         {'id' : 50, 'format' : 3, 'sfn' : 'even', 'subf' : (7,)}, 
-                         {'id' : 51, 'format' : 3, 'sfn' : 'any', 'subf' : (1,)}, 
-                         {'id' : 52, 'format' : 3, 'sfn' : 'any', 'subf' : (4,)}, 
-                         {'id' : 53, 'format' : 3, 'sfn' : 'any', 'subf' : (7,)},
-                         {'id' : 54, 'format' : 3, 'sfn' : 'any', 'subf' : (1, 6)}, 
-                         {'id' : 55, 'format' : 3, 'sfn' : 'any', 'subf' : (2, 7)},
-                         {'id' : 56, 'format' : 3, 'sfn' : 'any', 'subf' : (3, 8)}, 
-                         {'id' : 57, 'format' : 3, 'sfn' : 'any', 'subf' : (1, 4, 7)}, 
-                         {'id' : 58, 'format' : 3, 'sfn' : 'any', 'subf' : (2, 5, 8)}, 
-                         {'id' : 59, 'format' : 3, 'sfn' : 'any', 'subf' : (3, 6, 9)}, 
-                         #invalid config index = 60/61/62
-                         {'id' : 60, 'format' : -1},
-                         {'id' : 61, 'format' : -1},
-                         {'id' : 62, 'format' : -1},
-                         {'id' : 63, 'format' : 3, 'sfn' : 'any', 'sfNum' : (9,)}]
+        #Table 5.7.1-2: Frame structure type 1 random access configuration for preamble formats 0-3
+        _prachConfFdd = [{'format' : 0, 'sfn' : 'even', 'subf' : (1,)}, 
+                         #1
+                         {'format' : 0, 'sfn' : 'even', 'subf' : (4,)},
+                         #2
+                         {'format' : 0, 'sfn' : 'even', 'subf' : (7,)}, 
+                         #3
+                         {'format' : 0, 'sfn' : 'any', 'subf' : (1,)}, 
+                         #4
+                         {'format' : 0, 'sfn' : 'any', 'subf' : (4,)}, 
+                         #5
+                         {'format' : 0, 'sfn' : 'any', 'subf' : (7,)}, 
+                         #6
+                         {'format' : 0, 'sfn' : 'any', 'subf' : (1, 6)}, 
+                         #7
+                         {'format' : 0, 'sfn' : 'any', 'subf' : (2, 7)},
+                         #8
+                         {'format' : 0, 'sfn' : 'any', 'subf' : (3, 8)}, 
+                         #9
+                         {'format' : 0, 'sfn' : 'any', 'subf' : (1, 4, 7)}, 
+                         #10
+                         {'format' : 0, 'sfn' : 'any', 'subf' : (2, 5, 8)}, 
+                         #11
+                         {'format' : 0, 'sfn' : 'any', 'subf' : (3, 6, 9)}, 
+                         #12
+                         {'format' : 0, 'sfn' : 'any', 'subf' : (0, 2, 4, 6, 8)}, 
+                         #13
+                         {'format' : 0, 'sfn' : 'any', 'subf' : (1, 3, 5, 7, 9)}, 
+                         #14
+                         {'format' : 0, 'sfn' : 'any', 'subf' : (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)}, 
+                         #15
+                         {'format' : 0, 'sfn' : 'even', 'subf' : (9,)}, 
+                         #16
+                         {'format' : 1, 'sfn' : 'even', 'subf' : (1,)}, 
+                         #17
+                         {'format' : 1, 'sfn' : 'even', 'subf' : (4,)}, 
+                         #18
+                         {'format' : 1, 'sfn' : 'even', 'subf' : (7,)}, 
+                         #19
+                         {'format' : 1, 'sfn' : 'any', 'subf' : (1,)}, 
+                         #20
+                         {'format' : 1, 'sfn' : 'any', 'subf' : (4,)}, 
+                         #21
+                         {'format' : 1, 'sfn' : 'any', 'subf' : (7,)}, 
+                         #22
+                         {'format' : 1, 'sfn' : 'any', 'subf' : (1, 6)}, 
+                         #23
+                         {'format' : 1, 'sfn' : 'any', 'subf' : (2, 7)},
+                         #24
+                         {'format' : 1, 'sfn' : 'any', 'subf' : (3, 8)}, 
+                         #25
+                         {'format' : 1, 'sfn' : 'any', 'subf' : (1, 4, 7)}, 
+                         #26
+                         {'format' : 1, 'sfn' : 'any', 'subf' : (2, 5, 8)}, 
+                         #27
+                         {'format' : 1, 'sfn' : 'any', 'subf' : (3, 6, 9)}, 
+                         #28
+                         {'format' : 1, 'sfn' : 'any', 'subf' : (0, 2, 4, 6, 8)}, 
+                         #29
+                         {'format' : 1, 'sfn' : 'any', 'subf' : (1, 3, 5, 7, 9)}, 
+                         #30 invalid config index = 30
+                         {'format' : -1},
+                         #31
+                         {'format' : 1, 'sfn' : 'any', 'subf' : (9,)}, 
+                         #32
+                         {'format' : 2, 'sfn' : 'even', 'subf' : (1,)}, 
+                         #33
+                         {'format' : 2, 'sfn' : 'even', 'subf' : (4,)}, 
+                         #34
+                         {'format' : 2, 'sfn' : 'even', 'subf' : (7,)}, 
+                         #35
+                         {'format' : 2, 'sfn' : 'any', 'subf' : (1,)}, 
+                         #36
+                         {'format' : 2, 'sfn' : 'any', 'subf' : (4,)}, 
+                         #37
+                         {'format' : 2, 'sfn' : 'any', 'subf' : (7,)},
+                         #38
+                         {'format' : 2, 'sfn' : 'any', 'subf' : (1, 6)}, 
+                         #39
+                         {'format' : 2, 'sfn' : 'any', 'subf' : (2, 7)},
+                         #40
+                         {'format' : 2, 'sfn' : 'any', 'subf' : (3, 8)}, 
+                         #41
+                         {'format' : 2, 'sfn' : 'any', 'subf' : (1, 4, 7)}, 
+                         #42
+                         {'format' : 2, 'sfn' : 'any', 'subf' : (2, 5, 8)}, 
+                         #43
+                         {'format' : 2, 'sfn' : 'any', 'subf' : (3, 6, 9)}, 
+                         #44
+                         {'format' : 2, 'sfn' : 'any', 'subf' : (0, 2, 4, 6, 8)}, 
+                         #45
+                         {'format' : 2, 'sfn' : 'any', 'subf' : (1, 3, 5, 7, 9)}, 
+                         #46 invalid config index = 46 
+                         {'format' : -1},
+                         #47
+                         {'format' : 2, 'sfn' : 'any', 'subf' : (9,)}, 
+                         #48
+                         {'format' : 3, 'sfn' : 'even', 'subf' : (1,)}, 
+                         #49
+                         {'format' : 3, 'sfn' : 'even', 'subf' : (4,)}, 
+                         #50
+                         {'format' : 3, 'sfn' : 'even', 'subf' : (7,)}, 
+                         #51
+                         {'format' : 3, 'sfn' : 'any', 'subf' : (1,)}, 
+                         #52
+                         {'format' : 3, 'sfn' : 'any', 'subf' : (4,)}, 
+                         #53
+                         {'format' : 3, 'sfn' : 'any', 'subf' : (7,)},
+                         #54
+                         {'format' : 3, 'sfn' : 'any', 'subf' : (1, 6)}, 
+                         #55
+                         {'format' : 3, 'sfn' : 'any', 'subf' : (2, 7)},
+                         #56
+                         {'format' : 3, 'sfn' : 'any', 'subf' : (3, 8)}, 
+                         #57
+                         {'format' : 3, 'sfn' : 'any', 'subf' : (1, 4, 7)}, 
+                         #58
+                         {'format' : 3, 'sfn' : 'any', 'subf' : (2, 5, 8)}, 
+                         #59
+                         {'format' : 3, 'sfn' : 'any', 'subf' : (3, 6, 9)}, 
+                         #60~62 invalid config index = 60/61/62
+                         {'format' : -1},
+                         {'format' : -1},
+                         {'format' : -1},
+                         #63
+                         {'format' : 3, 'sfn' : 'any', 'sfNum' : (9,)}]
         
-        if _prachconffdd[self.prachConfInd]['format'] < 0:
+        if _prachConfFdd[self.prachConfInd]['format'] < 0:
             self.ngwin.logEdit.append('args error: invalid PRACH configuration index: %d. PRACH index 30/46/60/61/62 are not supported in FDD.' % self.prachConfInd)
             return False
-        self.prachFddFormat = _prachconffdd[self.prachConfInd]['format']
-        self.prachFddSfn = _prachconffdd[self.prachConfInd]['sfn']
-        self.prachFddSubf = _prachconffdd[self.prachConfInd]['subf']
+        self.prachFddFormat = _prachConfFdd[self.prachConfInd]['format']
+        self.prachFddSfn = _prachConfFdd[self.prachConfInd]['sfn']
+        self.prachFddSubf = _prachConfFdd[self.prachConfInd]['subf']
         return True
     
     def initPrachTdd(self):
+        #Table 5.7.1-3: Frame structure type 2 random access configurations for preamble formats 0-4.
         if self.prachConfInd in range(20):
             self.prachTddFormat = 0
         elif self.prachConfInd in range(20, 30):
@@ -236,7 +304,8 @@ class NgLteGrid(object):
             self.ngwin.logEdit.append('args error: PRACH configuration index 58~63 are not supported for frame structure type 2.')
             return False
         
-        _prachquadstdd = [[[(0,1,0,2)], [(0,1,0,1)], [(0,1,0,0)], [(0,1,0,2)], [(0,1,0,1)], [(0,1,0,0)], [(0,1,0,2)]],
+        #Table 5.7.1-4: Frame structure type 2 random access preamble mapping in time and frequency.
+        _prachQuadTdd = [[[(0,1,0,2)], [(0,1,0,1)], [(0,1,0,0)], [(0,1,0,2)], [(0,1,0,1)], [(0,1,0,0)], [(0,1,0,2)]],
                   #1
                   [[(0,2,0,2)], [(0,2,0,1)], [(0,2,0,0)], [(0,2,0,2)], [(0,2,0,1)], [(0,2,0,0)], [(0,2,0,2)]],
                   #2
@@ -360,7 +429,7 @@ class NgLteGrid(object):
                   [None, None, None, None, None, None, None]
                   ]
         
-        self.prachTddQuad = _prachquadstdd[self.prachConfInd][self.sa]
+        self.prachTddQuad = _prachQuadTdd[self.prachConfInd][self.sa]
         if self.prachTddQuad is None:
             self.ngwin.logEdit.append('args error: invalid PRACH configuration index %d for UL/DL configuration %d' % (self.prachConfInd, self.sa))
             return False
@@ -368,8 +437,86 @@ class NgLteGrid(object):
         return True
         
     def initSrsFdd(self):
-        pass
+        #Table 5.5.3.3-1: Frame structure type 1 sounding reference signal subframe configuration.
+        _srsSubfConfFdd = [{'tSfc' : 1, 'deltaSfc' : (0,)},
+                       {'tSfc' : 2, 'deltaSfc' : (0,)},
+                       {'tSfc' : 2, 'deltaSfc' : (1,)},
+                       {'tSfc' : 5, 'deltaSfc' : (0,)},
+                       {'tSfc' : 5, 'deltaSfc' : (1,)},
+                       {'tSfc' : 5, 'deltaSfc' : (2,)},
+                       {'tSfc' : 5, 'deltaSfc' : (3,)},
+                       {'tSfc' : 5, 'deltaSfc' : (0,1)},
+                       {'tSfc' : 5, 'deltaSfc' : (2,3)},
+                       {'tSfc' : 10, 'deltaSfc' : (0,)},
+                       {'tSfc' : 10, 'deltaSfc' : (1,)},
+                       {'tSfc' : 10, 'deltaSfc' : (2,)},
+                       {'tSfc' : 10, 'deltaSfc' : (3,)},
+                       {'tSfc' : 10, 'deltaSfc' : (0,1,2,3,4,6,8)},
+                       {'tSfc' : 10, 'deltaSfc' : (0,1,2,3,4,5,6,8)},
+                       #15 is invalid
+                       None
+                       ]
+        
+        if self.srsSubfConf < 0 or self.srsSubfConf > 14:
+            self.ngwin.logEdit.append('args error: valid SRS subframe configuration for FDD is [0, 14].')
+            return False
+        self.tSfc = _srsSubfConfFdd[self.srsSubfConf]['tSfc']
+        self.deltaSfc = _srsSubfConfFdd[self.srsSubfConf]['deltaSfc']
+        return True
     
     def initSrsTdd(self):
+        #Table 5.5.3.3-2: Frame structure type 2 sounding reference signal subframe configuration.
+        _srsSubfConfTdd = [{'tSfc' : 5, 'deltaSfc' : (1,)},
+                       {'tSfc' : 5, 'deltaSfc' : (1,2)},
+                       {'tSfc' : 5, 'deltaSfc' : (1,3)},
+                       {'tSfc' : 5, 'deltaSfc' : (1,4)},
+                       {'tSfc' : 5, 'deltaSfc' : (1,2,3)},
+                       {'tSfc' : 5, 'deltaSfc' : (1,2,4)},
+                       {'tSfc' : 5, 'deltaSfc' : (1,3,4)},
+                       {'tSfc' : 5, 'deltaSfc' : (1,2,3,4)},
+                       {'tSfc' : 10, 'deltaSfc' : (1,2,6)},
+                       {'tSfc' : 10, 'deltaSfc' : (1,3,6)},
+                       {'tSfc' : 10, 'deltaSfc' : (1,6,7)},
+                       {'tSfc' : 10, 'deltaSfc' : (1,2,6,8)},
+                       {'tSfc' : 10, 'deltaSfc' : (1,3,6,9)},
+                       {'tSfc' : 10, 'deltaSfc' : (1,4,6,7)},
+                       #14~15 are invalid
+                       None,
+                       None
+                       ]
+        if self.srsSubfConf < 0 or self.srsSubfConf > 13:
+            self.ngwin.logEdit.append('args error: valid SRS subframe configuration for TDD is [0, 13].')
+            return False
+        self.tSfc = _srsSubfConfTdd[self.srsSubfConf]['tSfc']
+        self.deltaSfc = _srsSubfConfTdd[self.srsSubfConf]['deltaSfc']
+        return True
+    
+    def fillCrs(self):
         pass
-                    
+    
+    def fillPbch(self):
+        pass
+    
+    def fillSch(self):
+        pass
+    
+    def fillPdcch(self):
+        pass
+    
+    def printDl(self):
+        pass
+    
+    def fillPucch(self):
+        pass
+    
+    def fillPrach(self):
+        pass
+    
+    def fillDmrsForPusch(self):
+        pass
+    
+    def fillSrs(self):
+        pass
+    
+    def printUl(self):
+        pass

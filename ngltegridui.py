@@ -58,6 +58,18 @@ class NgLteGridUi(QDialog):
                 self.ngwin.logEdit.append('key=%s, value=%s' % (key, str(value)))
         
         grid = NgLteGrid(self.ngwin, self.args)
+        if grid.isOk:
+            grid.fillCrs()
+            grid.fillPbch()
+            grid.fillSch()
+            grid.fillPdcch()
+            grid.printDl()
+            
+            grid.fillPucch()
+            grid.fillPrach()
+            grid.fillDmrsForPusch()
+            grid.fillSrs()
+            grid.printUl()
         
         self.accept()
     
