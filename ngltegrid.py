@@ -35,7 +35,7 @@ class NgLteGrid(object):
         self.phichRes = args['phichRes']
         self.sa = args['sa']
         self.ssp = args['ssp']
-        _sspmap_norm = {0 : (3, 10, 1),
+        _sspNormCp = {0 : (3, 10, 1),
                    1 : (9, 4, 1),
                    2 : (10, 3, 1),
                    3 : (11, 2, 1),
@@ -44,7 +44,7 @@ class NgLteGrid(object):
                    6 : (9, 3, 2),
                    7 : (10, 2, 2),
                    8 : (11, 1, 2)}
-        _sspmap_ext = {0 : (3, 8, 1),
+        _sspExtCp = {0 : (3, 8, 1),
                        1 : (8, 3, 1),
                        2 : (9, 2, 1),
                        3 : (10, 1, 1),
@@ -52,13 +52,13 @@ class NgLteGrid(object):
                        5 : (8, 2, 2),
                        6 : (9, 1, 2)}
         if self.cp == LtePhy.LTE_CP_NORMAL.value:
-            self.dwpts, self.gp, self.uppts = _sspmap_norm[self.ssp]
+            self.dwpts, self.gp, self.uppts = _sspNormCp[self.ssp]
         else:
             if self.ssp >= 7:
                 self.ngwin.logEdit.append('args error: SSP 7/8 can only be used for normal CP.')
                 return
             else:
-                self.dwpts, self.gp, self.uppts = _sspmap_ext[self.ssp]
+                self.dwpts, self.gp, self.uppts = _sspExtCp[self.ssp]
         self.deltaPucchShift = args['dsPucch']
         self.nCqiRb = args['nCqiRb']
         self.nCsAn = args['nCsAn']
@@ -99,15 +99,15 @@ class NgLteGrid(object):
             self.ngwin.logEdit.append('NgLteGrid.gridDl info: ndim=%s, shape=%s, dtype=%s' % (str(self.gridDl.ndim), str(self.gridDl.shape), str(self.gridDl.dtype)))
             self.ngwin.logEdit.append('NgLteGrid.gridUl info: ndim=%s, shape=%s, dtype=%s' % (str(self.gridUl.ndim), str(self.gridUl.shape), str(self.gridUl.dtype)))
             
-        _tddconf = [{'name' : 'sa0', 'pat' : 'dsuuudsuuu', 'ack' : {2 : (6,), 4 : (4,), 7 : (6,), 9 : (4,)}},
+        _tddConf = [{'name' : 'sa0', 'pat' : 'dsuuudsuuu', 'ack' : {2 : (6,), 4 : (4,), 7 : (6,), 9 : (4,)}},
                     {'name' : 'sa1', 'pat' : 'dsuuddsuud', 'ack' : {2 : (7, 6), 3 : (4,), 7 : (7, 6), 8 : (4,)}},
                     {'name' : 'sa2', 'pat' : 'dsudddsudd', 'ack': {2 : (8, 7, 4, 6), 7 : (8, 7, 4, 6)}}, 
                     {'name' : 'sa3', 'pat' : 'dsuuudsddd', 'ack': {2 : (7, 6, 11), 3 : (6, 5), 4: (5, 4)}},
                     {'name' : 'sa4', 'pat' : 'dsuudddddd', 'ack' : {2 : (12, 8, 7, 11), 3 : (6, 5, 4, 7)}},
                     {'name' : 'sa5', 'pat' : 'dsuddddddd', 'ack' : {2 : (13, 12, 9, 8, 7, 5, 4, 11, 6)}},
                     {'name' : 'sa6', 'pat' : 'dsuuudsuud', 'ack' : {2 : (7,), 3 : (7,), 4 : (5,), 7 : (7,), 8 : (7,)}}]
-        self.subfPatTdd = _tddconf[self.sa]['pat']
-        self.ackIndTdd = _tddconf[self.sa]['ack']
+        self.subfPatTdd = _tddConf[self.sa]['pat']
+        self.ackIndTdd = _tddConf[self.sa]['ack']
         self.cce = np.zeros(self.subfPerRf)
         self.maxPucch = np.zeros(self.subfPerRf)
         
