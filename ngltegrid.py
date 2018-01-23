@@ -83,6 +83,7 @@ class NgLteGrid(object):
         
         self.symbPerSlot = 7 if self.cp == LtePhy.LTE_CP_NORMAL.value else 6
         self.symbPerSubf = self.symbPerSlot * self.slotPerSubf
+        self.symbPerRf = self.symbPerSubf * self.subfPerRf
         self.rePerSymb = self.prbNum * self.scPerPrb
         self.rePerSlot = self.rePerSymb * self.symbPerSlot
         self.rePerSubf = self.rePerSlot * self.slotPerSubf
@@ -91,9 +92,9 @@ class NgLteGrid(object):
         _apmap = (1, 2, 4)
         self.apNum = _apmap[self.ap]
         
-        self.gridDl = np.zeros((self.apNum, self.rePerRf))
+        self.gridDl = np.zeros((self.apNum, self.rePerSymb, self.symbPerRf))
         self.gridDl += LteResType.LTE_RES_PDSCH.value 
-        self.gridUl = np.zeros((1, self.rePerRf))
+        self.gridUl = np.zeros((1, self.rePerSymb, self.symbPerRf))
         self.gridUl += LteResType.LTE_RES_PUSCH.value
         if self.ngwin.enableDebug:
             self.ngwin.logEdit.append('NgLteGrid.gridDl info: ndim=%s, shape=%s, dtype=%s' % (str(self.gridDl.ndim), str(self.gridDl.shape), str(self.gridDl.dtype)))
@@ -115,19 +116,25 @@ class NgLteGrid(object):
             for isf in range(self.subfPerRf):
                 if self.subfPatTdd[isf] == 'u':
                     for iap in range(self.apNum):
-                        for ire in range(self.rePerSubf):
-                            self.gridDl[iap][isf * self.rePerSubf + ire] = LteResType.LTE_RES_UL.value
+                        self.gridDl[iap][:][isf*self.symbPerSubf:(isf+1)*self.symbPerSubf] = LteResType.LTE_RES_UL.value
+                        #for ire in range(self.rePerSubf):
+                        #    self.gridDl[iap][isf * self.rePerSubf + ire] = LteResType.LTE_RES_UL.value
                 elif self.subfPatTdd[isf] == 's':
                     for iap in range(self.apNum):
                         for isymb in range(self.dwpts, self.symbPerSubf):
-                            for ire in range(self.rePerSymb):
-                                self.gridDl[iap][isf * self.rePerSubf + isymb * self.rePerSymb + ire] = LteResType.LTE_RES_GP.value if isymb < self.dwpts + self.gp else LteResType.LTE_RES_UL.value
+                            self.gridDl[iap][:][isf*self.symbPerSubf+self.dwpts:isf*self.symbPerSubf+self.dwpts+self.gp] = LteResType.LTE_RES_GP.value
+                            self.gridDl[iap][:][isf*self.symbPerSubf+self.dwpts+self.gp:(isf+1)*self.symbPerSubf] = LteResType.LTE_RES_UL.value
+                            #for ire in range(self.rePerSymb):
+                            #    self.gridDl[iap][isf * self.rePerSubf + isymb * self.rePerSymb + ire] = LteResType.LTE_RES_GP.value if isymb < self.dwpts + self.gp else LteResType.LTE_RES_UL.value
                     for isymb in range(self.dwpts + self.gp):
-                        for ire in range(self.rePerSymb):
-                            self.gridUl[0][isf * self.rePerSubf + isymb * self.rePerSymb + ire] = LteResType.LTE_RES_DL.value  if isymb < self.dwpts else LteResType.LTE_RES_GP.value
+                        self.gridUl[0][:][isf*self.symbPerSubf:isf*self.symbPerSubf+self.dwpts] = LteResType.LTE_RES_DL.value
+                        self.gridUl[0][:][isf*self.symbPerSubf+self.dwpts:isf*self.symbPerSubf+self.dwpts+self.gp] = LteResType.LTE_RES_GP.value
+                        #for ire in range(self.rePerSymb):
+                        #    self.gridUl[0][isf * self.rePerSubf + isymb * self.rePerSymb + ire] = LteResType.LTE_RES_DL.value  if isymb < self.dwpts else LteResType.LTE_RES_GP.value
                 else:
-                    for ire in range(self.rePerSubf):
-                        self.gridUl[0][isf * self.rePerSubf + ire] = LteResType.LTE_RES_DL.value
+                    self.gridUl[0][:][isf*self.symbPerSubf:(isf+1)*self.symbPerSubf] = LteResType.LTE_RES_DL.value
+                    #for ire in range(self.rePerSubf):
+                    #    self.gridUl[0][isf * self.rePerSubf + ire] = LteResType.LTE_RES_DL.value
         
         if self.fs == LtePhy.LTE_FS_TYPE1.value:
             if not self.initPrachFdd():
@@ -492,13 +499,163 @@ class NgLteGrid(object):
         return True
     
     def fillCrs(self):
-        pass
-    
+        if self.crsOk:
+            return
+        #6.10.1.2	Mapping to resource elements
+        '''
+        iap,l,v,k,special case
+        0,0,0,6*im+(v+v_shift)%6,no
+        0,symbPerSlot-3,3,same,no
+        0,0,3,same,in case apNum == 1
+        1,0,3,same,no
+        1,symbPerSlot-3,0,same,no
+        2,1,0,same,no
+        2,1,3,same,no
+        3,1,3,same,no
+        3,1,6,same,no
+        '''
+        _crsPos = [(0, 0, 0),
+                   (0, self.symbPerSlot-3, 3),
+                   (0, 0, 3),   #in case self.apNum == 1
+                   (1, 0, 3),
+                   (1, self.symbPerSlot-3, 0),
+                   (2, 1, 0),
+                   (2, 1, 3),
+                   (3, 1, 3),
+                   (3, 1, 6)]
+        if self.apNum == 1:
+            _crsPos = _crsPos[:3]
+        elif self.apNum == 2:
+            _crsPos = _crsPos[:5]
+            
+        m = list(range(2*self.prbNum))
+        vShift = self.pci % 6
+        
+        for ap, l, v in _crsPos:
+            k = list(map(lambda x : 6*x+(v+vShift)%6, m))
+            
+            if (ap == 0 and v != 3) or ap == 1:
+                symb = [isf*self.symbPerSubf+l for isf in range(self.subfPerRf)] + [isf*self.symbPerSubf+self.symbPerSlot+l for isf in range(self.subfPerRf)]
+            elif ap == 0 and v == 3 and self.apNum == 1:
+                #in case of the first ofdm symbol with one antenna port, CRS is mapped as if two CRS are exist, as specified in 3GPP 36.211 6.2.4.
+                symb = [isf*self.symbPerSubf+l for isf in range(self.subfPerRf)]
+            elif (ap == 2 and v == 0) or (ap == 3 and v == 3):
+                symb = [isf*self.symbPerSubf+l for isf in range(self.subfPerRf)]
+            else: #(ap == 2 and v == 3) or (ap == 3 and v == 6)
+                symb = [isf*self.symbPerSubf+self.symbPerSlot+l for isf in range(self.subfPerRf)]
+            
+            if ap == 0 and v == 3 and self.apNum == 1:
+                for _k in k:
+                    for _symb in symb:
+                        if self.gridDl[ap][_k][_symb] == LteResType.LTE_RES_PDSCH.value:
+                            self.gridDl[ap][_k][_symb] = LteResType.LTE_RES_DTX.value
+            else:
+                for _k in k:
+                    for _symb in symb:
+                        if self.gridDl[ap][_k][_symb] == LteResType.LTE_RES_PDSCH.value:
+                            self.gridDl[ap][_k][_symb] = LteResType.LTE_RES_CRS.value
+                
+                for _ap in range(self.apNum):
+                    if _ap != ap:
+                        for _k in k:
+                            for _symb in symb:
+                                if self.gridDl[_ap][_k][_symb] == LteResType.LTE_RES_PDSCH.value:
+                                    self.gridDl[_ap][_k][_symb] = LteResType.LTE_RES_DTX.value
+            
+        self.crsOk= True
+            
     def fillPbch(self):
-        pass
+        if not self.crsOk:
+            self.ngwin.logEdit.append('NgLteGrid.fillCrs must be called before NgLteGrid.fillPbch.')
+            return
+        #BUGFIX: according to 36.211
+        #The mapping operation shall assume cell-specific reference signals for antenna ports 0-3 being present irrespective of the actual configuration.
+        #The UE shall assume that the resource elements assumed to be reserved for reference signals in the mapping operation above but not used for transmission of reference signal are not available for PDSCH transmission.
+        gridDlTmp = np.zeros((4, self.rePerSymb, self.symbPerRf))
+        gridDlTmp += LteResType.LTE_RES_PDSCH.value
+        _crsPos = [(0, 0, 0),
+                   (0, self.symbPerSlot-3, 3),
+                   (1, 0, 3),
+                   (1, self.symbPerSlot-3, 0),
+                   (2, 1, 0),
+                   (2, 1, 3),
+                   (3, 1, 3),
+                   (3, 1, 6)]
+            
+        m = list(range(2*self.prbNum))
+        vShift = self.pci % 6
+        
+        for ap, l, v in _crsPos:
+            k = list(map(lambda x : 6*x+(v+vShift)%6, m))
+            
+            if ap in [0, 1]:
+                symb = [isf*self.symbPerSubf+l for isf in range(self.subfPerRf)] + [isf*self.symbPerSubf+self.symbPerSlot+l for isf in range(self.subfPerRf)]
+            elif (ap == 2 and v == 0) or (ap == 3 and v == 3):
+                symb = [isf*self.symbPerSubf+l for isf in range(self.subfPerRf)]
+            else: #(ap == 2 and v == 3) or (ap == 3 and v == 6)
+                symb = [isf*self.symbPerSubf+self.symbPerSlot+l for isf in range(self.subfPerRf)]
+            
+            for _k in k:
+                for _symb in symb:
+                    if gridDlTmp[ap][_k][_symb] == LteResType.LTE_RES_PDSCH.value:
+                        gridDlTmp[ap][_k][_symb] = LteResType.LTE_RES_CRS.value
+            
+            for _ap in range(self.apNum):
+                if _ap != ap:
+                    for _k in k:
+                        for _symb in symb:
+                            if gridDlTmp[_ap][_k][_symb] == LteResType.LTE_RES_PDSCH.value:
+                                gridDlTmp[_ap][_k][_symb] = LteResType.LTE_RES_DTX.value
+        
+        reNumPbch = 72
+        symbNumPbch = 4
+        startRePbch = self.rePerSymb // 2 - 36
+        for iap in range(self.apNum):
+            for isym in range(symbNumPbch):
+                for ire in range(reNumPbch):
+                    if gridDlTmp[iap][startRePbch+ire][self.symbPerSlot+isym] != LteResType.LTE_RES_CRS.value and gridDlTmp[iap][startRePbch+ire][self.symbPerSlot+isym] != LteResType.LTE_RES_DTX.value:
+                        self.gridDl[iap][startRePbch+ire][self.symbPerSlot+isym] = LteResType.LTE_RES_PBCH.value
+                    elif self.gridDl[iap][startRePbch+ire][self.symbPerSlot+isym] == LteResType.LTE_RES_PDSCH.value:
+                        self.gridDl[iap][startRePbch+ire][self.symbPerSlot+isym] = LteResType.LTE_RES_DTX.value
     
     def fillSch(self):
-        pass
+        #assume that P-SCH and S-SCH is transmitted on all antenna port
+        ns = [i-5 for i in range(72)]
+        if self.fs == LtePhy.LTE_FS_TYPE1.value:
+            slots = [1, 10]
+            for iap in range(self.apNum):
+                for slot in slots:
+                    for n in ns:
+                        k = n - 31 + self.rePerSymb // 2
+                        if n <= -1 or n >= 62:
+                            self.gridDl[iap][k][slot*self.symbPerSlot+(self.symbPerSlot-1)] = LteResType.LTE_RES_DTX.value
+                            self.gridDl[iap][k][slot*self.symbPerSlot+(self.symbPerSlot-2)] = LteResType.LTE_RES_DTX.value
+                        else:
+                            self.gridDl[iap][k][slot*self.symbPerSlot+(self.symbPerSlot-1)] = LteResType.LTE_RES_PSCH.value
+                            self.gridDl[iap][k][slot*self.symbPerSlot+(self.symbPerSlot-2)] = LteResType.LTE_RES_SSCH.value
+        else:
+            #P-SCH
+            sfs = [1, 6]
+            for iap in range(self.apNum):
+                for sf in sfs:
+                    for n in ns:
+                        k = n - 31 + self.rePerSymb // 2
+                        if n <= -1 or n >= 62:
+                            self.gridDl[iap][k][sf*self.symbPerSubf+2] = LteResType.LTE_RES_DTX.value
+                        else:
+                            self.gridDl[iap][k][sf*self.symbPerSubf+2] = LteResType.LTE_RES_PSCH.value
+            
+            #S-SCH
+            slots = [1, 11]
+            for iap in range(self.apNum):
+                for slot in slots:
+                    for n in ns:
+                        k = n - 31 + self.rePerSymb // 2
+                        if n <= -1 or n >= 62:
+                            self.gridDl[iap][k][slot*self.symbPerSlot+(self.symbPerSlot-1)] = LteResType.LTE_RES_DTX.value
+                        else:
+                            self.gridDl[iap][k][slot*self.symbPerSlot+(self.symbPerSlot-1)] = LteResType.LTE_RES_SSCH.value
+            
     
     def fillPdcch(self):
         pass
