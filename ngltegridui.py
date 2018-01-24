@@ -53,9 +53,9 @@ class NgLteGridUi(QDialog):
         self.args['prachFreqOff'] = int(self.prachFreqOffEdit.text())
         self.args['srsSubfConf'] = int(self.srsSfConfEdit.text())
         if self.ngwin.enableDebug:
-            self.ngwin.logEdit.append('-->contents of NgLteGridUI.args:')
+            self.ngwin.logEdit.append('contents of NgLteGridUI.args:')
             for key, value in self.args.items():
-                self.ngwin.logEdit.append('key=%s, value=%s' % (key, str(value)))
+                self.ngwin.logEdit.append('-->key=%s, value=%s' % (key, str(value)))
         
         grid = NgLteGrid(self.ngwin, self.args)
         if grid.isOk:
@@ -261,28 +261,28 @@ class NgLteGridUi(QDialog):
     
     def initResGridMapper(self):
         dlMap = dict()
-        dlMap[LteResType.LTE_RES_PDSCH] = ('PDSCH', QColor(0, 0, 0), QColor(255, 255, 255)) 
-        dlMap[LteResType.LTE_RES_PDCCH] = ('PDCCH', QColor(0, 0, 0), QColor(0, 255, 255)) 
-        dlMap[LteResType.LTE_RES_PHICH] = ('PHICH', QColor(0, 0, 0), QColor(255, 0, 255)) 
-        dlMap[LteResType.LTE_RES_PCFICH] = ('PCFICH', QColor(0, 0, 255), QColor(255, 255, 255)) 
-        dlMap[LteResType.LTE_RES_PBCH] = ('PBCH', QColor(0, 0, 0), QColor(128, 255, 255)) 
-        dlMap[LteResType.LTE_RES_PSCH] = ('PSCH', QColor(0, 0, 0), QColor(0, 255, 0)) 
-        dlMap[LteResType.LTE_RES_SSCH] = ('SSCH', QColor(0, 0, 0), QColor(255, 255, 0)) 
-        dlMap[LteResType.LTE_RES_CRS] = ('CRS', QColor(0, 0, 0), QColor(255, 0, 0)) 
-        dlMap[LteResType.LTE_RES_DTX] = ('DTX', QColor(255, 255, 255), QColor(0, 0, 0)) 
-        dlMap[LteResType.LTE_RES_GP] = ('GP', QColor(255, 255, 255), QColor(0, 0, 0)) 
-        dlMap[LteResType.LTE_RES_UL] = ('UL', QColor(255, 255, 255), QColor(0, 0, 0)) 
+        dlMap[LteResType.LTE_RES_PDSCH.value] = ('PDSCH', QColor(0, 0, 0), QColor(255, 255, 255)) 
+        dlMap[LteResType.LTE_RES_PDCCH.value] = ('PDCCH', QColor(0, 0, 0), QColor(0, 255, 255)) 
+        dlMap[LteResType.LTE_RES_PHICH.value] = ('PHICH', QColor(0, 0, 0), QColor(255, 0, 255)) 
+        dlMap[LteResType.LTE_RES_PCFICH.value] = ('PCFICH', QColor(0, 0, 255), QColor(255, 255, 255)) 
+        dlMap[LteResType.LTE_RES_PBCH.value] = ('PBCH', QColor(0, 0, 0), QColor(128, 255, 255)) 
+        dlMap[LteResType.LTE_RES_PSCH.value] = ('PSCH', QColor(0, 0, 0), QColor(0, 255, 0)) 
+        dlMap[LteResType.LTE_RES_SSCH.value] = ('SSCH', QColor(0, 0, 0), QColor(255, 255, 0)) 
+        dlMap[LteResType.LTE_RES_CRS.value] = ('CRS', QColor(0, 0, 0), QColor(255, 0, 0)) 
+        dlMap[LteResType.LTE_RES_DTX.value] = ('DTX', QColor(255, 255, 255), QColor(0, 0, 0)) 
+        dlMap[LteResType.LTE_RES_GP.value] = ('GP', QColor(255, 255, 255), QColor(0, 0, 0)) 
+        dlMap[LteResType.LTE_RES_UL.value] = ('UL', QColor(255, 255, 255), QColor(0, 0, 0)) 
         
         ulMap = dict()
-        ulMap[LteResType.LTE_RES_GP] = ('GP', QColor(0, 0, 0), QColor(0, 255, 0))
-        ulMap[LteResType.LTE_RES_DL] = ('DL', QColor(255, 255, 255), QColor(0, 0, 0))
-        ulMap[LteResType.LTE_RES_PUSCH] = ('PUSCH', QColor(0, 0, 0), QColor(255, 255, 255))
-        ulMap[LteResType.LTE_RES_PUCCH_AN] = ('AN', QColor(0, 0, 0), QColor(0, 255, 255))
-        ulMap[LteResType.LTE_RES_PUCCH_MIXED] = ('MIXED', QColor(0, 0, 0), QColor(255, 0, 255))
-        ulMap[LteResType.LTE_RES_PUCCH_CQI] = ('CQI', QColor(255, 255, 255), QColor(0, 0, 255))
-        ulMap[LteResType.LTE_RES_PRACH] = ('PRACH', QColor(0, 0, 0), QColor(128, 255, 255))
-        ulMap[LteResType.LTE_RES_DMRS] = ('DMRS', QColor(0, 0, 0), QColor(255, 0, 0))
-        ulMap[LteResType.LTE_RES_SRS] = ('SRS', QColor(0, 0, 0), QColor(255, 255, 0))
+        ulMap[LteResType.LTE_RES_GP.value] = ('GP', QColor(0, 0, 0), QColor(0, 255, 0))
+        ulMap[LteResType.LTE_RES_DL.value] = ('DL', QColor(255, 255, 255), QColor(0, 0, 0))
+        ulMap[LteResType.LTE_RES_PUSCH.value] = ('PUSCH', QColor(0, 0, 0), QColor(255, 255, 255))
+        ulMap[LteResType.LTE_RES_PUCCH_AN.value] = ('AN', QColor(0, 0, 0), QColor(0, 255, 255))
+        ulMap[LteResType.LTE_RES_PUCCH_MIXED.value] = ('MIXED', QColor(0, 0, 0), QColor(255, 0, 255))
+        ulMap[LteResType.LTE_RES_PUCCH_CQI.value] = ('CQI', QColor(255, 255, 255), QColor(0, 0, 255))
+        ulMap[LteResType.LTE_RES_PRACH.value] = ('PRACH', QColor(0, 0, 0), QColor(128, 255, 255))
+        ulMap[LteResType.LTE_RES_DMRS.value] = ('DMRS', QColor(0, 0, 0), QColor(255, 0, 0))
+        ulMap[LteResType.LTE_RES_SRS.value] = ('SRS', QColor(0, 0, 0), QColor(255, 255, 0))
         
         self.args['dlmap'] = dlMap
         self.args['ulmap'] = ulMap
