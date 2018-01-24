@@ -512,7 +512,6 @@ class NgLteGrid(object):
         '''
         _crsPos = [(0, 0, 0),
                    (0, self.symbPerSlot-3, 3),
-                   (0, 0, 3),   #in case self.apNum == 1
                    (1, 0, 3),
                    (1, self.symbPerSlot-3, 0),
                    (2, 1, 0),
@@ -520,9 +519,9 @@ class NgLteGrid(object):
                    (3, 1, 3),
                    (3, 1, 6)]
         if self.apNum == 1:
-            _crsPos = _crsPos[:3]
+            _crsPos = _crsPos[:2]
         elif self.apNum == 2:
-            _crsPos = _crsPos[:5]
+            _crsPos = _crsPos[:4]
             
         m = list(range(2*self.prbNum))
         vShift = self.pci % 6
@@ -530,33 +529,34 @@ class NgLteGrid(object):
         for ap, l, v in _crsPos:
             k = list(map(lambda x : 6*x+(v+vShift)%6, m))
             
-            if (ap == 0 and v != 3) or ap == 1:
+            if ap in [0, 1]:
                 symb = [isf*self.symbPerSubf+l for isf in range(self.subfPerRf)] + [isf*self.symbPerSubf+self.symbPerSlot+l for isf in range(self.subfPerRf)]
-            elif ap == 0 and v == 3 and self.apNum == 1:
-                #in case of the first ofdm symbol with one antenna port, CRS is mapped as if two CRS are exist, as specified in 3GPP 36.211 6.2.4.
-                symb = [isf*self.symbPerSubf+l for isf in range(self.subfPerRf)]
             elif (ap == 2 and v == 0) or (ap == 3 and v == 3):
                 symb = [isf*self.symbPerSubf+l for isf in range(self.subfPerRf)]
             else: #(ap == 2 and v == 3) or (ap == 3 and v == 6)
                 symb = [isf*self.symbPerSubf+self.symbPerSlot+l for isf in range(self.subfPerRf)]
             
-            if ap == 0 and v == 3 and self.apNum == 1:
-                for _k in k:
-                    for _symb in symb:
-                        if self.gridDl[ap][_k][_symb] == LteResType.LTE_RES_PDSCH.value:
-                            self.gridDl[ap][_k][_symb] = LteResType.LTE_RES_DTX.value
-            else:
-                for _k in k:
-                    for _symb in symb:
-                        if self.gridDl[ap][_k][_symb] == LteResType.LTE_RES_PDSCH.value:
-                            self.gridDl[ap][_k][_symb] = LteResType.LTE_RES_CRS.value
-                
-                for _ap in range(self.apNum):
-                    if _ap != ap:
-                        for _k in k:
-                            for _symb in symb:
-                                if self.gridDl[_ap][_k][_symb] == LteResType.LTE_RES_PDSCH.value:
-                                    self.gridDl[_ap][_k][_symb] = LteResType.LTE_RES_DTX.value
+            for _k in k:
+                for _symb in symb:
+                    if self.gridDl[ap][_k][_symb] == LteResType.LTE_RES_PDSCH.value:
+                        self.gridDl[ap][_k][_symb] = LteResType.LTE_RES_CRS.value
+            
+            for _ap in range(self.apNum):
+                if _ap != ap:
+                    for _k in k:
+                        for _symb in symb:
+                            if self.gridDl[_ap][_k][_symb] == LteResType.LTE_RES_PDSCH.value:
+                                self.gridDl[_ap][_k][_symb] = LteResType.LTE_RES_DTX.value
+        
+        #in case of the first ofdm symbol with one antenna port, CRS is mapped as if two CRS are exist, as specified in 3GPP 36.211 6.2.4.
+        if self.apNum == 1:
+            ap, l, v = [0, 0, 3]
+            k = list(map(lambda x : 6*x+(v+vShift)%6, m))
+            symb = [isf*self.symbPerSubf+l for isf in range(self.subfPerRf)]
+            for _k in k:
+                for _symb in symb:
+                    if self.gridDl[ap][_k][_symb] == LteResType.LTE_RES_PDSCH.value:
+                        self.gridDl[ap][_k][_symb] = LteResType.LTE_RES_DTX.value
             
         self.crsOk= True
             
