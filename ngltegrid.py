@@ -13,6 +13,7 @@ Change History:
 from collections import Counter
 import math
 import os
+import time 
 import numpy as np
 import ngmainwin
 from ngltephy import LtePhy, LteResType
@@ -502,7 +503,6 @@ class NgLteGrid(object):
         iap,l,v,k,special case
         0,0,0,6*im+(v+v_shift)%6,no
         0,symbPerSlot-3,3,same,no
-        0,0,3,same,in case apNum == 1
         1,0,3,same,no
         1,symbPerSlot-3,0,same,no
         2,1,0,same,no
@@ -815,7 +815,7 @@ class NgLteGrid(object):
         if not os.path.exists(outDir):
             os.mkdir(outDir)
         for iap in range(self.apNum):
-            with open(os.path.join(outDir, 'LTE_DL_RES_GRID_AP'+str(iap)+'.csv'), 'w') as f:
+            with open(os.path.join(outDir, 'LTE_DL_RES_GRID_AP'+str(iap)+'_'+time.strftime('%Y%m%d%H%M%S', time.localtime())+'.csv'), 'w') as f:
                 line = []
                 line.append('k/l')
                 line.extend([str(k) for i in range(self.subfPerRf) for j in range(self.slotPerSubf) for k in range(self.symbPerSlot)])
