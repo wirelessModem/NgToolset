@@ -92,10 +92,8 @@ class NgLteGrid(object):
         _apmap = (1, 2, 4)
         self.apNum = _apmap[self.ap]
         
-        self.gridDl = np.zeros((self.apNum, self.rePerSymb, self.symbPerRf))
-        self.gridDl += LteResType.LTE_RES_PDSCH.value 
-        self.gridUl = np.zeros((1, self.rePerSymb, self.symbPerRf))
-        self.gridUl += LteResType.LTE_RES_PUSCH.value
+        self.gridDl = np.full((self.apNum, self.rePerSymb, self.symbPerRf), LteResType.LTE_RES_PDSCH.value)
+        self.gridUl = np.full((1, self.rePerSymb, self.symbPerRf), LteResType.LTE_RES_PUSCH.value)
         if self.ngwin.enableDebug:
             self.ngwin.logEdit.append('NgLteGrid.gridDl info: ndim=%s, shape=%s, dtype=%s' % (str(self.gridDl.ndim), str(self.gridDl.shape), str(self.gridDl.dtype)))
             self.ngwin.logEdit.append('NgLteGrid.gridUl info: ndim=%s, shape=%s, dtype=%s' % (str(self.gridUl.ndim), str(self.gridUl.shape), str(self.gridUl.dtype)))
@@ -571,8 +569,7 @@ class NgLteGrid(object):
         #BUGFIX: according to 36.211
         #The mapping operation shall assume cell-specific reference signals for antenna ports 0-3 being present irrespective of the actual configuration.
         #The UE shall assume that the resource elements assumed to be reserved for reference signals in the mapping operation above but not used for transmission of reference signal are not available for PDSCH transmission.
-        gridDlTmp = np.zeros((4, self.rePerSymb, self.symbPerRf))
-        gridDlTmp += LteResType.LTE_RES_PDSCH.value
+        gridDlTmp = np.full((4, self.rePerSymb, self.symbPerRf), LteResType.LTE_RES_PDSCH.value)
         _crsPos = [(0, 0, 0),
                    (0, self.symbPerSlot-3, 3),
                    (1, 0, 3),
