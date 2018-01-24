@@ -10,6 +10,9 @@ Change History:
     2018-1-21   v0.1    created.    github/zhenggao2
 '''
 
+from collections import Counter
+import math
+import os
 import numpy as np
 import ngmainwin
 from ngltephy import LtePhy, LteResType
@@ -19,6 +22,7 @@ class NgLteGrid(object):
         self.scPerPrb = 12
         self.slotPerSubf = 2
         self.subfPerRf = 10
+        self.regPerCce = 9
         self.isOk = False
         self.ngwin = ngwin
         self.init(args)
@@ -114,25 +118,19 @@ class NgLteGrid(object):
             for isf in range(self.subfPerRf):
                 if self.subfPatTdd[isf] == 'u':
                     for iap in range(self.apNum):
-                        self.gridDl[iap][:][isf*self.symbPerSubf:(isf+1)*self.symbPerSubf] = LteResType.LTE_RES_UL.value
-                        #for ire in range(self.rePerSubf):
-                        #    self.gridDl[iap][isf * self.rePerSubf + ire] = LteResType.LTE_RES_UL.value
+                        for ire in range(self.rePerSymb):
+                            self.gridDl[iap][ire][isf*self.symbPerSubf:(isf+1)*self.symbPerSubf] = LteResType.LTE_RES_UL.value
                 elif self.subfPatTdd[isf] == 's':
                     for iap in range(self.apNum):
-                        for isymb in range(self.dwpts, self.symbPerSubf):
-                            self.gridDl[iap][:][isf*self.symbPerSubf+self.dwpts:isf*self.symbPerSubf+self.dwpts+self.gp] = LteResType.LTE_RES_GP.value
-                            self.gridDl[iap][:][isf*self.symbPerSubf+self.dwpts+self.gp:(isf+1)*self.symbPerSubf] = LteResType.LTE_RES_UL.value
-                            #for ire in range(self.rePerSymb):
-                            #    self.gridDl[iap][isf * self.rePerSubf + isymb * self.rePerSymb + ire] = LteResType.LTE_RES_GP.value if isymb < self.dwpts + self.gp else LteResType.LTE_RES_UL.value
-                    for isymb in range(self.dwpts + self.gp):
-                        self.gridUl[0][:][isf*self.symbPerSubf:isf*self.symbPerSubf+self.dwpts] = LteResType.LTE_RES_DL.value
-                        self.gridUl[0][:][isf*self.symbPerSubf+self.dwpts:isf*self.symbPerSubf+self.dwpts+self.gp] = LteResType.LTE_RES_GP.value
-                        #for ire in range(self.rePerSymb):
-                        #    self.gridUl[0][isf * self.rePerSubf + isymb * self.rePerSymb + ire] = LteResType.LTE_RES_DL.value  if isymb < self.dwpts else LteResType.LTE_RES_GP.value
+                        for ire in range(self.rePerSymb):
+                            self.gridDl[iap][ire][isf*self.symbPerSubf+self.dwpts:isf*self.symbPerSubf+self.dwpts+self.gp] = LteResType.LTE_RES_GP.value
+                            self.gridDl[iap][ire][isf*self.symbPerSubf+self.dwpts+self.gp:(isf+1)*self.symbPerSubf] = LteResType.LTE_RES_UL.value
+                    for ire in range(self.rePerSymb):
+                        self.gridUl[0][ire][isf*self.symbPerSubf:isf*self.symbPerSubf+self.dwpts] = LteResType.LTE_RES_DL.value
+                        self.gridUl[0][ire][isf*self.symbPerSubf+self.dwpts:isf*self.symbPerSubf+self.dwpts+self.gp] = LteResType.LTE_RES_GP.value
                 else:
-                    self.gridUl[0][:][isf*self.symbPerSubf:(isf+1)*self.symbPerSubf] = LteResType.LTE_RES_DL.value
-                    #for ire in range(self.rePerSubf):
-                    #    self.gridUl[0][isf * self.rePerSubf + ire] = LteResType.LTE_RES_DL.value
+                    for ire in range(self.rePerSymb):
+                        self.gridUl[0][ire][isf*self.symbPerSubf:(isf+1)*self.symbPerSubf] = LteResType.LTE_RES_DL.value
         
         if self.fs == LtePhy.LTE_FS_TYPE1.value:
             if not self.initPrachFdd():
@@ -655,10 +653,181 @@ class NgLteGrid(object):
             
     
     def fillPdcch(self):
-        pass
+        if not self.pcfichOk:
+            self.fillPcfich()
+        if not self.phichOk:
+            self.fillPhich()
+            
+        if self.fs == LtePhy.LTE_FS_TYPE1.value:
+            L = [self.cfi] * self.subfPerRf
+        else:
+            L = [0] * self.subfPerRf
+            for isf in range(self.subfPerRf):
+                if self.subfPatTdd[isf] == 'd':
+                    L[isf] = self.cfi
+                elif self.subfPatTdd[isf] == 's':
+                    L[isf] = self.cfiSsf
+        
+        for isf in range(self.subfPerRf):
+            if L[isf] == 0:
+                continue
+            
+            reg = []
+            for isym in range(L[isf]):
+                if isym == 0 or (isym == 1 and self.apNum == 4) or (isym == 3 and self.cp == LtePhy.LTE_CP_EXTENDED.value):
+                    numReg = 2  #two REGs
+                else:
+                    numReg = 3  #three REGs
+                sizeReg = self.scPerPrb // numReg
+                
+                used = [False] * (numReg*self.prbNum)
+                for ireg in range(numReg*self.prbNum):
+                    for ire in [sizeReg*ireg+i for i in range(sizeReg)]:
+                        if self.gridDl[0][ire][isf*self.symbPerSubf+isym] == LteResType.LTE_RES_PCFICH.value or self.gridDl[0][ire][isf*self.symbPerSubf+isym] == LteResType.LTE_RES_PHICH.value:
+                            used[ireg] = True
+                            break
+                reg.append(used)
+                
+                #assume all REGs remained are allocated to PDCCH
+                for iap in range(self.apNum):
+                    for ireg in range(numReg*self.prbNum):
+                        if used[ireg] == False:
+                            for ire in [sizeReg*ireg+i for i in range(sizeReg)]:
+                                if self.gridDl[iap][ire][isf*self.symbPerSubf+isym] != LteResType.LTE_RES_CRS.value and self.gridDl[iap][ire][isf*self.symbPerSubf+isym] != LteResType.LTE_RES_DTX.value:
+                                    self.gridDl[iap][ire][isf*self.symbPerSubf+isym] = LteResType.LTE_RES_PDCCH.value
+            
+            #REG can be used for other purpose, such as to calculate maximum available CCE number
+            _flatten = [x for used in reg for x in used]
+            regNum = Counter(_flatten)[False]
+            self.cce[isf] = math.floor(regNum / self.regPerCce)
+            
+        self.ngwin.logEdit.append('CCE statistics:')
+        if self.fs == LtePhy.LTE_FS_TYPE1.value:
+            for isf in range(self.subfPerRf):
+                self.ngwin.logEdit.append('-->CCE number in subframe %d = %d' % (isf, self.cce[isf]))
+        else:
+            for isf in [_isf for _isf in range(self.subfPerRf) if self.subfPatTdd[_isf] != 'u']:
+                self.ngwin.logEdit.append('-->CCE number in subframe %d = %d' % (isf, self.cce[isf]))
+    
+    def fillPcfich(self):
+        if not self.crsOk:
+            self.fillCrs()
+        if self.pcfichOk:
+            return
+        
+        regNumPcfich = 4
+        rePerReg = 6
+        kAvg = (self.scPerPrb // 2) * (self.pci % (2 * self.prbNum))
+        for iap in range(self.apNum):
+            for ireg in range(regNumPcfich):
+                k = kAvg + math.floor(ireg * self.prbNum / 2) * (self.scPerPrb // 2)
+                k = k % self.rePerSymb
+                for ire in range(rePerReg):
+                    #In case of one antenna port, a REG in the 1st symbol of a subframe contains 6 REs, make sure use DTX to replace the unused REs which are virtually reserved for CRS. Please refer to 3GPP 36.211 6.2.4.
+                    for isf in range(self.subfPerRf):
+                        if self.gridDl[iap][k+ire][isf*self.symbPerSubf] == LteResType.LTE_RES_PDSCH.value:
+                            self.gridDl[iap][k+ire][isf*self.symbPerSubf] = LteResType.LTE_RES_PCFICH.value
+        
+        self.pcfichOk = True
+    
+    def fillPhich(self):
+        if not self.pcfichOk:
+            self.fillPcfich()
+        if self.phichOk:
+            return
+        
+        if self.phichDur == LtePhy.LTE_PHICH_DUR_NORMAL.value:
+            phichDur = [1]*self.subfPerRf
+        else:
+            phichDur = [3]*self.subfPerRf
+            if self.fs == LtePhy.LTE_FS_TYPE2.value:
+                phichDur[1] = 2
+                phichDur[6] = 2
+        
+        phichRes = [1/6, 1/2, 1, 2][self.phichRes]
+        phichGrpNum = [math.ceil(phichRes*self.prbNum/8) if self.cp == LtePhy.LTE_CP_NORMAL.value else 2*math.ceil(phichRes*self.prbNum/8)]*self.subfPerRf
+        if self.fs == LtePhy.LTE_FS_TYPE2.value:
+            phichGrpNum = list(map(lambda isf:phichGrpNum[isf] if self.subfPatTdd[isf] != 'u' else 0, list(range(self.subfPerRf))))
+            
+            #Table 6.9-1: The factor mi for frame structure type 2.
+            _phichMi = [(2,1,None,None,None,2,1,None,None,None),
+                        (0,1,None,None,1,0,1,None,None,1),
+                        (0,0,None,1,0,0,0,None,1,0),
+                        (1,0,None,None,None,0,0,0,1,1),
+                        (0,0,None,None,0,0,0,0,1,1),
+                        (0,0,None,0,0,0,0,0,1,0),
+                        (1,1,None,None,None,1,1,None,None,1)]
+            mi = _phichMi[self.sa]
+            phichGrpNum = list(map(lambda isf:mi[isf]*phichGrpNum[isf] if mi[isf] is not None else phichGrpNum[isf], list(range(self.subfPerRf))))
+        
+        for isf in range(self.subfPerRf):
+            if phichGrpNum[isf] == 0:
+                continue
+            phichMapUnitNum = phichGrpNum[isf] if self.cp == LtePhy.LTE_CP_NORMAL.value else phichGrpNum[isf]//2
+            
+            for iap in range(self.apNum):
+                cchReg = []
+                for isym in range(phichDur[isf]):
+                    if isym == 0 or (isym == 1 and self.apNum == 4):
+                        numReg = 2
+                    elif (isym == 1 and (self.apNum == 1 or self.apNum == 2)) or isym == 2:
+                        numReg = 3
+                    rePerReg = self.scPerPrb//numReg
+                    reg = [True]*(numReg*self.prbNum)
+                    for ireg in range(numReg*self.prbNum):
+                        for ire in range(rePerReg):
+                            if self.gridDl[iap][rePerReg*ireg+ire][isym] == LteResType.LTE_RES_PCFICH.value:
+                                reg[ireg] = False
+                                break
+                    regInd = [ireg for ireg in range(numReg*self.prbNum) if reg[ireg] == True]
+                    cchReg.append(regInd)
+                    
+                for imu in range(phichMapUnitNum):
+                    for iquad in range(3):
+                        if self.phichDur == LtePhy.LTE_PHICH_DUR_NORMAL.value:
+                            timel = 0
+                        elif self.phichDur == LtePhy.LTE_PHICH_DUR_EXTENDED.value and self.fs == LtePhy.LTE_FS_TYPE2.value and (isf == 1 or isf == 6):
+                            timel = (math.floor(imu / 2) + iquad + 1) % 2
+                        else:
+                            timel = iquad
+                            
+                        if self.phichDur == LtePhy.LTE_PHICH_DUR_EXTENDED.value and self.fs == LtePhy.LTE_FS_TYPE2.value and (isf == 1 or isf == 6):
+                            nl = len(cchReg[timel])
+                            freqk = (math.floor(self.pci * nl / len(cchReg[1])) + imu + math.floor(iquad * nl / 3)) % nl
+                        else:
+                            nl = len(cchReg[timel])
+                            freqk = (math.floor(self.pci * nl / len(cchReg[0])) + imu + math.floor(iquad * nl / 3)) % nl
+                        
+                        if timel == 0 or (timel == 1 and self.apNum == 4):
+                            numReg = 2
+                        elif (timel == 1 and (self.apNum == 1 or self.apNum == 2)) or timel == 2:
+                            numReg = 3
+                        rePerReg = self.scPerPrb//numReg
+                        
+                        for ire in range(rePerReg):
+                            if self.gridDl[iap][rePerReg*cchReg[timel][freqk]+ire][isf*self.symbPerSubf+timel] != LteResType.LTE_RES_CRS.value and self.gridDl[iap][rePerReg*cchReg[timel][freqk]+ire][isf*self.symbPerSubf+timel] != LteResType.LTE_RES_DTX.value:
+                                self.gridDl[iap][rePerReg*cchReg[timel][freqk]+ire][isf*self.symbPerSubf+timel] = LteResType.LTE_RES_PHICH.value
+                            
+        self.phichOk = True
     
     def printDl(self):
-        pass
+        outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+        if not os.path.exists(outDir):
+            os.mkdir(outDir)
+        for iap in range(self.apNum):
+            with open(os.path.join(outDir, 'LTE_DL_RES_GRID_AP'+str(iap)+'.csv'), 'w') as f:
+                line = []
+                line.append('k/l')
+                line.extend([str(k) for i in range(self.subfPerRf) for j in range(self.slotPerSubf) for k in range(self.symbPerSlot)])
+                f.write(','.join(line))
+                f.write('\n')
+                
+                for ire in range(self.rePerSymb):
+                    line = []
+                    line.append(str(ire))
+                    line.extend([str(self.gridDl[iap][ire][isf*self.symbPerSubf+isym]) for isf in range(self.subfPerRf) for isym in range(self.symbPerSubf)])
+                    f.write(','.join(line))
+                    f.write('\n')
     
     def fillPucch(self):
         pass
