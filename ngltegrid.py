@@ -830,7 +830,80 @@ class NgLteGrid(object):
                     f.write('\n')
     
     def fillPucch(self):
-        pass
+        maxPucchRes = [0]*self.subfPerRf    #maximum PUCCH PRBs in one slot
+        for isf in range(self.subfPerRf):
+            #calculate n1Pucch, as defined in 3GPP 36.213 section 10
+            if self.fs == LtePhy.LTE_FS_TYPE1.value:
+                n1Pucch = self.cce[isf] + self.n1PucchAn
+            elif self.fs == LtePhy.LTE_FS_TYPE2.value and self.subfPatTdd[isf] == 'u' and self.ackIndTdd.get(isf) is not None:
+                '''
+                BUGFIX: for UL/DL configuration #0,
+                0	1	2	3	4	5	6	7	8	9
+                D	S	U	U	U	D	S	U	U	U
+                the #3 and #8 subframe(U) has NO downlink association according to 36.213!
+                	0	1	2	3	4	5	6	7	8	9
+                	-	-	6	-	4	-	-	6	-	4
+                We have to make sure that K set is not empty!
+                '''
+                _np = [max(0, math.floor(self.prbNum * (self.scPerPrb * p - 4) / 36)) for p in range(5)]
+                if self.tddAckMode == LtePhy.LTE_TDD_AN_BUNDLING.value or (self.tddAckMode == LtePhy.LTE_TDD_AN_MULTIPLEXING.value and len(self.ackIndTdd[isf]) == 1):
+                    #find smallest km, assuming that PDCCH can always be detected in subframe n-km
+                    km = min(self.ackIndTdd[isf])
+                    m = self.ackIndTdd[isf].index(km)
+                    
+                    nCce = self.cce[(isf - km + 2 * self.subfPerRf) % self.subfPerRf]
+                    #find proper p
+                    p = 0
+                    while p <= 3:
+                        #Np <= n_CCE < Np+1
+                        if _np[p+1] > nCce and nCce >= _np[p]:
+                            break
+                        else:
+                            p = p+1
+                    
+                    n1Pucch = (len(self.ackIndTdd[isf]) - m - 1) * _np[p] + m * _np[p+1] + nCce + self.n1PucchAn
+                    #Note: In case ACK/NACK repitition is enabled for bundling, we assume no impact on PUCCH filling function.
+                else:   #ACK/NACK multiplexing with M = 2/3/4
+                    n1PucchAn = []
+                    for i in range(len(self.ackIndTdd[isf])):
+                        ki = self.ackIndTdd[isf][i]
+                        nCce = self.cce[(isf - ki + 2 * self.subfPerRf) % self.subfPerRf]
+                        p = 0
+                        while p <= 3:
+                            #Np <= n_CCE < Np+1
+                            if _np[p+1] > nCce and nCce >= _np[p]:
+                                break
+                            else:
+                                p = p+1
+                        n1Pucch = (len(self.ackIndTdd[isf]) - i - 1) * _np[p] + i * _np[p+1] + nCce + self.n1PucchAn
+                        n1PucchAll.append(n1Pucch)
+                    #Note: Since ACK/NACK information is missing, we just assume that n1pucch is the max one, refer to 3GPP 36.213 table 10.1-2/10.1-3/10.1-4.
+                    n1Pucch = max(n1PucchAll)
+                            
+            if self.fs == LtePhy.LTE_FS_TYPE1.value or (self.fs == LtePhy.LTE_FS_TYPE2.value and self.subfPatTdd[isf] == 'u'):
+                c = 3 if self.cp == LtePhy.LTE_CP_NORMAL.value else 2
+                '''
+                for FDD：
+                MaxPucchResourceSize = nCqiRb + roundup{[((maxNumOfCce) + n1PucchAn - pucchNAnCs * 3 / deltaPucchShift) * deltaPucchShift] / (3 * 12)} + roundup(pucchNAnCs / 8)
+                for TDD：
+                MaxPucchResourceSize = nCqiRb + roundup{[ (max((M-i-1)* Np +i*Np1 + rounddown (((12 * (maxNrSymPdcch-Yi) - X) * chBw – mi*roundup(phichRes * (chBw / 8)) * 12 – 16 )/ 36)) + n1PucchAn - pucchNAnCs * c / deltaPucchShift) * deltaPucchShift] / (c*12)} + roundup (pucchNAnCs / 8)
+                '''
+                maxPucchRes[isf] = math.ceil((n1Pucch - c * self.nCsAn / self.deltaPucchShift) / (c * self.scPerPrb / self.deltaPucchShift)) + self.nCqiRb + math.ceil(self.nCsAn / 8)
+                for m in range(maxPucchRes[isf]):
+                    if m < self.nCqiRb:
+                        #firstly, fill PUCCH region for format 2/2a/2b
+                        #Note: format 2a/2b are supported only for normal CP. We use format 2 for general purpose
+                        pass
+                    elif m == self.nCqiRb and self.nCsAn > 0:
+                        #secondly, fill PUCCH region for mixed format 1/1a/1b and format 2/2a/2b
+                        pass
+                    else:
+                        #lastly, fill PUCCH region for format 1/1a/1b
+                        pass
+        
+        #TODO: when SRS and PUCCH is transmitted simultaneously...
+        
+        self.pucchOk = True
     
     def fillPrach(self):
         pass
