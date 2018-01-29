@@ -10,7 +10,6 @@ Change History:
     2018-1-19   v0.1    created.    github/zhenggao2
 '''
 
-import sys
 from PyQt5.QtWidgets import QMainWindow, QAction, QMenu, QTabWidget, QTextEdit, QMessageBox
 from PyQt5.QtWidgets import qApp, QApplication
 from PyQt5.QtCore import Qt

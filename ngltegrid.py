@@ -113,7 +113,7 @@ class NgLteGrid(object):
         self.subfPatTdd = _tddConf[self.sa]['pat']
         self.ackIndTdd = _tddConf[self.sa]['ack']
         self.cce = np.zeros(self.subfPerRf)
-        self.maxPucch = np.zeros(self.subfPerRf)
+        #self.maxPucchRes = np.zeros(self.subfPerRf)
         
         if self.fs == LtePhy.LTE_FS_TYPE2.value:
             for isf in range(self.subfPerRf):
@@ -830,7 +830,7 @@ class NgLteGrid(object):
                     f.write('\n')
     
     def fillPucch(self):
-        maxPucchRes = [0]*self.subfPerRf    #maximum PUCCH PRBs in one slot
+        self.maxPucchRes = [0]*self.subfPerRf    #maximum PUCCH PRBs in one slot
         for isf in range(self.subfPerRf):
             #calculate n1Pucch, as defined in 3GPP 36.213 section 10
             if self.fs == LtePhy.LTE_FS_TYPE1.value:
@@ -888,31 +888,147 @@ class NgLteGrid(object):
                 for TDD：
                 MaxPucchResourceSize = nCqiRb + roundup{[ (max((M-i-1)* Np +i*Np1 + rounddown (((12 * (maxNrSymPdcch-Yi) - X) * chBw – mi*roundup(phichRes * (chBw / 8)) * 12 – 16 )/ 36)) + n1PucchAn - pucchNAnCs * c / deltaPucchShift) * deltaPucchShift] / (c*12)} + roundup (pucchNAnCs / 8)
                 '''
-                maxPucchRes[isf] = math.ceil((n1Pucch - c * self.nCsAn / self.deltaPucchShift) / (c * self.scPerPrb / self.deltaPucchShift)) + self.nCqiRb + math.ceil(self.nCsAn / 8)
-                for m in range(maxPucchRes[isf]):
-                    if m < self.nCqiRb:
-                        #firstly, fill PUCCH region for format 2/2a/2b
-                        #Note: format 2a/2b are supported only for normal CP. We use format 2 for general purpose
-                        pass
-                    elif m == self.nCqiRb and self.nCsAn > 0:
-                        #secondly, fill PUCCH region for mixed format 1/1a/1b and format 2/2a/2b
-                        pass
-                    else:
-                        #lastly, fill PUCCH region for format 1/1a/1b
-                        pass
+                self.maxPucchRes[isf] = math.ceil((n1Pucch - c * self.nCsAn / self.deltaPucchShift) / (c * self.scPerPrb / self.deltaPucchShift)) + self.nCqiRb + math.ceil(self.nCsAn / 8)
+                for m in range(self.maxPucchRes[isf]):
+                    for ns in range(2):
+                        if (m + ns % 2) % 2 == 0:
+                            nPrb = math.floor(m / 2)
+                        else:
+                            nPrb = self.prbNum - 1 - math.floor(m / 2)
+                            
+                        for isym in range(self.symbPerSlot):
+                            for ire in range(self.scPerPrb):
+                                if m < self.nCqiRb:
+                                    #firstly, fill PUCCH region for format 2/2a/2b
+                                    #Note: format 2a/2b are supported only for normal CP. We use format 2 for general purpose
+                                    self.gridUl[0][nPrb * self.scPerPrb + ire][isf * self.symbPerSubf + ns * self.symbPerSlot + isym] = LteResType.LTE_RES_DMRS.value if (self.cp == LtePhy.LTE_CP_NORMAL.value and isym in [1, 5]) or (self.cp == LtePhy.LTE_CP_EXTENDED.value and isym == 3) else LteResType.LTE_RES_PUCCH_CQI.value
+                                elif m == self.nCqiRb and self.nCsAn > 0:
+                                    #secondly, fill PUCCH region for mixed format 1/1a/1b and format 2/2a/2b
+                                    self.gridUl[0][nPrb * self.scPerPrb + ire][isf * self.symbPerSubf + ns * self.symbPerSlot + isym] = LteResType.LTE_RES_DMRS.value if (self.cp == LtePhy.LTE_CP_NORMAL.value and isym in [2, 3, 4]) or (self.cp == LtePhy.LTE_CP_EXTENDED.value and isymm in [2, 3]) else LteResType.LTE_RES_PUCCH_MIXED.value
+                                else:
+                                    #lastly, fill PUCCH region for format 1/1a/1b
+                                    self.gridUl[0][nPrb * self.scPerPrb + ire][isf * self.symbPerSubf + ns * self.symbPerSlot + isym] = LteResType.LTE_RES_DMRS.value if (self.cp == LtePhy.LTE_CP_NORMAL.value and isym in [2, 3, 4]) or (self.cp == LtePhy.LTE_CP_EXTENDED.value and isym in [2, 3]) else LteResType.LTE_RES_PUCCH_AN.value
         
         #TODO: when SRS and PUCCH is transmitted simultaneously...
+        
+        self.ngwin.logEdit.append('Max PUCCH allocation info:')
+        for isf in range(self.subfPerRf):
+            if self.fs == LtePhy.LTE_FS_TYPE1.value or (self.fs == LtePhy.LTE_FS_TYPE2.value and self.subfPatTdd[isf] == 'u'):
+                self.ngwin.logEdit.append('-->max PUCCH region in subframe %d: %d' % (isf, self.maxPucchRes[isf]))
         
         self.pucchOk = True
     
     def fillPrach(self):
-        pass
+        if not self.pucchOk:
+            self.fillPucch()
+        
+        if self.fs == LtePhy.LTE_FS_TYPE1:
+            if (self.prachFddSfn == 'even' and self.sfn % 2 == 0) or self.prachFddSfn == 'any':
+                for i in range(len(self.prachFddSubf)):
+                    isf = self.prachFddSubf[i]
+                    lower = math.ceil(self.maxPucchRes[isf] / 2)
+                    upper = self.prbNum - 6 - lower 
+                    firstPrb = self.prachFreqOff
+                    '''
+                    //BUGFIX: 2012-10-30: The if statement is wrong!!!
+                    /*
+                    if(first_prb < lower || first_prb > upper)
+                    {
+                        //It can be lower or upper, but we assume to use lower here.
+                        first_prb = lower;
+                    }
+                    */
+                    '''
+                    if firstPrb < lower:
+                        firstPrb = lower
+                    elif firstPrb > upper:
+                        firstPrb = upper
+                    
+                    for isym in range(self.symbPerSubf):
+                        for irb in range(6):
+                            for ire in range(self.scPerPrb):
+                                self.gridUl[0][(firstPrb+irb)*self.scPerPrb+ire][isf*self.symbPerSubf+isym] = LteResType.LTE_RES_PRACH.value
+        else:
+            for iq in range(len(self.prachTddQuad)):
+                fRa, tRa0, tRa1, tRa2 = self.prachTddQuad[iq]
+                if tRa0 == 0 or (tRa0 == 1 and self.sfn % 2 == 0) or (tRa0 == 2 and self.sfn % 2 == 1):
+                    if self.prachTddFormat == 4:
+                        #10ms switch period if nsp==1, and 5ms otherwise
+                        nsp = 1 if self.sa in [3, 4, 5] else 2
+                        firstPrb = 6*fRa if ((self.sfn%2)*(2-nsp)+tRa1) % 2 == 0 else self.prbNum-6*(fRa+1)
+                    else:
+                        firstPrb = self.prachFreqOff+6*math.floor(fRa/2) if fRa%2 == 0 else self.prbNum-6-self.prachFreqOff-6*math.floor(fRa/2)
+                    
+                    #find the uplink subframe or the special subframe with UpPTS
+                    if self.prachTddFormat == 4:
+                        isf = 1 if tRa1 == 0 else 6
+                    else:
+                        start = 1 if tRa1 == 0 else 6
+                        isf = start + 1 + tRa2
+                        #validate firstPrb
+                        lower = math.ceil(self.maxPucchRes[isf] / 2)
+                        upper = self.prbNum - 6 - lower
+                        if firstPrb < lower:
+                            firstPrb = lower
+                        elif firstPrb > upper:
+                            firstPrb = upper
+                    
+                    for isym in range(self.symbPerSubf):
+                        if self.prachTddFormat < 4 or (self.prachTddFormat == 4 and isym >= (self.dwpts+self.gp)):
+                            for irb in range(6):
+                                for ire in range(self.scPerPrb):
+                                    self.gridUl[0][(firstPrb+irb)*self.scPerPrb+ire][isf*self.symbPerSubf+isym] = LteResType.LTE_RES_PRACH.value
+        self.prachOk = True
     
     def fillDmrsForPusch(self):
-        pass
+        if not self.pucchOk:
+            self.fillPucch()
+        if not self.prachOk:
+            self.fillPrach()
+        
+        for isf in range(self.subfPerRf):
+            if self.fs == LtePhy.LTE_FS_TYPE1.value or (self.fs == LtePhy.LTE_FS_TYPE2.value and self.subfPatTdd[isf] == 'u'):
+                for isym in range(self.symbPerSubf):
+                    if (self.cp == LtePhy.LTE_CP_NORMAL.value and isym in [3, 3+self.symbPerSlot]) or (self.cp == LtePhy.LTE_CP_EXTENDED.value and isym in [2, 2+self.symbPerSlot]):
+                        for irb in range(self.prbNum):
+                            if self.gridUl[0][irb*self.scPerPrb][isf*self.symbPerSubf+isym] == LteResType.LTE_RES_PUSCH.value:
+                                for ire in range(self.scPerPrb):
+                                    self.gridUl[0][irb*self.scPerPrb+ire][isf*self.symbPerSubf+isym] = LteResType.LTE_RES_DMRS.value
+                                    
     
     def fillSrs(self):
-        pass
+        #Note: Since srs has many ue-specific parameters, such as frequency bandwidth and offset and ue-specific subframe config.
+        #so we just include only one parameter: srs-SubframeConfig in this version, and assume that tha last symbol of the
+        #configured subframes and all the remained UpPTS is used for transmission of sounding rs.
+        for isf in range(self.subfPerRf):
+            if isf % self.tSfc in self.deltaSfc:
+                if self.fs == LtePhy.LTE_FS_TYPE1.value or (self.fs ==LtePhy.LTE_FS_TYPE2.value and self.subfPatTdd[isf] == 'u'):
+                    #the last symbol
+                    isym = self.symbPerSubf - 1
+                    for ire in range(self.rePerSymb):
+                        if self.gridUl[0][ire][isf*self.symbPerSubf+isym] == LteResType.LTE_RES_PUSCH.value:
+                            self.gridUl[0][ire][isf*self.symbPerSubf+isym] = LteResType.LTE_RES_SRS.value
+                elif self.fs == LtePhy.LTE_FS_TYPE2.value and self.subfPatTdd[isf] == 's':
+                    #UpPTS
+                    for isym in range(self.dwpts+self.gp, self.symbPerSubf):
+                        for ire in range(self.rePerSymb):
+                            if self.gridUl[0][ire][isf*self.symbPerSubf+isym] == LteResType.LTE_RES_PUSCH.value:
+                                self.gridUl[0][ire][isf*self.symbPerSubf+isym] = LteResType.LTE_RES_SRS.value
     
     def printUl(self):
-        pass
+        outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+        if not os.path.exists(outDir):
+            os.mkdir(outDir)
+        with open(os.path.join(outDir, 'LTE_UL_RES_GRID_'+time.strftime('%Y%m%d%H%M%S', time.localtime())+'.csv'), 'w') as f:
+            line = []
+            line.append('k/l')
+            line.extend([str(k) for i in range(self.subfPerRf) for j in range(self.slotPerSubf) for k in range(self.symbPerSlot)])
+            f.write(','.join(line))
+            f.write('\n')
+            
+            for ire in range(self.rePerSymb):
+                line = []
+                line.append(str(ire))
+                line.extend([str(self.gridUl[0][ire][isf*self.symbPerSubf+isym]) for isf in range(self.subfPerRf) for isym in range(self.symbPerSubf)])
+                f.write(','.join(line))
+                f.write('\n')
