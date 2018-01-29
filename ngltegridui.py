@@ -10,9 +10,11 @@ Change History:
     2018-1-19   v0.1    created.    github/zhenggao2
 '''
 
-from PyQt5.QtWidgets import QDialog, QTextEdit, QTabWidget, QLabel, QLineEdit, QComboBox, QPushButton
+import os
+from PyQt5.QtWidgets import QDialog, QTextEdit, QTabWidget, QLabel, QLineEdit, QComboBox, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView
 from PyQt5.QtWidgets import QGridLayout, QHBoxLayout, QVBoxLayout
 from PyQt5.QtGui import QColor
+from PyQt5.QtCore import Qt
 import ngmainwin
 from ngltephy import LteResType
 from ngltegrid import NgLteGrid
@@ -70,6 +72,8 @@ class NgLteGridUi(QDialog):
             grid.fillDmrsForPusch()
             grid.fillSrs()
             grid.printUl()
+            
+            self.parseLteGrid()
         
         self.accept()
     
@@ -205,7 +209,7 @@ class NgLteGridUi(QDialog):
         self.okBtn.clicked.connect(self.onOkBtnClicked)
         self.cancelBtn.clicked.connect(self.reject)
 
-        self.layout1 = QGridLayout();
+        self.layout1 = QGridLayout()
         self.layout1.addWidget(self.fsLabel, 0, 0)
         self.layout1.addWidget(self.fsCombo, 0, 1)
         self.layout1.addWidget(self.bwLabel, 1, 0)
@@ -247,12 +251,12 @@ class NgLteGridUi(QDialog):
         self.layout1.addWidget(self.srsSfConfLabel, 19, 0)
         self.layout1.addWidget(self.srsSfConfEdit, 19, 1)
 
-        self.layout2 = QHBoxLayout();
+        self.layout2 = QHBoxLayout()
         self.layout2.addStretch()
         self.layout2.addWidget(self.okBtn)
         self.layout2.addWidget(self.cancelBtn)
 
-        self.layout = QVBoxLayout();
+        self.layout = QVBoxLayout()
         self.layout.addLayout(self.layout1)
         self.layout.addLayout(self.layout2)
 
@@ -260,29 +264,81 @@ class NgLteGridUi(QDialog):
         self.setWindowTitle('LTE Resource Grid Tool')
     
     def initResGridMapper(self):
-        dlMap = dict()
-        dlMap[LteResType.LTE_RES_PDSCH.value] = ('PDSCH', QColor(0, 0, 0), QColor(255, 255, 255)) 
-        dlMap[LteResType.LTE_RES_PDCCH.value] = ('PDCCH', QColor(0, 0, 0), QColor(0, 255, 255)) 
-        dlMap[LteResType.LTE_RES_PHICH.value] = ('PHICH', QColor(0, 0, 0), QColor(255, 0, 255)) 
-        dlMap[LteResType.LTE_RES_PCFICH.value] = ('PCFICH', QColor(0, 0, 255), QColor(255, 255, 255)) 
-        dlMap[LteResType.LTE_RES_PBCH.value] = ('PBCH', QColor(0, 0, 0), QColor(128, 255, 255)) 
-        dlMap[LteResType.LTE_RES_PSCH.value] = ('PSCH', QColor(0, 0, 0), QColor(0, 255, 0)) 
-        dlMap[LteResType.LTE_RES_SSCH.value] = ('SSCH', QColor(0, 0, 0), QColor(255, 255, 0)) 
-        dlMap[LteResType.LTE_RES_CRS.value] = ('CRS', QColor(0, 0, 0), QColor(255, 0, 0)) 
-        dlMap[LteResType.LTE_RES_DTX.value] = ('DTX', QColor(255, 255, 255), QColor(0, 0, 0)) 
-        dlMap[LteResType.LTE_RES_GP.value] = ('GP', QColor(255, 255, 255), QColor(0, 0, 0)) 
-        dlMap[LteResType.LTE_RES_UL.value] = ('UL', QColor(255, 255, 255), QColor(0, 0, 0)) 
+        self.dlMap = dict()
+        self.dlMap[LteResType.LTE_RES_PDSCH.value] = ('PDSCH', QColor(0, 0, 0), QColor(255, 255, 255)) 
+        self.dlMap[LteResType.LTE_RES_PDCCH.value] = ('PDCCH', QColor(0, 0, 0), QColor(0, 255, 255)) 
+        self.dlMap[LteResType.LTE_RES_PHICH.value] = ('PHICH', QColor(0, 0, 0), QColor(255, 0, 255)) 
+        self.dlMap[LteResType.LTE_RES_PCFICH.value] = ('PCFICH', QColor(0, 0, 255), QColor(255, 255, 255)) 
+        self.dlMap[LteResType.LTE_RES_PBCH.value] = ('PBCH', QColor(0, 0, 0), QColor(128, 255, 255)) 
+        self.dlMap[LteResType.LTE_RES_PSCH.value] = ('PSCH', QColor(0, 0, 0), QColor(0, 255, 0)) 
+        self.dlMap[LteResType.LTE_RES_SSCH.value] = ('SSCH', QColor(0, 0, 0), QColor(255, 255, 0)) 
+        self.dlMap[LteResType.LTE_RES_CRS.value] = ('CRS', QColor(0, 0, 0), QColor(255, 0, 0)) 
+        self.dlMap[LteResType.LTE_RES_DTX.value] = ('DTX', QColor(255, 255, 255), QColor(0, 0, 0)) 
+        self.dlMap[LteResType.LTE_RES_GP.value] = ('GP', QColor(255, 255, 255), QColor(0, 0, 0)) 
+        self.dlMap[LteResType.LTE_RES_UL.value] = ('UL', QColor(255, 255, 255), QColor(0, 0, 0)) 
         
-        ulMap = dict()
-        ulMap[LteResType.LTE_RES_GP.value] = ('GP', QColor(0, 0, 0), QColor(0, 255, 0))
-        ulMap[LteResType.LTE_RES_DL.value] = ('DL', QColor(255, 255, 255), QColor(0, 0, 0))
-        ulMap[LteResType.LTE_RES_PUSCH.value] = ('PUSCH', QColor(0, 0, 0), QColor(255, 255, 255))
-        ulMap[LteResType.LTE_RES_PUCCH_AN.value] = ('AN', QColor(0, 0, 0), QColor(0, 255, 255))
-        ulMap[LteResType.LTE_RES_PUCCH_MIXED.value] = ('MIXED', QColor(0, 0, 0), QColor(255, 0, 255))
-        ulMap[LteResType.LTE_RES_PUCCH_CQI.value] = ('CQI', QColor(255, 255, 255), QColor(0, 0, 255))
-        ulMap[LteResType.LTE_RES_PRACH.value] = ('PRACH', QColor(0, 0, 0), QColor(128, 255, 255))
-        ulMap[LteResType.LTE_RES_DMRS.value] = ('DMRS', QColor(0, 0, 0), QColor(255, 0, 0))
-        ulMap[LteResType.LTE_RES_SRS.value] = ('SRS', QColor(0, 0, 0), QColor(255, 255, 0))
+        self.ulMap = dict()
+        self.ulMap[LteResType.LTE_RES_GP.value] = ('GP', QColor(0, 0, 0), QColor(0, 255, 0))
+        self.ulMap[LteResType.LTE_RES_DL.value] = ('DL', QColor(255, 255, 255), QColor(0, 0, 0))
+        self.ulMap[LteResType.LTE_RES_PUSCH.value] = ('PUSCH', QColor(0, 0, 0), QColor(255, 255, 255))
+        self.ulMap[LteResType.LTE_RES_PUCCH_AN.value] = ('AN', QColor(0, 0, 0), QColor(0, 255, 255))
+        self.ulMap[LteResType.LTE_RES_PUCCH_MIXED.value] = ('MIXED', QColor(0, 0, 0), QColor(255, 0, 255))
+        self.ulMap[LteResType.LTE_RES_PUCCH_CQI.value] = ('CQI', QColor(255, 255, 255), QColor(0, 0, 255))
+        self.ulMap[LteResType.LTE_RES_PRACH.value] = ('PRACH', QColor(0, 0, 0), QColor(128, 255, 255))
+        self.ulMap[LteResType.LTE_RES_DMRS.value] = ('DMRS', QColor(0, 0, 0), QColor(255, 0, 0))
+        self.ulMap[LteResType.LTE_RES_SRS.value] = ('SRS', QColor(0, 0, 0), QColor(255, 255, 0))
         
-        self.args['dlmap'] = dlMap
-        self.args['ulmap'] = ulMap
+    def parseLteGrid(self):
+        scPerPrb = 12
+        _prbs = (6, 15, 25, 50, 75, 100)
+        prbNum = _prbs[self.args['bw']]
+        
+        outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+        files = []
+        files.append('LTE_UL_RES_GRID.csv')
+        _aps = (1, 2, 4)
+        apNum = _aps[self.args['ap']]
+        for i in range(apNum):
+            files.append('LTE_DL_RES_GRID_AP%d.csv' % i)
+        
+        for fn in files:
+            with open(os.path.join(outDir, fn), 'r') as f:
+                line = f.readline()
+                colLabels = line.split(',')[1:]
+                rowLabels = []
+                numRows = prbNum * scPerPrb
+                numCols = len(colLabels)
+                
+                tab = QTableWidget()
+                tab.setRowCount(numRows)
+                tab.setColumnCount(numCols)
+                tab.setHorizontalHeaderLabels(colLabels)
+                tab.setVerticalHeaderLabels(rowLabels)
+                tab.horizontalHeader().setDefaultSectionSize(8 * self.fontMetrics().width('X'))
+                tab.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+                
+                ire = 0
+                while True:
+                    line = f.readline()
+                    if not line:
+                        break
+                    
+                    tokens = line.split(',')
+                    rowLabels.append(tokens[0])
+                    for isym in range(numCols):
+                        item = QTableWidgetItem()
+                        imap = int(tokens[isym+1])
+                        if 'UL_RES_GRID' in fn:
+                            _str, _fg, _bg = self.ulMap[imap]
+                        else:
+                            _str, _fg, _bg = self.dlMap[imap]
+                        item.setText(_str)
+                        item.setForeground(_fg)
+                        item.setBackground(_bg)
+                        item.setTextAlignment(Qt.AlignCenter)
+                        item.setFlags(item.flags() & (~Qt.ItemIsEditable));
+                        tab.setItem(ire, isym, item);
+                    ire = ire + 1
+                
+                tab.setVerticalHeaderLabels(rowLabels)
+                self.ngwin.tabWidget.addTab(tab, fn) 

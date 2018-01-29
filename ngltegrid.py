@@ -815,7 +815,7 @@ class NgLteGrid(object):
         if not os.path.exists(outDir):
             os.mkdir(outDir)
         for iap in range(self.apNum):
-            with open(os.path.join(outDir, 'LTE_DL_RES_GRID_AP'+str(iap)+'_'+time.strftime('%Y%m%d%H%M%S', time.localtime())+'.csv'), 'w') as f:
+            with open(os.path.join(outDir, 'LTE_DL_RES_GRID_AP'+str(iap)+'.csv'), 'w') as f:
                 line = []
                 line.append('k/l')
                 line.extend([str(k) for i in range(self.subfPerRf) for j in range(self.slotPerSubf) for k in range(self.symbPerSlot)])
@@ -1019,7 +1019,7 @@ class NgLteGrid(object):
         outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
         if not os.path.exists(outDir):
             os.mkdir(outDir)
-        with open(os.path.join(outDir, 'LTE_UL_RES_GRID_'+time.strftime('%Y%m%d%H%M%S', time.localtime())+'.csv'), 'w') as f:
+        with open(os.path.join(outDir, 'LTE_UL_RES_GRID.csv'), 'w') as f:
             line = []
             line.append('k/l')
             line.extend([str(k) for i in range(self.subfPerRf) for j in range(self.slotPerSubf) for k in range(self.symbPerSlot)])
