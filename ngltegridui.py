@@ -316,7 +316,7 @@ class NgLteGridUi(QDialog):
                 tab.setRowCount(numRows)
                 tab.setColumnCount(numCols)
                 tab.setHorizontalHeaderLabels(colLabels)
-                tab.setVerticalHeaderLabels(rowLabels)
+                #tab.setVerticalHeaderLabels(rowLabels)
                 tab.horizontalHeader().setDefaultSectionSize(8 * self.fontMetrics().width('X'))
                 tab.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
                 

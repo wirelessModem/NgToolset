@@ -925,7 +925,7 @@ class NgLteGrid(object):
         if not self.pucchOk:
             self.fillPucch()
         
-        if self.fs == LtePhy.LTE_FS_TYPE1:
+        if self.fs == LtePhy.LTE_FS_TYPE1.value:
             if (self.prachFddSfn == 'even' and self.sfn % 2 == 0) or self.prachFddSfn == 'any':
                 for i in range(len(self.prachFddSubf)):
                     isf = self.prachFddSubf[i]

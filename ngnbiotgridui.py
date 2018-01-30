@@ -11,7 +11,7 @@ Change History:
 '''
 
 import os
-from PyQt5.QtWidgets import QDialog, QTextEdit, QTabWidget, QLabel, QLineEdit, QComboBox, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, QWidget, QGroupBox
+from PyQt5.QtWidgets import QDialog, QTextEdit, QTabWidget, QLabel, QLineEdit, QComboBox, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, QWidget, QGroupBox, QMessageBox
 from PyQt5.QtWidgets import QGridLayout, QHBoxLayout, QVBoxLayout
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
@@ -24,19 +24,44 @@ class NgNbiotGridUi(QDialog):
     def __init__(self, ngwin):
         super().__init__()
         self.ngwin = ngwin
-        self.args = dict()
+        self.argsLte = dict()
+        self.argsNbiot = dict()
         self.initResGridMapper()
         self.initUi()
     
     def initResGridMapper(self):
-        pass
+        self.dlMap = dict()
+        self.dlMap[LteResType.LTE_RES_PDSCH.value] = ('PDSCH', QColor(0, 0, 0), QColor(255, 255, 255)) 
+        self.dlMap[LteResType.LTE_RES_PDCCH.value] = ('PDCCH', QColor(0, 0, 0), QColor(0, 255, 255)) 
+        self.dlMap[LteResType.LTE_RES_PHICH.value] = ('PHICH', QColor(0, 0, 0), QColor(255, 0, 255)) 
+        self.dlMap[LteResType.LTE_RES_PCFICH.value] = ('PCFICH', QColor(0, 0, 255), QColor(255, 255, 255)) 
+        self.dlMap[LteResType.LTE_RES_PBCH.value] = ('PBCH', QColor(0, 0, 0), QColor(128, 255, 255)) 
+        self.dlMap[LteResType.LTE_RES_PSCH.value] = ('PSCH', QColor(0, 0, 0), QColor(0, 255, 0)) 
+        self.dlMap[LteResType.LTE_RES_SSCH.value] = ('SSCH', QColor(0, 0, 0), QColor(255, 255, 0)) 
+        self.dlMap[LteResType.LTE_RES_CRS.value] = ('CRS', QColor(0, 0, 0), QColor(255, 0, 0)) 
+        self.dlMap[LteResType.LTE_RES_DTX.value] = ('DTX', QColor(255, 255, 255), QColor(0, 0, 0)) 
+        self.dlMap[LteResType.LTE_RES_GP.value] = ('GP', QColor(255, 255, 255), QColor(0, 0, 0)) 
+        self.dlMap[LteResType.LTE_RES_UL.value] = ('UL', QColor(255, 255, 255), QColor(0, 0, 0)) 
+        self.dlMap[LteResType.LTE_RES_NB_INBAND.value] = ('NB DL', QColor(128, 128, 128), QColor(0, 0, 0)) 
+        
+        self.ulMap = dict()
+        self.ulMap[LteResType.LTE_RES_GP.value] = ('GP', QColor(0, 0, 0), QColor(0, 255, 0))
+        self.ulMap[LteResType.LTE_RES_DL.value] = ('DL', QColor(255, 255, 255), QColor(0, 0, 0))
+        self.ulMap[LteResType.LTE_RES_PUSCH.value] = ('PUSCH', QColor(0, 0, 0), QColor(255, 255, 255))
+        self.ulMap[LteResType.LTE_RES_PUCCH_AN.value] = ('AN', QColor(0, 0, 0), QColor(0, 255, 255))
+        self.ulMap[LteResType.LTE_RES_PUCCH_MIXED.value] = ('MIXED', QColor(0, 0, 0), QColor(255, 0, 255))
+        self.ulMap[LteResType.LTE_RES_PUCCH_CQI.value] = ('CQI', QColor(255, 255, 255), QColor(0, 0, 255))
+        self.ulMap[LteResType.LTE_RES_PRACH.value] = ('PRACH', QColor(0, 0, 0), QColor(128, 255, 255))
+        self.ulMap[LteResType.LTE_RES_DMRS.value] = ('DMRS', QColor(0, 0, 0), QColor(255, 0, 0))
+        self.ulMap[LteResType.LTE_RES_SRS.value] = ('SRS', QColor(0, 0, 0), QColor(255, 255, 0))
+        self.ulMap[LteResType.LTE_RES_NB_INBAND.value] = ('NB UL', QColor(128, 128, 128), QColor(0, 0, 0))
     
     def initUi(self):
         self.fsLabel = QLabel('Frame Structure:')
         self.fsCombo = QComboBox()
         self.fsCombo.addItem('Type 1(FDD)')
         self.fsCombo.addItem('Type 2(TDD)')
-        self.fsCombo.currentIndexChanged.connect(self.onFsComboCurrentIndexChanged)
+        self.fsCombo.currentIndexChanged[int].connect(self.onFsComboCurrentIndexChanged)
         self.fsCombo.setCurrentIndex(0)
 
         self.bwLabel = QLabel('System Bandwidth:')
@@ -53,7 +78,7 @@ class NgNbiotGridUi(QDialog):
         self.cpCombo = QComboBox()
         self.cpCombo.addItem('Normal CP')
         self.cpCombo.addItem('Extended CP')
-        self.cpCombo.currentIndexChanged.connect(self.onCpComboCurrentIndexChanged)
+        self.cpCombo.currentIndexChanged[int].connect(self.onCpComboCurrentIndexChanged)
         self.cpCombo.setCurrentIndex(0)
 
         self.apLabel = QLabel('Downlink Antenna Port(s):')
@@ -248,7 +273,7 @@ class NgNbiotGridUi(QDialog):
         self.nbInBandPrbIdxDlCombo.setCurrentIndex(0)
 
         #auto fill nbInBandPrbIdxDlCombo when bwCombo is changed!
-        self.bwCombo.currentIndexChanged.connect(self.onBwComboCurrentIndexChanged)
+        self.bwCombo.currentIndexChanged[int].connect(self.onBwComboCurrentIndexChanged)
 
         self.nbHsfnLabel = QLabel('NB Hyper SFN:')
         self.nbHsfnEdit = QLineEdit()
@@ -719,14 +744,151 @@ class NgNbiotGridUi(QDialog):
         self.setLayout(layout)
         self.setWindowTitle('NB-IoT Resource Grid Tool')
         
-    def onFsComboCurrentIndexChanged(self):
-        pass
+    def onFsComboCurrentIndexChanged(self, index):
+        if index != 0:
+            QMessageBox.warning(self, 'Host LTE Cell Config', 'Only FDD is supported for NB-IoT!')
+            self.fsCombo.setCurrentIndex(0)
     
-    def onCpComboCurrentIndexChanged(self):
-        pass
+    def onCpComboCurrentIndexChanged(self, index):
+        if index != 0:
+            QMessageBox.warning(self, 'Host LTE Cell Config', 'Only normal CP is supported for NB-IoT!')
+            self.cpCombo.setCurrentIndex(0)
     
     def onOkBtnClicked(self):
+        #step 1: prepare NgLteGrid
+        self.argsLte['fs'] = self.fsCombo.currentIndex()
+        self.argsLte['bw'] = self.bwCombo.currentIndex()
+        self.argsLte['cp'] = self.cpCombo.currentIndex()
+        self.argsLte['ap'] = self.apCombo.currentIndex()
+        try:
+            _pci = int(self.pciEdit.text())
+        except ValueError as e:
+            self.ngwin.logEdit.append("Invalid PCI: '%s'." % self.pciEdit.text())
+            self.accept()
+            return
+        self.argsLte['pci'] = _pci
+        self.argsLte['cfi'] = int(self.cfiCombo.currentText())
+        self.argsLte['cfiSsf'] = int(self.cfiSsfCombo.currentText())
+        self.argsLte['phichDur'] = self.phichDurCombo.currentIndex()
+        self.argsLte['phichRes'] = self.phichResCombo.currentIndex()
+        self.argsLte['sa'] = self.saCombo.currentIndex()
+        self.argsLte['ssp'] = self.sspCombo.currentIndex()
+        self.argsLte['dsPucch'] = int(self.dsPucchCombo.currentText()[-1])
+        self.argsLte['nCqiRb'] = int(self.nCqiRbEdit.text())
+        self.argsLte['nCsAn'] = int(self.nCsAnEdit.text())
+        self.argsLte['n1PucchAn'] = int(self.n1PucchAnEdit.text())
+        self.argsLte['tddAckMode'] = self.tddAckModeCombo.currentIndex()
+        self.argsLte['sfn'] = int(self.sfnEdit.text())
+        self.argsLte['prachConfInd'] = int(self.prachConfIndEdit.text())
+        _prachFreqOff = int(self.prachFreqOffEdit.text())
+        if _prachFreqOff != 0:
+            self.ngwin.logEdit.append('PRACH frequency offset must be 0!')
+            self.accept()
+            return
+        self.argsLte['prachFreqOff'] = _prachFreqOff
+        self.argsLte['srsSubfConf'] = int(self.srsSfConfEdit.text())
+        
+        #step 2: call NgLteGrid and parse LTE grid
+        lteGrid = NgLteGrid(self.ngwin, self.argsLte)
+        if lteGrid.isOk:
+            lteGrid.fillCrs()
+            lteGrid.fillPbch()
+            lteGrid.fillSch()
+            lteGrid.fillPdcch()
+            lteGrid.printDl()
+            
+            lteGrid.fillPucch()
+            lteGrid.fillPrach()
+            lteGrid.fillDmrsForPusch()
+            lteGrid.fillSrs()
+            lteGrid.printUl()
+        else:
+            self.accept()
+            return
+        
+        #step 3: prepare NgNbiotGrid
+        self.argsNbiot['maxPucchRes'] = max(lteGrid.maxPucchRes)
+        files = []
+        files.append('LTE_UL_RES_GRID.csv')
+        apNum = (1, 2, 4)[self.argsLte['ap']]
+        for i in range(apNum):
+            files.append('LTE_DL_RES_GRID_AP%d.csv' % i)
+        self.argsNbiot['lteGrids'] = files
+        self.argsNbiot['hostLtePrbNum'] = (6, 15, 25, 50, 75, 100)[self.argsLte['bw']]
+        self.argsNbiot['hostLteApNum'] = apNum
+        self.argsNbiot['hostLtePci'] = self.argsLte['pci']
+        self.argsNbiot['hostLteCfi'] = self.argsLte['cfi']
+        self.argsNbiot['hostLteSrsSubfConf'] = self.argsLte['srsSubfConf']
+        
+        
+        #step 4: call NgNbiotGrid
+        
+        #step 5: parse LTE grid and NB-IoT grid
+        self.parseLteNbiotGrid()
+        
+        
         self.accept()
         
-    def onBwComboCurrentIndexChanged(self):
-        pass
+    def onBwComboCurrentIndexChanged(self, index):
+        if index == 0:
+            QMessageBox.warning(self, 'Host LTE Cell Config', '1.4MHz system bandwidth is not supported for NB-IoT!')
+            self.bwCombo.setCurrentIndex(2)
+        else:
+            _dlPrbInd = [None,
+                         (2, 12),
+                         (2, 7, 17, 22),
+                         (4, 9, 14, 19, 30, 35, 40, 45),
+                         (2, 7, 12, 17, 22, 27, 32, 42, 47, 52, 57, 62, 67, 72),
+                         (4, 9, 14, 19, 24, 29, 34, 39, 44, 55, 60, 65, 70, 75, 80, 85, 90, 95)]
+            self.nbInBandPrbIdxDlCombo.clear()
+            for i in _dlPrbInd[index]:
+                self.nbInBandPrbIdxDlCombo.addItem(str(i))
+            self.nbInBandPrbIdxDlCombo.setCurrentIndex(0)
+                         
+    def parseLteNbiotGrid(self):
+        outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+        
+        #parse LTE grid
+        scPerPrb = 12
+        prbNum = (6, 15, 25, 50, 75, 100)[self.argsLte['bw']]
+        for fn in self.argsNbiot['lteGrids']:
+            with open(os.path.join(outDir, fn), 'r') as f:
+                line = f.readline()
+                colLabels = line.split(',')[1:]
+                rowLabels = []
+                numRows = prbNum * scPerPrb
+                numCols = len(colLabels)
+                
+                tab = QTableWidget()
+                tab.setRowCount(numRows)
+                tab.setColumnCount(numCols)
+                tab.setHorizontalHeaderLabels(colLabels)
+                #tab.setVerticalHeaderLabels(rowLabels)
+                tab.horizontalHeader().setDefaultSectionSize(8 * self.fontMetrics().width('X'))
+                tab.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+                
+                ire = 0
+                while True:
+                    line = f.readline()
+                    if not line:
+                        break
+                    
+                    tokens = line.split(',')
+                    rowLabels.append(tokens[0])
+                    for isym in range(numCols):
+                        item = QTableWidgetItem()
+                        imap = int(tokens[isym+1])
+                        if 'UL_RES_GRID' in fn:
+                            _str, _fg, _bg = self.ulMap[imap]
+                        else:
+                            _str, _fg, _bg = self.dlMap[imap]
+                        item.setText(_str)
+                        item.setForeground(_fg)
+                        item.setBackground(_bg)
+                        item.setTextAlignment(Qt.AlignCenter)
+                        item.setFlags(item.flags() & (~Qt.ItemIsEditable));
+                        tab.setItem(ire, isym, item);
+                    ire = ire + 1
+                
+                tab.setVerticalHeaderLabels(rowLabels)
+                self.ngwin.tabWidget.addTab(tab, fn)
