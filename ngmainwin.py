@@ -16,6 +16,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtSql import QSqlDatabase
 #-->import plugins
 from ngltegridui import NgLteGridUi
+from ngnbiotgridui import NgNbiotGridUi
 
 class NgMainWin(QMainWindow):
     def __init__(self):
@@ -58,7 +59,8 @@ class NgMainWin(QMainWindow):
         dlg.exec_()
     
     def onExecNbiotResGrid(self):
-        pass
+        dlg = NgNbiotGridUi(self)
+        dlg.exec_()
     
     def onExecNrResGrid(self):
         pass
