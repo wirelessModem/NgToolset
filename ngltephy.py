@@ -88,6 +88,9 @@ class LteResType(Enum):
     LTE_RES_PRACH = 16
     LTE_RES_DMRS = 17
     LTE_RES_SRS = 18
+    
+    #for PRB(s) used for inband-nb in legacy lte resource grid
+    LTE_RES_NB_INBAND = 19
 
     LTE_RES_BUTT = 99
     

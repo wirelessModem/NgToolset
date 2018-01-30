@@ -17,6 +17,7 @@ import time
 import numpy as np
 import ngmainwin
 from ngltephy import LtePhy, LteResType
+from ngb36utils import time2str36, freq2str36
 
 class NgLteGrid(object):
     def __init__(self, ngwin, args):
@@ -818,13 +819,15 @@ class NgLteGrid(object):
             with open(os.path.join(outDir, 'LTE_DL_RES_GRID_AP'+str(iap)+'.csv'), 'w') as f:
                 line = []
                 line.append('k/l')
-                line.extend([str(k) for i in range(self.subfPerRf) for j in range(self.slotPerSubf) for k in range(self.symbPerSlot)])
+                #line.extend([str(k) for i in range(self.subfPerRf) for j in range(self.slotPerSubf) for k in range(self.symbPerSlot)])
+                line.extend([time2str36(0, self.sfn, i, j*self.symbPerSlot+k) for i in range(self.subfPerRf) for j in range(self.slotPerSubf) for k in range(self.symbPerSlot)])
                 f.write(','.join(line))
                 f.write('\n')
                 
                 for ire in range(self.rePerSymb):
                     line = []
-                    line.append(str(ire))
+                    #line.append(str(ire))
+                    line.append(freq2str36(ire//self.scPerPrb, ire%self.scPerPrb))
                     line.extend([str(self.gridDl[iap][ire][isf*self.symbPerSubf+isym]) for isf in range(self.subfPerRf) for isym in range(self.symbPerSubf)])
                     f.write(','.join(line))
                     f.write('\n')
@@ -1022,13 +1025,15 @@ class NgLteGrid(object):
         with open(os.path.join(outDir, 'LTE_UL_RES_GRID.csv'), 'w') as f:
             line = []
             line.append('k/l')
-            line.extend([str(k) for i in range(self.subfPerRf) for j in range(self.slotPerSubf) for k in range(self.symbPerSlot)])
+            #line.extend([str(k) for i in range(self.subfPerRf) for j in range(self.slotPerSubf) for k in range(self.symbPerSlot)])
+            line.extend([time2str36(0, self.sfn, i, j*self.symbPerSlot+k) for i in range(self.subfPerRf) for j in range(self.slotPerSubf) for k in range(self.symbPerSlot)])
             f.write(','.join(line))
             f.write('\n')
             
             for ire in range(self.rePerSymb):
                 line = []
-                line.append(str(ire))
+                #line.append(str(ire))
+                line.append(freq2str36(ire//self.scPerPrb, ire%self.scPerPrb))
                 line.extend([str(self.gridUl[0][ire][isf*self.symbPerSubf+isym]) for isf in range(self.subfPerRf) for isym in range(self.symbPerSubf)])
                 f.write(','.join(line))
                 f.write('\n')

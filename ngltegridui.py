@@ -3,7 +3,7 @@
 
 '''
 File:
-    ngltergdlg.py
+    ngltegridui.py
 Description:
     UI for LTE resource grid.
 Change History:
@@ -18,6 +18,7 @@ from PyQt5.QtCore import Qt
 import ngmainwin
 from ngltephy import LteResType
 from ngltegrid import NgLteGrid
+from ngb36utils import time2str36, freq2str36
 
 class NgLteGridUi(QDialog):
     def __init__(self, ngwin):
@@ -276,6 +277,7 @@ class NgLteGridUi(QDialog):
         self.dlMap[LteResType.LTE_RES_DTX.value] = ('DTX', QColor(255, 255, 255), QColor(0, 0, 0)) 
         self.dlMap[LteResType.LTE_RES_GP.value] = ('GP', QColor(255, 255, 255), QColor(0, 0, 0)) 
         self.dlMap[LteResType.LTE_RES_UL.value] = ('UL', QColor(255, 255, 255), QColor(0, 0, 0)) 
+        self.dlMap[LteResType.LTE_RES_NB_INBAND.value] = ('NB DL', QColor(128, 128, 128), QColor(0, 0, 0)) 
         
         self.ulMap = dict()
         self.ulMap[LteResType.LTE_RES_GP.value] = ('GP', QColor(0, 0, 0), QColor(0, 255, 0))
@@ -287,6 +289,7 @@ class NgLteGridUi(QDialog):
         self.ulMap[LteResType.LTE_RES_PRACH.value] = ('PRACH', QColor(0, 0, 0), QColor(128, 255, 255))
         self.ulMap[LteResType.LTE_RES_DMRS.value] = ('DMRS', QColor(0, 0, 0), QColor(255, 0, 0))
         self.ulMap[LteResType.LTE_RES_SRS.value] = ('SRS', QColor(0, 0, 0), QColor(255, 255, 0))
+        self.ulMap[LteResType.LTE_RES_NB_INBAND.value] = ('NB UL', QColor(128, 128, 128), QColor(0, 0, 0)) 
         
     def parseLteGrid(self):
         scPerPrb = 12
