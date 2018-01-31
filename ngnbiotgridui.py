@@ -814,6 +814,7 @@ class NgNbiotGridUi(QDialog):
         self.argsNbiot['hostLtePci'] = self.argsLte['pci']
         self.argsNbiot['hostLteCfi'] = self.argsLte['cfi']
         self.argsNbiot['hostLteSrsSubfConf'] = self.argsLte['srsSubfConf']
+        
         #-->nb common part
         self.argsNbiot['nbOpMode'] = self.nbOpModeCombo.currentIndex()
         if self.argsNbiot['nbOpMode'] > 1:
@@ -855,12 +856,86 @@ class NgNbiotGridUi(QDialog):
             self.accept()
             return
         #-->nb ul part
-        
+        self.argsNbiot['nbUlScSpacing'] = self.nbUlScSpacingCombo.currentIndex()
+        self.argsNbiot['npuschAllSymbols'] = True if self.nbNpuschAllSymCombo.currentIndex() == 0 else False
+        self.argsNbiot['npuschFormat1Scs'] = []
+        _val = int(self.nbDciN0ScIndEdit.text())
+        if self.argsNbiot['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_3DOT75K.value and _val >= 0 and _val <= 47):
+            self.argsNbiot['npuschFormat1Scs'].append(_val)
+        elif self.argsNbiot['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_15K.value and _val >= 0 and _val <= 18:
+            if _val >= 0 and _val <= 11:
+                self.argsNbiot['npuschFormat1Scs'].append(_val)
+            elif _val >= 12 and _val <= 15:
+                self.argsNbiot['npuschFormat1Scs'].append(3*(_val-12)+nsc) for nsc in range(3)
+            elif _val >= 16 and _val <= 17:
+                self.argsNbiot['npuschFormat1Scs'].append(6*(_val-16)+nsc) for nsc in range(6)
+            else:
+                self.argsNbiot['npuschFormat1Scs'].append(nsc) for nsc in range(12)
+        else:
+            self.ngwin.logEdit.append('Subcarrier Indication(DCI N0) is not valid! Value range is: [0, 47] for 3.75KHz and [0, 18] for 15KHz.')
+            self.accept()
+            return
+        self.argsNbiot['npuschFormat1NumRu'] = (1, 2, 3, 4, 5, 6, 8, 10)[self.nbDciN0RuIndCombo.currentIndex()]
+        self.argsNbiot['npuschFormat1NumRep'] = (1, 2, 4, 8, 16, 32, 64, 128)[self.nbDciN0RepIndCombo.currentIndex()]
+        self.argsNbiot['npuschFormat1K0'] = (8, 16, 32, 64)[self.nbDciN0DelayIndCombo.currentIndex()]
+        self.argsNbiot['npuschFormat2NumRep'] = int(self.nbDciN1AnIndCombo.currentText()[1:])
+        _npuschF2Conf = [[(38, 13), (39, 13), (40, 13), (41, 13), (42, 13), (43, 13), (44, 13), (45, 13),
+                      (38, 21), (39, 21), (40, 21), (41, 21), (42, 21), (43, 21), (44, 21), (45, 21)],
+                     [(0, 13), (1, 13), (2, 13), (3, 13), (0, 15), (1, 15), (2, 15), (3, 15),
+                      (0, 17), (1, 17), (2, 17), (3, 17), (0, 18), (1, 18), (2, 18), (3, 18)]]
+        self.argsNbiot['npuschFormat2Sc'], self.argsNbiot['npuschFormat2K0'] = _npuschF2Conf[self.argsNbiot['nbUlScSpacing']][self.nbDciN1AnIndCombo.currentIndex()]
+        self.argsNbiot['nprachPeriod'] = int(self.nbNprachPeriodCombo.currentText()[2:])
+        self.argsNbiot['nprachStartTime'] = int(self.nbNprachStartTimeCombo.currentText()[2:])
+        self.argsNbiot['nprachRepPerAtt'] = int(self.nbNprachRepCombo.currentText()[1:])
+        self.argsNbiot['nprachNumSc'] = int(self.nbNprachNumScCombo.currentText()[1:])
+        self.argsNbiot['nprachScOff'] = int(self.nbNprachScOffCombo.currentText()[1:])
         
         #-->nb dl part
-            
-        
-        
+        self.argsNbiot['nbDlBitmap'] = self.nbDlBitmapEdit.text().strip().replace(',', '')
+        try:
+            _val = int(self.argsNbiot['nbDlBitmap'], base=2)
+        except ValueError as e:
+            self.ngwin.logEdit.append('Invalid NB DL bitmap: %s' % self.argsNbiot['nbDlBitmap'])
+            self.accept()
+            return
+        if len(self.argsNbiot['nbDlBitmap']) != 10 and len(self.argsNbiot['nbDlBitmap']) != 40:
+            self.ngwin.logEdit.append('Invalid size of NB DL bitmap, which must be either 10bits or 40bits!')
+            self.accept()
+            return
+        self.argsNbiot['npdschNoBcchDciN1NumSf'] = (1, 2, 3, 4, 5, 6, 8, 10)[self.nbDciN1SfAssignCombo.currentIndex()]
+        self.argsNbiot['npdschNoBcchDciN1NumRep'] = (1, 2, 4, 8, 16, 32, 64, 128, 192, 256, 384, 512, 768, 1024, 1536, 2048)[self.nbDciN1RepCombo.currentIndex()]
+        rMax = int(self.nbNpdcchUssRepCombo.currentText()[1:])
+        self.argsNbiot['npdschNoBcchDciN1K0'] = (0, 4, 8, 12, 16, 32, 64, 128)[self.nbDciN1DelayCombo.currentIndex()] if rMax < 128 else (0, 16, 32, 64, 128, 256, 512, 1024)[self.nbDciN1DelayCombo.currentIndex()]
+        self.argsNbiot['nbDlGapThresh'] = int(self.nbDlGapThreshCombo.currentText()[1:])
+        self.argsNbiot['nbDlGapPeriod'] = int(self.nbDlGapPeriodCombo.currentText()[2:])
+        self.argsNbiot['nbDlGapDurCoeff'] = (1/8, 1/4, 3/8, 1/2)[self.nbDlGapDurCoeffCombo.currentIndex()]
+        self.argsNbiot['npdschSib1NumRep'] = (4, 8, 16, 4, 8, 16, 4, 8, 16, 4, 8, 16)[self.nbSchedInfoSib1Combo.currentIndex()]
+        if self.argsNbiot['npdschSib1NumRep'] == 4:
+            self.argsNbiot['npdschSib1StartRf'] = 16 * (self.argsNbiot['nbPci'] % 4)
+        elif self.argsNbiot['npdschSib1NumRep'] == 8:
+            self.argsNbiot['npdschSib1StartRf'] = 16 * (self.argsNbiot['nbPci'] % 2)
+        elif self.argsNbiot['npdschSib1NumRep'] == 16:
+            self.argsNbiot['npdschSib1StartRf'] = 1 * (self.argsNbiot['nbPci'] % 2)
+        self.argsNbiot['nbSiWinLen'] = int(self.nbSiWinLengthCombo.currentText()[2:])
+        self.argsNbiot['nbSiRfOff'] = int(self.nbSiFrameOffCombo.currentText())
+        self.argsNbiot['nbSib2Period'] = int(self.nbSib2PeriodCombo.currentText()[2:])
+        self.argsNbiot['nbSib2RepPattern'] = (2, 4, 8, 16)[self.nbSib2RepPatCombo.currentIndex()]
+        self.argsNbiot['nbSib2Tbs'] = int(self.nbSib2TbsCombo.currentText()[1:])
+        self.argsNbiot['nbSib3Period'] = int(self.nbSib3PeriodCombo.currentText()[2:])
+        self.argsNbiot['nbSib3RepPattern'] = (2, 4, 8, 16)[self.nbSib3RepPatCombo.currentIndex()]
+        self.argsNbiot['nbSib3Tbs'] = int(self.nbSib3TbsCombo.currentText()[1:])
+        self.argsNbiot['nbDciN0N1SfRep'] = int(self.nbDciN0N1SfRepCombo.currentText())
+        self.argsNbiot['npdcchUssNumRep'] = int(self.nbNpdcchUssRepCombo.currentText()[1:])
+        if (self.argsNbiot['npdcchUssNumRep'] == 1 and self.argsNbiot['nbDciN0N1SfRep'] > 0) or (self.argsNbiot['npdcchUssNumRep'] == 2 and self.argsNbiot['nbDciN0N1SfRep'] > 1) or (self.argsNbiot['npdcchUssNumRep'] == 4 and self.argsNbiot['nbDciN0N1SfRep'] > 2):
+            self.ngwin.logEdit.append('For NPDCCH USS, DCI N0/N1 subframe repetition number is: [0] when npdcch-NumRepetition = 1, [0,1] when npdcch-NumRepetition = 2, and [0,1,2] when npdcch-NumRepetition = 4!')
+            self.accept()
+            return
+        self.argsNbiot['npdcchUssStartSf'] = (1.5, 2, 4, 8, 16, 32, 48, 64)[self.nbNpdcchUssStartSfCombo.currentIndex()]
+        if self.argsNbiot['npdcchUssNumRep'] * self.argsNbiot['npdcchUssStartSf'] < 4:
+            self.ngwin.logEdit.append('T >= 4 where T = R_max * G as specified in 36.213 16.6!')
+            self.accept()
+            return
+        self.argsNbiot['npdcchUssOff'] = (0, 1/8, 1/4, 3/8)[self.nbNpdcchUssOffCombo.currentIndex()]
         
         #step 4: call NgNbiotGrid
         
