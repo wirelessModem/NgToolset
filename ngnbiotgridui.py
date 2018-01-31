@@ -633,7 +633,7 @@ class NgNbiotGridUi(QDialog):
         self.nbNpdcchUssStartSfCombo.addItem('v32')
         self.nbNpdcchUssStartSfCombo.addItem('v48')
         self.nbNpdcchUssStartSfCombo.addItem('v64')
-        self.nbNpdcchUssStartSfCombo.setCurrentIndex(0)
+        self.nbNpdcchUssStartSfCombo.setCurrentIndex(2)
 
         self.nbNpdcchUssOffLabel = QLabel('npdcch-Offset-USS-r13:')
         self.nbNpdcchUssOffCombo = QComboBox()
@@ -782,6 +782,12 @@ class NgNbiotGridUi(QDialog):
             return
         self.argsLte['srsSubfConf'] = int(self.srsSfConfEdit.text())
         
+        if self.ngwin.enableDebug:
+            self.ngwin.logEdit.append('contents of NgNbiotGridUI.argsLte:')
+            for key, value in self.argsLte.items():
+                self.ngwin.logEdit.append('-->key=%s, value=%s' % (key, str(value)))
+
+        
         #step 2: call NgLteGrid and parse LTE grid
         lteGrid = NgLteGrid(self.ngwin, self.argsLte)
         if lteGrid.isOk:
@@ -808,7 +814,7 @@ class NgNbiotGridUi(QDialog):
         apNum = (1, 2, 4)[self.argsLte['ap']]
         for i in range(apNum):
             files.append('LTE_DL_RES_GRID_AP%d.csv' % i)
-        self.argsNbiot['lteGrids'] = files
+        self.argsNbiot['hostLteGrids'] = files
         self.argsNbiot['hostLtePrbNum'] = (6, 15, 25, 50, 75, 100)[self.argsLte['bw']]
         self.argsNbiot['hostLteApNum'] = apNum
         self.argsNbiot['hostLtePci'] = self.argsLte['pci']
@@ -976,7 +982,7 @@ class NgNbiotGridUi(QDialog):
         #parse LTE grid
         scPerPrb = 12
         prbNum = (6, 15, 25, 50, 75, 100)[self.argsLte['bw']]
-        for fn in self.argsNbiot['lteGrids']:
+        for fn in self.argsNbiot['hostLteGrids']:
             with open(os.path.join(outDir, fn), 'r') as f:
                 line = f.readline()
                 colLabels = line.split(',')[1:]
