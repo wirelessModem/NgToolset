@@ -20,6 +20,7 @@ from ngltephy import LteResType
 from ngltegrid import NgLteGrid
 from ngb36utils import time2str36, freq2str36
 from ngnbiotphy import NbiotPhy, NbiotResType
+from ngnbiotgrid import NgNbiotGrid
 
 class NgNbiotGridUi(QDialog):
     def __init__(self, ngwin):
@@ -757,6 +758,56 @@ class NgNbiotGridUi(QDialog):
     
     def onOkBtnClicked(self):
         #step 1: prepare NgLteGrid
+        self.prepLteGrid()
+        
+        #step 2: call NgLteGrid and parse LTE grid
+        lteGrid = NgLteGrid(self.ngwin, self.argsLte)
+        if lteGrid.isOk:
+            lteGrid.fillCrs()
+            lteGrid.fillPbch()
+            lteGrid.fillSch()
+            lteGrid.fillPdcch()
+            lteGrid.printDl()
+            
+            lteGrid.fillPucch()
+            lteGrid.fillPrach()
+            lteGrid.fillDmrsForPusch()
+            lteGrid.fillSrs()
+            lteGrid.printUl()
+        else:
+            self.accept()
+            return
+        
+        self.argsNbiot['maxPucchRes'] = max(lteGrid.maxPucchRes)
+            
+        #step 3: prepare NgNbiotGrid
+        self.prepNbiotGrid()
+        
+        #step 4: call NgNbiotGrid
+        nbGrid = NgNbiotGrid(self.ngwin, self.argsNbiot)
+        
+        #step 5: parse LTE grid and NB-IoT grid
+        self.parseLteNbiotGrid()
+        
+        self.accept()
+        
+    def onBwComboCurrentIndexChanged(self, index):
+        if index == 0:
+            QMessageBox.warning(self, 'Host LTE Cell Config', '1.4MHz system bandwidth is not supported for NB-IoT!')
+            self.bwCombo.setCurrentIndex(2)
+        else:
+            _dlPrbInd = [None,
+                         (2, 12),
+                         (2, 7, 17, 22),
+                         (4, 9, 14, 19, 30, 35, 40, 45),
+                         (2, 7, 12, 17, 22, 27, 32, 42, 47, 52, 57, 62, 67, 72),
+                         (4, 9, 14, 19, 24, 29, 34, 39, 44, 55, 60, 65, 70, 75, 80, 85, 90, 95)]
+            self.nbInBandPrbIdxDlCombo.clear()
+            for i in _dlPrbInd[index]:
+                self.nbInBandPrbIdxDlCombo.addItem(str(i))
+            self.nbInBandPrbIdxDlCombo.setCurrentIndex(0)
+            
+    def prepLteGrid(self):
         self.argsLte['fs'] = self.fsCombo.currentIndex()
         self.argsLte['bw'] = self.bwCombo.currentIndex()
         self.argsLte['cp'] = self.cpCombo.currentIndex()
@@ -786,29 +837,9 @@ class NgNbiotGridUi(QDialog):
             self.ngwin.logEdit.append('contents of NgNbiotGridUI.argsLte:')
             for key, value in self.argsLte.items():
                 self.ngwin.logEdit.append('-->key=%s, value=%s' % (key, str(value)))
-
-        
-        #step 2: call NgLteGrid and parse LTE grid
-        lteGrid = NgLteGrid(self.ngwin, self.argsLte)
-        if lteGrid.isOk:
-            lteGrid.fillCrs()
-            lteGrid.fillPbch()
-            lteGrid.fillSch()
-            lteGrid.fillPdcch()
-            lteGrid.printDl()
-            
-            lteGrid.fillPucch()
-            lteGrid.fillPrach()
-            lteGrid.fillDmrsForPusch()
-            lteGrid.fillSrs()
-            lteGrid.printUl()
-        else:
-            self.accept()
-            return
-        
-        #step 3: prepare NgNbiotGrid
+    
+    def prepNbiotGrid(self):
         #-->host lte part
-        self.argsNbiot['maxPucchRes'] = max(lteGrid.maxPucchRes)
         files = []
         files.append('LTE_UL_RES_GRID.csv')
         apNum = (1, 2, 4)[self.argsLte['ap']]
@@ -951,30 +982,6 @@ class NgNbiotGridUi(QDialog):
             self.ngwin.logEdit.append('contents of NgNbiotGridUI.argsNbiot:')
             for key, value in self.argsNbiot.items():
                 self.ngwin.logEdit.append('-->key=%s, value=%s' % (key, str(value)))
-        
-        #step 4: call NgNbiotGrid
-        
-        #step 5: parse LTE grid and NB-IoT grid
-        self.parseLteNbiotGrid()
-        
-        
-        self.accept()
-        
-    def onBwComboCurrentIndexChanged(self, index):
-        if index == 0:
-            QMessageBox.warning(self, 'Host LTE Cell Config', '1.4MHz system bandwidth is not supported for NB-IoT!')
-            self.bwCombo.setCurrentIndex(2)
-        else:
-            _dlPrbInd = [None,
-                         (2, 12),
-                         (2, 7, 17, 22),
-                         (4, 9, 14, 19, 30, 35, 40, 45),
-                         (2, 7, 12, 17, 22, 27, 32, 42, 47, 52, 57, 62, 67, 72),
-                         (4, 9, 14, 19, 24, 29, 34, 39, 44, 55, 60, 65, 70, 75, 80, 85, 90, 95)]
-            self.nbInBandPrbIdxDlCombo.clear()
-            for i in _dlPrbInd[index]:
-                self.nbInBandPrbIdxDlCombo.addItem(str(i))
-            self.nbInBandPrbIdxDlCombo.setCurrentIndex(0)
                          
     def parseLteNbiotGrid(self):
         outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
