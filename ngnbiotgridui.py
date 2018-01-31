@@ -860,17 +860,20 @@ class NgNbiotGridUi(QDialog):
         self.argsNbiot['npuschAllSymbols'] = True if self.nbNpuschAllSymCombo.currentIndex() == 0 else False
         self.argsNbiot['npuschFormat1Scs'] = []
         _val = int(self.nbDciN0ScIndEdit.text())
-        if self.argsNbiot['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_3DOT75K.value and _val >= 0 and _val <= 47):
+        if self.argsNbiot['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_3DOT75K.value and _val >= 0 and _val <= 47:
             self.argsNbiot['npuschFormat1Scs'].append(_val)
         elif self.argsNbiot['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_15K.value and _val >= 0 and _val <= 18:
             if _val >= 0 and _val <= 11:
                 self.argsNbiot['npuschFormat1Scs'].append(_val)
             elif _val >= 12 and _val <= 15:
-                self.argsNbiot['npuschFormat1Scs'].append(3*(_val-12)+nsc) for nsc in range(3)
+                for nsc in range(3):
+                    self.argsNbiot['npuschFormat1Scs'].append(3*(_val-12)+nsc) 
             elif _val >= 16 and _val <= 17:
-                self.argsNbiot['npuschFormat1Scs'].append(6*(_val-16)+nsc) for nsc in range(6)
+                for nsc in range(6):
+                    self.argsNbiot['npuschFormat1Scs'].append(6*(_val-16)+nsc)
             else:
-                self.argsNbiot['npuschFormat1Scs'].append(nsc) for nsc in range(12)
+                 for nsc in range(12):
+                    self.argsNbiot['npuschFormat1Scs'].append(nsc)
         else:
             self.ngwin.logEdit.append('Subcarrier Indication(DCI N0) is not valid! Value range is: [0, 47] for 3.75KHz and [0, 18] for 15KHz.')
             self.accept()
@@ -878,7 +881,8 @@ class NgNbiotGridUi(QDialog):
         self.argsNbiot['npuschFormat1NumRu'] = (1, 2, 3, 4, 5, 6, 8, 10)[self.nbDciN0RuIndCombo.currentIndex()]
         self.argsNbiot['npuschFormat1NumRep'] = (1, 2, 4, 8, 16, 32, 64, 128)[self.nbDciN0RepIndCombo.currentIndex()]
         self.argsNbiot['npuschFormat1K0'] = (8, 16, 32, 64)[self.nbDciN0DelayIndCombo.currentIndex()]
-        self.argsNbiot['npuschFormat2NumRep'] = int(self.nbDciN1AnIndCombo.currentText()[1:])
+        #self.argsNbiot['npuschFormat2NumRep'] = int(self.nbDciN1AnIndCombo.currentText()[1:])
+        self.argsNbiot['npuschFormat2NumRep'] = int(self.nbNumAnRepCombo.currentText()[1:])
         _npuschF2Conf = [[(38, 13), (39, 13), (40, 13), (41, 13), (42, 13), (43, 13), (44, 13), (45, 13),
                       (38, 21), (39, 21), (40, 21), (41, 21), (42, 21), (43, 21), (44, 21), (45, 21)],
                      [(0, 13), (1, 13), (2, 13), (3, 13), (0, 15), (1, 15), (2, 15), (3, 15),
@@ -936,6 +940,11 @@ class NgNbiotGridUi(QDialog):
             self.accept()
             return
         self.argsNbiot['npdcchUssOff'] = (0, 1/8, 1/4, 3/8)[self.nbNpdcchUssOffCombo.currentIndex()]
+        
+        if self.ngwin.enableDebug:
+            self.ngwin.logEdit.append('contents of NgNbiotGridUI.argsNbiot:')
+            for key, value in self.argsNbiot.items():
+                self.ngwin.logEdit.append('-->key=%s, value=%s' % (key, str(value)))
         
         #step 4: call NgNbiotGrid
         
