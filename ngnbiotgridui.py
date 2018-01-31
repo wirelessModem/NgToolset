@@ -19,6 +19,7 @@ import ngmainwin
 from ngltephy import LteResType
 from ngltegrid import NgLteGrid
 from ngb36utils import time2str36, freq2str36
+from ngnbiotphy import NbiotPhy, NbiotResType
 
 class NgNbiotGridUi(QDialog):
     def __init__(self, ngwin):
@@ -760,13 +761,7 @@ class NgNbiotGridUi(QDialog):
         self.argsLte['bw'] = self.bwCombo.currentIndex()
         self.argsLte['cp'] = self.cpCombo.currentIndex()
         self.argsLte['ap'] = self.apCombo.currentIndex()
-        try:
-            _pci = int(self.pciEdit.text())
-        except ValueError as e:
-            self.ngwin.logEdit.append("Invalid PCI: '%s'." % self.pciEdit.text())
-            self.accept()
-            return
-        self.argsLte['pci'] = _pci
+        self.argsLte['pci'] = int(self.pciEdit.text())
         self.argsLte['cfi'] = int(self.cfiCombo.currentText())
         self.argsLte['cfiSsf'] = int(self.cfiSsfCombo.currentText())
         self.argsLte['phichDur'] = self.phichDurCombo.currentIndex()
@@ -780,12 +775,11 @@ class NgNbiotGridUi(QDialog):
         self.argsLte['tddAckMode'] = self.tddAckModeCombo.currentIndex()
         self.argsLte['sfn'] = int(self.sfnEdit.text())
         self.argsLte['prachConfInd'] = int(self.prachConfIndEdit.text())
-        _prachFreqOff = int(self.prachFreqOffEdit.text())
-        if _prachFreqOff != 0:
+        self.argsLte['prachFreqOff'] = int(self.prachFreqOffEdit.text())
+        if self.argsLte['prachFreqOff'] != 0:
             self.ngwin.logEdit.append('PRACH frequency offset must be 0!')
             self.accept()
             return
-        self.argsLte['prachFreqOff'] = _prachFreqOff
         self.argsLte['srsSubfConf'] = int(self.srsSfConfEdit.text())
         
         #step 2: call NgLteGrid and parse LTE grid
@@ -807,6 +801,7 @@ class NgNbiotGridUi(QDialog):
             return
         
         #step 3: prepare NgNbiotGrid
+        #-->host lte part
         self.argsNbiot['maxPucchRes'] = max(lteGrid.maxPucchRes)
         files = []
         files.append('LTE_UL_RES_GRID.csv')
@@ -819,6 +814,52 @@ class NgNbiotGridUi(QDialog):
         self.argsNbiot['hostLtePci'] = self.argsLte['pci']
         self.argsNbiot['hostLteCfi'] = self.argsLte['cfi']
         self.argsNbiot['hostLteSrsSubfConf'] = self.argsLte['srsSubfConf']
+        #-->nb common part
+        self.argsNbiot['nbOpMode'] = self.nbOpModeCombo.currentIndex()
+        if self.argsNbiot['nbOpMode'] > 1:
+            self.ngwin.logEdit.append('Only inband NB-IoT is supported!')
+            self.accept()
+            return
+        self.argsNbiot['nbDlAp'] = 1 if self.nbApCombo.currentIndex() == 0 else 2
+        if self.argsNbiot['hostLteApNum'] != self.argsNbiot['nbDlAp']:
+            self.ngwin.logEdit.append('#AP of NB cell must be the same as #AP of host LTE cell for inband deployment!')
+            self.accept()
+            return
+        self.argsNbiot['nbPci'] = int(self.nbPciEdit.text())
+        if self.argsNbiot['nbPci'] < 0 or self.argsNbiot['nbPci'] > 503:
+            self.ngwin.logEdit.append('Invalid NB PCI! Valid range is [0, 503].')
+            self.accept()
+            return
+        elif self.argsNbiot['nbOpMode'] == NbiotPhy.NBIOT_INBAND_SAME_PCI.value and self.argsNbiot['hostLtePci'] != self.argsNbiot['nbPci']:
+            self.ngwin.logEdit.append('PCI of host LTE and NB is different for inband-samePCI deployment!')
+            self.accept()
+            return
+        elif self.argsNbiot['nbOpMode'] == NbiotPhy.NBIOT_INBAND_DIFF_PCI.value and self.argsNbiot['hostLtePci'] == self.argsNbiot['nbPci']:
+            self.ngwin.logEdit.append('PCI of host LTE and NB is the same for inband-differentPCI deployment!')
+            self.accept()
+            return
+        self.argsNbiot['nbInbandPrbIndUl'] = int(self.nbInBandPrbIdxUlEdit.text())
+        if self.argsNbiot['nbInbandPrbIndUl'] != 0:
+            self.ngwin.logEdit.append('NB Inband PRB Index UL must be 0!')
+            self.accept()
+            return
+        self.argsNbiot['nbInbandPrbIndDl'] = int(self.nbInBandPrbIdxDlCombo.currentText())
+        self.argsNbiot['nbHsfn'] = int(self.nbHsfnEdit.text())
+        if self.argsNbiot['nbHsfn'] < 0 or self.argsNbiot['nbHsfn'] > 1023:
+            self.ngwin.logEdit.append('Invalid NB HSFN! Valid range is: [0, 1023].')
+            self.accept()
+            return
+        self.argsNbiot['nbSfn'] = int(self.nbSfnEdit.text())
+        if self.argsNbiot['nbSfn'] < 0 or self.argsNbiot['nbSfn'] > 1023:
+            self.ngwin.logEdit.append('Invalid NB SFN! Valid range is: [0, 1023].')
+            self.accept()
+            return
+        #-->nb ul part
+        
+        
+        #-->nb dl part
+            
+        
         
         
         #step 4: call NgNbiotGrid
