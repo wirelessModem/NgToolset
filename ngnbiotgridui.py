@@ -760,7 +760,7 @@ class NgNbiotGridUi(QDialog):
         #step 1: prepare NgLteGrid
         self.prepLteGrid()
         
-        #step 2: call NgLteGrid and parse LTE grid
+        #step 2: call NgLteGrid
         lteGrid = NgLteGrid(self.ngwin, self.argsLte)
         if lteGrid.isOk:
             lteGrid.fillCrs()
@@ -785,6 +785,20 @@ class NgNbiotGridUi(QDialog):
         
         #step 4: call NgNbiotGrid
         nbGrid = NgNbiotGrid(self.ngwin, self.argsNbiot)
+        nrf = 0
+        hsfn = self.argsNbiot['nbHsfn']
+        sfn = self.argsNbiot['nbSfn']
+        while nrf < 256:
+            nbGrid.normalOps(hsfn, sfn)
+            
+            sfn = sfn + 1
+            if sfn == 1024:
+                sfn = 0
+                hsfn = hsfn + 1
+                if hsfn == 1024:
+                    hsfn = 0
+            
+            nrf = nrf + 1
         
         #step 5: parse LTE grid and NB-IoT grid
         self.parseLteNbiotGrid()
