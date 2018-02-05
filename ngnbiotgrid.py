@@ -101,6 +101,9 @@ class NgNbiotGrid(object):
     def fillHostCrs(self, hsfn, sfn):
         pass
     
+    def fillHostSrs(self, hsfn, sfn):
+        pass
+    
     def fillNpbch(self, hsfn, sfn):
         pass
     
@@ -140,3 +143,19 @@ class NgNbiotGrid(object):
         self.fillNbSib3(hsfn, sfn)
         #NB UL
         self.fillNprach(hsfn, sfn)
+    
+    def monitorNpdcch(self, hsfn, sfn):
+        self.normalOps(hsfn, sfn)
+        self.fillNpdcch(hsfn, sfn)
+        
+    def sendNpuschFormat1(self, hsfn, sfn):
+        self.normalOps(hsfn, sfn)
+        self.fillNpuschFormat1(hsfn, sfn)
+    
+    def sendNpuschFormat2(self, hsfn, sfn):
+        self.normalOps(hsfn, sfn)
+        self.fillNpuschFormat2(hsfn, sfn)
+    
+    def recvNpdschWoBcch(self, hsfn, sfn):
+        self.normalOps(hsfn, sfn)
+        self.fillNpdschWoBcch(hsfn, sfn)
