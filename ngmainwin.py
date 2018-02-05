@@ -17,6 +17,7 @@ from PyQt5.QtSql import QSqlDatabase
 #-->import plugins
 from ngltegridui import NgLteGridUi
 from ngnbiotgridui import NgNbiotGridUi
+from ngxmlparser import NgXmlParser
 
 class NgMainWin(QMainWindow):
     def __init__(self):
@@ -35,7 +36,7 @@ class NgMainWin(QMainWindow):
         self.setWindowFlags(self.windowFlags() or Qt.WindowMinMaxButtonsHint)
         self.setWindowState(self.windowState() or Qt.WindowMaximized)
         self.tabWidget.tabCloseRequested.connect(self.onTabCloseRequested)
-    
+        
     def onTabCloseRequested(self, index):
         if index == 0:
             return
@@ -53,6 +54,12 @@ class NgMainWin(QMainWindow):
         drivers = QSqlDatabase().drivers()
         for e in drivers:
             self.logEdit.append('Found SQL driver: %s' % e)
+    
+    def onExecXmlParser(self):
+        indir = '/home/zhenggao/py35/ngtoolset'
+        parser = NgXmlParser(self, indir) 
+        parser.start()
+        
             
     def onExecLteResGrid(self):
         dlg = NgLteGridUi(self)
@@ -83,6 +90,8 @@ class NgMainWin(QMainWindow):
         #Misc menu
         self.chkSqlAction = QAction('Check SQL Plugin')
         self.chkSqlAction.triggered.connect(self.onChkSqlPlugin)
+        self.xmlParserAction = QAction('XML Parser')
+        self.xmlParserAction.triggered.connect(self.onExecXmlParser)
         
         #Options menu
         self.enableDebugAction = QAction('Enable Debug')
@@ -109,6 +118,7 @@ class NgMainWin(QMainWindow):
         
         self.miscMenu = self.menuBar().addMenu('Misc')
         self.miscMenu.addAction(self.chkSqlAction)
+        self.miscMenu.addAction(self.xmlParserAction)
         
         self.optionsMenu = self.menuBar().addMenu('Options')
         self.optionsMenu.addAction(self.enableDebugAction)
