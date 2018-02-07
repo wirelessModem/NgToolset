@@ -22,7 +22,9 @@ from ngb36utils import time2str36, freq2str36
 class NgNbiotGrid(object):
     def __init__(self, ngwin, args):
         self.scNbDl= 12 
-        self.slotPerRfNbDl = 20
+        self.slotPerSubfNbDl = 2
+        self.subfPerRfNbDl = 10
+        self.slotPerRfNbDl = self.slotPerSubfNbDl * self.subfPerRfNbDl 
         if args['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_3DOT75K.value:
             self.scNbUl = 48
             self.slotPerRfNbUl = 5
@@ -31,7 +33,8 @@ class NgNbiotGrid(object):
             self.slotPerRfNbUl = 20
         self.symbPerSlotNb = 7
         self.symbPerRfNbUl = self.symbPerSlotNb * self.slotPerRfNbUl
-        self.symbPerRfNbDl = self.symbPerSlotNb * self.slotPerRfNbDl
+        self.symbPerSubfNbDl = self.symbPerSlotNb * self.slotPerSubfNbDl
+        self.symbPerRfNbDl = self.symbPerSubfNbDl * self.subfPerRfNbDl
         self.ngwin = ngwin
         self.args = args
         self.init()
@@ -75,6 +78,7 @@ class NgNbiotGrid(object):
         #data structure for NB mapping
         self.gridNbUl = OrderedDict()  #key='HSFN_SFN', value=ndarray of [#ap, #sc, #symbol]
         self.gridNbDl = OrderedDict()  #key='HSFN_SFN', value=ndarray of [#ap, #sc, #symbol]
+        self.gridNbDlTmp = None
         
     def initSib1Mapping(self):
         #from 36.331 5.2.1.2a
@@ -90,22 +94,156 @@ class NgNbiotGrid(object):
             self.sib1MapRf = [self.args['npdschSib1StartRf'] + 16 * i + 2 * j for i in range(16) for j in range(8)]
     
     def fillNpss(self, hsfn, sfn):
-        pass
+        dn = str(hsfn) + '_' + str(sfn)
+        if not dn in self.gridNbDl:
+            self.ngwin.logEdit.append('Call NgNbiotGrid.fillHostCrs at first to initialize NgNbiotGrid.gridNbDl!')
+            return
+        
+        slots = (5*2, 5*2+1) #subframe 5 of each radio frame
+        for iap in range(self.args['nbDlAp']):
+            for islot in slots:
+                for isymb in range(3, self.symbPerSlotNb): #skip first 3 ofdm symbols which are reserved for PDCCH
+                    for isc in range(self.scNbDl-1): #last subcarrier is reserved
+                        if self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
+                            self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_NPSS.value
     
     def fillNsss(self, hsfn, sfn):
-        pass
+        if sfn % 2 != 0:
+            return
+        
+        dn = str(hsfn) + '_' + str(sfn)
+        if not dn in self.gridNbDl:
+            self.ngwin.logEdit.append('Call NgNbiotGrid.fillHostCrs at first to initialize NgNbiotGrid.gridNbDl!')
+            return
+        
+        slots = (9*2, 9*2+1) #subframe 9 of even radio frame
+        for iap in range(self.args['nbDlAp']):
+            for islot in slots:
+                for isymb in range(3, self.symbPerSlotNb): #skip first 3 ofdm symbols which are reserved for PDCCH
+                    for isc in range(self.scNbDl):
+                        if self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
+                            self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_NSSS.value
+        
     
     def fillNrs(self, hsfn, sfn):
         pass
     
     def fillHostCrs(self, hsfn, sfn):
-        pass
+        dn = str(hsfn) + '_' + str(sfn)
+        
+        #init gridNbDl and gridNbUl for dn="hsfn_sfn"
+        if not dn in self.gridNbDl:
+            self.gridNbDl[dn] = np.full((self.args['nbDlAp'], self.scNbDl, self.symbPerRfNbDl), NbiotResType.NBIOT_RES_BLANK.value)
+            self.gridNbUl[dn] = np.full((1, self.scNbUl, self.symbPerRfNbUl), NbiotResType.NBIOT_RES_BLANK.value)
+        
+        _crsPos = [(0, 0, 0),
+                   (0, self.symbPerSlotNb-3, 3),
+                   (1, 0, 3),
+                   (1, self.symbPerSlotNb-3, 0)]
+        m = list(range(2))
+        vShift = self.args['nbPci'] % 6
+        
+        for ap, l, v in _crsPos:
+            k = list(map(lambda x : 6*x+(v+vShift)%6, m))
+            symb = [islot * self.symbPerSlotNb + l for islot in range(self.slotPerRfNbDl)]
+            
+            for _k in k:
+                for _symb in symb:
+                    if self.gridNbDl[dn][ap][_k][_symb] == NbiotResType.NBIOT_RES_BLANK.value:
+                        self.gridNbDl[dn][ap][_k][_symb] = NbiotResType.NBIOT_RES_CRS.value
+            
+            for _ap in range(self.args['nbDlAp']):
+                if _ap != ap:
+                    for _k in k:
+                        for _symb in symb:
+                            if self.gridNbDl[dn][_ap][_k][_symb] == NbiotResType.NBIOT_RES_BLANK.value:
+                                self.gridNbDl[dn][_ap][_k][_symb] = NbiotResType.NBIOT_RES_DTX.value
     
     def fillHostSrs(self, hsfn, sfn):
         pass
+
+    def fillGridNbDlTmp(self):
+        if self.gridNbDlTmp is not None:
+            return
+        
+        #from 36.211 10.2.4.4
+        #For the purpose of the (NPBCH) mapping, the UE shall assume cell-specific reference signals for antenna ports 0-3 and
+        #narrowband reference signals for antenna ports 2000 and 2001 being present irrespective of the actual configuration.
+        self.gridNbDlTmp = np.full((4, self.scNbDl, self.symbPerRfNbDl), NbiotResType.NBIOT_RES_BLANK.value)
+        
+        _crsPos = [(0, 0, 0),
+                   (0, self.symbPerSlotNb-3, 3),
+                   (1, 0, 3),
+                   (1, self.symbPerSlotNb-3, 0),
+                   (2, 1, 0),
+                   (2, 1, 3),
+                   (3, 1, 3),
+                   (3, 1, 6)]
+        
+        _nrsPos = [(0, self.symbPerSlotNb-2, 0),
+                   (0, self.symbPerSlotNb-1, 3),
+                   (1, self.symbPerSlotNb-2, 3),
+                   (1, self.symbPerSlotNb-1, 0)]
+        
+        m = list(range(2))
+        vShift = self.args['nbPci']% 6
+        
+        #Temporary CRS mapping with 4 antenna ports
+        for ap, l, v in _crsPos:
+            k = list(map(lambda x : 6*x+(v+vShift)%6, m))
+            
+            if ap in [0, 1]:
+                symb = [islot * self.symbPerSlotNb + l for islot in range(self.slotPerRfNbDl)]
+            elif (ap == 2 and v == 0) or (ap == 3 and v == 3):
+                symb = [islot * self.symbPerSlotNb + l for islot in range(self.slotPerRfNbDl) if islot % 2 == 0]
+            else: #(ap == 2 and v == 3) or (ap == 3 and v == 6)
+                symb = [islot * self.symbPerSlotNb + l for islot in range(self.slotPerRfNbDl) if islot % 2 == 1]
+            
+            for _k in k:
+                for _symb in symb:
+                    if self.gridNbDlTmp[ap][_k][_symb] == NbiotResType.NBIOT_RES_BLANK.value:
+                        self.gridNbDlTmp[ap][_k][_symb] = NbiotResType.NBIOT_RES_CRS.value
+            
+            for _ap in range(4):
+                if _ap != ap:
+                    for _k in k:
+                        for _symb in symb:
+                            if self.gridNbDlTmp[_ap][_k][_symb] == NbiotResType.NBIOT_RES_BLANK.value:
+                                self.gridNbDlTmp[_ap][_k][_symb] = NbiotResType.NBIOT_RES_DTX.value
+        
+        #Temporary NRS mapping with 2 antenna ports
+        for ap, l, v in _nrsPos:
+            k = list(map(lambda x : 6*x+(v+vShift)%6, m))
+            symb = [islot * self.symbPerSlotNb + l for islot in range(self.slotPerRfNbDl)]
+            
+            for _k in k:
+                for _symb in symb:
+                    if self.gridNbDlTmp[ap][_k][_symb] == NbiotResType.NBIOT_RES_BLANK.value:
+                        self.gridNbDlTmp[ap][_k][_symb] = NbiotResType.NBIOT_RES_NRS.value
+            
+            for _ap in range(2):
+                if _ap != ap:
+                    for _k in k:
+                        for _symb in symb:
+                            if self.gridNbDlTmp[_ap][_k][_symb] == NbiotResType.NBIOT_RES_BLANK.value:
+                                self.gridNbDlTmp[_ap][_k][_symb] = NbiotResType.NBIOT_RES_DTX.value
     
     def fillNpbch(self, hsfn, sfn):
-        pass
+        dn = str(hsfn) + '_' + str(sfn)
+        if not dn in self.gridNbDl:
+            self.ngwin.logEdit.append('Call NgNbiotGrid.fillHostCrs at first to initialize NgNbiotGrid.gridNbDl!')
+            return
+        
+        if self.gridNbDlTmp is None:
+            self.fillGridNbDlTmp()
+        
+        slots = (0, 1) #subframe 0 of each radio frame
+        for iap in range(self.args['nbDlAp']):
+            for islot in slots:
+                for isymb in range(3, self.symbPerSlotNb): #skip first 3 ofdm symbols which are reserved for PDCCH
+                    for isc in range(self.scNbDl):
+                        if self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value and self.gridNbDlTmp[iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
+                            self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_NPBCH.value
     
     def fillNbSib1(self, hsfn, sfn):
         pass

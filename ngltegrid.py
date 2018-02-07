@@ -532,11 +532,11 @@ class NgLteGrid(object):
             k = list(map(lambda x : 6*x+(v+vShift)%6, m))
             
             if ap in [0, 1]:
-                symb = [isf*self.symbPerSubf+l for isf in range(self.subfPerRf)] + [isf*self.symbPerSubf+self.symbPerSlot+l for isf in range(self.subfPerRf)]
+                symb = [islot * self.symbPerSlot + l for islot in range(self.slotPerRf)]
             elif (ap == 2 and v == 0) or (ap == 3 and v == 3):
-                symb = [isf*self.symbPerSubf+l for isf in range(self.subfPerRf)]
+                symb = [islot * self.symbPerSlot + l for islot in range(self.slotPerRf) if islot % 2 == 0]
             else: #(ap == 2 and v == 3) or (ap == 3 and v == 6)
-                symb = [isf*self.symbPerSubf+self.symbPerSlot+l for isf in range(self.subfPerRf)]
+                symb = [islot * self.symbPerSlot + l for islot in range(self.slotPerRf) if islot % 2 == 1]
             
             for _k in k:
                 for _symb in symb:
@@ -578,7 +578,6 @@ class NgLteGrid(object):
                    (2, 1, 3),
                    (3, 1, 3),
                    (3, 1, 6)]
-            
         m = list(range(2*self.prbNum))
         vShift = self.pci % 6
         
@@ -586,18 +585,18 @@ class NgLteGrid(object):
             k = list(map(lambda x : 6*x+(v+vShift)%6, m))
             
             if ap in [0, 1]:
-                symb = [isf*self.symbPerSubf+l for isf in range(self.subfPerRf)] + [isf*self.symbPerSubf+self.symbPerSlot+l for isf in range(self.subfPerRf)]
+                symb = [islot * self.symbPerSlot + l for islot in range(self.slotPerRf)]
             elif (ap == 2 and v == 0) or (ap == 3 and v == 3):
-                symb = [isf*self.symbPerSubf+l for isf in range(self.subfPerRf)]
+                symb = [islot * self.symbPerSlot + l for islot in range(self.slotPerRf) if islot % 2 == 0]
             else: #(ap == 2 and v == 3) or (ap == 3 and v == 6)
-                symb = [isf*self.symbPerSubf+self.symbPerSlot+l for isf in range(self.subfPerRf)]
+                symb = [islot * self.symbPerSlot + l for islot in range(self.slotPerRf) if islot % 2 == 1]
             
             for _k in k:
                 for _symb in symb:
                     if gridDlTmp[ap][_k][_symb] == LteResType.LTE_RES_PDSCH.value:
                         gridDlTmp[ap][_k][_symb] = LteResType.LTE_RES_CRS.value
             
-            for _ap in range(self.apNum):
+            for _ap in range(4):
                 if _ap != ap:
                     for _k in k:
                         for _symb in symb:
