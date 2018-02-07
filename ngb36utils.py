@@ -12,17 +12,17 @@ Change History:
 
 from numpy import base_repr
 
-def time2str36(hsfn, sfn, subf, symb):
+def time2str36(hsfn, sfn, slot, symb):
     #HSFN, range 0~1023, two base36 chars
     strHsfn = base_repr(hsfn, base=36)
     #SFN, range 0~1023, two base36 chars
     strSfn = base_repr(sfn, base=36)
-    #subframe, range 0~10, one base36 char
-    strSubf = base_repr(subf, base=36)
-    #symbol, range 0~14, one base36 char
+    #slot, range 0~20, one base36 char
+    strSlot = base_repr(slot, base=36)
+    #symbol, range 0~7, one base36 char
     strSymb = base_repr(symb, base=36)
     
-    return '[%s%s%s%s]' % (strHsfn.zfill(2), strSfn.zfill(2), strSubf, strSymb)
+    return '[%s%s%s%s]' % (strHsfn.zfill(2), strSfn.zfill(2), strSlot, strSymb)
 
 def freq2str36(prb, sc):
     #prb, range 0~99, two base36 chars

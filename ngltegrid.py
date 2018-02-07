@@ -24,6 +24,7 @@ class NgLteGrid(object):
         self.scPerPrb = 12
         self.slotPerSubf = 2
         self.subfPerRf = 10
+        self.slotPerRf = self.slotPerSubf * self.subfPerRf
         self.regPerCce = 9
         self.isOk = False
         self.ngwin = ngwin
@@ -819,8 +820,8 @@ class NgLteGrid(object):
             with open(os.path.join(outDir, 'LTE_DL_RES_GRID_AP'+str(iap)+'.csv'), 'w') as f:
                 line = []
                 line.append('k/l')
-                #line.extend([str(k) for i in range(self.subfPerRf) for j in range(self.slotPerSubf) for k in range(self.symbPerSlot)])
-                line.extend([time2str36(0, self.sfn, i, j*self.symbPerSlot+k) for i in range(self.subfPerRf) for j in range(self.slotPerSubf) for k in range(self.symbPerSlot)])
+                #line.extend([time2str36(0, self.sfn, i, j*self.symbPerSlot+k) for i in range(self.subfPerRf) for j in range(self.slotPerSubf) for k in range(self.symbPerSlot)])
+                line.extend([time2str36(0, self.sfn, i, j) for i in range(self.slotPerRf) for j in range(self.symbPerSlot)])
                 f.write(','.join(line))
                 f.write('\n')
                 
@@ -828,7 +829,8 @@ class NgLteGrid(object):
                     line = []
                     #line.append(str(ire))
                     line.append(freq2str36(ire//self.scPerPrb, ire%self.scPerPrb))
-                    line.extend([str(self.gridDl[iap][ire][isf*self.symbPerSubf+isym]) for isf in range(self.subfPerRf) for isym in range(self.symbPerSubf)])
+                    #line.extend([str(self.gridDl[iap][ire][isf*self.symbPerSubf+isym]) for isf in range(self.subfPerRf) for isym in range(self.symbPerSubf)])
+                    line.extend([str(self.gridDl[iap][ire][islot*self.symbPerSlot+isym]) for islot in range(self.slotPerRf) for isym in range(self.symbPerSlot)])
                     f.write(','.join(line))
                     f.write('\n')
     
@@ -1025,8 +1027,8 @@ class NgLteGrid(object):
         with open(os.path.join(outDir, 'LTE_UL_RES_GRID.csv'), 'w') as f:
             line = []
             line.append('k/l')
-            #line.extend([str(k) for i in range(self.subfPerRf) for j in range(self.slotPerSubf) for k in range(self.symbPerSlot)])
-            line.extend([time2str36(0, self.sfn, i, j*self.symbPerSlot+k) for i in range(self.subfPerRf) for j in range(self.slotPerSubf) for k in range(self.symbPerSlot)])
+            #line.extend([time2str36(0, self.sfn, i, j*self.symbPerSlot+k) for i in range(self.subfPerRf) for j in range(self.slotPerSubf) for k in range(self.symbPerSlot)])
+            line.extend([time2str36(0, self.sfn, i, j) for i in range(self.slotPerRf) for j in range(self.symbPerSlot)])
             f.write(','.join(line))
             f.write('\n')
             
@@ -1034,6 +1036,7 @@ class NgLteGrid(object):
                 line = []
                 #line.append(str(ire))
                 line.append(freq2str36(ire//self.scPerPrb, ire%self.scPerPrb))
-                line.extend([str(self.gridUl[0][ire][isf*self.symbPerSubf+isym]) for isf in range(self.subfPerRf) for isym in range(self.symbPerSubf)])
+                #line.extend([str(self.gridUl[0][ire][isf*self.symbPerSubf+isym]) for isf in range(self.subfPerRf) for isym in range(self.symbPerSubf)])
+                line.extend([str(self.gridUl[0][ire][islot*self.symbPerSlot+isym]) for islot in range(self.slotPerRf) for isym in range(self.symbPerSlot)])
                 f.write(','.join(line))
                 f.write('\n')
