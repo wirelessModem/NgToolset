@@ -399,8 +399,20 @@ class NgNbiotGrid(object):
                         if self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
                             self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_SIB3.value
     
-    def fillNpdcch(self, hsfn, sfn):
-        pass
+    def fillNpdcchUss(self, hsfn, sfn):
+        dn = str(hsfn) + '_' + str(sfn)
+        if not dn in self.gridNbDl:
+            self.ngwin.logEdit.append('Call NgNbiotGrid.fillHostCrs at first to initialize NgNbiotGrid.gridNbDl!')
+            return
+        
+        #from 36.213 16.6
+        #The locations of starting subframe k are given by k=k_b where k_b is the bth consecutive NB-IoT DL subframe from subframe k0,
+        #excluding subframes used for transmission of SI messages, and b=u*R , and u=0,1,...,R_max/R-1, and where:
+        #-subframe k0 is a subframe satisfying the condition: (10*nf + floor(ns/2)) mod T = floor(a_offset * T)
+        #-where T = R_max * G, T >= 4
+        rMax = self.args['npdcchUssNumRep']
+        t = rMax * self.args['npdcchUssStartSf']
+        
     
     def fillNpdschWoBcch(self, hsfn, sfn):
         pass
@@ -429,7 +441,7 @@ class NgNbiotGrid(object):
     
     def monitorNpdcch(self, hsfn, sfn):
         self.normalOps(hsfn, sfn)
-        self.fillNpdcch(hsfn, sfn)
+        self.fillNpdcchUss(hsfn, sfn)
         
     def sendNpuschFormat1(self, hsfn, sfn):
         self.normalOps(hsfn, sfn)
