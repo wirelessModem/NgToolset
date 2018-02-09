@@ -19,7 +19,7 @@ import ngmainwin
 from ngltephy import LteResType
 from ngltegrid import NgLteGrid
 from ngb36utils import time2str36, freq2str36
-from ngnbiotphy import NbiotPhy, NbiotResType
+from ngnbiotphy import NbiotPhy, NbiotResType, incSfn
 from ngnbiotgrid import NgNbiotGrid
 
 class NgNbiotGridUi(QDialog):
@@ -791,13 +791,7 @@ class NgNbiotGridUi(QDialog):
         while nrf < 256:
             nbGrid.normalOps(hsfn, sfn)
             
-            sfn = sfn + 1
-            if sfn == 1024:
-                sfn = 0
-                hsfn = hsfn + 1
-                if hsfn == 1024:
-                    hsfn = 0
-            
+            hsfn, sfn = incSfn(hsfn, sfn, 1)
             nrf = nrf + 1
         
         #step 5: parse LTE grid and NB-IoT grid

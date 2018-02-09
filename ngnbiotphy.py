@@ -52,3 +52,12 @@ class NbiotResType(Enum):
     NBIOT_RES_BLANK = 20
     
     NBIOT_RES_BUTT = 99
+
+def incSfn(hsfn, sfn, n):
+    sfn = sfn + n
+    if sfn >= 1024:
+        sfn = sfn % 1024
+        hsfn = hsfn + 1
+        if hsfn >= 1024:
+            hsfn = hsfn % 1024
+    return (hsfn, sfn)
