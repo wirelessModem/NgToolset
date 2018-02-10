@@ -81,8 +81,19 @@ class NgNbiotGrid(object):
         self.gridNbDl = OrderedDict()  #key='HSFN_SFN', value=ndarray of [#ap, #sc, #symbol]
         
         #data structure for SIB2/SIB3 mapping
-        self.sib2Map = OrderedDict()   #key='hsfn_sfn', value=[list of subframes]
-        self.sib3Map = OrderedDict()   #key='hsfn_sfn', value=[list of subframes]
+        self.sib2Map = OrderedDict()   #key='hsfn_sfn', value=[list of dl subframes for sib2 mapping]
+        self.sib3Map = OrderedDict()   #key='hsfn_sfn', value=[list of dl subframes for sib3 mapping]
+        
+        #data structure for NPDCCH USS mapping
+        self.npdcchUssMap = OrderedDict()   #key='hsfn_sfn', value=[list of dl subframes for the first uss candidate]
+        
+        self.ussRmax = self.args['npdcchUssNumRep']
+        #Table 16.6-1: NPDCCH UE- specific search space candidates
+        _ussCand = {1 : [(1, 1, 'ncce0')], #(1, 1, 'ncce1'), (1, 2, 'ncce01') not supported!
+                    2 : [(1, 1, 'ncce0'), (2, 2, 'ncce01')], #(1, 1, 'ncce1'), (2, 2, 'ncce01') not supported!
+                    4 : [(1, 2, 'ncce01'), (2, 2, 'ncce01'), (4, 2, 'ncce01')],
+                    8 : [(self.ussRmax // 8, 2, 'ncce01'), (self.ussRmax // 4, 2, 'ncce01'), (self.ussRmax // 2, 2, 'ncce01'), (self.ussRmax, 2, 'ncce01')]}
+        self.ussR, self.ussAggLev, ncce = _ussCand[self.ussRmax][self.args['nbDciN0N1SfRep']] if self.ussRmax < 8 else _ussCand[8][self.args['nbDciN0N1SfRep']]
         
     def initSib1Mapping(self):
         #from 36.331 5.2.1.2a
@@ -399,6 +410,9 @@ class NgNbiotGrid(object):
                         if self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
                             self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_SIB3.value
     
+    def resetNpdcchUssMap(self, hsfn, sfn, k0, b):
+        self.npdcchUssMap.clear()
+    
     def fillNpdcchUss(self, hsfn, sfn):
         dn = str(hsfn) + '_' + str(sfn)
         if not dn in self.gridNbDl:
@@ -410,9 +424,22 @@ class NgNbiotGrid(object):
         #excluding subframes used for transmission of SI messages, and b=u*R , and u=0,1,...,R_max/R-1, and where:
         #-subframe k0 is a subframe satisfying the condition: (10*nf + floor(ns/2)) mod T = floor(a_offset * T)
         #-where T = R_max * G, T >= 4
-        rMax = self.args['npdcchUssNumRep']
-        t = rMax * self.args['npdcchUssStartSf']
+        T = int(self.ussRmax * self.args['npdcchUssStartSf'])
+        k0 = None
+        for i in range(self.subfPerRfNbDl):
+            if (sfn * self.subfPerRfNbDl + i) % T == math.floor(self.args['npdcchUssOff'] * T):
+                k0 = i
+                break
         
+        u = list(range(self.ussRmax // self.ussR))
+        b = u[0] * self.ussR    #for simplicity, always use the first candidate
+        
+        if k0 is not None:
+            self.resetNpdcchUssMap(hsfn, sfn, k0, b)
+        
+        key = str(hsfn) + '_' + str(sfn)
+        if not key in self.npdcchUssMap:
+            return
     
     def fillNpdschWoBcch(self, hsfn, sfn):
         pass

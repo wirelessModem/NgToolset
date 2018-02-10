@@ -789,7 +789,8 @@ class NgNbiotGridUi(QDialog):
         hsfn = self.argsNbiot['nbHsfn']
         sfn = self.argsNbiot['nbSfn']
         while nrf < 256:
-            nbGrid.normalOps(hsfn, sfn)
+            #nbGrid.normalOps(hsfn, sfn)
+            nbGrid.monitorNpdcch(hsfn, sfn)
             
             hsfn, sfn = incSfn(hsfn, sfn, 1)
             nrf = nrf + 1
