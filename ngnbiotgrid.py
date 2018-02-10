@@ -412,6 +412,52 @@ class NgNbiotGrid(object):
     
     def resetNpdcchUssMap(self, hsfn, sfn, k0, b):
         self.npdcchUssMap.clear()
+        
+        #find starting subframe k
+        key = str(hsfn) + '_' + str(sfn)
+        for subf in range(k0, self.subfPerRfNbDl):
+            if self.validateDlSubf(sfn, subf):
+                if not ((key in self.sib2Map and subf in self.sib2Map[key]) or (key in self.sib3Map and subf in self.sib3Map[key])):
+                    b = b - 1
+                    if b == 0:  #found starting subframe k=kb
+                        self.npdcchUssMap[key] = [subf]
+                        break
+        while b > 0:
+            hsfn, sfn = incSfn(hsfn, sfn, 1)
+            key = str(hsfn) + '_' + str(sfn)
+            for subf in range(self.subfPerRfNbDl):
+                if self.validateDlSubf(sfn, subf):
+                    if not ((key in self.sib2Map and subf in self.sib2Map[key]) or (key in self.sib3Map and subf in self.sib3Map[key])):
+                        b = b - 1
+                        if b == 0:  #found starting subframe k=kb
+                            self.npdcchUssMap[key] = [subf]
+                            break
+        
+        #init uss candidate which repeated in a set of R consecutive NB-IoT downlink subframes
+        R = self.ussR - 1
+        if R == 0:
+            return
+        for subf in range(self.npdcchUssMap[key][0], self.subfPerRfNbDl):
+            if self.validateDlSubf(sfn, subf):
+                if not ((key in self.sib2Map and subf in self.sib2Map[key]) or (key in self.sib3Map and subf in self.sib3Map[key])):
+                    R = R - 1
+                    self.npdcchUssMap[key].append(subf)
+                    if R == 0:
+                        break
+                    
+        while R > 0:
+            hsfn, sfn = incSfn(hsfn, sfn, 1)
+            key = str(hsfn) + '_' + str(sfn)
+            for subf in range(self.subfPerRfNbDl):
+                if self.validateDlSubf(sfn, subf):
+                    if not ((key in self.sib2Map and subf in self.sib2Map[key]) or (key in self.sib3Map and subf in self.sib3Map[key])):
+                        R = R - 1
+                        if key in self.npdcchUssMap:
+                            self.npdcchUssMap[key].append(subf)
+                        else:
+                            self.npdcchUssMap[key] = [subf]
+                        if R == 0:
+                            break
     
     def fillNpdcchUss(self, hsfn, sfn):
         dn = str(hsfn) + '_' + str(sfn)
@@ -440,6 +486,19 @@ class NgNbiotGrid(object):
         key = str(hsfn) + '_' + str(sfn)
         if not key in self.npdcchUssMap:
             return
+        
+        slots = []
+        for subf in self.npdcchUssMap[key]:
+            slots.extend([2*subf, 2*subf+1])
+            
+        for iap in range(self.args['nbDlAp']):
+            for islot in slots:
+                for isymb in range(self.symbPerSlotNb):
+                    for isc in range(self.scNbDl):
+                        if self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
+                            self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_NPDCCH.value
+        
+        #TODO: NPDCCH Gap to be implemented!
     
     def fillNpdschWoBcch(self, hsfn, sfn):
         pass
