@@ -86,11 +86,12 @@ class NgNbiotGrid(object):
         
         #data structure for NPDCCH USS mapping
         self.npdcchUssMap = OrderedDict()   #key='hsfn_sfn', value=[list of dl subframes for the first uss candidate]
+        self.recvingNpdcch = False
         
         self.ussRmax = self.args['npdcchUssNumRep']
         #Table 16.6-1: NPDCCH UE- specific search space candidates
         _ussCand = {1 : [(1, 1, 'ncce0')], #(1, 1, 'ncce1'), (1, 2, 'ncce01') not supported!
-                    2 : [(1, 1, 'ncce0'), (2, 2, 'ncce01')], #(1, 1, 'ncce1'), (2, 2, 'ncce01') not supported!
+                    2 : [(1, 1, 'ncce0'), (2, 2, 'ncce01')], #(1, 1, 'ncce1') not supported!
                     4 : [(1, 2, 'ncce01'), (2, 2, 'ncce01'), (4, 2, 'ncce01')],
                     8 : [(self.ussRmax // 8, 2, 'ncce01'), (self.ussRmax // 4, 2, 'ncce01'), (self.ussRmax // 2, 2, 'ncce01'), (self.ussRmax, 2, 'ncce01')]}
         self.ussR, self.ussAggLev, ncce = _ussCand[self.ussRmax][self.args['nbDciN0N1SfRep']] if self.ussRmax < 8 else _ussCand[8][self.args['nbDciN0N1SfRep']]
@@ -139,8 +140,48 @@ class NgNbiotGrid(object):
                         if self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
                             self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_NSSS.value
     
+    def validateNrsSubf(self, sfn, subf):
+        #from 36.211 10.2.6
+        #When UE receives higher-layer parameter operationModeInfo indicating inband-SamePCI or inband-DifferentPCI,
+        #- Before the UE obtains SystemInformationBlockType1-NB, the UE may assume narrowband reference signals are transmitted in subframes #0, #4 and in subframes #9 not containing NSSS.
+        #- After the UE obtains SystemInformationBlockType1-NB, the UE may assume narrowband reference signals are transmitted in subframes #0, #4, subframes #9 not containing NSSS, and in NB-IoT downlink subframes and shall not expect narrowband reference signals in other downlink subframes.
+        if subf == 0 or subf == 4 or (sfn % 2 == 1 and subf == 9) or self.validateDlSubf(sfn, subf):
+            return True
+        else:
+            return False
+    
     def fillNrs(self, hsfn, sfn):
-        pass
+        dn = str(hsfn) + '_' + str(sfn)
+        if not dn in self.gridNbDl:
+            self.ngwin.logEdit.append('Call NgNbiotGrid.fillHostCrs at first to initialize NgNbiotGrid.gridNbDl!')
+            return
+        
+        _nrsPos = [(0, self.symbPerSlotNb-2, 0),
+                   (0, self.symbPerSlotNb-1, 3),
+                   (1, self.symbPerSlotNb-2, 3),
+                   (1, self.symbPerSlotNb-1, 0)]
+        if self.args['nbDlAp'] == 1:
+            _nrsPos = _nrsPos[:2]
+        
+        m = list(range(2))
+        vShift = self.args['nbPci'] % 6
+        
+        for ap, l, v in _nrsPos:
+            k = list(map(lambda x : 6*x+(v+vShift)%6, m))
+            symb = [islot * self.symbPerSlotNb + l for islot in range(self.slotPerRfNbDl) if self.validateNrsSubf(sfn, math.floor(islot/2))]
+            
+            for _k in k:
+                for _symb in symb:
+                    if self.gridNbDlTmp[ap][_k][_symb] == NbiotResType.NBIOT_RES_BLANK.value:
+                        self.gridNbDlTmp[ap][_k][_symb] = NbiotResType.NBIOT_RES_NRS.value
+            
+            for _ap in range(self.args['nbDlAp']):
+                if _ap != ap:
+                    for _k in k:
+                        for _symb in symb:
+                            if self.gridNbDlTmp[_ap][_k][_symb] == NbiotResType.NBIOT_RES_BLANK.value:
+                                self.gridNbDlTmp[_ap][_k][_symb] = NbiotResType.NBIOT_RES_DTX.value
+        
     
     def fillHostCrs(self, hsfn, sfn):
         dn = str(hsfn) + '_' + str(sfn)
@@ -154,6 +195,9 @@ class NgNbiotGrid(object):
                    (0, self.symbPerSlotNb-3, 3),
                    (1, 0, 3),
                    (1, self.symbPerSlotNb-3, 0)]
+        if self.args['nbDlAp'] == 1:
+            _crsPos = _crsPos[:2]
+            
         m = list(range(2))
         vShift = self.args['nbPci'] % 6
         
@@ -197,7 +241,7 @@ class NgNbiotGrid(object):
                    (1, self.symbPerSlotNb-1, 0)]
         
         m = list(range(2))
-        vShift = self.args['nbPci']% 6
+        vShift = self.args['nbPci'] % 6
         
         #Temporary CRS mapping with 4 antenna ports
         for ap, l, v in _crsPos:
@@ -262,10 +306,17 @@ class NgNbiotGrid(object):
             self.ngwin.logEdit.append('Call NgNbiotGrid.fillHostCrs at first to initialize NgNbiotGrid.gridNbDl!')
             return
         
+        #from 36.211 10.2.3.4
+        #the index l in the first slot in a subframe fulfills l >= l_Data_Start where l_Data_Start is given by clause 16.4.1.4 of 3GPP TS 36.213 [4].
+        #from 36.213 16.4.1.4
+        #- if subframe k is a subframe used for receiving SIB1-NB
+        #   - l_Data_Start = 3 the value of the higher layer parameter operationModeInfo is set to ’00’ or ‘01’
+        #   - l_Data_Start = 0 otherwise
+        #- else...
         slots = (2*4, 2*4+1) #subframe 4 of valid radio frame
         for iap in range(self.args['nbDlAp']):
             for islot in slots:
-                for isymb in range(self.symbPerSlotNb):
+                for isymb in range(3 if islot % 2 == 0 else 0, self.symbPerSlotNb):
                     for isc in range(self.scNbDl):
                         if self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
                             self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_SIB1.value
@@ -373,13 +424,22 @@ class NgNbiotGrid(object):
         if not key in self.sib2Map:
             return
         
+        #from 36.211 10.2.3.4
+        #the index l in the first slot in a subframe fulfills l >= l_Data_Start where l_Data_Start is given by clause 16.4.1.4 of 3GPP TS 36.213 [4].
+        #from 36.213 16.4.1.4
+        #- if subframe k is a subframe used for receiving SIB1-NB
+        #   - l_Data_Start = 3 the value of the higher layer parameter operationModeInfo is set to ’00’ or ‘01’
+        #   - l_Data_Start = 0 otherwise
+        #- else
+        #   - l_Data_Start is given by the higher layer parameter eutraControlRegionSize if the value of the higher layer parameter eutraControlRegionSize is present
+        #   - l_Data_Start = 0 otherwise
         slots = []
         for subf in self.sib2Map[key]:
             slots.extend([2*subf, 2*subf+1])
             
         for iap in range(self.args['nbDlAp']):
             for islot in slots:
-                for isymb in range(self.symbPerSlotNb):
+                for isymb in range(self.args['hostLteCfi'] if islot % 2 == 0 else 0, self.symbPerSlotNb):
                     for isc in range(self.scNbDl):
                         if self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
                             self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_SIB2.value
@@ -405,7 +465,8 @@ class NgNbiotGrid(object):
             
         for iap in range(self.args['nbDlAp']):
             for islot in slots:
-                for isymb in range(self.symbPerSlotNb):
+                #from 36.211 10.2.3.4 and 36.213 16.4.1.4
+                for isymb in range(self.args['hostLteCfi'] if islot % 2 == 0 else 0, self.symbPerSlotNb):
                     for isc in range(self.scNbDl):
                         if self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
                             self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_SIB3.value
@@ -480,7 +541,7 @@ class NgNbiotGrid(object):
         u = list(range(self.ussRmax // self.ussR))
         b = u[0] * self.ussR    #for simplicity, always use the first candidate
         
-        if k0 is not None:
+        if (not self.recvingNpdcch) and (k0 is not None):
             self.resetNpdcchUssMap(hsfn, sfn, k0, b)
         
         key = str(hsfn) + '_' + str(sfn)
@@ -490,12 +551,21 @@ class NgNbiotGrid(object):
         slots = []
         for subf in self.npdcchUssMap[key]:
             slots.extend([2*subf, 2*subf+1])
-            
+        
+        #from 36.211 10.2.5.5
+        #...which meet all of the following criteria: 
+        #- they are part of the NCCE(s) assigned for the NPDCCH transmission, and
+        #- they are not used for transmission of NPBCH, NPSS, or NSSS , and
+        #- they are assumed by the UE not to be used for NRS, and
+        #- they are not overlapping with resource elements used for PBCH, PSS, SSS, or CRS as defined in clause 6 (if any), and
+        #- the index l in the first slot in a subframe fulfills l >= l_NPDCCH_start where l_NPDCCH_start is given by clause 16.6.1 of 3GPP TS 36.213 [4].
         for iap in range(self.args['nbDlAp']):
             for islot in slots:
-                for isymb in range(self.symbPerSlotNb):
-                    for isc in range(self.scNbDl):
-                        if self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
+                #for simplicity, let l = CFI of host LTE in the first slot if a subframe
+                for isymb in range(self.args['hostLteCfi'] if islot % 2 == 0 else 0, self.symbPerSlotNb):
+                    #for simplicity, always use NCCE0 when AL==1
+                    for isc in range(self.scNbDl // 2 if self.ussAggLev == 1 else self.scNbDl):
+                        if self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value and self.args['hostLteGridDl'][iap][self.args['nbInbandPrbIndDl'] * 12 + isc][islot*self.symbPerSlotNb+isymb] == LteResType.LTE_RES_PDSCH.value:
                             self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_NPDCCH.value
         
         #TODO: NPDCCH Gap to be implemented!

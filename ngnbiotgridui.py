@@ -11,6 +11,7 @@ Change History:
 '''
 
 import os
+import math
 from PyQt5.QtWidgets import QDialog, QTextEdit, QTabWidget, QLabel, QLineEdit, QComboBox, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, QWidget, QGroupBox, QMessageBox
 from PyQt5.QtWidgets import QGridLayout, QHBoxLayout, QVBoxLayout
 from PyQt5.QtGui import QColor
@@ -766,6 +767,12 @@ class NgNbiotGridUi(QDialog):
             lteGrid.fillCrs()
             lteGrid.fillPbch()
             lteGrid.fillSch()
+            
+            #36.211 10.2.5.5 NPDCCH mapping
+            #- they are not overlapping with resource elements used for PBCH, PSS, SSS, or CRS as defined in clause 6 (if any),
+            #note the use of ndarray.copy()!
+            self.argsNbiot['hostLteGridDl'] = lteGrid.gridDl.copy()
+            
             lteGrid.fillPdcch()
             lteGrid.printDl()
             
@@ -788,12 +795,28 @@ class NgNbiotGridUi(QDialog):
         nrf = 0
         hsfn = self.argsNbiot['nbHsfn']
         sfn = self.argsNbiot['nbSfn']
-        while nrf < 256:
-            #nbGrid.normalOps(hsfn, sfn)
-            nbGrid.monitorNpdcch(hsfn, sfn)
+        while True: 
+            #npdcch check?
+            T = int(nbGrid.ussRmax * nbGrid.args['npdcchUssStartSf'])
+            k0 = None
+            for i in range(nbGrid.subfPerRfNbDl):
+                if (sfn * nbGrid.subfPerRfNbDl + i) % T == math.floor(nbGrid.args['npdcchUssOff'] * T):
+                    k0 = i
+                    break
             
-            hsfn, sfn = incSfn(hsfn, sfn, 1)
+            if k0 is None:
+                self.ngwin.logEdit.append('normalOps @ [HSFN=%d,SFN=%d]' % (hsfn, sfn))
+                nbGrid.normalOps(hsfn, sfn)
+                hsfn, sfn = incSfn(hsfn, sfn, 1)
+            else:
+                self.ngwin.logEdit.append('monitorNpdcch @ [HSFN=%d,SFN=%d]' % (hsfn, sfn))
+                nbGrid.monitorNpdcch(hsfn, sfn)
+                hsfn, sfn = incSfn(hsfn, sfn, 1)
+                #hsfn, sfn, subf = nbGrid.monitorNpdcch(hsfn, sfn)
+            
             nrf = nrf + 1
+            if nrf > 256:
+                break
         
         #step 5: parse LTE grid and NB-IoT grid
         self.parseLteNbiotGrid()
