@@ -540,11 +540,10 @@ class NgNbiotGrid(object):
                 k0 = i
                 break
         
-        u = list(range(self.ussRmax // self.ussR))
-        b = u[0] * self.ussR    #for simplicity, always use the first candidate
-        
         if not self.recvingNpdcch and not self.recvingNpdsch and not self.sendingNpusch and k0 is not None:
-            self.ngwin.logEdit.append('call resetNpdcchUssMap with R=%d, k0=%d, b=%d' % (self.ussR, k0, b))
+            u = list(range(self.ussRmax // self.ussR))
+            b = u[0] * self.ussR    #for simplicity, always use the first candidate
+            self.ngwin.logEdit.append('call resetNpdcchUssMap with T=%d, R=%d, k0=%d, b=%d' % (T, self.ussR, k0, b))
             self.resetNpdcchUssMap(hsfn, sfn, k0, b)
             for key,val in self.npdcchUssMap.items():
                 self.ngwin.logEdit.append('key=%s,val=%s' % (key, val))
@@ -608,6 +607,33 @@ class NgNbiotGrid(object):
         self.ngwin.logEdit.append('monitorNpdcch @ [HSFN=%d,SFN=%d]' % (hsfn, sfn))
         self.normalOps(hsfn, sfn)
         self.fillNpdcchUss(hsfn, sfn)
+        
+        #proceed to receive NPDCCH
+        allKeys = list(self.npdcchUssMap.keys())
+        key = str(hsfn) + '_' + str(sfn)
+        if key in allKeys:
+            current = key
+            last = allKeys[-1] if len(allKeys) > 1 else None
+        else:
+            current = key
+            last = allKeys[-1]
+        if last is not None:
+            while True:
+                hsfn, sfn = incSfn(hsfn, sfn, 1)
+                self.normalOps(hsfn, sfn)
+                self.fillNpdcchUss(hsfn, sfn)
+                
+                current = str(hsfn) + '_' + str(sfn)
+                if current == last:
+                    break
+        
+        #reset flag after receiving NPDCCH
+        self.recvingNpdcch = False
+        
+        #make return tuple
+        retHsfn, retSfn = allKeys[-1].split('_')
+        retSubf = self.npdcchUssMap[allKeys[-1]][-1]
+        return (int(retHsfn), int(retSfn), retSubf)
         
     def sendNpuschFormat1(self, hsfn, sfn):
         self.normalOps(hsfn, sfn)

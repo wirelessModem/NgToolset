@@ -796,7 +796,7 @@ class NgNbiotGridUi(QDialog):
         hsfn = self.argsNbiot['nbHsfn']
         sfn = self.argsNbiot['nbSfn']
         while True: 
-            #npdcch check?
+            #npdcch candidate check?
             T = int(nbGrid.ussRmax * nbGrid.args['npdcchUssStartSf'])
             k0 = None
             for i in range(nbGrid.subfPerRfNbDl):
@@ -805,13 +805,14 @@ class NgNbiotGridUi(QDialog):
                     break
             
             if nbGrid.recvingNpdcch or (k0 is not None and not nbGrid.recvingNpdsch and not nbGrid.sendingNpusch):
-                nbGrid.monitorNpdcch(hsfn, sfn)
+                #nbGrid.monitorNpdcch(hsfn, sfn)
+                hsfn, sfn, subf = nbGrid.monitorNpdcch(hsfn, sfn)
                 hsfn, sfn = incSfn(hsfn, sfn, 1)
-                #hsfn, sfn, subf = nbGrid.monitorNpdcch(hsfn, sfn)
             else:
                 nbGrid.normalOps(hsfn, sfn)
                 hsfn, sfn = incSfn(hsfn, sfn, 1)
             
+            #note: nrf is only used for testing purpose!
             nrf = nrf + 1
             if nrf > 256:
                 break
