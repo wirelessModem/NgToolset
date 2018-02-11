@@ -79,6 +79,8 @@ class NgNbiotGrid(object):
         #data structure for NB mapping
         self.gridNbUl = OrderedDict()  #key='HSFN_SFN', value=ndarray of [#ap, #sc, #symbol]
         self.gridNbDl = OrderedDict()  #key='HSFN_SFN', value=ndarray of [#ap, #sc, #symbol]
+        self.recvingNpdsch = False
+        self.sendingNpusch = False
         
         #data structure for SIB2/SIB3 mapping
         self.sib2Map = OrderedDict()   #key='hsfn_sfn', value=[list of dl subframes for sib2 mapping]
@@ -480,7 +482,7 @@ class NgNbiotGrid(object):
             if self.validateDlSubf(sfn, subf):
                 if not ((key in self.sib2Map and subf in self.sib2Map[key]) or (key in self.sib3Map and subf in self.sib3Map[key])):
                     b = b - 1
-                    if b == 0:  #found starting subframe k=kb
+                    if b <= 0:  #found starting subframe k=kb
                         self.npdcchUssMap[key] = [subf]
                         break
         while b > 0:
@@ -490,7 +492,7 @@ class NgNbiotGrid(object):
                 if self.validateDlSubf(sfn, subf):
                     if not ((key in self.sib2Map and subf in self.sib2Map[key]) or (key in self.sib3Map and subf in self.sib3Map[key])):
                         b = b - 1
-                        if b == 0:  #found starting subframe k=kb
+                        if b <= 0:  #found starting subframe k=kb
                             self.npdcchUssMap[key] = [subf]
                             break
         
@@ -498,7 +500,7 @@ class NgNbiotGrid(object):
         R = self.ussR - 1
         if R == 0:
             return
-        for subf in range(self.npdcchUssMap[key][0], self.subfPerRfNbDl):
+        for subf in range(self.npdcchUssMap[key][0]+1, self.subfPerRfNbDl):
             if self.validateDlSubf(sfn, subf):
                 if not ((key in self.sib2Map and subf in self.sib2Map[key]) or (key in self.sib3Map and subf in self.sib3Map[key])):
                     R = R - 1
@@ -541,12 +543,18 @@ class NgNbiotGrid(object):
         u = list(range(self.ussRmax // self.ussR))
         b = u[0] * self.ussR    #for simplicity, always use the first candidate
         
-        if (not self.recvingNpdcch) and (k0 is not None):
+        if not self.recvingNpdcch and not self.recvingNpdsch and not self.sendingNpusch and k0 is not None:
+            self.ngwin.logEdit.append('call resetNpdcchUssMap with R=%d, k0=%d, b=%d' % (self.ussR, k0, b))
             self.resetNpdcchUssMap(hsfn, sfn, k0, b)
+            for key,val in self.npdcchUssMap.items():
+                self.ngwin.logEdit.append('key=%s,val=%s' % (key, val))
+            self.recvingNpdcch = True
         
         key = str(hsfn) + '_' + str(sfn)
         if not key in self.npdcchUssMap:
             return
+        
+        self.ngwin.logEdit.append('recving NPDCCH @ [HSFN=%d,SFN=%d]' % (hsfn, sfn))
         
         slots = []
         for subf in self.npdcchUssMap[key]:
@@ -583,6 +591,7 @@ class NgNbiotGrid(object):
         pass
     
     def normalOps(self, hsfn, sfn):
+        self.ngwin.logEdit.append('normalOps @ [HSFN=%d,SFN=%d]' % (hsfn, sfn))
         #NB DL
         self.fillHostCrs(hsfn, sfn)
         self.fillNpss(hsfn, sfn)
@@ -596,6 +605,7 @@ class NgNbiotGrid(object):
         self.fillNprach(hsfn, sfn)
     
     def monitorNpdcch(self, hsfn, sfn):
+        self.ngwin.logEdit.append('monitorNpdcch @ [HSFN=%d,SFN=%d]' % (hsfn, sfn))
         self.normalOps(hsfn, sfn)
         self.fillNpdcchUss(hsfn, sfn)
         

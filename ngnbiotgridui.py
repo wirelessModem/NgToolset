@@ -804,15 +804,13 @@ class NgNbiotGridUi(QDialog):
                     k0 = i
                     break
             
-            if k0 is None:
-                self.ngwin.logEdit.append('normalOps @ [HSFN=%d,SFN=%d]' % (hsfn, sfn))
-                nbGrid.normalOps(hsfn, sfn)
-                hsfn, sfn = incSfn(hsfn, sfn, 1)
-            else:
-                self.ngwin.logEdit.append('monitorNpdcch @ [HSFN=%d,SFN=%d]' % (hsfn, sfn))
+            if nbGrid.recvingNpdcch or (k0 is not None and not nbGrid.recvingNpdsch and not nbGrid.sendingNpusch):
                 nbGrid.monitorNpdcch(hsfn, sfn)
                 hsfn, sfn = incSfn(hsfn, sfn, 1)
                 #hsfn, sfn, subf = nbGrid.monitorNpdcch(hsfn, sfn)
+            else:
+                nbGrid.normalOps(hsfn, sfn)
+                hsfn, sfn = incSfn(hsfn, sfn, 1)
             
             nrf = nrf + 1
             if nrf > 256:
