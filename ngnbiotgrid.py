@@ -16,7 +16,7 @@ import time
 import numpy as np
 import ngmainwin
 from ngltephy import LtePhy, LteResType
-from ngnbiotphy import NbiotPhy, NbiotResType, incSfn
+from ngnbiotphy import NbiotPhy, NbiotResType, incSfn, incSubf
 from ngb36utils import time2str36, freq2str36
 
 class NgNbiotGrid(object):
@@ -79,8 +79,9 @@ class NgNbiotGrid(object):
         #data structure for NB mapping
         self.gridNbUl = OrderedDict()  #key='HSFN_SFN', value=ndarray of [#ap, #sc, #symbol]
         self.gridNbDl = OrderedDict()  #key='HSFN_SFN', value=ndarray of [#ap, #sc, #symbol]
-        self.recvingNpdsch = False
-        self.sendingNpusch = False
+        self.npdschWoBcchMap = OrderedDict()  #key='HSFN_SFN', value=[list of dl subframes for NPDSCH mapping]
+        self.npuschFmt1Map = OrderedDict()  #key='HSFN_SFN', value=[list of dl subframes for NPUSCH format 1 mapping]
+        self.npuschFmt2Map = OrderedDict()  #key='HSFN_SFN', value=[list of dl subframes for NPUSCH format 2 mapping]
         
         #data structure for SIB2/SIB3 mapping
         self.sib2Map = OrderedDict()   #key='hsfn_sfn', value=[list of dl subframes for sib2 mapping]
@@ -88,7 +89,6 @@ class NgNbiotGrid(object):
         
         #data structure for NPDCCH USS mapping
         self.npdcchUssMap = OrderedDict()   #key='hsfn_sfn', value=[list of dl subframes for the first uss candidate]
-        self.recvingNpdcch = False
         
         self.ussRmax = self.args['npdcchUssNumRep']
         #Table 16.6-1: NPDCCH UE- specific search space candidates
@@ -147,7 +147,7 @@ class NgNbiotGrid(object):
         #When UE receives higher-layer parameter operationModeInfo indicating inband-SamePCI or inband-DifferentPCI,
         #- Before the UE obtains SystemInformationBlockType1-NB, the UE may assume narrowband reference signals are transmitted in subframes #0, #4 and in subframes #9 not containing NSSS.
         #- After the UE obtains SystemInformationBlockType1-NB, the UE may assume narrowband reference signals are transmitted in subframes #0, #4, subframes #9 not containing NSSS, and in NB-IoT downlink subframes and shall not expect narrowband reference signals in other downlink subframes.
-        if subf == 0 or subf == 4 or (sfn % 2 == 1 and subf == 9) or self.validateDlSubf(sfn, subf):
+        if subf == 0 or subf == 4 or (sfn % 2 == 1 and subf == 9) or self.validateNbDlSubf(sfn, subf):
             return True
         else:
             return False
@@ -323,7 +323,7 @@ class NgNbiotGrid(object):
                         if self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
                             self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_SIB1.value
     
-    def validateDlSubf(self, sfn, subf):
+    def validateNbDlSubf(self, sfn, subf):
         #from 36.213 16.4
         #A NB-IoT UE shall assume a subframe as a NB-IoT DL subframe if
         #-	the UE determines that the subframe does not contain NPSS/NSSS/NPBCH/NB-SIB1 transmission, and
@@ -365,7 +365,7 @@ class NgNbiotGrid(object):
             for i in range(sib2RepPat):
                 _hsfn, _sfn = incSfn(_hsfn, _sfn, i)
                 for _subf in range(self.subfPerRfNbDl):
-                    if self.validateDlSubf(_sfn, _subf):
+                    if self.validateNbDlSubf(_sfn, _subf):
                         key = str(_hsfn)+'_'+str(_sfn)
                         if key in self.sib2Map:
                             self.sib2Map[key].append(_subf)
@@ -397,7 +397,7 @@ class NgNbiotGrid(object):
             for i in range(sib3RepPat):
                 _hsfn, _sfn = incSfn(_hsfn, _sfn, i)
                 for _subf in range(self.subfPerRfNbDl):
-                    if self.validateDlSubf(_sfn, _subf):
+                    if self.validateNbDlSubf(_sfn, _subf):
                         key = str(_hsfn)+'_'+str(_sfn)
                         if key in self.sib3Map:
                             self.sib3Map[key].append(_subf)
@@ -479,7 +479,7 @@ class NgNbiotGrid(object):
         #find starting subframe k
         key = str(hsfn) + '_' + str(sfn)
         for subf in range(k0, self.subfPerRfNbDl):
-            if self.validateDlSubf(sfn, subf):
+            if self.validateNbDlSubf(sfn, subf):
                 if not ((key in self.sib2Map and subf in self.sib2Map[key]) or (key in self.sib3Map and subf in self.sib3Map[key])):
                     b = b - 1
                     if b <= 0:  #found starting subframe k=kb
@@ -489,7 +489,7 @@ class NgNbiotGrid(object):
             hsfn, sfn = incSfn(hsfn, sfn, 1)
             key = str(hsfn) + '_' + str(sfn)
             for subf in range(self.subfPerRfNbDl):
-                if self.validateDlSubf(sfn, subf):
+                if self.validateNbDlSubf(sfn, subf):
                     if not ((key in self.sib2Map and subf in self.sib2Map[key]) or (key in self.sib3Map and subf in self.sib3Map[key])):
                         b = b - 1
                         if b <= 0:  #found starting subframe k=kb
@@ -501,7 +501,7 @@ class NgNbiotGrid(object):
         if R == 0:
             return
         for subf in range(self.npdcchUssMap[key][0]+1, self.subfPerRfNbDl):
-            if self.validateDlSubf(sfn, subf):
+            if self.validateNbDlSubf(sfn, subf):
                 if not ((key in self.sib2Map and subf in self.sib2Map[key]) or (key in self.sib3Map and subf in self.sib3Map[key])):
                     R = R - 1
                     self.npdcchUssMap[key].append(subf)
@@ -512,7 +512,7 @@ class NgNbiotGrid(object):
             hsfn, sfn = incSfn(hsfn, sfn, 1)
             key = str(hsfn) + '_' + str(sfn)
             for subf in range(self.subfPerRfNbDl):
-                if self.validateDlSubf(sfn, subf):
+                if self.validateNbDlSubf(sfn, subf):
                     if not ((key in self.sib2Map and subf in self.sib2Map[key]) or (key in self.sib3Map and subf in self.sib3Map[key])):
                         R = R - 1
                         if key in self.npdcchUssMap:
@@ -527,27 +527,6 @@ class NgNbiotGrid(object):
         if not dn in self.gridNbDl:
             self.ngwin.logEdit.append('Call NgNbiotGrid.fillHostCrs at first to initialize NgNbiotGrid.gridNbDl!')
             return
-        
-        #from 36.213 16.6
-        #The locations of starting subframe k are given by k=k_b where k_b is the bth consecutive NB-IoT DL subframe from subframe k0,
-        #excluding subframes used for transmission of SI messages, and b=u*R , and u=0,1,...,R_max/R-1, and where:
-        #-subframe k0 is a subframe satisfying the condition: (10*nf + floor(ns/2)) mod T = floor(a_offset * T)
-        #-where T = R_max * G, T >= 4
-        T = int(self.ussRmax * self.args['npdcchUssStartSf'])
-        k0 = None
-        for i in range(self.subfPerRfNbDl):
-            if (sfn * self.subfPerRfNbDl + i) % T == math.floor(self.args['npdcchUssOff'] * T):
-                k0 = i
-                break
-        
-        if not self.recvingNpdcch and not self.recvingNpdsch and not self.sendingNpusch and k0 is not None:
-            u = list(range(self.ussRmax // self.ussR))
-            b = u[0] * self.ussR    #for simplicity, always use the first candidate
-            self.ngwin.logEdit.append('call resetNpdcchUssMap with T=%d, R=%d, k0=%d, b=%d' % (T, self.ussR, k0, b))
-            self.resetNpdcchUssMap(hsfn, sfn, k0, b)
-            for key,val in self.npdcchUssMap.items():
-                self.ngwin.logEdit.append('key=%s,val=%s' % (key, val))
-            self.recvingNpdcch = True
         
         key = str(hsfn) + '_' + str(sfn)
         if not key in self.npdcchUssMap:
@@ -568,17 +547,101 @@ class NgNbiotGrid(object):
         #- the index l in the first slot in a subframe fulfills l >= l_NPDCCH_start where l_NPDCCH_start is given by clause 16.6.1 of 3GPP TS 36.213 [4].
         for iap in range(self.args['nbDlAp']):
             for islot in slots:
-                #for simplicity, let l = CFI of host LTE in the first slot if a subframe
+                #l = CFI of host LTE in the first slot if a subframe
                 for isymb in range(self.args['hostLteCfi'] if islot % 2 == 0 else 0, self.symbPerSlotNb):
                     #for simplicity, always use NCCE0 when AL==1
                     for isc in range(self.scNbDl // 2 if self.ussAggLev == 1 else self.scNbDl):
-                        if self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value and self.args['hostLteGridDl'][iap][self.args['nbInbandPrbIndDl'] * 12 + isc][islot*self.symbPerSlotNb+isymb] == LteResType.LTE_RES_PDSCH.value:
+                        if self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value and self.args['hostLteGridDlNpdcch'][iap][self.args['nbInbandPrbIndDl'] * 12 + isc][islot*self.symbPerSlotNb+isymb] == LteResType.LTE_RES_PDSCH.value:
                             self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_NPDCCH.value
         
         #TODO: NPDCCH Gap to be implemented!
     
+    def resetNpdschWoBcchMap(self, hsfn, sfn, subf):
+        self.npdschWoBcchMap.clear()
+        
+        #36.213 16.4.1
+        #A UE shall upon detection on a given serving cell of a NPDCCH with DCI format N1, N2 ending in subframe n intended for the UE, decode, starting in n+5 DL subframe, the corresponding NPDSCH transmission in N consecutive NB-IoT DL subframe(s) ni with i = 0, 1, …, N-1 according to the NPDCCH information
+        hsfn, sfn, subf = incSubf(hsfn, sfn, subf, 5)
+        
+        N = self.args['npdschNoBcchDciN1NumSf'] * self.args['npdschNoBcchDciN1NumRep']
+        k0 = self.args['npdschNoBcchDciN1K0']
+        
+        #skip k0 NB-IoT DL subframes (scheduling delay)
+        markSubf = 0
+        for _subf in range(subf, self.subfPerRfNbDl):
+            if self.validateNbDlSubf(sfn, _subf):
+                k0 = k0 - 1
+                if k0 <= 0:
+                    markSubf = _subf
+                    break
+                
+        while k0 > 0:
+            hsfn, sfn = incSfn(hsfn, sfn, 1)
+            for _subf in range(self.subfPerRfNbDl):
+                if self.validateNbDlSubf(sfn, _subf):
+                    k0 = k0 - 1
+                    if k0 <= 0:
+                        markSubf = _subf
+                        break
+        
+        #find NPDSCH NB-IoT DL subframes n[0..N-1]
+        key = str(hsfn) + '_' + str(sfn)
+        for _subf in range(markSubf+1, self.subfPerRfNbDl):
+            if self.validateNbDlSubf(sfn, _subf):
+                if not ((key in self.sib2Map and _subf in self.sib2Map[key]) or (key in self.sib3Map and _subf in self.sib3Map[key])):
+                    N = N - 1
+                    if key in self.npdschWoBcchMap:
+                        self.npdschWoBcchMap[key].append(_subf)
+                    else:
+                        self.npdschWoBcchMap[key] = [_subf]
+                    if N == 0:
+                        break
+                    
+        while N > 0:
+            hsfn, sfn = incSfn(hsfn, sfn, 1)
+            key = str(hsfn) + '_' + str(sfn)
+            for _subf in range(self.subfPerRfNbDl):
+                if self.validateNbDlSubf(sfn, _subf):
+                    if not ((key in self.sib2Map and _subf in self.sib2Map[key]) or (key in self.sib3Map and _subf in self.sib3Map[key])):
+                        N = N - 1
+                        if key in self.npdschWoBcchMap:
+                            self.npdschWoBcchMap[key].append(_subf)
+                        else:
+                            self.npdschWoBcchMap[key] = [_subf]
+                        if N == 0:
+                            break
+    
     def fillNpdschWoBcch(self, hsfn, sfn):
-        pass
+        dn = str(hsfn) + '_' + str(sfn)
+        if not dn in self.gridNbDl:
+            self.ngwin.logEdit.append('Call NgNbiotGrid.fillHostCrs at first to initialize NgNbiotGrid.gridNbDl!')
+            return
+        
+        key = str(hsfn) + '_' + str(sfn)
+        if not key in self.npdschWoBcchMap:
+            return
+        
+        self.ngwin.logEdit.append('recving NPDSCH w/o BCCH @ [HSFN=%d,SFN=%d]' % (hsfn, sfn))
+        
+        slots = []
+        for subf in self.npdschWoBcchMap[key]:
+            slots.extend([2*subf, 2*subf+1])
+        
+        #from 36.211 10.2.5.5
+        #...which meet all of the following criteria in the current subframe:
+        #- the subframe is not used for transmission of NPBCH, NPSS, or NSSS, and
+        #- they are assumed by the UE not to be used for NRS, and
+        #- they are not overlapping with resource elements used for CRS as defined in clause 6 (if any), and
+        #- the index l in the first slot in a subframe fulfills l >= l_Data_Start  where l_Data_Start is given by clause 16.4.1.4 of 3GPP TS 36.213 [4].
+        for iap in range(self.args['nbDlAp']):
+            for islot in slots:
+                #l = CFI of host LTE in the first slot if a subframe
+                for isymb in range(self.args['hostLteCfi'] if islot % 2 == 0 else 0, self.symbPerSlotNb):
+                    for isc in range(self.scNbDl):
+                        if self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value and self.args['hostLteGridDlNpdsch'][iap][self.args['nbInbandPrbIndDl'] * 12 + isc][islot*self.symbPerSlotNb+isymb] == LteResType.LTE_RES_PDSCH.value:
+                            self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_NPDSCH_WO_BCCH.value
+        
+        #TODO: NPDSCH Gap to be implemented!
     
     def fillNprach(self, hsfn, sfn):
         pass
@@ -604,7 +667,37 @@ class NgNbiotGrid(object):
         self.fillNprach(hsfn, sfn)
     
     def monitorNpdcch(self, hsfn, sfn):
-        self.ngwin.logEdit.append('monitorNpdcch @ [HSFN=%d,SFN=%d]' % (hsfn, sfn))
+        #self.ngwin.logEdit.append('monitorNpdcch @ [HSFN=%d,SFN=%d]' % (hsfn, sfn))
+        
+        while True:
+            #from 36.213 16.6
+            #The locations of starting subframe k are given by k=k_b where k_b is the bth consecutive NB-IoT DL subframe from subframe k0,
+            #excluding subframes used for transmission of SI messages, and b=u*R , and u=0,1,...,R_max/R-1, and where:
+            #-subframe k0 is a subframe satisfying the condition: (10*nf + floor(ns/2)) mod T = floor(a_offset * T)
+            #-where T = R_max * G, T >= 4
+            T = int(self.ussRmax * self.args['npdcchUssStartSf'])
+            k0 = None
+            for i in range(self.subfPerRfNbDl):
+                if (sfn * self.subfPerRfNbDl + i) % T == math.floor(self.args['npdcchUssOff'] * T):
+                    k0 = i
+                    break
+                
+            if k0 is not None:
+                u = list(range(self.ussRmax // self.ussR))
+                b = u[0] * self.ussR    #for simplicity, always use the first candidate
+                
+                self.ngwin.logEdit.append('call resetNpdcchUssMap with T=%d, R=%d, k0=%d, b=%d @ [HSFN=%d,SFN=%d]' % (T, self.ussR, k0, b, hsfn, sfn))
+                
+                self.resetNpdcchUssMap(hsfn, sfn, k0, b)
+                
+                for key,val in self.npdcchUssMap.items():
+                    self.ngwin.logEdit.append('key=%s,val=%s' % (key, val))
+                    
+                break
+            else:
+                self.normalOps(hsfn, sfn)
+                hsfn, sfn = incSfn(hsfn, sfn, 1)
+        
         self.normalOps(hsfn, sfn)
         self.fillNpdcchUss(hsfn, sfn)
         
@@ -627,22 +720,61 @@ class NgNbiotGrid(object):
                 if current == last:
                     break
         
-        #reset flag after receiving NPDCCH
-        self.recvingNpdcch = False
-        
         #make return tuple
         retHsfn, retSfn = allKeys[-1].split('_')
         retSubf = self.npdcchUssMap[allKeys[-1]][-1]
         return (int(retHsfn), int(retSfn), retSubf)
         
-    def sendNpuschFormat1(self, hsfn, sfn):
+    def sendNpuschFormat1(self, hsfn, sfn, subf):
         self.normalOps(hsfn, sfn)
         self.fillNpuschFormat1(hsfn, sfn)
+        
+        #make return tuple
+        retHsfn, retSfn = ('0', '0')
+        retSubf = 0
+        return (int(retHsfn), int(retSfn), retSubf)
     
-    def sendNpuschFormat2(self, hsfn, sfn):
+    def sendNpuschFormat2(self, hsfn, sfn, subf):
         self.normalOps(hsfn, sfn)
         self.fillNpuschFormat2(hsfn, sfn)
+        
+        #make return tuple
+        retHsfn, retSfn = ('0', '0')
+        retSubf = 0
+        return (int(retHsfn), int(retSfn), retSubf)
     
-    def recvNpdschWoBcch(self, hsfn, sfn):
-        self.normalOps(hsfn, sfn)
+    def recvNpdschWoBcch(self, hsfn, sfn, subf):
+        self.ngwin.logEdit.append('call resetNpdschWoBcchMap with N=%d, k0=%d @ [HSFN=%d,SFN=%d,SUBF=%d]' % (self.args['npdschNoBcchDciN1NumSf']*self.args['npdschNoBcchDciN1NumRep'], self.args['npdschNoBcchDciN1K0'], hsfn, sfn, subf))
+        
+        self.resetNpdschWoBcchMap(hsfn, sfn, subf)
+        
+        for key,val in self.npdschWoBcchMap.items():
+            self.ngwin.logEdit.append('key=%s,val=%s' % (key, val))
+        
+        #note there is no need to call normalOps again!
+        #self.normalOps(hsfn, sfn)
         self.fillNpdschWoBcch(hsfn, sfn)
+        
+        #proceed to receive NPDSCH
+        allKeys = list(self.npdschWoBcchMap.keys())
+        key = str(hsfn) + '_' + str(sfn)
+        if key in allKeys:
+            current = key
+            last = allKeys[-1] if len(allKeys) > 1 else None
+        else:
+            current = key
+            last = allKeys[-1]
+        if last is not None:
+            while True:
+                hsfn, sfn = incSfn(hsfn, sfn, 1)
+                self.normalOps(hsfn, sfn)
+                self.fillNpdschWoBcch(hsfn, sfn)
+                
+                current = str(hsfn) + '_' + str(sfn)
+                if current == last:
+                    break
+        
+        #make return tuple
+        retHsfn, retSfn = allKeys[-1].split('_')
+        retSubf = self.npdschWoBcchMap[allKeys[-1]][-1]
+        return (int(retHsfn), int(retSfn), retSubf)

@@ -61,3 +61,11 @@ def incSfn(hsfn, sfn, n):
         if hsfn >= 1024:
             hsfn = hsfn % 1024
     return (hsfn, sfn)
+
+def incSubf(hsfn, sfn, subf, n):
+    subf = subf + n
+    if subf >= 10:
+        subf = subf % 10
+        hsfn, sfn = incSfn(hsfn, sfn, subf // 10)
+    
+    return (hsfn, sfn, subf)

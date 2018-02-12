@@ -765,13 +765,19 @@ class NgNbiotGridUi(QDialog):
         lteGrid = NgLteGrid(self.ngwin, self.argsLte)
         if lteGrid.isOk:
             lteGrid.fillCrs()
+            
+            #36.211 10.2.3.4 NPDSCH mapping
+            #- they are not overlapping with resource elements used for CRS as defined in clause 6 (if any),
+            #note the use of ndarray.copy()!
+            self.argsNbiot['hostLteGridDlNpdsch'] = lteGrid.gridDl.copy()
+            
             lteGrid.fillPbch()
             lteGrid.fillSch()
             
             #36.211 10.2.5.5 NPDCCH mapping
             #- they are not overlapping with resource elements used for PBCH, PSS, SSS, or CRS as defined in clause 6 (if any),
             #note the use of ndarray.copy()!
-            self.argsNbiot['hostLteGridDl'] = lteGrid.gridDl.copy()
+            self.argsNbiot['hostLteGridDlNpdcch'] = lteGrid.gridDl.copy()
             
             lteGrid.fillPdcch()
             lteGrid.printDl()
@@ -792,9 +798,11 @@ class NgNbiotGridUi(QDialog):
         
         #step 4: call NgNbiotGrid
         nbGrid = NgNbiotGrid(self.ngwin, self.argsNbiot)
-        nrf = 0
         hsfn = self.argsNbiot['nbHsfn']
         sfn = self.argsNbiot['nbSfn']
+        
+        '''
+        nrf = 0
         while True: 
             #npdcch candidate check?
             T = int(nbGrid.ussRmax * nbGrid.args['npdcchUssStartSf'])
@@ -816,6 +824,19 @@ class NgNbiotGridUi(QDialog):
             nrf = nrf + 1
             if nrf > 256:
                 break
+        '''
+        #NB DL SU scheduling simulation
+        hsfn, sfn, subf = nbGrid.monitorNpdcch(hsfn, sfn)   #recv NPDCCH DCI N1
+        hsfn, sfn, subf = nbGrid.recvNpdschWoBcch(hsfn, sfn, subf)  #recv NPDSCH w/o BCCH
+        #hsfn, sfn, subf = nbGrid.sendNpuschFormat2(hsfn, sfn, subf) #TODO send NPUSCH format 2
+        
+        hsfn, sfn = incSfn(hsfn, sfn, 1) #wait for next NPDCCH candidate
+        
+        #NB UL SU scheduling simulation
+        hsfn, sfn, subf = nbGrid.monitorNpdcch(hsfn, sfn)   #recv NPDCCH DCI N0
+        #hsfn, sfn, subf = nbGrid.sendNpuschFormat1(hsfn, sfn, subf) #TODO send NPUSCH format 1
+        
+        hsfn, sfn = incSfn(hsfn, sfn, 1) #wait for next NPDCCH candidate
         
         #step 5: parse LTE grid and NB-IoT grid
         self.parseLteNbiotGrid()
