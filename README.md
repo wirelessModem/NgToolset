@@ -7,7 +7,7 @@ NgToolset is set of userful NPO tool for 4G/LTE and 5G/NR, written with Python/P
 
 2, License
 -----
-TBD. Please always include this 'README.md' whenever use the source code.
+BSD License.
 
 3, Contact
 -----
