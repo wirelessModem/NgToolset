@@ -16,7 +16,7 @@ import time
 import numpy as np
 import ngmainwin
 from ngltephy import LtePhy, LteResType
-from ngnbiotphy import NbiotPhy, NbiotResType, incSfn, incSubf
+from ngnbiotphy import NbiotPhy, NbiotResType, incSfn, incSubf, randc
 from ngb36utils import time2str36, freq2str36
 
 class NgNbiotGrid(object):
@@ -97,6 +97,14 @@ class NgNbiotGrid(object):
                     4 : [(1, 2, 'ncce01'), (2, 2, 'ncce01'), (4, 2, 'ncce01')],
                     8 : [(self.ussRmax // 8, 2, 'ncce01'), (self.ussRmax // 4, 2, 'ncce01'), (self.ussRmax // 2, 2, 'ncce01'), (self.ussRmax, 2, 'ncce01')]}
         self.ussR, self.ussAggLev, ncce = _ussCand[self.ussRmax][self.args['nbDciN0N1SfRep']] if self.ussRmax < 8 else _ussCand[8][self.args['nbDciN0N1SfRep']]
+        
+        #data struture for NPRACH mapping
+        self.nprachMap = []
+        self.scNbRa = 12
+        self.initNprachFreqLoc()
+        self.ngwin.logEdit.append('NPRACH frequency locations (nInit=%d):' % self.nInit)
+        for i in range(self.args['nprachRepPerAtt']):
+            self.ngwin.logEdit.append('-->NPRACH repetion #%d: [%s]' % (i, ','.join([str(self.nScRa[grp]) for grp in range(4*i, 4*(i+1))])))
         
     def initSib1Mapping(self):
         #from 36.331 5.2.1.2a
@@ -642,6 +650,34 @@ class NgNbiotGrid(object):
                             self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_NPDSCH_WO_BCCH.value
         
         #TODO: NPDSCH Gap to be implemented!
+        
+    def initNprachFreqLoc(self):
+        self.nInit = np.random.randint(0, self.args['nprachNumSc'])
+        nStart = self.args['nprachScOff'] + math.floor(self.nInit / self.scNbRa) * self.scNbRa
+        self.nScRa = [self.nInit % self.scNbRa]
+        
+        c = randc(self.args['nbPci'], 10*self.args['nprachRepPerAtt'])
+        f = []
+        for t in range(self.args['nprachRepPerAtt']):
+            nset = list(range(10*t+1, 10*(t+1)))
+            ft = sum([c[n] * 2**(n-(10*t+1)) for n in nset]) % (self.scNbRa - 1) + 1
+            if t > 0:
+                ft = ft + f[t - 1]
+            f.append(ft % self.scNbRa)
+        
+        for i in range(1, 4 * self.args['nprachRepPerAtt']):
+            if i % 4 == 0 and i > 0:
+                self.nScRa.append((self.nScRa[0] + f[i // 4]) % self.scNbRa)
+            elif i % 4 in [1, 3] and self.nScRa[i-1] % 2 == 0:
+                self.nScRa.append(self.nScRa[i-1] + 1)
+            elif i % 4 in [1, 3] and self.nScRa[i-1] % 2 == 1:
+                self.nScRa.append(self.nScRa[i-1] - 1)
+            elif i % 4 == 2 and self.nScRa[i-1] < 6:
+                self.nScRa.append(self.nScRa[i-1] + 6)
+            elif i % 4 == 2 and self.nScRa[i-1] >= 6:
+                self.nScRa.append(self.nScRa[i-1] - 6)
+        
+        self.nScRa = [nStart + n for n in self.nScRa]
     
     def fillNprach(self, hsfn, sfn):
         pass

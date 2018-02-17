@@ -11,6 +11,7 @@ Change History:
 '''
 
 from enum import Enum
+import numpy as np
 
 class NbiotPhy(Enum):
     #nb operation mode
@@ -69,3 +70,28 @@ def incSubf(hsfn, sfn, subf, n):
         hsfn, sfn = incSfn(hsfn, sfn, subf // 10)
     
     return (hsfn, sfn, subf)
+
+def randc(seed, mpn):
+    #36.211 7.2	Pseudo-random sequence generation
+    nc = 1600
+    
+    #init x1
+    x1 = [0] * 31
+    x1[0] = 1
+    
+    #init x2
+    seedStr = np.base_repr(seed, base=2).zfill(31)
+    x2=[int(s) for s in seedStr]
+    
+    #deduce x1 and x2
+    for n in range(31, nc+mpn):
+        x1.append((x1[n-31+3] + x1[n-31]) % 2)
+        x2.append((x2[n-31+3] + x2[n-31+2] + x2[n-31+1] + x2[n-31]) % 2)
+    
+    c = []
+    for n in range(mpn):
+        c.append((x1[n+nc] + x2[n+nc]) % 2)
+    
+    return c
+        
+    
