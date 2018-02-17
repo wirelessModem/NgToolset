@@ -104,10 +104,11 @@ class NgNbiotGrid(object):
         self.nprachMap = [] #list of OrderedDict, where key='hsfn_sfn', value=[[symbols for group0], [group1], [group2], [group3]] or None for nprach gap
         self.scNbRa = 12
         self.initNprachFreqLoc()
+        self.sendingNprach = False
+        
         self.ngwin.logEdit.append('NPRACH frequency locations (nInit=%d):' % self.nInit)
         for i in range(self.args['nprachRepPerAtt']):
             self.ngwin.logEdit.append('-->NPRACH repetion #%d: [%s]' % (i, ','.join([str(self.nScRa[grp]) for grp in range(4*i, 4*(i+1))])))
-        self.sendingNprach = False
         
     def initSib1Mapping(self):
         #from 36.331 5.2.1.2a
