@@ -28,9 +28,11 @@ class NgNbiotGrid(object):
         if args['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_3DOT75K.value:
             self.scNbUl = 48
             self.slotPerRfNbUl = 5
+            self.slotDurNbUl = 2
         else:
             self.scNbUl = 12
             self.slotPerRfNbUl = 20
+            self.slotDurNbUl = 0.5
         self.symbPerSlotNb = 7
         self.symbPerRfNbUl = self.symbPerSlotNb * self.slotPerRfNbUl
         self.symbPerSubfNbDl = self.symbPerSlotNb * self.slotPerSubfNbDl
@@ -99,12 +101,13 @@ class NgNbiotGrid(object):
         self.ussR, self.ussAggLev, ncce = _ussCand[self.ussRmax][self.args['nbDciN0N1SfRep']] if self.ussRmax < 8 else _ussCand[8][self.args['nbDciN0N1SfRep']]
         
         #data struture for NPRACH mapping
-        self.nprachMap = []
+        self.nprachMap = [] #list of OrderedDict, where key='hsfn_sfn', value=[[symbols for group0], [group1], [group2], [group3]] or None for nprach gap
         self.scNbRa = 12
         self.initNprachFreqLoc()
         self.ngwin.logEdit.append('NPRACH frequency locations (nInit=%d):' % self.nInit)
         for i in range(self.args['nprachRepPerAtt']):
             self.ngwin.logEdit.append('-->NPRACH repetion #%d: [%s]' % (i, ','.join([str(self.nScRa[grp]) for grp in range(4*i, 4*(i+1))])))
+        self.sendingNprach = False
         
     def initSib1Mapping(self):
         #from 36.331 5.2.1.2a
@@ -199,7 +202,9 @@ class NgNbiotGrid(object):
         #init gridNbDl and gridNbUl for dn="hsfn_sfn"
         if not dn in self.gridNbDl:
             self.gridNbDl[dn] = np.full((self.args['nbDlAp'], self.scNbDl, self.symbPerRfNbDl), NbiotResType.NBIOT_RES_BLANK.value)
-            self.gridNbUl[dn] = np.full((1, self.scNbUl, self.symbPerRfNbUl), NbiotResType.NBIOT_RES_BLANK.value)
+            #self.gridNbUl[dn] = np.full((1, self.scNbUl, self.symbPerRfNbUl), NbiotResType.NBIOT_RES_BLANK.value)
+            #for NPRACH mapping, set shape to (1, 48, self.symbPerRfNbUl)
+            self.gridNbUl[dn] = np.full((1, 48, self.symbPerRfNbUl), NbiotResType.NBIOT_RES_BLANK.value)
         
         _crsPos = [(0, 0, 0),
                    (0, self.symbPerSlotNb-3, 3),
@@ -679,9 +684,99 @@ class NgNbiotGrid(object):
         
         self.nScRa = [nStart + n for n in self.nScRa]
     
-    def fillNprach(self, hsfn, sfn):
-        pass
+    def resetNprachMapping(self, hsfn, sfn):
+        self.nprachMap.clear()
+        self.nprachMap = [OrderedDict() for i in range(self.args['nprachRepPerAtt'])]
+        
+        hsfn, sfn, subf = incSubf(hsfn, sfn, 0, self.args['nprachStartTime'])
+        
+        if self.args['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_3DOT75K.value:
+            slotNprachPreamb = 3
+            symbNprachPreamb = (5, 5, 5, 6)
+            if subf / self.slotDurNbUl > self.slotPerRfNbUl - 1:
+                hsfn, sfn = incSfn(hsfn, sfn)
+                slot = 0
+            else:
+                slot = math.floor(subf / self.slotDurNbUl)
+        else:
+            slotNprachPreamb = 12
+            symbNprachPreamb= (21, 21, 21, 21)
+            slot = math.floor(subf / self.slotDurNbUl)
+        
+        rep = 0
+        while rep < self.args['nprachRepPerAtt']:
+            if rep > 0 and rep % 64 == 0:   #after 64 nprach preambles, a 40ms gap is inserted
+                for i in range(4):
+                    hsfn, sfn = incSfn(hsfn, sfn, 1)
+                    key = str(hsfn) + '_' + str(sfn)
+                    if not key in self.nprachMap[rep]:
+                        self.nprachMap[rep][key] = None
+                        
+            hsfn, sfn, slot, _list = self.findNextNSlots(hsfn, sfn, slot, slotNprachPreamb)
+            
+            '''
+            self.ngwin.logEdit.append('content of findNextNSlots._list (rep=%d):' % rep)
+            self.ngwin.logEdit.append('%s' % ','.join(_list))
+            '''
+                
+            symbGrps = [_list[:sum(symbNprachPreamb[:1])],
+                        _list[sum(symbNprachPreamb[:1]):sum(symbNprachPreamb[:2])],
+                        _list[sum(symbNprachPreamb[:2]):sum(symbNprachPreamb[:3])],
+                        _list[sum(symbNprachPreamb[:3]):sum(symbNprachPreamb[:4])]]
+            
+            for i, grp in enumerate(symbGrps):
+                for symb in grp:
+                    tokens = symb.split('|')
+                    key = tokens[0]
+                    isymb = int(tokens[1])
+                    if not key in self.nprachMap[rep] or self.nprachMap[rep][key] is None:
+                        self.nprachMap[rep][key] = [None, None, None, None]
+                        self.nprachMap[rep][key][i] = [isymb]
+                    elif self.nprachMap[rep][key][i] is None:
+                        self.nprachMap[rep][key][i] = [isymb]
+                    else:
+                        self.nprachMap[rep][key][i].append(isymb)
+                        
+            self.ngwin.logEdit.append('NPRACH mapping(rep=%d):' % rep)
+            for key, val in self.nprachMap[rep].items():
+                self.ngwin.logEdit.append('-->rep=%d,key=%s,val=%s' % (rep, key, val))
+            
+            rep = rep + 1
     
+    def findNextNSlots(self, hsfn, sfn, slot, n):
+        _list = []
+        while n > 0:
+            if slot < self.slotPerRfNbUl:
+                #format = 'hsfn_sfn|symbol'
+                _list.extend([str(hsfn)+'_'+str(sfn)+'|'+str(slot*self.symbPerSlotNb+i) for i in range(self.symbPerSlotNb)])
+                n = n - 1
+                slot = slot + 1
+                
+            if slot == self.slotPerRfNbUl:
+                hsfn, sfn = incSfn(hsfn, sfn, 1)
+                slot = 0
+        
+        return [hsfn, sfn, slot, _list]
+        
+    def fillNprach(self, hsfn, sfn):
+        if sfn % (self.args['nprachPeriod'] // 10) == 0 and not self.sendingNprach:
+            self.resetNprachMapping(hsfn, sfn)
+        
+        key = str(hsfn) + '_' + str(sfn)
+        
+        for rep in range(self.args['nprachRepPerAtt']):
+            if not key in self.nprachMap[rep]:
+                continue
+            
+            if key in self.nprachMap[rep] and self.nprachMap[rep][key] is None:   #NPRACH gap
+                continue
+            
+            #set or clear sendingNprach flag
+            if not self.sendingNprach:
+                self.sendingNprach = True
+            if self.sendingNprach and rep == self.args['nprachRepPerAtt']-1 and list(self.nprachMap[rep].keys())[-1] == key:
+                self.sendingNprach = False
+            
     def fillNpuschFormat1(self, hsfn, sfn):
         pass
     
