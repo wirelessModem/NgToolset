@@ -794,7 +794,10 @@ class NgNbiotGridUi(QDialog):
         self.argsNbiot['maxPucchRes'] = max(lteGrid.maxPucchRes)
             
         #step 3: prepare NgNbiotGrid
-        self.prepNbiotGrid()
+        nbOk = self.prepNbiotGrid()
+        if not nbOk:
+            self.accept()
+            return
         
         #step 4: call NgNbiotGrid
         nbGrid = NgNbiotGrid(self.ngwin, self.argsNbiot)
@@ -909,41 +912,41 @@ class NgNbiotGridUi(QDialog):
         if self.argsNbiot['nbOpMode'] > 1:
             self.ngwin.logEdit.append('Only inband NB-IoT is supported!')
             self.accept()
-            return
+            return False
         self.argsNbiot['nbDlAp'] = 1 if self.nbApCombo.currentIndex() == 0 else 2
         if self.argsNbiot['hostLteApNum'] != self.argsNbiot['nbDlAp']:
             self.ngwin.logEdit.append('#AP of NB cell must be the same as #AP of host LTE cell for inband deployment!')
             self.accept()
-            return
+            return False
         self.argsNbiot['nbPci'] = int(self.nbPciEdit.text())
         if self.argsNbiot['nbPci'] < 0 or self.argsNbiot['nbPci'] > 503:
             self.ngwin.logEdit.append('Invalid NB PCI! Valid range is [0, 503].')
             self.accept()
-            return
+            return False
         elif self.argsNbiot['nbOpMode'] == NbiotPhy.NBIOT_INBAND_SAME_PCI.value and self.argsNbiot['hostLtePci'] != self.argsNbiot['nbPci']:
             self.ngwin.logEdit.append('PCI of host LTE and NB is different for inband-samePCI deployment!')
             self.accept()
-            return
+            return False
         elif self.argsNbiot['nbOpMode'] == NbiotPhy.NBIOT_INBAND_DIFF_PCI.value and self.argsNbiot['hostLtePci'] == self.argsNbiot['nbPci']:
             self.ngwin.logEdit.append('PCI of host LTE and NB is the same for inband-differentPCI deployment!')
             self.accept()
-            return
+            return False
         self.argsNbiot['nbInbandPrbIndUl'] = int(self.nbInBandPrbIdxUlEdit.text())
         if self.argsNbiot['nbInbandPrbIndUl'] != 0:
             self.ngwin.logEdit.append('NB Inband PRB Index UL must be 0!')
             self.accept()
-            return
+            return False
         self.argsNbiot['nbInbandPrbIndDl'] = int(self.nbInBandPrbIdxDlCombo.currentText())
         self.argsNbiot['nbHsfn'] = int(self.nbHsfnEdit.text())
         if self.argsNbiot['nbHsfn'] < 0 or self.argsNbiot['nbHsfn'] > 1023:
             self.ngwin.logEdit.append('Invalid NB HSFN! Valid range is: [0, 1023].')
             self.accept()
-            return
+            return False
         self.argsNbiot['nbSfn'] = int(self.nbSfnEdit.text())
         if self.argsNbiot['nbSfn'] < 0 or self.argsNbiot['nbSfn'] > 1023:
             self.ngwin.logEdit.append('Invalid NB SFN! Valid range is: [0, 1023].')
             self.accept()
-            return
+            return False
         #-->nb ul part
         self.argsNbiot['nbUlScSpacing'] = self.nbUlScSpacingCombo.currentIndex()
         self.argsNbiot['npuschAllSymbols'] = True if self.nbNpuschAllSymCombo.currentIndex() == 0 else False
@@ -966,7 +969,7 @@ class NgNbiotGridUi(QDialog):
         else:
             self.ngwin.logEdit.append('Subcarrier Indication(DCI N0) is not valid! Value range is: [0, 47] for 3.75KHz and [0, 18] for 15KHz.')
             self.accept()
-            return
+            return False
         self.argsNbiot['npuschFormat1NumRu'] = (1, 2, 3, 4, 5, 6, 8, 10)[self.nbDciN0RuIndCombo.currentIndex()]
         self.argsNbiot['npuschFormat1NumRep'] = (1, 2, 4, 8, 16, 32, 64, 128)[self.nbDciN0RepIndCombo.currentIndex()]
         self.argsNbiot['npuschFormat1K0'] = (8, 16, 32, 64)[self.nbDciN0DelayIndCombo.currentIndex()]
@@ -982,6 +985,10 @@ class NgNbiotGridUi(QDialog):
         self.argsNbiot['nprachRepPerAtt'] = int(self.nbNprachRepCombo.currentText()[1:])
         self.argsNbiot['nprachNumSc'] = int(self.nbNprachNumScCombo.currentText()[1:])
         self.argsNbiot['nprachScOff'] = int(self.nbNprachScOffCombo.currentText()[1:])
+        if self.argsNbiot['nprachNumSc'] + self.argsNbiot['nprachScOff'] > 48:
+            self.ngwin.logEdit.append('Invalid NPRACH configuration: nprachScOff + nprachNumSc > 48!')
+            self.accept()
+            return False
         
         #-->nb dl part
         self.argsNbiot['nbDlBitmap'] = self.nbDlBitmapEdit.text().strip().replace(',', '')
@@ -990,11 +997,11 @@ class NgNbiotGridUi(QDialog):
         except ValueError as e:
             self.ngwin.logEdit.append('Invalid NB DL bitmap: %s' % self.argsNbiot['nbDlBitmap'])
             self.accept()
-            return
+            return False
         if len(self.argsNbiot['nbDlBitmap']) != 10 and len(self.argsNbiot['nbDlBitmap']) != 40:
             self.ngwin.logEdit.append('Invalid size of NB DL bitmap, which must be either 10bits or 40bits!')
             self.accept()
-            return
+            return False
         self.argsNbiot['npdschNoBcchDciN1NumSf'] = (1, 2, 3, 4, 5, 6, 8, 10)[self.nbDciN1SfAssignCombo.currentIndex()]
         self.argsNbiot['npdschNoBcchDciN1NumRep'] = (1, 2, 4, 8, 16, 32, 64, 128, 192, 256, 384, 512, 768, 1024, 1536, 2048)[self.nbDciN1RepCombo.currentIndex()]
         rMax = int(self.nbNpdcchUssRepCombo.currentText()[1:])
@@ -1022,18 +1029,20 @@ class NgNbiotGridUi(QDialog):
         if (self.argsNbiot['npdcchUssNumRep'] == 1 and self.argsNbiot['nbDciN0N1SfRep'] > 0) or (self.argsNbiot['npdcchUssNumRep'] == 2 and self.argsNbiot['nbDciN0N1SfRep'] > 1) or (self.argsNbiot['npdcchUssNumRep'] == 4 and self.argsNbiot['nbDciN0N1SfRep'] > 2):
             self.ngwin.logEdit.append('For NPDCCH USS, DCI N0/N1 subframe repetition number is: [0] when npdcch-NumRepetition = 1, [0,1] when npdcch-NumRepetition = 2, and [0,1,2] when npdcch-NumRepetition = 4!')
             self.accept()
-            return
+            return False
         self.argsNbiot['npdcchUssStartSf'] = (1.5, 2, 4, 8, 16, 32, 48, 64)[self.nbNpdcchUssStartSfCombo.currentIndex()]
         if self.argsNbiot['npdcchUssNumRep'] * self.argsNbiot['npdcchUssStartSf'] < 4:
             self.ngwin.logEdit.append('T >= 4 where T = R_max * G as specified in 36.213 16.6!')
             self.accept()
-            return
+            return False
         self.argsNbiot['npdcchUssOff'] = (0, 1/8, 1/4, 3/8)[self.nbNpdcchUssOffCombo.currentIndex()]
         
         if self.ngwin.enableDebug:
             self.ngwin.logEdit.append('contents of NgNbiotGridUI.argsNbiot:')
             for key, value in self.argsNbiot.items():
                 self.ngwin.logEdit.append('-->key=%s, value=%s' % (key, str(value)))
+        
+        return True
                          
     def parseLteNbiotGrid(self):
         outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')

@@ -108,7 +108,7 @@ class NgNbiotGrid(object):
         
         self.ngwin.logEdit.append('NPRACH frequency locations (nInit=%d):' % self.nInit)
         for i in range(self.args['nprachRepPerAtt']):
-            self.ngwin.logEdit.append('-->NPRACH repetion #%d: [%s]' % (i, ','.join([str(self.nScRa[grp]) for grp in range(4*i, 4*(i+1))])))
+            self.ngwin.logEdit.append('-->NPRACH repetition #%d: [%s]' % (i, ','.join([str(self.nScRa[grp]) for grp in range(4*i, 4*(i+1))])))
         
     def initSib1Mapping(self):
         #from 36.331 5.2.1.2a
@@ -777,6 +777,14 @@ class NgNbiotGrid(object):
                 self.sendingNprach = True
             if self.sendingNprach and rep == self.args['nprachRepPerAtt']-1 and list(self.nprachMap[rep].keys())[-1] == key:
                 self.sendingNprach = False
+                
+            for grp, symb in enumerate(self.nprachMap[rep][key]):
+                if symb is not None:
+                    isc = self.nScRa[4 * rep + grp]
+                    for isymb in symb:
+                        for iap in range(self.args['nbDlAp']):
+                            if self.gridNbUl[key][iap][isc][isymb] == NbiotResType.NBIOT_RES_BLANK.value:
+                                self.gridNbUl[key][iap][isc][isymb] = NbiotResType.NBIOT_RES_NPRACH.value
             
     def fillNpuschFormat1(self, hsfn, sfn):
         pass
