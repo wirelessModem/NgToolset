@@ -782,9 +782,8 @@ class NgNbiotGrid(object):
                 if symb is not None:
                     isc = self.nScRa[4 * rep + grp]
                     for isymb in symb:
-                        for iap in range(self.args['nbDlAp']):
-                            if self.gridNbUl[key][iap][isc][isymb] == NbiotResType.NBIOT_RES_BLANK.value:
-                                self.gridNbUl[key][iap][isc][isymb] = NbiotResType.NBIOT_RES_NPRACH.value
+                            if self.gridNbUl[key][0][isc][isymb] == NbiotResType.NBIOT_RES_BLANK.value:
+                                self.gridNbUl[key][0][isc][isymb] = NbiotResType.NBIOT_RES_NPRACH.value
             
     def fillNpuschFormat1(self, hsfn, sfn):
         pass
