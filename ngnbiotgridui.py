@@ -831,7 +831,7 @@ class NgNbiotGridUi(QDialog):
         #NB DL SU scheduling simulation
         hsfn, sfn, subf = nbGrid.monitorNpdcch(hsfn, sfn)   #recv NPDCCH DCI N1
         hsfn, sfn, subf = nbGrid.recvNpdschWoBcch(hsfn, sfn, subf)  #recv NPDSCH w/o BCCH
-        #hsfn, sfn, subf = nbGrid.sendNpuschFormat2(hsfn, sfn, subf) #TODO send NPUSCH format 2
+        hsfn, sfn, subf = nbGrid.sendNpuschFormat2(hsfn, sfn, subf) #send NPUSCH format 2
         
         hsfn, sfn = incSfn(hsfn, sfn, 1) #wait for next NPDCCH candidate
         

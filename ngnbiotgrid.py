@@ -16,7 +16,7 @@ import time
 import numpy as np
 import ngmainwin
 from ngltephy import LtePhy, LteResType
-from ngnbiotphy import NbiotPhy, NbiotResType, incSfn, incSubf, randc
+from ngnbiotphy import NbiotPhy, NbiotResType, incSfn, incSubf, incSlot, randc
 from ngb36utils import time2str36, freq2str36
 
 class NgNbiotGrid(object):
@@ -29,10 +29,12 @@ class NgNbiotGrid(object):
             self.scNbUl = 48
             self.slotPerRfNbUl = 5
             self.slotDurNbUl = 2
+            self.nSlots = 1 #N_slots in 36.211 10.1.3.6	Mapping to physical resources
         else:
             self.scNbUl = 12
             self.slotPerRfNbUl = 20
             self.slotDurNbUl = 0.5
+            self.nSlots = 2 #N_slots in 36.211 10.1.3.6	Mapping to physical resources
         self.symbPerSlotNb = 7
         self.symbPerRfNbUl = self.symbPerSlotNb * self.slotPerRfNbUl
         self.symbPerSubfNbDl = self.symbPerSlotNb * self.slotPerSubfNbDl
@@ -82,8 +84,8 @@ class NgNbiotGrid(object):
         self.gridNbUl = OrderedDict()  #key='HSFN_SFN', value=ndarray of [#ap, #sc, #symbol]
         self.gridNbDl = OrderedDict()  #key='HSFN_SFN', value=ndarray of [#ap, #sc, #symbol]
         self.npdschWoBcchMap = OrderedDict()  #key='HSFN_SFN', value=[list of dl subframes for NPDSCH mapping]
-        self.npuschFmt1Map = OrderedDict()  #key='HSFN_SFN', value=[list of dl subframes for NPUSCH format 1 mapping]
-        self.npuschFmt2Map = OrderedDict()  #key='HSFN_SFN', value=[list of dl subframes for NPUSCH format 2 mapping]
+        self.npuschFmt1Map = OrderedDict()  #key='HSFN_SFN', value=[list of ul slots for NPUSCH format 1 mapping]
+        self.npuschFmt2Map = OrderedDict()  #key='HSFN_SFN', value=[list of ul slots for NPUSCH format 2 mapping]
         
         #data structure for SIB2/SIB3 mapping
         self.sib2Map = OrderedDict()   #key='hsfn_sfn', value=[list of dl subframes for sib2 mapping]
@@ -102,6 +104,8 @@ class NgNbiotGrid(object):
         
         #data struture for NPRACH mapping
         self.nprachMap = [] #list of OrderedDict, where key='hsfn_sfn', value=[[symbols for group0], [group1], [group2], [group3]] or None for nprach gap
+        self.nprachSlots = OrderedDict() #key='hsfn_sfn', value=[list of ul slots for nprach, excluding possible nprach gap]
+        self.nprachGapSlots = OrderedDict()  #key='hsfn_sfn', value = [list of ul slots for nprach gap]
         self.scNbRa = 12
         self.initNprachFreqLoc()
         self.sendingNprach = False
@@ -688,6 +692,7 @@ class NgNbiotGrid(object):
     def resetNprachMapping(self, hsfn, sfn):
         self.nprachMap.clear()
         self.nprachMap = [OrderedDict() for i in range(self.args['nprachRepPerAtt'])]
+        self.nprachGapSlots.clear()
         
         hsfn, sfn, subf = incSubf(hsfn, sfn, 0, self.args['nprachStartTime'])
         
@@ -707,6 +712,22 @@ class NgNbiotGrid(object):
         rep = 0
         while rep < self.args['nprachRepPerAtt']:
             if rep > 0 and rep % 64 == 0:   #after 64 nprach preambles, a 40ms gap is inserted
+                for i in reversed(range(4)):
+                    if self.nprachMap[rep-1][key][i] is not None:
+                        gapStartSlot = math.ceil(self.nprachMap[rep-1][str(hsfn)+'_'+str(sfn)][i][-1] / self.symbPerSlotNb)
+                        break
+                _hsfn, _sfn = hsfn, sfn
+                self.nprachGapSlots[str(_hsfn)+'_'+str(_sfn)] = list(range(gapStartSlot, self.slotPerRfNbUl))
+                for i in range(3):
+                    _hsfn, _sfn = incSfn(_hsfn, _sfn, 1)
+                    self.nprachGapSlots[str(_hsfn)+'_'+str(_sfn)] = list(range(self.slotPerRfNbUl))
+                _hsfn, _sfn = incSfn(_hsfn, _sfn, 1)
+                self.nprachGapSlots[str(_hsfn)+'_'+str(_sfn)] = list(range(gapStartSlot))
+                
+                self.ngwin.logEdit.append('nprach gap(hsfn=%d, sfn=%d, start_slot=%d)' % (hsfn, sfn, gapStartSlot))
+                for key, val in self.nprachGapSlots.items():
+                    self.ngwin.logEdit.append('-->[NPRACH GAP]key=%s,val=%s' % (key, val))
+                    
                 for i in range(4):
                     hsfn, sfn = incSfn(hsfn, sfn, 1)
                     key = str(hsfn) + '_' + str(sfn)
@@ -760,8 +781,52 @@ class NgNbiotGrid(object):
         return [hsfn, sfn, slot, _list]
         
     def fillNprach(self, hsfn, sfn):
+        self.ngwin.logEdit.append('sendingNprach=%s @ [HSFN=%d,SFN=%d]' % (self.sendingNprach, hsfn, sfn))
+                                  
         if sfn % (self.args['nprachPeriod'] // 10) == 0 and not self.sendingNprach:
             self.resetNprachMapping(hsfn, sfn)
+            
+            #get ra start/end slot for npusch mapping
+            self.nprachSlots.clear()
+            repPerAtt = self.args['nprachRepPerAtt']
+            allKeys = list(self.nprachMap[0].keys())
+            firstKey = allKeys[0]
+            for i in range(4):
+                if self.nprachMap[0][firstKey][i] is not None:
+                    raStartSlot = math.floor(self.nprachMap[0][firstKey][i][0] / self.symbPerSlotNb)
+                    self.nprachStartSlot = firstKey + '_' + str(raStartSlot)
+                    break
+            
+            allKeys = list(self.nprachMap[repPerAtt-1].keys())
+            lastKey = allKeys[-1]
+            for i in reversed(range(4)):
+                if self.nprachMap[repPerAtt-1][lastKey][i] is not None:
+                    raEndSlot = math.floor(self.nprachMap[repPerAtt-1][lastKey][i][-1] / self.symbPerSlotNb)
+                    self.nprachEndSlot = lastKey + '_' + str(raEndSlot)
+                    break
+            
+            self.ngwin.logEdit.append('nprach start slot=[%s], end slot=[%s]' % (self.nprachStartSlot, self.nprachEndSlot))
+            _hsfn, _sfn, _slot = list(map(int, self.nprachStartSlot.split('_')))
+            hsfnEnd, sfnEnd, slotEnd = list(map(int, self.nprachEndSlot.split('_')))
+            
+            while True:
+                key = str(_hsfn)+'_'+str(_sfn)
+                if key in self.nprachSlots:
+                    if not key in self.nprachGapSlots or not _slot in self.nprachGapSlots[key]:
+                        self.nprachSlots[key].append(_slot)
+                else:
+                    if not key in self.nprachGapSlots or not _slot in self.nprachGapSlots[key]:
+                        self.nprachSlots[key] = [_slot]
+                
+                if (_hsfn, _sfn, _slot) == (hsfnEnd, sfnEnd, slotEnd):
+                    break
+                
+                _hsfn, _sfn, _slot = incSlot(_hsfn, _sfn, _slot, 1, self.slotPerRfNbUl)
+            
+            self.ngwin.logEdit.append('contents of self.nprachSlots:')
+            for key, val in self.nprachSlots.items():
+                self.ngwin.logEdit.append('-->[NPRACH]key=%s,val=%s' % (key, val))
+                
         
         key = str(hsfn) + '_' + str(sfn)
         
@@ -784,12 +849,61 @@ class NgNbiotGrid(object):
                     for isymb in symb:
                             if self.gridNbUl[key][0][isc][isymb] == NbiotResType.NBIOT_RES_BLANK.value:
                                 self.gridNbUl[key][0][isc][isymb] = NbiotResType.NBIOT_RES_NPRACH.value
+    
+    def validateNpuschSlot(self, hsfn, sfn, slot):
+        if self.args['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_15K.value and self.npuschPostponed and slot % 2 != 0:
+            return False
+        
+        valid = True
+        for i in range(self.nSlots):
+            _hsfn, _sfn, _slot = incSlot(hsfn, sfn, slot, i, self.slotPerRfNbUl)
+            key = str(_hsfn)+'_'+str(_sfn)
+            if key in self.nprachSlots and _slot in self.nprachSlots[key]:
+                valid = False
+                break
+        
+        return valid
             
     def fillNpuschFormat1(self, hsfn, sfn):
         pass
     
     def resetNpuschFormat2Map(self, hsfn, sfn, subf):
-        pass
+        self.npuschFmt2Map.clear()
+        
+        #36.213 16.4.2	UE procedure for reporting ACK/NACK
+        #The UE shall upon detection of a NPDSCH transmission ending in NB-IoT subframe n intended for the UE and for which an ACK/NACK shall be provided, start, at the end of n+k0-1 DL subframe transmission of the NPUSCH carrying ACK/NACK response using NPUSCH format 2 in N consecutive NB-IoT UL slots.
+        N = self.args['npuschFormat2NumRep'] * 4    #36.211 Table 10.1.2.3-1
+        k0 = self.args['npuschFormat2K0']
+        hsfn, sfn, subf = incSubf(hsfn, sfn, subf, k0-1)
+        
+        if self.args['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_3DOT75K.value:
+            if subf / self.slotDurNbUl > self.slotPerRfNbUl - 1:
+                hsfn, sfn = incSfn(hsfn, sfn)
+                slot = 0
+            else:
+                slot = math.floor(subf / self.slotDurNbUl)
+        else:
+            slot = math.floor(subf / self.slotDurNbUl)
+        
+        #first possible slot for NPUSCH format 2
+        hsfn, sfn, slot = incSlot(hsfn, sfn, slot, 1, self.slotPerRfNbUl)
+        self.npuschPostponed = False
+        while N > 0:
+            if self.validateNpuschSlot(hsfn, sfn, slot):
+                for i in range(self.nSlots):
+                    _hsfn, _sfn, _slot = incSlot(hsfn, sfn, slot, i, self.slotPerRfNbUl)
+                    key = str(_hsfn) + '_' + str(_sfn)
+                    if key in self.npuschFmt2Map:
+                        self.npuschFmt2Map[key].append(_slot)
+                    else:
+                        self.npuschFmt2Map[key] = [_slot]
+                        
+                N = N - self.nSlots
+                hsfn, sfn, slot = incSlot(hsfn, sfn, slot, self.nSlots, self.slotPerRfNbUl)
+                self.npuschPostponed = False
+            else:
+                hsfn, sfn, slot = incSlot(hsfn, sfn, slot, 1, self.slotPerRfNbUl)
+                self.npuschPostponed = True
     
     def fillNpuschFormat2(self, hsfn, sfn):
         pass
@@ -881,13 +995,39 @@ class NgNbiotGrid(object):
         
         self.resetNpuschFormat2Map(hsfn, sfn, subf)
         
+        for key, val in self.npuschFmt2Map.items():
+            self.ngwin.logEdit.append('key=%s,val=%s' % (key, val))
+        
+        #note there is no need to call normalOps again!
         #self.normalOps(hsfn, sfn)
-        #self.fillNpuschFormat2(hsfn, sfn)
+        self.fillNpuschFormat2(hsfn, sfn)
+        
+        #proceed to send NPUSCH Format 2
+        allKeys = list(self.npuschFmt2Map.keys())
+        key = str(hsfn) + '_' + str(sfn)
+        if key in allKeys:
+            current = key
+            last = allKeys[-1] if len(allKeys) > 1 else None
+        else:
+            current = key
+            last = allKeys[-1]
+        if last is not None:
+            while True:
+                hsfn, sfn = incSfn(hsfn, sfn, 1)
+                self.normalOps(hsfn, sfn)
+                self.fillNpuschFormat2(hsfn, sfn)
+                
+                current = str(hsfn) + '_' + str(sfn)
+                if current == last:
+                    break
         
         #make return tuple
-        retHsfn, retSfn = ('0', '0')
-        retSubf = 0
-        return (int(retHsfn), int(retSfn), retSubf)
+        retHsfn, retSfn = list(map(int, allKeys[-1].split('_')))
+        retSubf = math.floor((self.npuschFmt2Map[allKeys[-1]][-1] + 1) * self.slotDurNbUl)
+        if retSubf == self.subfPerRfNbDl:
+            retSubf = 0
+            retHsfn, retSfn = incSfn(retHsfn, retSfn, 1)
+        return (retHsfn, retSfn, retSubf)
     
     def recvNpdschWoBcch(self, hsfn, sfn, subf):
         self.ngwin.logEdit.append('call resetNpdschWoBcchMap with N=%d, k0=%d @ [HSFN=%d,SFN=%d,SUBF=%d]' % (self.args['npdschNoBcchDciN1NumSf']*self.args['npdschNoBcchDciN1NumRep'], self.args['npdschNoBcchDciN1K0'], hsfn, sfn, subf))
