@@ -975,6 +975,8 @@ class NgNbiotGridUi(QDialog):
         self.argsNbiot['npuschFormat1K0'] = (8, 16, 32, 64)[self.nbDciN0DelayIndCombo.currentIndex()]
         #self.argsNbiot['npuschFormat2NumRep'] = int(self.nbDciN1AnIndCombo.currentText()[1:])
         self.argsNbiot['npuschFormat2NumRep'] = int(self.nbNumAnRepCombo.currentText()[1:])
+        #Table 16.4.2-1: ACK/NACK subcarrier and k0 for NPUSCH with subcarrier spacing delta_f = 3.75KHz
+        #Table 16.4.2-2: ACK/NACK subcarrier and k0 for NPUSCH with subcarrier spacing delta_f = 15KHz
         _npuschF2Conf = [[(38, 13), (39, 13), (40, 13), (41, 13), (42, 13), (43, 13), (44, 13), (45, 13),
                       (38, 21), (39, 21), (40, 21), (41, 21), (42, 21), (43, 21), (44, 21), (45, 21)],
                      [(0, 13), (1, 13), (2, 13), (3, 13), (0, 15), (1, 15), (2, 15), (3, 15),

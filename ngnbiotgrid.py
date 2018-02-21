@@ -788,6 +788,9 @@ class NgNbiotGrid(object):
     def fillNpuschFormat1(self, hsfn, sfn):
         pass
     
+    def resetNpuschFormat2Map(self, hsfn, sfn, subf):
+        pass
+    
     def fillNpuschFormat2(self, hsfn, sfn):
         pass
     
@@ -874,8 +877,12 @@ class NgNbiotGrid(object):
         return (int(retHsfn), int(retSfn), retSubf)
     
     def sendNpuschFormat2(self, hsfn, sfn, subf):
-        self.normalOps(hsfn, sfn)
-        self.fillNpuschFormat2(hsfn, sfn)
+        self.ngwin.logEdit.append('call resetNpuschFormat2Map with N=%d, sc=%d, k0=%d @ [HSFN=%d,sfn=%d,SUBF=%d]' % (self.args['npuschFormat2NumRep']*4, self.args['npuschFormat2Sc'], self.args['npuschFormat2K0'], hsfn, sfn, subf))
+        
+        self.resetNpuschFormat2Map(hsfn, sfn, subf)
+        
+        #self.normalOps(hsfn, sfn)
+        #self.fillNpuschFormat2(hsfn, sfn)
         
         #make return tuple
         retHsfn, retSfn = ('0', '0')
