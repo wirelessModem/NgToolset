@@ -55,6 +55,9 @@ class NbiotResType(Enum):
     NBIOT_RES_BUTT = 99
 
 def incSfn(hsfn, sfn, n):
+    if n <= 0:
+        return (hsfn, sfn)
+    
     sfn = sfn + n
     if sfn >= 1024:
         sfn = sfn % 1024
@@ -64,12 +67,26 @@ def incSfn(hsfn, sfn, n):
     return (hsfn, sfn)
 
 def incSubf(hsfn, sfn, subf, n):
+    if n <= 0:
+        return (hsfn, sfn, subf)
+    
     subf = subf + n
     if subf >= 10:
-        subf = subf % 10
         hsfn, sfn = incSfn(hsfn, sfn, subf // 10)
+        subf = subf % 10
     
     return (hsfn, sfn, subf)
+
+def incSlot(hsfn, sfn, slot, n, slotPerRf):
+    if n <= 0:
+        return (hsfn, sfn, slot)
+    
+    slot = slot + n
+    if slot >= slotPerRf:
+        hsfn, sfn = incSfn(hsfn, sfn, slot // slotPerRf)
+        slot = slot % slotPerRf
+        
+    return (hsfn, sfn, slot)
 
 def randc(seed, mpn):
     #36.211 7.2	Pseudo-random sequence generation
