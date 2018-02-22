@@ -692,6 +692,7 @@ class NgNbiotGrid(object):
     def resetNprachMapping(self, hsfn, sfn):
         self.nprachMap.clear()
         self.nprachMap = [OrderedDict() for i in range(self.args['nprachRepPerAtt'])]
+        self.nprachSlots.clear()
         self.nprachGapSlots.clear()
         
         hsfn, sfn, subf = incSubf(hsfn, sfn, 0, self.args['nprachStartTime'])
@@ -764,30 +765,8 @@ class NgNbiotGrid(object):
                 self.ngwin.logEdit.append('-->rep=%d,key=%s,val=%s' % (rep, key, val))
             
             rep = rep + 1
-    
-    def findNextNSlots(self, hsfn, sfn, slot, n):
-        _list = []
-        while n > 0:
-            if slot < self.slotPerRfNbUl:
-                #format = 'hsfn_sfn|symbol'
-                _list.extend([str(hsfn)+'_'+str(sfn)+'|'+str(slot*self.symbPerSlotNb+i) for i in range(self.symbPerSlotNb)])
-                n = n - 1
-                slot = slot + 1
-                
-            if slot == self.slotPerRfNbUl:
-                hsfn, sfn = incSfn(hsfn, sfn, 1)
-                slot = 0
         
-        return [hsfn, sfn, slot, _list]
-        
-    def fillNprach(self, hsfn, sfn):
-        self.ngwin.logEdit.append('sendingNprach=%s @ [HSFN=%d,SFN=%d]' % (self.sendingNprach, hsfn, sfn))
-                                  
-        if sfn % (self.args['nprachPeriod'] // 10) == 0 and not self.sendingNprach:
-            self.resetNprachMapping(hsfn, sfn)
-            
             #get ra start/end slot for npusch mapping
-            self.nprachSlots.clear()
             repPerAtt = self.args['nprachRepPerAtt']
             allKeys = list(self.nprachMap[0].keys())
             firstKey = allKeys[0]
@@ -826,7 +805,27 @@ class NgNbiotGrid(object):
             self.ngwin.logEdit.append('contents of self.nprachSlots:')
             for key, val in self.nprachSlots.items():
                 self.ngwin.logEdit.append('-->[NPRACH]key=%s,val=%s' % (key, val))
+    
+    def findNextNSlots(self, hsfn, sfn, slot, n):
+        _list = []
+        while n > 0:
+            if slot < self.slotPerRfNbUl:
+                #format = 'hsfn_sfn|symbol'
+                _list.extend([str(hsfn)+'_'+str(sfn)+'|'+str(slot*self.symbPerSlotNb+i) for i in range(self.symbPerSlotNb)])
+                n = n - 1
+                slot = slot + 1
                 
+            if slot == self.slotPerRfNbUl:
+                hsfn, sfn = incSfn(hsfn, sfn, 1)
+                slot = 0
+        
+        return [hsfn, sfn, slot, _list]
+        
+    def fillNprach(self, hsfn, sfn):
+        self.ngwin.logEdit.append('sendingNprach=%s @ [HSFN=%d,SFN=%d]' % (self.sendingNprach, hsfn, sfn))
+                                  
+        if sfn % (self.args['nprachPeriod'] // 10) == 0 and not self.sendingNprach:
+            self.resetNprachMapping(hsfn, sfn)
         
         key = str(hsfn) + '_' + str(sfn)
         
