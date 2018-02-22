@@ -12,6 +12,7 @@ Change History:
 
 import os
 import math
+import time
 from PyQt5.QtWidgets import QDialog, QTextEdit, QTabWidget, QLabel, QLineEdit, QComboBox, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, QWidget, QGroupBox, QMessageBox
 from PyQt5.QtWidgets import QGridLayout, QHBoxLayout, QVBoxLayout
 from PyQt5.QtGui import QColor
@@ -758,6 +759,7 @@ class NgNbiotGridUi(QDialog):
             self.cpCombo.setCurrentIndex(0)
     
     def onOkBtnClicked(self):
+        self.ngwin.logEdit.append('<font color=blue>[%s] ***nb-iot grid generation started!***</font>' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
         #step 1: prepare NgLteGrid
         self.prepLteGrid()
         
@@ -844,6 +846,7 @@ class NgNbiotGridUi(QDialog):
         #step 5: parse LTE grid and NB-IoT grid
         self.parseLteNbiotGrid()
         
+        self.ngwin.logEdit.append('<font color=blue>[%s] ***nb-iot grid generation finished!***</font><br>' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
         self.accept()
         
     def onBwComboCurrentIndexChanged(self, index):
