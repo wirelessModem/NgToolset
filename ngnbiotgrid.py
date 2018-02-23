@@ -826,7 +826,6 @@ class NgNbiotGrid(object):
         
     def fillNprach(self, hsfn, sfn):
         #self.ngwin.logEdit.append('sendingNprach=%s @ [HSFN=%d,SFN=%d]' % (self.sendingNprach, hsfn, sfn))
-                                  
         if sfn % (self.args['nprachPeriod'] // 10) == 0 and not self.sendingNprach:
             self.resetNprachMapping(hsfn, sfn)
         
@@ -868,11 +867,54 @@ class NgNbiotGrid(object):
         
         return valid
             
-    def fillNpuschFormat1(self, hsfn, sfn):
-        pass
+    def fillNpuschFormat1(self, hsfn, sfn, slot):
+        allSymb = self.args['npuschAllSymbols']
+        scs = self.args['npuschFormat1Scs']
+        
+        #host LTE grid (isc, isymb)
+        hostScs = [self.args['nbInbandPrbIndUl'] * 12 + isc for isc in scs] if self.args['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_15K.value else [self.args['nbInbandPrbIndUl'] * 12 + math.floor(isc/4) for isc in scs]
+        hostSlot = [slot] if self.args['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_15K.value else list(range(4*slot, 4*(slot+1)))
+        hostSymb = []
+        hostSymb.extend([i*self.symbPerSlotNb+j for i in hostSlot for j in range(self.symbPerSlotNb)])
+        
+        key = str(hsfn)+'_'+str(sfn)
+        for ind, isc in enumerate(scs):
+            for isymb in range(self.symbPerSlotNb):
+                if allSymb: #npusch-AllSymbols = True
+                    if self.gridNbUl[key][0][isc][slot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
+                        self.gridNbUl[key][0][isc][slot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_NPUSCH_FORMAT2.value
+                else:
+                    isSrs = False
+                    for i in range(1 if self.args['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_15K.value else 4):
+                        if self.args['hostLteGridUl'][0][hostScs[ind]][hostSymb[4*isymb+i]] == LTE_RES_SRS.value:
+                            isSrs = True
+                            break
+                    if not isSrs and self.gridNbUl[key][0][isc][slot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
+                        self.gridNbUl[key][0][isc][slot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_NPUSCH_FORMAT2.value
     
     def fillNpuschFormat2(self, hsfn, sfn, slot):
-        pass
+        allSymb = self.args['npuschAllSymbols']
+        isc = self.args['npuschFormat2Sc']
+        
+        #host LTE grid (isc, isymb)
+        hostIsc = self.args['nbInbandPrbIndUl'] * 12 + isc if self.args['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_15K.value else self.args['nbInbandPrbIndUl'] * 12 + math.floor(isc/4)
+        hostSlot = [slot] if self.args['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_15K.value else list(range(4*slot, 4*(slot+1)))
+        hostSymb = []
+        hostSymb.extend([i*self.symbPerSlotNb+j for i in hostSlot for j in range(self.symbPerSlotNb)])
+        
+        key = str(hsfn)+'_'+str(sfn)        
+        for isymb in range(self.symbPerSlotNb):
+            if allSymb: #npusch-AllSymbols = True
+                if self.gridNbUl[key][0][isc][slot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
+                    self.gridNbUl[key][0][isc][slot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_NPUSCH_FORMAT2.value
+            else:
+                isSrs = False
+                for i in range(1 if self.args['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_15K.value else 4):
+                    if self.args['hostLteGridUl'][0][hostIsc][hostSymb[4*isymb+i]] == LTE_RES_SRS.value:
+                        isSrs = True
+                        break
+                if not isSrs and self.gridNbUl[key][0][isc][slot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
+                    self.gridNbUl[key][0][isc][slot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_NPUSCH_FORMAT2.value
     
     def normalOps(self, hsfn, sfn):
         self.ngwin.logEdit.append('<font color=purple>normalOps @ [HSFN=%d,SFN=%d]</font>' % (hsfn, sfn))
@@ -948,16 +990,111 @@ class NgNbiotGrid(object):
         return (int(retHsfn), int(retSfn), retSubf)
         
     def sendNpuschFormat1(self, hsfn, sfn, subf):
-        self.normalOps(hsfn, sfn)
-        self.fillNpuschFormat1(hsfn, sfn)
+        self.ngwin.logEdit.append('<font color=purple>sendNpuschFormat1 with N=%d, sc=%s, k0=%d @ [HSFN=%d,SFN=%d,SUBF=%d]</font>' % (self.args['npuschFormat1NumRep']*self.args['npuschFormat1NumRu']*self.args['npuschFormat1NumSlots'], self.args['npuschFormat1Scs'], self.args['npuschFormat1K0'], hsfn, sfn, subf))
         
+        oldHsfn, oldSfn = hsfn, sfn
+        oldKey = str(hsfn)+'_'+str(sfn)
+        
+        #36.213 16.5.1	UE procedure for transmitting format 1 narrowband physical uplink shared channel
+        #A UE shall upon detection on a given serving cell of a NPDCCH with DCI format N0 ending in NB-IoT DL subframe n intended for the UE, adjust, at the end of n+k0 DL subframe, the corresponding NPUSCH transmission using NPUSCH format 1 in N consecutive NB-IoT UL slots ni with i = 0, 1, …, N-1 according to the NPDCCH information...
+        N = self.args['npuschFormat1NumRep']*self.args['npuschFormat1NumRu']*self.args['npuschFormat1NumSlots']
+        k0 = self.args['npuschFormat1K0']
+        hsfn, sfn, subf = incSubf(hsfn, sfn, subf, k0)
+        
+        newKey = str(hsfn)+'_'+str(sfn)
+        while oldKey != newKey:
+            oldHsfn, oldSfn = incSfn(oldHsfn, oldSfn, 1)
+            oldKey = str(oldHsfn) + '_' + str(oldSfn)
+            self.normalOps(oldHsfn, oldSfn)
+        
+        if self.args['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_3DOT75K.value:
+            if subf / self.slotDurNbUl > self.slotPerRfNbUl - 1:
+                hsfn, sfn = incSfn(hsfn, sfn)
+                slot = 0
+            else:
+                slot = math.floor(subf / self.slotDurNbUl)
+        else:
+            slot = math.floor(subf / self.slotDurNbUl)
+        
+        self.npuschFmt1Map.clear()
+        self.npuschGap.clear()
+        npuschGapTh = math.floor(256 / self.slotDurNbUl)    #slot number for 256ms
+        npuschGapDur = math.floor(40 / self.slotDurNbUl)    #slot number for 40ms
+        slotMapped = 0
+        slotTotal = 0
+        slotRaPostponed = 0
+        self.npuschPostponed = False
+        while slotMapped < N:
+            if slotTotal > 0 and slotTotal % npuschGapTh == 0: #after 256ms, a 40ms npusch gap is inserted
+                self.ngwin.logEdit.append('<font color=red>NPUSCH gap [N=%d,slotMapped=%d,slotRaPostponed=%d,slotTotal=%d] @ [HSFN=%d,SFN=%d,SLOT=%d]</font>' % (N, slotMapped, slotRaPostponed, slotTotal, hsfn, sfn, slot))
+                #36.211 10.1.3.6 Mapping to physical resources
+                #The portion of a postponement due to NPRACH which coincides with a (NPUSCH) gap is counted as part of the gap.
+                slotActGap = npuschGapDur - slotRaPostponed
+                for i in range(slotActGap):
+                    hsfn, sfn, slot = incSlot(hsfn, sfn, slot, 1, self.slotPerRfNbUl)
+                    newKey = str(hsfn)+'_'+str(sfn)
+                    if newKey != oldKey:
+                        self.normalOps(hsfn, sfn)
+                        oldKey = newKey
+                        
+                    if newKey in self.npuschGap:
+                        self.npuschGap[newKey].append(slot)
+                    else:
+                        self.npuschGap[newKey] = [slot]
+                #reset slotRaPostponed
+                slotRaPostponed = 0
+                
+            hsfn, sfn, slot = incSlot(hsfn, sfn, slot, 1, self.slotPerRfNbUl)
+            newKey = str(hsfn)+'_'+str(sfn)
+            if newKey != oldKey:
+                self.normalOps(hsfn, sfn)
+                oldKey = newKey
+                
+            if self.validateNpuschSlot(hsfn, sfn, slot):
+                for i in range(self.nSlots):
+                    hsfn, sfn, slot = incSlot(hsfn, sfn, slot, i, self.slotPerRfNbUl)
+                    
+                    newKey = str(hsfn)+'_'+str(sfn)
+                    if newKey != oldKey:
+                        self.normalOps(hsfn, sfn)
+                        oldKey = newKey
+                        
+                    self.fillNpuschFormat1(hsfn, sfn, slot)
+                    #keep track of npuschFmt1Map
+                    key = str(hsfn) + '_' + str(sfn)
+                    if key in self.npuschFmt1Map:
+                        self.npuschFmt1Map[key].append(slot)
+                    else:
+                        self.npuschFmt1Map[key] = [slot]
+                slotMapped = slotMapped + self.nSlots
+                slotTotal = slotTotal + self.nSlots
+                self.npuschPostponed = False
+                #reset slotRaPostponed
+                slotRaPostponed = 0
+            else:
+                slotRaPostponed = slotRaPostponed + 1
+                slotTotal = slotTotal + 1
+                self.npuschPostponed = True
+        
+        self.ngwin.logEdit.append('contents of self.npuschFmt1Map:')
+        for key, val in self.npuschFmt1Map.items():
+            self.ngwin.logEdit.append('-->[NPUSCH FORMAT 1]key=%s,val=%s' % (key, val))
+        if len(self.npuschGap) > 0:
+            self.ngwin.logEdit.append('<font color=red>contents of self.npuschGap:</font>')
+            for key, val in self.npuschGap.items():
+                self.ngwin.logEdit.append('<font color=red>-->[NPUSCH GAP]key=%s,val=%s</font>' % (key, val))
+
         #make return tuple
-        retHsfn, retSfn = ('0', '0')
-        retSubf = 0
-        return (int(retHsfn), int(retSfn), retSubf)
+        allKeys = list(self.npuschFmt1Map.keys())
+        retHsfn, retSfn = list(map(int, allKeys[-1].split('_')))
+        retSubf = math.floor((self.npuschFmt1Map[allKeys[-1]][-1] + 1) * self.slotDurNbUl)
+        if retSubf == self.subfPerRfNbDl:
+            retSubf = 0
+            retHsfn, retSfn = incSfn(retHsfn, retSfn, 1)
+        return (retHsfn, retSfn, retSubf)
     
     def sendNpuschFormat2(self, hsfn, sfn, subf):
-        self.ngwin.logEdit.append('<font color=purple>sendNpuschFormat2 with N=%d, sc=%d, k0=%d @ [HSFN=%d,SFN=%d,SUBF=%d]</font>' % (self.args['npuschFormat2NumRep']*4, self.args['npuschFormat2Sc'], self.args['npuschFormat2K0'], hsfn, sfn, subf))
+        self.ngwin.logEdit.append('<font color=purple>sendNpuschFormat2 with N=%d, sc=%s, k0=%d @ [HSFN=%d,SFN=%d,SUBF=%d]</font>' % (self.args['npuschFormat2NumRep']*4, [self.args['npuschFormat2Sc']], self.args['npuschFormat2K0'], hsfn, sfn, subf))
         
         oldHsfn, oldSfn = hsfn, sfn
         oldKey = str(hsfn)+'_'+str(sfn)
