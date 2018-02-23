@@ -788,6 +788,12 @@ class NgNbiotGridUi(QDialog):
             lteGrid.fillPrach()
             lteGrid.fillDmrsForPusch()
             lteGrid.fillSrs()
+            
+            #36.211 10.1.3.6 Mapping to physical resources
+            #When higher layer parameter npusch-AllSymbols is set to false, resource elements in SC-FDMA symbols overlapping with a symbol configured with SRS according to srs-SubframeConfig shall be counted in the NPUSCH mapping but not used for transmission of the NPUSCH. When higher layer parameter npusch-AllSymbols is set to true, all symbols are transmitted.
+            #note the use of ndarray.copy()!
+            self.argsNbiot['hostLteGridUl'] = lteGrid.gridUl.copy()
+            
             lteGrid.printUl()
         else:
             self.accept()
@@ -831,17 +837,25 @@ class NgNbiotGridUi(QDialog):
                 break
         '''
         #NB DL SU scheduling simulation
+        self.ngwin.logEdit.append('<font color=green><b>Start NB DL SU scheduling simulation</b></font>')
+        self.ngwin.logEdit.append('<font color=green><b>[NB DL SU SIM]recv NPDCCH DCI N1</b></font>')
         hsfn, sfn, subf = nbGrid.monitorNpdcch(hsfn, sfn)   #recv NPDCCH DCI N1
+        self.ngwin.logEdit.append('<font color=green><b>[NB DL SU SIM]recv NPDSCH w/o BCCH</b></font>')
         hsfn, sfn, subf = nbGrid.recvNpdschWoBcch(hsfn, sfn, subf)  #recv NPDSCH w/o BCCH
+        self.ngwin.logEdit.append('<font color=green><b>[NB DL SU SIM]send NPUSCH Format 2</b></font>')
         hsfn, sfn, subf = nbGrid.sendNpuschFormat2(hsfn, sfn, subf) #send NPUSCH format 2
         
+        self.ngwin.logEdit.append('<font color=green><b>Wait for next NPDCCH candidate</b></font>')
         hsfn, sfn = incSfn(hsfn, sfn, 1) #wait for next NPDCCH candidate
         
         #NB UL SU scheduling simulation
+        self.ngwin.logEdit.append('<font color=green><b>Start NB UL SU scheduling simulation</b></font>')
+        self.ngwin.logEdit.append('<font color=green><b>[NB UL SU SIM]recv NPDCCH DCI N0</b></font>')
         hsfn, sfn, subf = nbGrid.monitorNpdcch(hsfn, sfn)   #recv NPDCCH DCI N0
-        #hsfn, sfn, subf = nbGrid.sendNpuschFormat1(hsfn, sfn, subf) #TODO send NPUSCH format 1
+        self.ngwin.logEdit.append('<font color=green><b>[NB UL SU SIM]send NPUSCH Format 1</b></font>')
+        hsfn, sfn, subf = nbGrid.sendNpuschFormat1(hsfn, sfn, subf) #send NPUSCH format 1
         
-        hsfn, sfn = incSfn(hsfn, sfn, 1) #wait for next NPDCCH candidate
+        #hsfn, sfn = incSfn(hsfn, sfn, 1) #wait for next NPDCCH candidate
         
         #step 5: parse LTE grid and NB-IoT grid
         self.parseLteNbiotGrid()
@@ -957,18 +971,23 @@ class NgNbiotGridUi(QDialog):
         _val = int(self.nbDciN0ScIndEdit.text())
         if self.argsNbiot['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_3DOT75K.value and _val >= 0 and _val <= 47:
             self.argsNbiot['npuschFormat1Scs'].append(_val)
+            self.argsNbiot['npuschFormat1NumSlots'] = 16 #36.211 Table 10.1.2.3-1, N_UL_Slots
         elif self.argsNbiot['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_15K.value and _val >= 0 and _val <= 18:
             if _val >= 0 and _val <= 11:
                 self.argsNbiot['npuschFormat1Scs'].append(_val)
+                self.argsNbiot['npuschFormat1NumSlots'] = 16
             elif _val >= 12 and _val <= 15:
                 for nsc in range(3):
                     self.argsNbiot['npuschFormat1Scs'].append(3*(_val-12)+nsc) 
+                self.argsNbiot['npuschFormat1NumSlots'] = 8
             elif _val >= 16 and _val <= 17:
                 for nsc in range(6):
                     self.argsNbiot['npuschFormat1Scs'].append(6*(_val-16)+nsc)
+                self.argsNbiot['npuschFormat1NumSlots'] = 4
             else:
-                 for nsc in range(12):
+                for nsc in range(12):
                     self.argsNbiot['npuschFormat1Scs'].append(nsc)
+                self.argsNbiot['npuschFormat1NumSlots'] = 2
         else:
             self.ngwin.logEdit.append('Subcarrier Indication(DCI N0) is not valid! Value range is: [0, 47] for 3.75KHz and [0, 18] for 15KHz.')
             self.accept()
