@@ -137,7 +137,7 @@ class NgNbiotGrid(object):
         slots = (5*2, 5*2+1) #subframe 5 of each radio frame
         for iap in range(self.args['nbDlAp']):
             for islot in slots:
-                for isymb in range(3, self.symbPerSlotNb): #skip first 3 ofdm symbols which are reserved for PDCCH
+                for isymb in range(3 if islot % 2 == 0 else 0, self.symbPerSlotNb): #skip first 3 ofdm symbols which are reserved for PDCCH
                     for isc in range(self.scNbDl-1): #last subcarrier is reserved
                         if self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
                             self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_NPSS.value
@@ -154,7 +154,7 @@ class NgNbiotGrid(object):
         slots = (9*2, 9*2+1) #subframe 9 of even radio frame
         for iap in range(self.args['nbDlAp']):
             for islot in slots:
-                for isymb in range(3, self.symbPerSlotNb): #skip first 3 ofdm symbols which are reserved for PDCCH
+                for isymb in range(1 if islot % 2 == 0 else 0, self.symbPerSlotNb):  #last 11 symbols
                     for isc in range(self.scNbDl):
                         if self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
                             self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_NSSS.value
@@ -191,15 +191,15 @@ class NgNbiotGrid(object):
             
             for _k in k:
                 for _symb in symb:
-                    if self.gridNbDlTmp[ap][_k][_symb] == NbiotResType.NBIOT_RES_BLANK.value:
-                        self.gridNbDlTmp[ap][_k][_symb] = NbiotResType.NBIOT_RES_NRS.value
+                    if self.gridNbDl[dn][ap][_k][_symb] == NbiotResType.NBIOT_RES_BLANK.value:
+                        self.gridNbDl[dn][ap][_k][_symb] = NbiotResType.NBIOT_RES_NRS.value
             
             for _ap in range(self.args['nbDlAp']):
                 if _ap != ap:
                     for _k in k:
                         for _symb in symb:
-                            if self.gridNbDlTmp[_ap][_k][_symb] == NbiotResType.NBIOT_RES_BLANK.value:
-                                self.gridNbDlTmp[_ap][_k][_symb] = NbiotResType.NBIOT_RES_DTX.value
+                            if self.gridNbDl[dn][_ap][_k][_symb] == NbiotResType.NBIOT_RES_BLANK.value:
+                                self.gridNbDl[dn][_ap][_k][_symb] = NbiotResType.NBIOT_RES_DTX.value
         
     
     def fillHostCrs(self, hsfn, sfn):
@@ -238,9 +238,6 @@ class NgNbiotGrid(object):
                             if self.gridNbDl[dn][_ap][_k][_symb] == NbiotResType.NBIOT_RES_BLANK.value:
                                 self.gridNbDl[dn][_ap][_k][_symb] = NbiotResType.NBIOT_RES_DTX.value
     
-    def fillHostSrs(self, hsfn, sfn):
-        pass
-
     def initGridNbDlTmp(self):
         #from 36.211 10.2.4.4
         #For the purpose of the (NPBCH) mapping, the UE shall assume cell-specific reference signals for antenna ports 0-3 and
@@ -313,7 +310,7 @@ class NgNbiotGrid(object):
         slots = (0, 1) #subframe 0 of each radio frame
         for iap in range(self.args['nbDlAp']):
             for islot in slots:
-                for isymb in range(3, self.symbPerSlotNb): #skip first 3 ofdm symbols which are reserved for PDCCH
+                for isymb in range(3 if islot % 2 == 0 else 0, self.symbPerSlotNb): #The first three OFDM symbols in a subframe shall not be used in the mapping process.
                     for isc in range(self.scNbDl):
                         if self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value and self.gridNbDlTmp[iap][isc][islot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
                             self.gridNbDl[dn][iap][isc][islot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_NPBCH.value
@@ -362,6 +359,7 @@ class NgNbiotGrid(object):
         return valid
     
     def resetSib2Mapping(self, hsfn, sfn):
+        self.ngwin.logEdit.append('call resetSib2Mapping @ [HSFN=%d,SFN=%d]' % (hsfn, sfn))
         self.sib2Map.clear()
         siWinLen = self.args['nbSiWinLen'] // 10
         sib2RepPat = self.args['nbSib2RepPattern']
@@ -394,6 +392,7 @@ class NgNbiotGrid(object):
                             break
     
     def resetSib3Mapping(self, hsfn, sfn):
+        self.ngwin.logEdit.append('call resetSib3Mapping @ [HSFN=%d,SFN=%d]' % (hsfn, sfn))
         self.sib3Map.clear()
         siWinLen = self.args['nbSiWinLen'] // 10
         sib3RepPat = self.args['nbSib3RepPattern']
@@ -473,7 +472,7 @@ class NgNbiotGrid(object):
         
         #SI starting frame: (hsfn*1024+sfn) mod si_period = (n-1)*si_winLen/10 + si_offset
         n = 2   #ascending order in NB-SIB1 schedulingInfoList
-        if (hsfn*1024+sfn)%self.args['nbSib2Period'] == (n-1)*self.args['nbSiWinLen']//10+self.args['nbSiRfOff']:
+        if (hsfn*1024+sfn)%self.args['nbSib3Period'] == (n-1)*self.args['nbSiWinLen']//10+self.args['nbSiRfOff']:
             self.resetSib3Mapping(hsfn, sfn)
         
         key = str(hsfn)+'_'+str(sfn)
@@ -868,6 +867,7 @@ class NgNbiotGrid(object):
         return valid
             
     def fillNpuschFormat1(self, hsfn, sfn, slot):
+        symbDmrsNpuschFmt1 = ((4,), (3,))[self.args['nbUlScSpacing']]
         allSymb = self.args['npuschAllSymbols']
         scs = self.args['npuschFormat1Scs']
         
@@ -882,7 +882,7 @@ class NgNbiotGrid(object):
             for isymb in range(self.symbPerSlotNb):
                 if allSymb: #npusch-AllSymbols = True
                     if self.gridNbUl[key][0][isc][slot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
-                        self.gridNbUl[key][0][isc][slot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_NPUSCH_FORMAT2.value
+                        self.gridNbUl[key][0][isc][slot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_DMRS_NPUSCH.value if isymb in symbDmrsNpuschFmt1 else NbiotResType.NBIOT_RES_NPUSCH_FORMAT1.value 
                 else:
                     isSrs = False
                     for i in range(1 if self.args['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_15K.value else 4):
@@ -890,9 +890,10 @@ class NgNbiotGrid(object):
                             isSrs = True
                             break
                     if not isSrs and self.gridNbUl[key][0][isc][slot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
-                        self.gridNbUl[key][0][isc][slot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_NPUSCH_FORMAT2.value
+                        self.gridNbUl[key][0][isc][slot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_DMRS_NPUSCH.value if isymb in symbDmrsNpuschFmt1 else NbiotResType.NBIOT_RES_NPUSCH_FORMAT1.value 
     
     def fillNpuschFormat2(self, hsfn, sfn, slot):
+        symbDmrsNpuschFmt2 = ((0, 1, 2), (2, 3, 4))[self.args['nbUlScSpacing']]
         allSymb = self.args['npuschAllSymbols']
         isc = self.args['npuschFormat2Sc']
         
@@ -906,7 +907,7 @@ class NgNbiotGrid(object):
         for isymb in range(self.symbPerSlotNb):
             if allSymb: #npusch-AllSymbols = True
                 if self.gridNbUl[key][0][isc][slot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
-                    self.gridNbUl[key][0][isc][slot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_NPUSCH_FORMAT2.value
+                    self.gridNbUl[key][0][isc][slot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_DMRS_NPUSCH.value if isymb in symbDmrsNpuschFmt2 else NbiotResType.NBIOT_RES_NPUSCH_FORMAT2.value 
             else:
                 isSrs = False
                 for i in range(1 if self.args['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_15K.value else 4):
@@ -914,7 +915,7 @@ class NgNbiotGrid(object):
                         isSrs = True
                         break
                 if not isSrs and self.gridNbUl[key][0][isc][slot*self.symbPerSlotNb+isymb] == NbiotResType.NBIOT_RES_BLANK.value:
-                    self.gridNbUl[key][0][isc][slot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_NPUSCH_FORMAT2.value
+                    self.gridNbUl[key][0][isc][slot*self.symbPerSlotNb+isymb] = NbiotResType.NBIOT_RES_DMRS_NPUSCH.value if isymb in symbDmrsNpuschFmt2 else NbiotResType.NBIOT_RES_NPUSCH_FORMAT2.value 
     
     def normalOps(self, hsfn, sfn):
         self.ngwin.logEdit.append('<font color=purple>normalOps @ [HSFN=%d,SFN=%d]</font>' % (hsfn, sfn))
@@ -934,6 +935,8 @@ class NgNbiotGrid(object):
         self.ngwin.logEdit.append('<font color=purple>monitorNpdcch @ [HSFN=%d,SFN=%d]</font>' % (hsfn, sfn))
         
         while True:
+            self.normalOps(hsfn, sfn)
+            
             #from 36.213 16.6
             #The locations of starting subframe k are given by k=k_b where k_b is the bth consecutive NB-IoT DL subframe from subframe k0,
             #excluding subframes used for transmission of SI messages, and b=u*R , and u=0,1,...,R_max/R-1, and where:
@@ -959,10 +962,9 @@ class NgNbiotGrid(object):
                     
                 break
             else:
-                self.normalOps(hsfn, sfn)
                 hsfn, sfn = incSfn(hsfn, sfn, 1)
         
-        self.normalOps(hsfn, sfn)
+        #self.normalOps(hsfn, sfn)
         self.fillNpdcchUss(hsfn, sfn)
         
         #proceed to receive NPDCCH
@@ -1198,7 +1200,7 @@ class NgNbiotGrid(object):
         return (retHsfn, retSfn, retSubf)
     
     def recvNpdschWoBcch(self, hsfn, sfn, subf):
-        self.ngwin.logEdit.append('<font color=purple> recvNpdschWoBcch with N=%d, k0=%d @ [HSFN=%d,SFN=%d,SUBF=%d]</font>' % (self.args['npdschNoBcchDciN1NumSf']*self.args['npdschNoBcchDciN1NumRep'], self.args['npdschNoBcchDciN1K0'], hsfn, sfn, subf))
+        self.ngwin.logEdit.append('<font color=purple>recvNpdschWoBcch with N=%d, k0=%d @ [HSFN=%d,SFN=%d,SUBF=%d]</font>' % (self.args['npdschNoBcchDciN1NumSf']*self.args['npdschNoBcchDciN1NumRep'], self.args['npdschNoBcchDciN1K0'], hsfn, sfn, subf))
         
         self.resetNpdschWoBcchMap(hsfn, sfn, subf)
         
@@ -1232,3 +1234,54 @@ class NgNbiotGrid(object):
         retHsfn, retSfn = allKeys[-1].split('_')
         retSubf = self.npdschWoBcchMap[allKeys[-1]][-1]
         return (int(retHsfn), int(retSfn), retSubf)
+    
+    def exportCsv(self):
+        self.ngwin.logEdit.append('<font color=purple>export to csv:</font>')
+        outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+        _nrsAp = (2000, 2001)
+        self.expCsv = []
+        #export DL
+        for iap in range(self.args['nbDlAp']):
+            fn = 'NBIOT_DL_RES_GRID_AP%d.csv' % _nrsAp[iap]
+            with open(os.path.join(outDir, fn), 'w') as f:
+                self.expCsv.append(fn)
+                self.ngwin.logEdit.append('-->%s' % os.path.join(outDir, fn)) 
+                
+                line = []
+                line.append('k/l')
+                for key,val in self.gridNbDl.items():
+                    hsfn, sfn = list(map(int, key.split('_')))
+                    line.extend([time2str36(hsfn, sfn, i, j) for i in range(self.slotPerRfNbDl) for j in range(self.symbPerSlotNb)])
+                f.write(','.join(line))
+                f.write('\n')
+                
+                for ire in range(self.scNbDl):
+                    line = []
+                    line.append(freq2str36(self.args['nbInbandPrbIndDl'], ire))
+                    for key in self.gridNbDl.keys():
+                        line.extend([str(self.gridNbDl[key][iap][ire][islot*self.symbPerSlotNb+isym]) for islot in range(self.slotPerRfNbDl) for isym in range(self.symbPerSlotNb)])
+                    f.write(','.join(line))
+                    f.write('\n')
+        
+        #export UL
+        fn = 'NBIOT_UL_RES_GRID_AP0.csv'
+        with open(os.path.join(outDir, fn), 'w') as f:
+            self.expCsv.append(fn)
+            self.ngwin.logEdit.append('-->%s' % os.path.join(outDir, fn)) 
+            
+            line = []
+            line.append('k/l')
+            for key,val in self.gridNbUl.items():
+                hsfn, sfn = list(map(int, key.split('_')))
+                line.extend([time2str36(hsfn, sfn, i, j) for i in range(self.slotPerRfNbUl) for j in range(self.symbPerSlotNb)])
+            f.write(','.join(line))
+            f.write('\n')
+            
+            for ire in range(48):   #since NPRACH is 3.75KHz (48 subcarriers per NB carrier)
+                line = []
+                line.append(freq2str36(self.args['nbInbandPrbIndUl'], ire))
+                for key in self.gridNbDl.keys():
+                    line.extend([str(self.gridNbUl[key][0][ire][islot*self.symbPerSlotNb+isym]) for islot in range(self.slotPerRfNbUl) for isym in range(self.symbPerSlotNb)])
+                f.write(','.join(line))
+                f.write('\n')
+        
