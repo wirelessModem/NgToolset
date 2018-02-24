@@ -34,31 +34,56 @@ class NgNbiotGridUi(QDialog):
         self.initUi()
     
     def initResGridMapper(self):
-        self.dlMap = dict()
-        self.dlMap[LteResType.LTE_RES_PDSCH.value] = ('PDSCH', QColor(0, 0, 0), QColor(255, 255, 255)) 
-        self.dlMap[LteResType.LTE_RES_PDCCH.value] = ('PDCCH', QColor(0, 0, 0), QColor(0, 255, 255)) 
-        self.dlMap[LteResType.LTE_RES_PHICH.value] = ('PHICH', QColor(0, 0, 0), QColor(255, 0, 255)) 
-        self.dlMap[LteResType.LTE_RES_PCFICH.value] = ('PCFICH', QColor(0, 0, 255), QColor(255, 255, 255)) 
-        self.dlMap[LteResType.LTE_RES_PBCH.value] = ('PBCH', QColor(0, 0, 0), QColor(128, 255, 255)) 
-        self.dlMap[LteResType.LTE_RES_PSCH.value] = ('PSCH', QColor(0, 0, 0), QColor(0, 255, 0)) 
-        self.dlMap[LteResType.LTE_RES_SSCH.value] = ('SSCH', QColor(0, 0, 0), QColor(255, 255, 0)) 
-        self.dlMap[LteResType.LTE_RES_CRS.value] = ('CRS', QColor(0, 0, 0), QColor(255, 0, 0)) 
-        self.dlMap[LteResType.LTE_RES_DTX.value] = ('DTX', QColor(255, 255, 255), QColor(0, 0, 0)) 
-        self.dlMap[LteResType.LTE_RES_GP.value] = ('GP', QColor(255, 255, 255), QColor(0, 0, 0)) 
-        self.dlMap[LteResType.LTE_RES_UL.value] = ('UL', QColor(255, 255, 255), QColor(0, 0, 0)) 
-        self.dlMap[LteResType.LTE_RES_NB_INBAND.value] = ('NB DL', QColor(128, 128, 128), QColor(0, 0, 0)) 
+        self.dlMapLte = dict()
+        self.dlMapLte[LteResType.LTE_RES_PDSCH.value] = ('PDSCH', QColor(0, 0, 0), QColor(255, 255, 255)) 
+        self.dlMapLte[LteResType.LTE_RES_PDCCH.value] = ('PDCCH', QColor(0, 0, 0), QColor(0, 255, 255)) 
+        self.dlMapLte[LteResType.LTE_RES_PHICH.value] = ('PHICH', QColor(0, 0, 0), QColor(255, 0, 255)) 
+        self.dlMapLte[LteResType.LTE_RES_PCFICH.value] = ('PCFICH', QColor(0, 0, 255), QColor(255, 255, 255)) 
+        self.dlMapLte[LteResType.LTE_RES_PBCH.value] = ('PBCH', QColor(0, 0, 0), QColor(128, 255, 255)) 
+        self.dlMapLte[LteResType.LTE_RES_PSCH.value] = ('PSCH', QColor(0, 0, 0), QColor(0, 255, 0)) 
+        self.dlMapLte[LteResType.LTE_RES_SSCH.value] = ('SSCH', QColor(0, 0, 0), QColor(255, 255, 0)) 
+        self.dlMapLte[LteResType.LTE_RES_CRS.value] = ('CRS', QColor(0, 0, 0), QColor(255, 0, 0)) 
+        self.dlMapLte[LteResType.LTE_RES_DTX.value] = ('DTX', QColor(255, 255, 255), QColor(0, 0, 0)) 
+        self.dlMapLte[LteResType.LTE_RES_GP.value] = ('GP', QColor(255, 255, 255), QColor(0, 0, 0)) 
+        self.dlMapLte[LteResType.LTE_RES_UL.value] = ('UL', QColor(255, 255, 255), QColor(0, 0, 0)) 
+        self.dlMapLte[LteResType.LTE_RES_NB_INBAND.value] = ('NB DL', QColor(128, 128, 128), QColor(0, 0, 0)) 
         
-        self.ulMap = dict()
-        self.ulMap[LteResType.LTE_RES_GP.value] = ('GP', QColor(0, 0, 0), QColor(0, 255, 0))
-        self.ulMap[LteResType.LTE_RES_DL.value] = ('DL', QColor(255, 255, 255), QColor(0, 0, 0))
-        self.ulMap[LteResType.LTE_RES_PUSCH.value] = ('PUSCH', QColor(0, 0, 0), QColor(255, 255, 255))
-        self.ulMap[LteResType.LTE_RES_PUCCH_AN.value] = ('AN', QColor(0, 0, 0), QColor(0, 255, 255))
-        self.ulMap[LteResType.LTE_RES_PUCCH_MIXED.value] = ('MIXED', QColor(0, 0, 0), QColor(255, 0, 255))
-        self.ulMap[LteResType.LTE_RES_PUCCH_CQI.value] = ('CQI', QColor(255, 255, 255), QColor(0, 0, 255))
-        self.ulMap[LteResType.LTE_RES_PRACH.value] = ('PRACH', QColor(0, 0, 0), QColor(128, 255, 255))
-        self.ulMap[LteResType.LTE_RES_DMRS.value] = ('DMRS', QColor(0, 0, 0), QColor(255, 0, 0))
-        self.ulMap[LteResType.LTE_RES_SRS.value] = ('SRS', QColor(0, 0, 0), QColor(255, 255, 0))
-        self.ulMap[LteResType.LTE_RES_NB_INBAND.value] = ('NB UL', QColor(128, 128, 128), QColor(0, 0, 0))
+        self.ulMapLte = dict()
+        self.ulMapLte[LteResType.LTE_RES_GP.value] = ('GP', QColor(0, 0, 0), QColor(0, 255, 0))
+        self.ulMapLte[LteResType.LTE_RES_DL.value] = ('DL', QColor(255, 255, 255), QColor(0, 0, 0))
+        self.ulMapLte[LteResType.LTE_RES_PUSCH.value] = ('PUSCH', QColor(0, 0, 0), QColor(255, 255, 255))
+        self.ulMapLte[LteResType.LTE_RES_PUCCH_AN.value] = ('AN', QColor(0, 0, 0), QColor(0, 255, 255))
+        self.ulMapLte[LteResType.LTE_RES_PUCCH_MIXED.value] = ('MIXED', QColor(0, 0, 0), QColor(255, 0, 255))
+        self.ulMapLte[LteResType.LTE_RES_PUCCH_CQI.value] = ('CQI', QColor(255, 255, 255), QColor(0, 0, 255))
+        self.ulMapLte[LteResType.LTE_RES_PRACH.value] = ('PRACH', QColor(0, 0, 0), QColor(128, 255, 255))
+        self.ulMapLte[LteResType.LTE_RES_DMRS.value] = ('DMRS', QColor(0, 0, 0), QColor(255, 0, 0))
+        self.ulMapLte[LteResType.LTE_RES_SRS.value] = ('SRS', QColor(0, 0, 0), QColor(255, 255, 0))
+        self.ulMapLte[LteResType.LTE_RES_NB_INBAND.value] = ('NB UL', QColor(128, 128, 128), QColor(0, 0, 0))
+        
+        self.dlMapNb = dict()
+        self.dlMapNb[NbiotResType.NBIOT_RES_NPDSCH_WO_BCCH.value] = ('NPDSCH', QColor(0, 0, 0), QColor(255, 255, 255)) 
+        self.dlMapNb[NbiotResType.NBIOT_RES_NPDCCH.value] = ('NPDCCH', QColor(0, 0, 0), QColor(0, 255, 255)) 
+        self.dlMapNb[NbiotResType.NBIOT_RES_SIB1.value] = ('SIB1', QColor(0, 0, 0), QColor(255, 0, 255)) 
+        self.dlMapNb[NbiotResType.NBIOT_RES_SIB2.value] = ('SIB2', QColor(0, 0, 0), QColor(255, 0, 255)) 
+        self.dlMapNb[NbiotResType.NBIOT_RES_SIB3.value] = ('SIB3', QColor(0, 0, 0), QColor(255, 0, 255)) 
+        self.dlMapNb[NbiotResType.NBIOT_RES_NPBCH.value] = ('NPBCH', QColor(0, 0, 0), QColor(128, 255, 255)) 
+        self.dlMapNb[NbiotResType.NBIOT_RES_NPSS.value] = ('NPSS', QColor(0, 0, 0), QColor(0, 255, 0)) 
+        self.dlMapNb[NbiotResType.NBIOT_RES_NSSS.value] = ('NSSS', QColor(0, 0, 0), QColor(255, 255, 0)) 
+        self.dlMapNb[NbiotResType.NBIOT_RES_CRS.value] = ('CRS', QColor(0, 0, 0), QColor(255, 0, 0)) 
+        self.dlMapNb[NbiotResType.NBIOT_RES_NRS.value] = ('NRS', QColor(0, 0, 0), QColor(0, 255, 0)) 
+        self.dlMapNb[NbiotResType.NBIOT_RES_DTX.value] = ('DTX', QColor(255, 255, 255), QColor(0, 0, 0)) 
+        self.dlMapNb[NbiotResType.NBIOT_RES_NPDSCH_GAP.value] = ('GAP', QColor(255, 255, 255), QColor(0, 0, 0)) 
+        self.dlMapNb[NbiotResType.NBIOT_RES_NPDCCH_GAP.value] = ('GAP', QColor(255, 255, 255), QColor(0, 0, 0)) 
+        self.dlMapNb[NbiotResType.NBIOT_RES_BLANK.value] = ('', QColor(0, 0, 0), QColor(255, 255, 255)) 
+        
+        self.ulMapNb = dict()
+        #self.ulMapNb[NbiotResType.NBIOT_RES_NPRACH_GAP.value] = ('GAP', QColor(255, 255, 255), QColor(0, 0, 0))
+        #self.ulMapNb[NbiotResType.NBIOT_RES_NPUSCH_GAP.value] = ('GAP', QColor(255, 255, 255), QColor(0, 0, 0))
+        self.ulMapNb[NbiotResType.NBIOT_RES_NPUSCH_FORMAT1.value] = ('NPUSCH', QColor(0, 0, 0), QColor(255, 255, 255))
+        self.ulMapNb[NbiotResType.NBIOT_RES_NPUSCH_FORMAT2.value] = ('HARQ', QColor(0, 0, 0), QColor(0, 255, 255))
+        self.ulMapNb[NbiotResType.NBIOT_RES_NPRACH.value] = ('NPRACH', QColor(0, 0, 0), QColor(128, 255, 255))
+        self.ulMapNb[NbiotResType.NBIOT_RES_DMRS_NPUSCH.value] = ('DMRS', QColor(0, 0, 0), QColor(255, 0, 0))
+        self.ulMapNb[NbiotResType.NBIOT_RES_BLANK.value] = ('', QColor(0, 0, 0), QColor(255, 255, 255)) 
     
     def initUi(self):
         self.fsLabel = QLabel('Frame Structure:')
@@ -811,31 +836,7 @@ class NgNbiotGridUi(QDialog):
         nbGrid = NgNbiotGrid(self.ngwin, self.argsNbiot)
         hsfn = self.argsNbiot['nbHsfn']
         sfn = self.argsNbiot['nbSfn']
-        
-        '''
-        nrf = 0
-        while True: 
-            #npdcch candidate check?
-            T = int(nbGrid.ussRmax * nbGrid.args['npdcchUssStartSf'])
-            k0 = None
-            for i in range(nbGrid.subfPerRfNbDl):
-                if (sfn * nbGrid.subfPerRfNbDl + i) % T == math.floor(nbGrid.args['npdcchUssOff'] * T):
-                    k0 = i
-                    break
-            
-            if nbGrid.recvingNpdcch or (k0 is not None and not nbGrid.recvingNpdsch and not nbGrid.sendingNpusch):
-                #nbGrid.monitorNpdcch(hsfn, sfn)
-                hsfn, sfn, subf = nbGrid.monitorNpdcch(hsfn, sfn)
-                hsfn, sfn = incSfn(hsfn, sfn, 1)
-            else:
-                nbGrid.normalOps(hsfn, sfn)
-                hsfn, sfn = incSfn(hsfn, sfn, 1)
-            
-            #note: nrf is only used for testing purpose!
-            nrf = nrf + 1
-            if nrf > 256:
-                break
-        '''
+
         #NB DL SU scheduling simulation
         self.ngwin.logEdit.append('<font color=green><b>Start NB DL SU scheduling simulation</b></font>')
         self.ngwin.logEdit.append('<font color=green><b>[NB DL SU SIM]recv NPDCCH DCI N1</b></font>')
@@ -857,8 +858,10 @@ class NgNbiotGridUi(QDialog):
         
         #hsfn, sfn = incSfn(hsfn, sfn, 1) #wait for next NPDCCH candidate
         
+        nbGrid.exportCsv()
+        
         #step 5: parse LTE grid and NB-IoT grid
-        self.parseLteNbiotGrid()
+        self.parseLteNbiotGrid(nbGrid.expCsv)
         
         self.ngwin.logEdit.append('<font color=blue>[%s] ***nb-iot grid generation finished!***</font><br>' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
         self.accept()
@@ -1068,7 +1071,7 @@ class NgNbiotGridUi(QDialog):
         
         return True
                          
-    def parseLteNbiotGrid(self):
+    def parseLteNbiotGrid(self, csv):
         outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
         
         #parse LTE grid
@@ -1089,6 +1092,8 @@ class NgNbiotGridUi(QDialog):
                 #tab.setVerticalHeaderLabels(rowLabels)
                 tab.horizontalHeader().setDefaultSectionSize(8 * self.fontMetrics().width('X'))
                 tab.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+                tab.verticalHeader().setDefaultSectionSize(self.fontMetrics().height())
+                tab.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
                 
                 ire = 0
                 while True:
@@ -1102,9 +1107,57 @@ class NgNbiotGridUi(QDialog):
                         item = QTableWidgetItem()
                         imap = int(tokens[isym+1])
                         if 'UL_RES_GRID' in fn:
-                            _str, _fg, _bg = self.ulMap[imap]
+                            _str, _fg, _bg = self.ulMapLte[imap]
                         else:
-                            _str, _fg, _bg = self.dlMap[imap]
+                            _str, _fg, _bg = self.dlMapLte[imap]
+                        item.setText(_str)
+                        item.setForeground(_fg)
+                        item.setBackground(_bg)
+                        item.setTextAlignment(Qt.AlignCenter)
+                        item.setFlags(item.flags() & (~Qt.ItemIsEditable));
+                        tab.setItem(ire, isym, item);
+                    ire = ire + 1
+                
+                tab.setVerticalHeaderLabels(rowLabels)
+                self.ngwin.tabWidget.addTab(tab, fn)
+            
+        #parse NB grid
+        scNbDl = 12
+        scNbUl = 48 if self.argsNbiot['nbUlScSpacing'] == NbiotPhy.NBIOT_UL_3DOT75K.value else 12
+        scNprach = 48
+        for fn in csv:
+            with open(os.path.join(outDir, fn), 'r') as f:
+                line = f.readline()
+                colLabels = line.split(',')[1:]
+                rowLabels = []
+                numRows = scNbDl if 'DL_RES_GRID' in fn else scNprach
+                numCols = len(colLabels)
+                
+                tab = QTableWidget()
+                tab.setRowCount(numRows)
+                tab.setColumnCount(numCols)
+                tab.setHorizontalHeaderLabels(colLabels)
+                #tab.setVerticalHeaderLabels(rowLabels)
+                tab.horizontalHeader().setDefaultSectionSize(8 * self.fontMetrics().width('X'))
+                tab.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+                tab.verticalHeader().setDefaultSectionSize(self.fontMetrics().height())
+                tab.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+                
+                ire = 0
+                while True:
+                    line = f.readline()
+                    if not line:
+                        break
+                    
+                    tokens = line.split(',')
+                    rowLabels.append(tokens[0])
+                    for isym in range(numCols):
+                        item = QTableWidgetItem()
+                        imap = int(tokens[isym+1])
+                        if 'UL_RES_GRID' in fn:
+                            _str, _fg, _bg = self.ulMapNb[imap]
+                        else:
+                            _str, _fg, _bg = self.dlMapNb[imap]
                         item.setText(_str)
                         item.setForeground(_fg)
                         item.setBackground(_bg)
