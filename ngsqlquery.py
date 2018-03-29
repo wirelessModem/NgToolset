@@ -10,8 +10,12 @@ Change History:
     2018-3-22   v0.1    created.    github/zhenggao2
 '''
 
+from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import qApp
 import cx_Oracle
 import os
+import re
+from ngsqlsubui import NgSqlSubUi
 
 class NgSqlQuery(object):
     def __init__(self, ngwin, args):
@@ -43,22 +47,93 @@ class NgSqlQuery(object):
                     elif tokens[0].upper() == 'USER_PASSCODE':
                         self.dbUserPwd = tokens[1]
     
-    def exec(self):
+    def exec_(self):
         dsn = cx_Oracle.makedsn(self.dbHost, self.dbPort, service_name=self.dbService)
-        print(dsn)
-        db = cx_Oracle.connect(self.dbUserName, self.dbUserPwd, dsn)
+        
+        self.ngwin.logEdit.append('<font color=blue>Connecting to Oracle DB</font>(DSN=%s)' % dsn)
+        qApp.processEvents()
+        try:
+            db = cx_Oracle.connect(self.dbUserName, self.dbUserPwd, dsn)
+        except cx_Oracle.DatabseError as e:
+            # cx_Oracle 5.0.4 raises a cx_Oracle.DatabaseError exception
+            # with the following attributes and values:
+            #  code = 2091
+            #  message = 'ORA-02091: transaction rolled back
+            #            'ORA-02291: integrity constraint (TEST_DJANGOTEST.SYS
+            #               _C00102056) violated - parent key not found'
+            self.ngwin.logEdit.append('<font color=red>cx_Oracle.DatabaseError: %s!</font>' % e.args[0].message)
+            return
+            
         cursor = db.cursor()
         
         sqlDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sql')
         for sqlFn in self.args['sqlQuery']:
             with open(os.path.join(sqlDir, sqlFn), 'r') as f:
-                print('executing %s' % f.name)
+                self.ngwin.logEdit.append('<font color=blue>Executing query: %s</font>' % f.name)
+                qApp.processEvents()
+                
+                self.names = []
+                self.answers = []
+                reSql = re.compile(r"^[a-zA-Z0-9\_\s\>\<\=\(]+\&([a-zA-Z\_]+)[\,\s\'a-zA-Z0-9\)]+$")
+                while True:
+                    line = f.readline()
+                    if not line:
+                        break
+                    
+                    #substitute names if necessary
+                    m = reSql.match(line)
+                    if m is not None:
+                        self.names.extend(m.groups())
+                        
+                f.seek(0)
                 query = f.read()
-                cursor.execute(query)
+                if len(self.names) > 0:
+                    dlg = NgSqlSubUi(self.ngwin, self.names)
+                    if dlg.exec_() == QDialog.Accepted:
+                        self.answers = dlg.answers
+                        valid = True
+                        for an in self.answers:
+                            if len(an) == 0:
+                                valid = False
+                                break
+                        if not valid:
+                            self.ngwin.logEdit.append('<font color=red>-->Query skipped!</font>')
+                            qApp.processEvents()
+                            continue
+                        
+                        if self.ngwin.enableDebug:
+                            for name,answer in zip(self.names, self.answers):
+                                self.ngwin.logEdit.append('-->Subsitution: %s=%s' % (name, answer))
+                            qApp.processEvents()
+                            
+                        for index,name in enumerate(self.names):
+                            query = query.replace('&'+name, "'"+self.answers[index]+"'")
+                    else:
+                        self.ngwin.logEdit.append('<font color=red>-->Query skipped!</font>')
+                        qApp.processEvents()
+                        continue
+                
+                try:
+                    cursor.execute(query)
+                except cx_Oracle.DatabaseError as e:
+                    self.ngwin.logEdit.append('<font color=red>cx_Oracle.DatabaseError: %s!</font>' % e.args[0].message)
+                    return
                 
                 fields = ','.join([a[0] for a in cursor.description])
-                fields = 'INDEX,' + fields
-                print(fields)
+                #self.ngwin.logEdit.append('Fields: %s' % fields)
+                
+                #record = cursor.fetchone()
+                #self.ngwin.logEdit.append(','.join([str(i) for i in record]))
                 records = cursor.fetchall()
-                for i,r in enumerate(records):
-                    print('%d: %s' % (i, r))
+                
+                outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+                outFn = sqlFn.replace('.sql', '.csv')
+                with open(os.path.join(outDir, outFn), 'w') as of:
+                    self.ngwin.logEdit.append('-->Exporting query results to: %s' % of.name)
+                    qApp.processEvents()
+                    
+                    of.write(fields)
+                    of.write('\n')
+                    for r in records:
+                        of.write(','.join([str(token) for token in r]))
+                        of.write('\n')
