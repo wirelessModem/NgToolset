@@ -3,7 +3,7 @@
 
 '''
 File:
-    ng_mainwin.py
+    ngmainwin.py
 Description:
     NgMainWin definition
 Change History:
@@ -18,6 +18,7 @@ from PyQt5.QtSql import QSqlDatabase
 from ngltegridui import NgLteGridUi
 from ngnbiotgridui import NgNbiotGridUi
 from ngxmlparser import NgXmlParser
+from ngsqlquery import NgSqlQuery
 
 class NgMainWin(QMainWindow):
     def __init__(self):
@@ -59,8 +60,15 @@ class NgMainWin(QMainWindow):
         indir = '/home/zhenggao/py35/ngtoolset'
         parser = NgXmlParser(self, indir) 
         parser.start()
+    
+    def onExecSqlQuery(self):
+        args = dict()
+        args['dbConf'] = 'dbconfig.txt'
+        args['sqlQuery'] = ['neds_lnadj.sql', 'neds_lnadjl.sql', 'neds_lncel.sql', 'neds_lnhoif.sql', 'neds_lnrel.sql', 'neds_m8015.sql']
+    
+        query = NgSqlQuery(self, args)
+        query.exec_()
         
-            
     def onExecLteResGrid(self):
         dlg = NgLteGridUi(self)
         dlg.exec_()
@@ -92,6 +100,8 @@ class NgMainWin(QMainWindow):
         self.chkSqlAction.triggered.connect(self.onChkSqlPlugin)
         self.xmlParserAction = QAction('XML Parser')
         self.xmlParserAction.triggered.connect(self.onExecXmlParser)
+        self.sqlQueryAction = QAction('SQL Query')
+        self.sqlQueryAction.triggered.connect(self.onExecSqlQuery)
         
         #Options menu
         self.enableDebugAction = QAction('Enable Debug')
@@ -119,6 +129,7 @@ class NgMainWin(QMainWindow):
         self.miscMenu = self.menuBar().addMenu('Misc')
         self.miscMenu.addAction(self.chkSqlAction)
         self.miscMenu.addAction(self.xmlParserAction)
+        self.miscMenu.addAction(self.sqlQueryAction)
         
         self.optionsMenu = self.menuBar().addMenu('Options')
         self.optionsMenu.addAction(self.enableDebugAction)
