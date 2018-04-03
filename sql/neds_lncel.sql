@@ -4,6 +4,7 @@
 
 select
 co_lncel.co_gid lncel_id
+,co_lnbts.co_gid lnbts_id
 ,co_lnbts.co_object_instance enb_id
 ,co_lncel.co_object_instance lcr_id
 --LNCEL parameters
