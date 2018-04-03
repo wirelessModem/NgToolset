@@ -1,0 +1,16 @@
+###################Oracle Database Configurations#################
+
+#set host name 
+HOST_NAME = 100.92.4.46
+
+#set db name
+DB_NAME = oss
+
+#set tcp port
+TCP_PORT = 1521
+
+#set user name
+USER_NAME = omc
+
+#set user passcode
+USER_PASSCODE = Ossdb1-g
