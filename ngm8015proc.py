@@ -11,27 +11,29 @@ Change History:
 '''
 
 import os
+import time
+from PyQt5.QtWidgets import qApp
 
 class M8015(object):
     def __init__(self):
-        self.periodStartTime = None
-        self.iaHoPrepFail = None
-        self.iaHoAtt = None
-        self.iaHoSucc = None
-        self.iaHoFailTime = None
-        self.irHoPrepFailOth = None
-        self.irHoPrepFailTime = None
-        self.irHoPrepFailAc = None
-        self.irHoPrepFailQci = None
-        self.irHoAtt = None
-        self.irHoSucc = None
-        self.irHoFailTime = None
-        self.mroLateHo = None
-        self.mroEarlyType1Ho = None
-        self.mroEarlyType2Ho = None
-        self.mroPingPongHo = None
-        self.ifLbHoAtt = None
-        self.ifLbHoSucc = None
+        self.periodStartTime = 'NA'
+        self.iaHoPrepFail = 0
+        self.iaHoAtt = 0
+        self.iaHoSucc = 0
+        self.iaHoFailTime = 0
+        self.irHoPrepFailOth = 0
+        self.irHoPrepFailTime = 0
+        self.irHoPrepFailAc = 0
+        self.irHoPrepFailQci = 0
+        self.irHoAtt = 0
+        self.irHoSucc = 0
+        self.irHoFailTime = 0
+        self.mroLateHo = 0
+        self.mroEarlyType1Ho = 0
+        self.mroEarlyType2Ho = 0
+        self.mroPingPongHo = 0
+        self.ifLbHoAtt = 0
+        self.ifLbHoSucc = 0
         
     def __str__(self):
         _list = [self.periodStartTime, self.iaHoPrepFail, self.iaHoAtt, self.iaHoSucc, self.iaHoFailTime,
@@ -39,9 +41,8 @@ class M8015(object):
                  self.irHoAtt, self.irHoSucc, self.irHoFailTime,
                  self.mroLateHo, self.mroEarlyType1Ho, self.mroEarlyType2Ho, self.mroPingPongHo,
                  self.ifLbHoAtt, self.ifLbHoSucc]
+        _list = list(map(str, _list))
         return ','.join(_list)
-    
-    __repr__ = __str__
 
 class Lncel(object):
     def __init__(self):
@@ -75,8 +76,6 @@ class Lncel(object):
                  self.a2Th2If, self.hysA2Th2If, self.a2Ttt,
                  self.a1Th2a, self.hysA1Th2a, self.a1Ttt]
         return ','.join(_list)
-    
-    __repr__ = __str__
 
 class Lnadj(object):
     def __init__(self):
@@ -89,8 +88,6 @@ class Lnadj(object):
         _list = [self.coDn, self.adjEnbId, self.adjEnbIp, self.x2Stat]
         return ','.join(_list)
     
-    __repr__ = __str__
-
 class Lnadjl(object):
     def __init__(self):
         self.coDn = None
@@ -104,8 +101,6 @@ class Lnadjl(object):
         _list = [self.coDn, self.adjEnbId, self.adjLcrId, self.adjEarfcn, self.adjPci, self.adjTac]
         return ','.join(_list)
     
-    __repr__ = __str__
-        
 class Lnhoif(object):
     def __init__(self):
         self.coDn = None
@@ -126,8 +121,6 @@ class Lnhoif(object):
                  self.ifA5Th3, self.ifA5Th3a, self.ifHysA5Th3, self.ifA5RepInt, self.ifA5Ttt, self.ifMbw]
         return ','.join(_list)
     
-    __repr__ = __str__
-    
 class Lnrel(object):
     def __init__(self):
         self.coDn = None
@@ -141,11 +134,27 @@ class Lnrel(object):
         _list = [self.coDn, #self.adjEnbId, self.adjLcrId, 
                  self.cio, self.hoAllowed, self.nrStat]
         return ','.join(_list)
+
+class HoStat(object):
+    def __init__(self):
+        self.lnbtsId = None
+        self.lncelId = None
+        self.iaHoPrepFail = 0
+        self.iaHoAtt = 0
+        self.iaHoSucc = 0
+        self.irHoPrepFail = 0
+        self.irHoAtt = 0
+        self.irHoSucc = 0
     
-    __repr__ = __str__
+    def __str__(self):
+        _list = [self.lnbtsId, self.lncelId, self.iaHoPrepFail, self.iaHoAtt, self.iaHoSucc, self.irHoPrepFail, self.irHoAtt, self.irHoSucc]
+        _list = list(map(_list, str))
+        return ','.join(_list)
         
 class NgM8015Proc(object):
-    def __init__(self):
+    def __init__(self, ngwin):
+        self.ngwin = ngwin
+        
         #connection defined as below:
         #m8015Data.key.lncel_id == lncelData.key
         #m8015Data.key.lncel_id == lnhoifData.key
@@ -153,11 +162,20 @@ class NgM8015Proc(object):
         #m8015Data.key.lnbts_id == lnadjData.key
         #m8015Data.key.lnbts_id == lnadjlData.key
         self.m8015Data= dict() #[key='m8015.lnbts_id+m8015.lncel_id+m8015.eci_id', val=list of M8015]
+        self.m8015AggData= dict() #[key='m8015.lnbts_id+m8015.lncel_id+m8015.eci_id', val=aggregated M8015]
         self.lncelData = dict() #[key=lncel.lncel_id, val=Lncel]
         self.lnadjData = dict() #[key=lnadj.lnbts_id, val=Lnadj]
         self.lnadjlData = dict() #[key=lnadjl.lnbts_id, val=Lnadjl]
         self.lnhoifData = dict() #[key=lnhoif.lncel_id, val=Lnhoif]
         self.lnrelData = dict() #[key='lnrel.lncel_id+lnrel.adj_enb_id+lnrel.adj_lcr_id', val=Lnrel]
+        
+        self.earfcnMap = dict() #[key=eci, val=earfcn]
+        self.pciMap = dict() #[key=eci, val=pci]
+        self.tacMap = dict() #[key=eci, val=tac]
+        
+        self.m8015Earfcnxy = dict() #[key='earfcnx+earfcny', val=HoStat]
+        self.m8015Ecixy = dict() #[key='ecix+eciy', val=HoStat]
+        self.ngwin.logEdit.append('<font color=blue>M8015 analyzer initialized!</font>')
     
     def loadCsvData(self):
         self.loadLncel()
@@ -167,7 +185,7 @@ class NgM8015Proc(object):
         self.loadLnrel()
         self.loadM8015()
     
-    def print(self):
+    def print_(self):
         for key,val in self.lncelData.items():
             print('key=%s,val=%s' % (key, val))
         for key,val in self.lnadjData.items():
@@ -184,11 +202,15 @@ class NgM8015Proc(object):
     def loadLncel(self):
         outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
         with open(os.path.join(outDir, 'neds_lncel.csv'), 'r') as f:
+            #print('Loading %s' % f.name)
+            self.ngwin.logEdit.append('Loading %s' % f.name)
+            qApp.processEvents()
+            
             #note: use strip to remove the tailing '/n'
             line = f.readline().strip()
             tokens = line.split(',')
             d = dict(zip(tokens, range(len(tokens))))
-            print(d)
+            #print(d)
             
             while True:
                 line = f.readline().strip()
@@ -226,10 +248,14 @@ class NgM8015Proc(object):
     def loadLnadj(self):
         outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
         with open(os.path.join(outDir, 'neds_lnadj.csv'), 'r') as f:
+            #print('Loading %s' % f.name)
+            self.ngwin.logEdit.append('Loading %s' % f.name)
+            qApp.processEvents()
+            
             line = f.readline().strip()
             tokens = line.split(',')
             d = dict(zip(tokens, range(len(tokens))))
-            print(d)
+            #print(d)
             
             while True:
                 line = f.readline().strip()
@@ -240,19 +266,23 @@ class NgM8015Proc(object):
                 
                 t = Lnadj()
                 t.coDn = '/'.join(tokens[d['CO_DN']].split('/')[1:])
-                t.adjEnbId = tokens[d['ADJ_ENB_ID']]
+                #t.adjEnbId = tokens[d['ADJ_ENB_ID']]
                 t.adjEnbIp = tokens[d['ADJ_ENB_IP']]
                 t.x2Stat = tokens[d['X2_STAT']]
                 
-                self.lnadjData[tokens[d['LNBTS_ID']]] = t
+                self.lnadjData[tokens[d['LNBTS_ID']] + '_' + tokens[d['ADJ_ENB_ID']]] = t
     
     def loadLnadjl(self):
         outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
         with open(os.path.join(outDir, 'neds_lnadjl.csv'), 'r') as f:
+            #print('Loading %s' % f.name)
+            self.ngwin.logEdit.append('Loading %s' % f.name)
+            qApp.processEvents()
+            
             line = f.readline().strip()
             tokens = line.split(',')
             d = dict(zip(tokens, range(len(tokens))))
-            print(d)
+            #print(d)
             
             while True:
                 line = f.readline().strip()
@@ -274,10 +304,14 @@ class NgM8015Proc(object):
     def loadLnhoif(self):
         outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
         with open(os.path.join(outDir, 'neds_lnhoif.csv'), 'r') as f:
+            #print('Loading %s' % f.name)
+            self.ngwin.logEdit.append('Loading %s' % f.name)
+            qApp.processEvents()
+            
             line = f.readline().strip()
             tokens = line.split(',')
             d = dict(zip(tokens, range(len(tokens))))
-            print(d)
+            #print(d)
             
             while True:
                 line = f.readline().strip()
@@ -305,10 +339,14 @@ class NgM8015Proc(object):
     def loadLnrel(self):
         outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
         with open(os.path.join(outDir, 'neds_lnrel.csv'), 'r') as f:
+            #print('Loading %s' % f.name)
+            self.ngwin.logEdit.append('Loading %s' % f.name)
+            qApp.processEvents()
+            
             line = f.readline().strip()
             tokens = line.split(',')
             d = dict(zip(tokens, range(len(tokens))))
-            print(d)
+            #print(d)
             
             while True:
                 line = f.readline().strip()
@@ -330,10 +368,14 @@ class NgM8015Proc(object):
     def loadM8015(self):
         outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
         with open(os.path.join(outDir, 'neds_m8015.csv'), 'r') as f:
+            #print('Loading %s' % f.name)
+            self.ngwin.logEdit.append('Loading %s' % f.name)
+            qApp.processEvents()
+            
             line = f.readline().strip()
             tokens = line.split(',')
             d = dict(zip(tokens, range(len(tokens))))
-            print(d)
+            #print(d)
             
             while True:
                 line = f.readline().strip()
@@ -368,3 +410,236 @@ class NgM8015Proc(object):
                     self.m8015Data[key] = [t]
                 else:
                     self.m8015Data[key].append(t)
+        
+        self.aggM8015()
+    
+    def aggM8015(self):
+        #print('Aggregating M8015')
+        self.ngwin.logEdit.append('Aggregating M8015')
+        qApp.processEvents()
+        
+        for key,val in self.m8015Data.items():
+            t = M8015()
+            for rec in val:
+                t.iaHoPrepFail = t.iaHoPrepFail + int(rec.iaHoPrepFail)
+                t.iaHoAtt = t.iaHoAtt + int(rec.iaHoAtt)
+                t.iaHoSucc = t.iaHoSucc + int(rec.iaHoSucc)
+                t.iaHoFailTime = t.iaHoFailTime + int(rec.iaHoFailTime)
+                t.irHoPrepFailOth = t.irHoPrepFailOth + int(rec.irHoPrepFailOth)
+                t.irHoPrepFailTime = t.irHoPrepFailTime + int(rec.irHoPrepFailTime)
+                t.irHoPrepFailAc = t.irHoPrepFailAc + int(rec.irHoPrepFailAc)
+                t.irHoPrepFailQci = t.irHoPrepFailQci + int(rec.irHoPrepFailQci)
+                t.irHoAtt = t.irHoAtt + int(rec.irHoAtt)
+                t.irHoSucc = t.irHoSucc + int(rec.irHoSucc)
+                t.irHoFailTime = t.irHoFailTime + int(rec.irHoFailTime)
+                t.mroLateHo = t.mroLateHo + int(rec.mroLateHo)
+                t.mroEarlyType1Ho = t.mroEarlyType1Ho + int(rec.mroEarlyType1Ho)
+                t.mroEarlyType2Ho = t.mroEarlyType2Ho + int(rec.mroEarlyType2Ho)
+                t.mroPingPongHo = t.mroPingPongHo + int(rec.mroPingPongHo)
+                t.ifLbHoAtt = t.ifLbHoAtt + int(rec.ifLbHoAtt)
+                t.ifLbHoSucc = t.ifLbHoSucc + int(rec.ifLbHoSucc)
+            
+            self.m8015AggData[key] = t
+                
+        '''
+        for key,val in self.m8015AggData.items():
+            print('key=%s,val=%s' % (key,val))
+        '''
+    
+    def makeEciMap(self):
+        #print('Making per ECI map')
+        self.ngwin.logEdit.append('Making per ECI map')
+        qApp.processEvents()
+        
+        for key,val in self.lncelData.items():
+            if not val.eci in self.earfcnMap:
+                self.earfcnMap[val.eci] = val.earfcn
+                self.pciMap[val.eci] = val.pci
+                self.tacMap[val.eci] = val.tac
+        
+        for key,val in self.lnadjlData.items():
+            eci = 256*val.adjEnbId+val.adjLcrId
+            if not eci in self.earfcnMap:
+                self.earfcnMap[eci] = val.adjEarfcn
+                self.pciMap[eci] = val.adjPci
+                self.tacMap[eci] = val.adjTac
+                
+    def procUserCase01(self):
+        #print('Performing analysis for user case #01: per earfcn hosr')
+        self.ngwin.logEdit.append('<font color=blue>Performing analysis for user case #01: per earfcn hosr</font>')
+        qApp.processEvents()
+        
+        #user case#1: EARFCNx -> EARFCNy HOSR analysis
+        for key,val in self.m8015AggData.items():
+            tokens = key.split('_')
+            if len(tokens) == 3:
+                lnbtsId = tokens[0]
+                lncelId = tokens[1]
+                eci = tokens[2]
+            else:
+                continue
+            
+            eciSrc = self.lncelData[lncelId].eci
+            if eciSrc in self.earfcnMap:
+                earfcnSrc = self.earfcnMap[eciSrc]
+            else:
+                earfcnSrc = 'NA'
+                
+            if eci in self.earfcnMap:
+                earfcnDst = self.earfcnMap[eci]
+            else:
+                earfcnDst = 'NA'
+            
+            key = earfcnSrc + '_' + earfcnDst 
+            if not key in self.m8015Earfcnxy:
+                self.m8015Earfcnxy[key] = HoStat()
+            self.m8015Earfcnxy[key].iaHoAtt = self.m8015Earfcnxy[key].iaHoAtt + val.iaHoAtt
+            self.m8015Earfcnxy[key].iaHoSucc = self.m8015Earfcnxy[key].iaHoSucc + val.iaHoSucc
+            self.m8015Earfcnxy[key].irHoAtt = self.m8015Earfcnxy[key].irHoAtt + val.irHoAtt
+            self.m8015Earfcnxy[key].irHoSucc = self.m8015Earfcnxy[key].irHoSucc + val.irHoSucc
+        
+        outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+        with open(os.path.join(outDir, 'm8015_per_earfcn_%s.csv' % time.strftime('%Y%m%d%H%M%S', time.localtime())), 'w') as f:
+            self.ngwin.logEdit.append('-->Exporting results to: %s' % f.name)
+            qApp.processEvents()
+                    
+            header = ['DN', 'IA_HO_ATT', 'IA_HO_SUCC', 'IR_HO_ATT', 'IR_HO_SUCC', 'HO_ATT_TOT', 'HO_SUCC_TOT', 'HOSR2(%)']
+            f.write(','.join(header))
+            f.write('\n')
+            
+            #for key,val in self.m8015Earfcnxy.items():
+            for key,val in sorted(self.m8015Earfcnxy.items(), key=lambda d : d[0]):
+                line = [key, val.iaHoAtt, val.iaHoSucc, val.irHoAtt, val.irHoSucc]
+                line.append(val.iaHoAtt + val.irHoAtt)
+                line.append(val.iaHoSucc + val.irHoSucc)
+                if val.iaHoAtt + val.irHoAtt == 0:
+                    line.append('DIV0')
+                else:
+                    line.append('%.2f' % (100*(val.iaHoSucc+val.irHoSucc)/(val.iaHoAtt+val.irHoAtt)))
+                line = list(map(str, line))
+                f.write(','.join(line))
+                f.write('\n')
+        
+    def procUserCase02(self):
+        #print('Performing analysis for user case #02: hosr top n')
+        self.ngwin.logEdit.append('<font color=blue>Performing analysis for user case #02: hosr top n</font>')
+        qApp.processEvents()
+        
+        #user case#2: hosr top n analysis
+        for key,val in self.m8015AggData.items():
+            tokens = key.split('_')
+            if len(tokens) == 3:
+                lnbtsId = tokens[0]
+                lncelId = tokens[1]
+                eci = tokens[2]
+            else:
+                continue
+            
+            eciSrc = self.lncelData[lncelId].eci
+            
+            key = eciSrc + '_' + eci
+            if not key in self.m8015Ecixy:
+                self.m8015Ecixy[key] = HoStat()
+            self.m8015Ecixy[key].lnbtsId = lnbtsId
+            self.m8015Ecixy[key].lncelId = lncelId 
+            self.m8015Ecixy[key].iaHoPrepFail = val.iaHoPrepFail
+            self.m8015Ecixy[key].iaHoAtt = val.iaHoAtt
+            self.m8015Ecixy[key].iaHoSucc = val.iaHoSucc
+            self.m8015Ecixy[key].irHoPrepFail = val.irHoPrepFailAc + val.irHoPrepFailOth + val.irHoPrepFailQci + val.irHoPrepFailTime
+            self.m8015Ecixy[key].irHoAtt = val.irHoAtt
+            self.m8015Ecixy[key].irHoSucc = val.irHoSucc
+        
+        outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+        with open(os.path.join(outDir, 'm8015_topn_%s.csv' % time.strftime('%Y%m%d%H%M%S', time.localtime())), 'w') as f:
+            self.ngwin.logEdit.append('-->Exporting results to: %s' % f.name)
+            qApp.processEvents()
+                    
+            header = ['DN','SRC_ENB_ID', 'SRC_LCR_ID', 'SRC_EARFCN', 'SRC_PCI', 'SRC_TAC', 'DST_ENB_ID', 'DST_LCR_ID', 'DST_EARFCN', 'DST_PCI', 'DST_TAC']
+            header.extend(['IA_HO_PREP_FAIL', 'IA_HO_ATT', 'IA_HO_SUCC', 'IR_HO_PREP_FAIL', 'IR_HO_ATT', 'IR_HO_SUCC', 'HO_ATT_TOT', 'HO_SUCC_TOT', 'HO_PREP_FAIL', 'HO_EXEC_FAIL', 'HOSR2(%)'])
+            header.extend(['DN_LNADJ', 'X2_STAT'])
+            header.extend(['DN_LNREL', 'CIO', 'HO_ALLOWED'])
+            f.write(','.join(header))
+            f.write('\n')
+            
+            #for key,val in self.m8015Ecixy.items():
+            for key,val in sorted(self.m8015Ecixy.items(), key=lambda d : d[1].iaHoPrepFail+d[1].irHoPrepFail+d[1].iaHoAtt+d[1].irHoAtt-d[1].iaHoSucc-d[1].irHoSucc, reverse=True):
+                #src/dst cell info
+                line = [key]
+                eciSrc, eciDst = key.split('_')
+                lcrIdSrc = int(eciSrc) % 256
+                lcrIdDst = int(eciDst) % 256
+                enbIdSrc = (int(eciSrc) - lcrIdSrc) // 256
+                enbIdDst = (int(eciDst) - lcrIdDst) // 256
+                
+                if eciSrc in self.earfcnMap:
+                    earfcnSrc = self.earfcnMap[eciSrc]
+                else:
+                    earfcnSrc = 'NA'
+                    
+                if eciDst in self.earfcnMap:
+                    earfcnDst = self.earfcnMap[eciDst]
+                else:
+                    earfcnDst = 'NA'
+                
+                if eciSrc in self.pciMap:
+                    pciSrc = self.pciMap[eciSrc]
+                else:
+                    pciSrc = 'NA'
+                    
+                if eciDst in self.pciMap:
+                    pciDst = self.pciMap[eciDst]
+                else:
+                    pciDst = 'NA'
+                    
+                if eciSrc in self.tacMap:
+                    tacSrc = self.tacMap[eciSrc]
+                else:
+                    tacSrc = 'NA'
+                    
+                if eciDst in self.tacMap:
+                    tacDst = self.tacMap[eciDst]
+                else:
+                    tacDst = 'NA'
+                    
+                line.extend([enbIdSrc, lcrIdSrc, earfcnSrc, pciSrc, tacSrc])
+                line.extend([enbIdDst, lcrIdDst, earfcnDst, pciDst, tacDst])
+                
+                #M8015 info
+                line.extend([val.iaHoPrepFail, val.iaHoAtt, val.iaHoSucc, val.irHoPrepFail, val.irHoAtt, val.irHoSucc])
+                line.append(val.iaHoAtt + val.irHoAtt)
+                line.append(val.iaHoSucc + val.irHoSucc)
+                line.append(val.iaHoPrepFail + val.irHoPrepFail)
+                line.append(val.iaHoAtt + val.irHoAtt - val.iaHoSucc - val.irHoSucc)
+                if val.iaHoAtt + val.irHoAtt == 0:
+                    line.append('DIV0')
+                else:
+                    line.append('%.2f' % (100*(val.iaHoSucc+val.irHoSucc)/(val.iaHoAtt+val.irHoAtt)))
+                
+                #LNADJ info
+                lnadjKey = val.lnbtsId + '_' + str(enbIdDst)
+                if lnadjKey in self.lnadjData:
+                    dnLnadj = self.lnadjData[lnadjKey].coDn
+                    x2Stat = self.lnadjData[lnadjKey].x2Stat
+                else:
+                    dnLnadj = 'NA'
+                    x2Stat = 'NA'
+                line.extend([dnLnadj, x2Stat])
+                
+                #LNREL info
+                lnrelKey = val.lncelId + '_' + str(enbIdDst) + '_' + str(lcrIdDst)
+                if lnrelKey in self.lnrelData:
+                    dnLnrel = self.lnrelData[lnrelKey].coDn
+                    cio = self.lnrelData[lnrelKey].cio
+                    hoAllowed = self.lnrelData[lnrelKey].hoAllowed
+                else:
+                    dnLnrel = 'NA'
+                    cio = 'NA'
+                    hoAllowed = 'NA'
+                line.extend([dnLnrel, cio, hoAllowed])
+                
+                line = list(map(str, line))
+                f.write(','.join(line))
+                f.write('\n')
+    
+    def procUserCasexx(self):
+        pass
