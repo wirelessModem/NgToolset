@@ -46,6 +46,7 @@ class M8015(object):
 
 class Lncel(object):
     def __init__(self):
+        self.lnbtsId = None
         self.enbId = None
         self.lcrId = None
         self.eci = None
@@ -145,6 +146,9 @@ class HoStat(object):
         self.irHoPrepFail = 0
         self.irHoAtt = 0
         self.irHoSucc = 0
+        self.mroLateHo = 0
+        self.mroEarlyHo = 0
+        self.mroPingPongHo = 0
     
     def __str__(self):
         _list = [self.lnbtsId, self.lncelId, self.iaHoPrepFail, self.iaHoAtt, self.iaHoSucc, self.irHoPrepFail, self.irHoAtt, self.irHoSucc]
@@ -220,6 +224,7 @@ class NgM8015Proc(object):
                 tokens = line.split(',')
                 
                 t = Lncel()
+                t.lnbtsId = tokens[d['LNBTS_ID']]
                 t.enbId = tokens[d['ENB_ID']]
                 t.lcrId = tokens[d['LCR_ID']]
                 t.eci = tokens[d['ECI']]
@@ -322,7 +327,7 @@ class NgM8015Proc(object):
                 
                 t = Lnhoif()
                 t.coDn = '/'.join(tokens[d['CO_DN']].split('/')[1:])
-                t.ifEarfcn = tokens[d['IF_EARFCN']]
+                #t.ifEarfcn = tokens[d['IF_EARFCN']]
                 t.ifA3Off = tokens[d['IF_A3_OFF']]
                 t.ifHysA3Off = tokens[d['IF_HYS_A3_OFF']]
                 t.ifA3RepInt = tokens[d['IF_A3_REP_INT']]
@@ -334,7 +339,7 @@ class NgM8015Proc(object):
                 t.ifA5Ttt = tokens[d['IF_A5_TTT']]
                 t.ifMbw = tokens[d['IF_MBW']]
                 
-                self.lnhoifData[tokens[d['LNCEL_ID']]] = t
+                self.lnhoifData[tokens[d['LNCEL_ID']] + '_' + tokens[d['IF_EARFCN']]] = t
     
     def loadLnrel(self):
         outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
@@ -548,21 +553,29 @@ class NgM8015Proc(object):
             self.m8015Ecixy[key].irHoPrepFail = val.irHoPrepFailAc + val.irHoPrepFailOth + val.irHoPrepFailQci + val.irHoPrepFailTime
             self.m8015Ecixy[key].irHoAtt = val.irHoAtt
             self.m8015Ecixy[key].irHoSucc = val.irHoSucc
-        
+            self.m8015Ecixy[key].mroLateHo= val.mroLateHo
+            self.m8015Ecixy[key].mroEarlyHo= val.mroEarlyType1Ho + val.mroEarlyType2Ho
+            self.m8015Ecixy[key].mroPingPongHo= val.mroPingPongHo
+            
         outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
         with open(os.path.join(outDir, 'm8015_topn_%s.csv' % time.strftime('%Y%m%d%H%M%S', time.localtime())), 'w') as f:
             self.ngwin.logEdit.append('-->Exporting results to: %s' % f.name)
             qApp.processEvents()
                     
             header = ['DN','SRC_ENB_ID', 'SRC_LCR_ID', 'SRC_EARFCN', 'SRC_PCI', 'SRC_TAC', 'DST_ENB_ID', 'DST_LCR_ID', 'DST_EARFCN', 'DST_PCI', 'DST_TAC']
-            header.extend(['IA_HO_PREP_FAIL', 'IA_HO_ATT', 'IA_HO_SUCC', 'IR_HO_PREP_FAIL', 'IR_HO_ATT', 'IR_HO_SUCC', 'HO_ATT_TOT', 'HO_SUCC_TOT', 'HO_PREP_FAIL', 'HO_EXEC_FAIL', 'HOSR2(%)'])
+            header.extend(['IA_HO_PREP_FAIL', 'IA_HO_ATT', 'IA_HO_SUCC', 'IR_HO_PREP_FAIL', 'IR_HO_ATT', 'IR_HO_SUCC', 'HO_ATT_TOT', 'HO_SUCC_TOT', 'HO_PREP_FAIL', 'HO_EXEC_FAIL', 'HOSR2(%)', 'MRO_LATE_HO', 'MRO_EARLY_HO', 'MRO_PPONG_HO'])
             header.extend(['DN_LNADJ', 'X2_STAT'])
             header.extend(['DN_LNREL', 'CIO', 'HO_ALLOWED'])
+            header.extend(['IA_A3', 'IA_A5', 'IF_A2', 'IF_A1'])
+            header.extend(['DN_LNHOIF', 'IF_A3', 'IF_A5'])
             f.write(','.join(header))
             f.write('\n')
             
             #for key,val in self.m8015Ecixy.items():
             for key,val in sorted(self.m8015Ecixy.items(), key=lambda d : d[1].iaHoPrepFail+d[1].irHoPrepFail+d[1].iaHoAtt+d[1].irHoAtt-d[1].iaHoSucc-d[1].irHoSucc, reverse=True):
+                if val.iaHoPrepFail + val.iaHoAtt + val.irHoPrepFail + val.irHoAtt == 0:
+                    continue
+                
                 #src/dst cell info
                 line = [key]
                 eciSrc, eciDst = key.split('_')
@@ -614,6 +627,7 @@ class NgM8015Proc(object):
                     line.append('DIV0')
                 else:
                     line.append('%.2f' % (100*(val.iaHoSucc+val.irHoSucc)/(val.iaHoAtt+val.irHoAtt)))
+                line.extend([val.mroLateHo, val.mroEarlyHo, val.mroPingPongHo])
                 
                 #LNADJ info
                 lnadjKey = val.lnbtsId + '_' + str(enbIdDst)
@@ -621,8 +635,7 @@ class NgM8015Proc(object):
                     dnLnadj = self.lnadjData[lnadjKey].coDn
                     x2Stat = self.lnadjData[lnadjKey].x2Stat
                 else:
-                    dnLnadj = 'NA'
-                    x2Stat = 'NA'
+                    dnLnadj, x2Stat = ('NA', 'NA')
                 line.extend([dnLnadj, x2Stat])
                 
                 #LNREL info
@@ -632,14 +645,81 @@ class NgM8015Proc(object):
                     cio = self.lnrelData[lnrelKey].cio
                     hoAllowed = self.lnrelData[lnrelKey].hoAllowed
                 else:
-                    dnLnrel = 'NA'
-                    cio = 'NA'
-                    hoAllowed = 'NA'
+                    dnLnrel, cio, hoAllowed = ('NA', 'NA', 'NA')
                 line.extend([dnLnrel, cio, hoAllowed])
                 
+                #LNCEL info
+                lncelKey = val.lncelId
+                if lncelKey in self.lncelData:
+                    iaA3 = self.lncelData[lncelKey].a3Off + '_' + self.lncelData[lncelKey].hysA3Off
+                    iaA5 = self.lncelData[lncelKey].a5Th3 + '_' + self.lncelData[lncelKey].a5Th3a + '_' + self.lncelData[lncelKey].hysA5Th3
+                    ifA2 = self.lncelData[lncelKey].a2Th2If + '_' + self.lncelData[lncelKey].hysA2Th2If
+                    ifA1 = self.lncelData[lncelKey].a1Th2a + '_' + self.lncelData[lncelKey].hysA1Th2a
+                else:
+                    iaA3, iaA5, ifA2, ifA1 = ('NA', 'NA', 'NA', 'NA')
+                line.extend([iaA3, iaA5, ifA2, ifA1])
+                    
+                #LNHOIF info
+                lnhoifKey = val.lncelId + '_' + earfcnDst
+                if lnhoifKey in self.lnhoifData:
+                    dnLnhoif = self.lnhoifData[lnhoifKey].coDn
+                    ifA3 = self.lnhoifData[lnhoifKey].ifA3Off + '_' + self.lnhoifData[lnhoifKey].ifHysA3Off
+                    ifA5 = self.lnhoifData[lnhoifKey].ifA5Th3 + '_' + self.lnhoifData[lnhoifKey].ifA5Th3a + '_' + self.lnhoifData[lnhoifKey].ifHysA5Th3
+                else:
+                    dnLnhoif, ifA3, ifA5 = ('NA', 'NA', 'NA')
+                line.extend([dnLnhoif, ifA3, ifA5])
+                    
                 line = list(map(str, line))
                 f.write(','.join(line))
                 f.write('\n')
-    
+                
+    def procUserCase03(self):
+        self.ngwin.logEdit.append('<font color=blue>Performing analysis for user case #0l: clean LNADJ/LNREL</font>')
+        qApp.processEvents()
+        
+        #user case#3: clean lnadj/lnrel
+        for lncelidx in self.lncelData.keys():
+            for lncelidy in self.lncelData.keys():
+                if lncelidx == lncelidy:
+                    continue
+                lnbtsidx = self.lncelData[lncelidx].lnbtsId
+                enbx = self.lncelData[lncelidx].enbId
+                lcrx = self.lncelData[lncelidy].lcrId
+                lnbtsidy = self.lncelData[lncelidy].lnbtsId
+                enby = self.lncelData[lncelidy].enbId
+                lcry = self.lncelData[lncelidy].lcrId
+                
+                #x-->y
+                m8015xy = lnbtsidx + '_' + lncelidx + '_' + str(256*int(enby)+int(lcry)) 
+                lnrelxy = lncelidx + '_' + enby + '_' + lcry
+                lnadjxy = lnbtsidx + '_' + enby
+                
+                #y-->x
+                m8015yx = lnbtsidy + '_' + lncelidy + '_' + str(256*int(enbx)+int(lcrx))
+                lnrelyx = lncelidy + '_' + enbx + '_' + lcrx
+                lnadjyx = lnbtsidy + '_' + enbx
+                
+                if lnrelxy in self.lnrelData and lnrelyx in self.lnrelData:
+                    if checkM8015(m8015xy) and checkM8015(m8015yx):
+                        continue
+                    else:
+                        #possible uni-directional NR
+                        pass
+                elif not (lnrelxy in self.lnrelData or lnrelyx in self.lnrelData):
+                    if enbx == enby or lnadjxy in self.lnadjData or lnadjyx in self.lnadjData:
+                        #redundant NR?
+                        pass
+            
+    def checkM8015(self, key):
+        if not key in self.m8015AggData:
+            return False
+        
+        val = self.m8015AggData[key]
+        numHo = val.iaHoPrepFail + val.iaHoAtt + val.irHoPrepFailAc + val.irHoPrepFailOth + val.irHoPrepFailQci + val.irHoPrepFailTime + val.irHoAtt
+        if numHo > 0:
+            return True 
+        else:
+            return False
+        
     def procUserCasexx(self):
         pass
