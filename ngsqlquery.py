@@ -137,3 +137,5 @@ class NgSqlQuery(object):
                     for r in records:
                         of.write(','.join([str(token) for token in r]))
                         of.write('\n')
+        
+        self.ngwin.logEdit.append('<font color=blue>Done!</font>')

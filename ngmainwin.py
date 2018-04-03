@@ -19,6 +19,7 @@ from ngltegridui import NgLteGridUi
 from ngnbiotgridui import NgNbiotGridUi
 from ngxmlparser import NgXmlParser
 from ngsqlquery import NgSqlQuery
+from ngm8015proc import NgM8015Proc
 
 class NgMainWin(QMainWindow):
     def __init__(self):
@@ -61,13 +62,19 @@ class NgMainWin(QMainWindow):
         parser = NgXmlParser(self, indir) 
         parser.start()
     
-    def onExecSqlQuery(self):
+    def onExecNedsM8015(self):
         args = dict()
         args['dbConf'] = 'dbconfig.txt'
         args['sqlQuery'] = ['neds_lnadj.sql', 'neds_lnadjl.sql', 'neds_lncel.sql', 'neds_lnhoif.sql', 'neds_lnrel.sql', 'neds_m8015.sql']
     
         query = NgSqlQuery(self, args)
         query.exec_()
+        
+        proc = NgM8015Proc(self)
+        proc.loadCsvData()
+        proc.makeEciMap()
+        proc.procUserCase01()
+        proc.procUserCase02()
         
     def onExecLteResGrid(self):
         dlg = NgLteGridUi(self)
@@ -100,8 +107,8 @@ class NgMainWin(QMainWindow):
         self.chkSqlAction.triggered.connect(self.onChkSqlPlugin)
         self.xmlParserAction = QAction('XML Parser')
         self.xmlParserAction.triggered.connect(self.onExecXmlParser)
-        self.sqlQueryAction = QAction('SQL Query')
-        self.sqlQueryAction.triggered.connect(self.onExecSqlQuery)
+        self.sqlQueryAction = QAction('NEDS (M8015 Analyzer)')
+        self.sqlQueryAction.triggered.connect(self.onExecNedsM8015)
         
         #Options menu
         self.enableDebugAction = QAction('Enable Debug')
