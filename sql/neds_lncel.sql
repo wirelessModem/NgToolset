@@ -3,8 +3,8 @@
 --2018-3-22: initial version by gaozw
 
 select
-co_lncel.co_gid lncel_id
-,co_lnbts.co_gid lnbts_id
+co_lnbts.co_gid lnbts_id
+,co_lncel.co_gid lncel_id
 ,co_lnbts.co_object_instance enb_id
 ,co_lncel.co_object_instance lcr_id
 --LNCEL parameters
@@ -39,3 +39,4 @@ ctp_common_objects co_lncel
 where
 lncel.conf_id = 1 and lncel.obj_gid = co_lncel.co_gid
 and co_lncel.co_parent_gid = co_lnbts.co_gid
+and lncel.LNCEL_EUTRA_CEL_ID is not null
