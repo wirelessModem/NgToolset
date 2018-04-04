@@ -484,7 +484,11 @@ class NgM8015Proc(object):
             else:
                 continue
             
+            if not lncelId in self.lncelData:
+                continue
+            
             eciSrc = self.lncelData[lncelId].eci
+            
             if eciSrc in self.earfcnMap:
                 earfcnSrc = self.earfcnMap[eciSrc]
             else:
@@ -538,6 +542,9 @@ class NgM8015Proc(object):
                 lncelId = tokens[1]
                 eci = tokens[2]
             else:
+                continue
+            
+            if not lncelId in self.lncelData:
                 continue
             
             eciSrc = self.lncelData[lncelId].eci
