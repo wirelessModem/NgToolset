@@ -21,6 +21,7 @@ class NgSqlQuery(object):
     def __init__(self, ngwin, args):
         self.ngwin = ngwin
         self.args = args
+        self.stat = False
         self.initDb()
     
     def initDb(self):
@@ -54,7 +55,7 @@ class NgSqlQuery(object):
         qApp.processEvents()
         try:
             db = cx_Oracle.connect(self.dbUserName, self.dbUserPwd, dsn)
-        except cx_Oracle.DatabseError as e:
+        except cx_Oracle.DatabaseError as e:
             # cx_Oracle 5.0.4 raises a cx_Oracle.DatabaseError exception
             # with the following attributes and values:
             #  code = 2091
@@ -138,4 +139,5 @@ class NgSqlQuery(object):
                         of.write(','.join([str(token) for token in r]))
                         of.write('\n')
         
+        self.stat = True
         self.ngwin.logEdit.append('<font color=blue>Done!</font>')

@@ -70,11 +70,12 @@ class NgMainWin(QMainWindow):
         query = NgSqlQuery(self, args)
         query.exec_()
         
-        proc = NgM8015Proc(self)
-        proc.loadCsvData()
-        proc.makeEciMap()
-        proc.procUserCase01()
-        proc.procUserCase02()
+        if query.stat:
+            proc = NgM8015Proc(self)
+            proc.loadCsvData()
+            proc.makeEciMap()
+            proc.procUserCase01()
+            proc.procUserCase02()
         
     def onExecLteResGrid(self):
         dlg = NgLteGridUi(self)
