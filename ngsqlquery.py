@@ -21,34 +21,42 @@ class NgSqlQuery(object):
     def __init__(self, ngwin, args):
         self.ngwin = ngwin
         self.args = args
-        self.stat = False
+        self.dbStat = False
+        self.queryStat = False
         self.initDb()
     
     def initDb(self):
         confDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config')
-        with open(os.path.join(confDir, self.args['dbConf']), 'r') as f:
-            while True:
-                line = f.readline()
-                if not line:
-                    break
-                if line.startswith('#') or line.strip() == '':
-                    continue
-                
-                tokens = line.split('=')
-                tokens = list(map(lambda x:x.strip(), tokens))
-                if len(tokens) == 2:
-                    if tokens[0].upper() == 'HOST_NAME':
-                        self.dbHost = tokens[1]
-                    elif tokens[0].upper() == 'TCP_PORT':
-                        self.dbPort = tokens[1]
-                    elif tokens[0].upper() == 'DB_NAME':
-                        self.dbService = tokens[1]
-                    elif tokens[0].upper() == 'USER_NAME':
-                        self.dbUserName = tokens[1]
-                    elif tokens[0].upper() == 'USER_PASSCODE':
-                        self.dbUserPwd = tokens[1]
+        try:
+            with open(os.path.join(confDir, self.args['dbConf']), 'r') as f:
+                while True:
+                    line = f.readline()
+                    if not line:
+                        break
+                    if line.startswith('#') or line.strip() == '':
+                        continue
+                    
+                    tokens = line.split('=')
+                    tokens = list(map(lambda x:x.strip(), tokens))
+                    if len(tokens) == 2:
+                        if tokens[0].upper() == 'HOST_NAME':
+                            self.dbHost = tokens[1]
+                        elif tokens[0].upper() == 'TCP_PORT':
+                            self.dbPort = tokens[1]
+                        elif tokens[0].upper() == 'DB_NAME':
+                            self.dbService = tokens[1]
+                        elif tokens[0].upper() == 'USER_NAME':
+                            self.dbUserName = tokens[1]
+                        elif tokens[0].upper() == 'USER_PASSCODE':
+                            self.dbUserPwd = tokens[1]
+                self.dbStat = True
+        except Exception as e:
+            self.ngwin.logEdit.append('<font color=red>Exception: %s</font>' % str(e))
     
     def exec_(self):
+        if not self.dbStat:
+            return
+        
         dsn = cx_Oracle.makedsn(self.dbHost, self.dbPort, service_name=self.dbService)
         
         self.ngwin.logEdit.append('<font color=blue>Connecting to Oracle DB</font>(DSN=%s)' % dsn)
@@ -139,5 +147,5 @@ class NgSqlQuery(object):
                         of.write(','.join([str(token) for token in r]))
                         of.write('\n')
         
-        self.stat = True
+        self.queryStat = True
         self.ngwin.logEdit.append('<font color=blue>Done!</font>')
