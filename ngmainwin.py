@@ -70,7 +70,7 @@ class NgMainWin(QMainWindow):
         query = NgSqlQuery(self, args)
         query.exec_()
         
-        if query.stat:
+        if query.queryStat:
             proc = NgM8015Proc(self)
             proc.loadCsvData()
             proc.makeEciMap()
