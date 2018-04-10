@@ -44,6 +44,77 @@ class M8015(object):
         _list = list(map(str, _list))
         return ','.join(_list)
 
+class M8001(object):
+    def __init__(self):
+        self.smallMsg1Att = 0
+        self.largeMsg1Att = 0
+        self.dedMsg1Att = 0
+        self.rachMsg2 = 0
+        
+    def __str__(self):
+        _list = [self.smallMsg1Att, self.largeMsg1Att, self.dedMsg1Att, self.rachMsg2]
+        _list = list(map(str, _list))
+        return ','.join(_list)
+
+class M8005(object):
+    def __init__(self):
+        self.avgRssiPucch = 0
+        self.avgRssiPusch = 0
+        self.avgSinrPucch = 0
+        self.avgSinrPusch = 0
+        
+    def __str__(self):
+        _list = [self.avgRssiPucch, self.avgRssiPusch, self.avgSinrPucch, self.avgSinrPusch]
+        _list = list(map(str, _list))
+        return ','.join(_list)
+
+class M8006(object):
+    def __init__(self):
+        self.erabRelQci1Tot = 0
+        self.erabRelQci1Ina = 0
+        self.erabRelQci1UeLost = 0
+        self.erabRelQci1Tru = 0
+        self.erabRelQci1Red = 0
+        self.erabRelQci1Eugr = 0
+        self.erabRelQci1Rrna = 0
+        self.erabRelQci1HoFail = 0
+        self.erabRelQci1EpcPs = 0
+        self.erabRelQci1TnlUnsp = 0
+        
+    def __str__(self):
+        _list = [self.erabRelQci1Tot, self.erabRelQci1Ina, self.erabRelQci1UeLost, self.erabRelQci1Tru, self.erabRelQci1Red,
+                 self.erabRelQci1Eugr, self.erabRelQci1Rrna, self.erabRelQci1HoFail, self.erabRelQci1EpcPs, self.erabRelQci1TnlUnsp]
+        _list = list(map(str, _list))
+        return ','.join(_list)
+
+class M8013(object):
+    def __init__(self):
+        self.rrcMsg3Mos = 0
+        self.rrcMsg3Mt = 0
+        self.rrcMsg3Mod = 0
+        self.rrcMsg3Emg = 0
+        self.rrcMsg3HiPrio = 0
+        self.rrcMsg3DelTol = 0
+        self.rrcMsg5 = 0
+        
+    def __str__(self):
+        _list = [self.rrcMsg3Mos, self.rrcMsg3Mt, self.rrcMsg3Mod, self.rrcMsg3Emg,
+                 self.rrcMsg3HiPrio, self.rrcMsg3DelTol, self.rrcMsg5]
+        _list = list(map(str, _list))
+        return ','.join(_list)
+    
+class M8051(object):
+    def __init__(self):
+        self.avgUeRrcConn = 0
+        self.maxUeRrcConn = 0
+        self.avgUeAct = 0
+        self.maxUeAct = 0
+        
+    def __str__(self):
+        _list = [self.avgRssiPucch, self.avgRssiPusch, self.avgSinrPucch, self.avgSinrPusch]
+        _list = list(map(str, _list))
+        return ','.join(_list)
+
 class Lncel(object):
     def __init__(self):
         self.lnbtsId = None
@@ -167,12 +238,29 @@ class NgM8015Proc(object):
         #m8015Data.key.lnbts_id == lnadjlData.key
         self.m8015Data= dict() #[key='m8015.lnbts_id+m8015.lncel_id+m8015.eci_id', val=list of M8015]
         self.m8015AggData= dict() #[key='m8015.lnbts_id+m8015.lncel_id+m8015.eci_id', val=aggregated M8015]
+        
+        self.m8001Data= dict() #[key='m8001.lnbts_id+m8001.lncel_id', val=list of M8001]
+        self.m8001AggData= dict() #[key='m8001.lnbts_id+m8001.lncel_id', val=aggregated M8001]
+        
+        self.m8005Data= dict() #[key='m8005.lnbts_id+m8005.lncel_id', val=list of M8005]
+        self.m8005AggData= dict() #[key='m8005.lnbts_id+m8005.lncel_id', val=aggregated M8005]
+        
+        self.m8006Data= dict() #[key='m8006.lnbts_id+m8006.lncel_id', val=list of M8006]
+        self.m8006AggData= dict() #[key='m8006.lnbts_id+m8006.lncel_id', val=aggregated M8006]
+        
+        self.m8013Data= dict() #[key='m8013.lnbts_id+m8013.lncel_id', val=list of M8013]
+        self.m8013AggData= dict() #[key='m8013.lnbts_id+m8013.lncel_id', val=aggregated M8013]
+        
+        self.m8051Data= dict() #[key='m8051.lnbts_id+m8051.lncel_id', val=list of M8051]
+        self.m8051AggData= dict() #[key='m8051.lnbts_id+m8051.lncel_id', val=aggregated M8051]
+        
         self.lncelData = dict() #[key=lncel.lncel_id, val=Lncel]
         self.lnadjData = dict() #[key=lnadj.lnbts_id, val=Lnadj]
         self.lnadjlData = dict() #[key=lnadjl.lnbts_id, val=Lnadjl]
         self.lnhoifData = dict() #[key=lnhoif.lncel_id, val=Lnhoif]
         self.lnrelData = dict() #[key='lnrel.lncel_id+lnrel.adj_enb_id+lnrel.adj_lcr_id', val=Lnrel]
         
+        self.lnbtsIdLncelIdMap = dict() #[key=ECI, val=lnbts_id+lncel_id]
         self.earfcnMap = dict() #[key=eci, val=earfcn]
         self.pciMap = dict() #[key=eci, val=pci]
         self.tacMap = dict() #[key=eci, val=tac]
@@ -188,6 +276,11 @@ class NgM8015Proc(object):
         self.loadLnhoif()
         self.loadLnrel()
         self.loadM8015()
+        self.loadM8001()
+        self.loadM8005()
+        self.loadM8006()
+        self.loadM8013()
+        self.loadM8051()
     
     def print_(self):
         for key,val in self.lncelData.items():
@@ -418,6 +511,328 @@ class NgM8015Proc(object):
         
         self.aggM8015()
     
+    def loadM8001(self):
+        outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+        with open(os.path.join(outDir, 'neds_m8001.csv'), 'r') as f:
+            #print('Loading %s' % f.name)
+            self.ngwin.logEdit.append('Loading %s' % f.name)
+            qApp.processEvents()
+            
+            line = f.readline().strip()
+            tokens = line.split(',')
+            d = dict(zip(tokens, range(len(tokens))))
+            #print(d)
+            
+            while True:
+                line = f.readline().strip()
+                if not line:
+                    break
+                
+                tokens = line.split(',')
+                
+                t = M8001()
+                t.smallMsg1Att = tokens[d['RACH_STP_ATT_SMALL_MSG']]
+                t.largeMsg1Att = tokens[d['RACH_STP_ATT_LARGE_MSG']]
+                t.dedMsg1Att = tokens[d['RACH_STP_ATT_DEDICATED']]
+                t.rachMsg2 = tokens[d['RACH_STP_COMPLETIONS']]
+                
+                key = tokens[d['LNBTS_ID']] + '_' + tokens[d['LNCEL_ID']]
+                
+                if not key in self.m8001Data:
+                    self.m8001Data[key] = [t]
+                else:
+                    self.m8001Data[key].append(t)
+        
+        self.aggM8001()
+    
+    def loadM8005(self):
+        outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+        with open(os.path.join(outDir, 'neds_m8005.csv'), 'r') as f:
+            #print('Loading %s' % f.name)
+            self.ngwin.logEdit.append('Loading %s' % f.name)
+            qApp.processEvents()
+            
+            line = f.readline().strip()
+            tokens = line.split(',')
+            d = dict(zip(tokens, range(len(tokens))))
+            #print(d)
+            
+            while True:
+                line = f.readline().strip()
+                if not line:
+                    break
+                
+                tokens = line.split(',')
+                
+                t = M8005()
+                t.avgRssiPucch = tokens[d['RSSI_PUCCH_AVG']]
+                t.avgRssiPusch = tokens[d['RSSI_PUSCH_AVG']]
+                t.avgSinrPucch = tokens[d['SINR_PUCCH_AVG']]
+                t.avgSinrPusch = tokens[d['SINR_PUSCH_AVG']]
+                
+                key = tokens[d['LNBTS_ID']] + '_' + tokens[d['LNCEL_ID']]
+                
+                if not key in self.m8005Data:
+                    self.m8005Data[key] = [t]
+                else:
+                    self.m8005Data[key].append(t)
+        
+        self.aggM8005()
+    
+    def loadM8006(self):
+        outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+        with open(os.path.join(outDir, 'neds_m8006.csv'), 'r') as f:
+            #print('Loading %s' % f.name)
+            self.ngwin.logEdit.append('Loading %s' % f.name)
+            qApp.processEvents()
+            
+            line = f.readline().strip()
+            tokens = line.split(',')
+            d = dict(zip(tokens, range(len(tokens))))
+            #print(d)
+            
+            while True:
+                line = f.readline().strip()
+                if not line:
+                    break
+                
+                tokens = line.split(',')
+                
+                t = M8006()
+                t.erabRelQci1Tot = tokens[d['ERAB_REL_ENB_QCI1']]
+                t.erabRelQci1Ina = tokens[d['ERAB_REL_ENB_RNL_INA_QCI1']]
+                t.erabRelQci1UeLost = tokens[d['ERAB_REL_ENB_RNL_UEL_QCI1']]
+                t.erabRelQci1Tru = tokens[d['ERAB_REL_ENB_TNL_TRU_QCI1']]
+                t.erabRelQci1Red = tokens[d['ERAB_REL_ENB_RNL_RED_QCI1']]
+                t.erabRelQci1Eugr = tokens[d['ERAB_REL_ENB_RNL_EUGR_QCI1']]
+                t.erabRelQci1Rrna = tokens[d['ERAB_REL_ENB_RNL_RRNA_QCI1']]
+                t.erabRelQci1HoFail = tokens[d['ERAB_REL_HO_FAIL_TIM_QCI1']]
+                t.erabRelQci1EpcPs = tokens[d['ERAB_REL_EPC_PATH_SWITCH_QCI1']]
+                t.erabRelQci1TnlUnsp = tokens[d['ERAB_REL_ENB_TNL_UNSP_QCI1']]
+                
+                key = tokens[d['LNBTS_ID']] + '_' + tokens[d['LNCEL_ID']]
+                
+                if not key in self.m8006Data:
+                    self.m8006Data[key] = [t]
+                else:
+                    self.m8006Data[key].append(t)
+        
+        self.aggM8006()
+    
+    def loadM8013(self):
+        outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+        with open(os.path.join(outDir, 'neds_m8013.csv'), 'r') as f:
+            #print('Loading %s' % f.name)
+            self.ngwin.logEdit.append('Loading %s' % f.name)
+            qApp.processEvents()
+            
+            line = f.readline().strip()
+            tokens = line.split(',')
+            d = dict(zip(tokens, range(len(tokens))))
+            #print(d)
+            
+            while True:
+                line = f.readline().strip()
+                if not line:
+                    break
+                
+                tokens = line.split(',')
+                
+                t = M8013()
+                t.rrcMsg3Mos = tokens[d['SIGN_CONN_ESTAB_ATT_MO_S']]
+                t.rrcMsg3Mt = tokens[d['SIGN_CONN_ESTAB_ATT_MT']]
+                t.rrcMsg3Mod = tokens[d['SIGN_CONN_ESTAB_ATT_MO_D']]
+                t.rrcMsg3Emg = tokens[d['SIGN_CONN_ESTAB_ATT_EMG']]
+                t.rrcMsg3HiPrio = tokens[d['SIGN_CONN_ESTAB_ATT_HIPRIO']]
+                t.rrcMsg3DelTol = tokens[d['SIGN_CONN_ESTAB_ATT_DEL_TOL']]
+                t.rrcMsg5 = tokens[d['SIGN_CONN_ESTAB_COMP']]
+                
+                key = tokens[d['LNBTS_ID']] + '_' + tokens[d['LNCEL_ID']]
+                
+                if not key in self.m8013Data:
+                    self.m8013Data[key] = [t]
+                else:
+                    self.m8013Data[key].append(t)
+        
+        self.aggM8013()
+    
+    def loadM8051(self):
+        outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+        with open(os.path.join(outDir, 'neds_m8051.csv'), 'r') as f:
+            #print('Loading %s' % f.name)
+            self.ngwin.logEdit.append('Loading %s' % f.name)
+            qApp.processEvents()
+            
+            line = f.readline().strip()
+            tokens = line.split(',')
+            d = dict(zip(tokens, range(len(tokens))))
+            #print(d)
+            
+            while True:
+                line = f.readline().strip()
+                if not line:
+                    break
+                
+                tokens = line.split(',')
+                
+                t = M8051()
+                t.avgUeRrcConn = tokens[d['RRC_CONNECTED_UE_AVG']]
+                t.maxUeRrcConn = tokens[d['RRC_CONNECTED_UE_MAX']]
+                t.avgUeAct = tokens[d['CELL_LOAD_ACTIVE_UE_AVG']]
+                t.maxUeAct = tokens[d['CELL_LOAD_ACTIVE_UE_MAX']]
+                
+                key = tokens[d['LNBTS_ID']] + '_' + tokens[d['LNCEL_ID']]
+                
+                if not key in self.m8051Data:
+                    self.m8051Data[key] = [t]
+                else:
+                    self.m8051Data[key].append(t)
+        
+        self.aggM8051()
+    
+    def aggM8001(self):
+        self.ngwin.logEdit.append('Aggregating M8001')
+        qApp.processEvents()
+        
+        for key,val in self.m8001Data.items():
+            t = M8001()
+            for rec in val:
+                try:
+                    t.smallMsg1Att = t.smallMsg1Att + int(rec.smallMsg1Att)
+                    t.largeMsg1Att = t.largeMsg1Att + int(rec.largeMsg1Att)
+                    t.dedMsg1Att = t.dedMsg1Att + int(rec.dedMsg1Att)
+                    t.rachMsg2 = t.rachMsg2 + int(rec.rachMsg2)
+                except Exception as e:
+                    #ignore ValueError that may raised by int()
+                    continue
+            
+            self.m8001AggData[key] = t
+                
+        '''
+        for key,val in self.m8001AggData.items():
+            print('key=%s,val=%s' % (key,val))
+        '''
+        
+    def aggM8005(self):
+        self.ngwin.logEdit.append('Aggregating M8005')
+        qApp.processEvents()
+        
+        for key,val in self.m8005Data.items():
+            t = M8005()
+            cnt = 0
+            for rec in val:
+                try:
+                    t.avgRssiPucch = t.avgRssiPucch + int(rec.avgRssiPucch)
+                    t.avgRssiPusch = t.avgRssiPusch + int(rec.avgRssiPusch)
+                    t.avgSinrPucch = t.avgSinrPucch + int(rec.avgSinrPucch)
+                    t.avgSinrPusch = t.avgSinrPusch + int(rec.avgSinrPusch)
+                    cnt = cnt + 1
+                except Exception as e:
+                    #ignore ValueError that may raised by int()
+                    continue
+            
+            if cnt > 0:
+                t.avgRssiPucch = round(t.avgRssiPucch / cnt, 2)
+                t.avgRssiPusch = round(t.avgRssiPusch / cnt, 2)
+                t.avgSinrPucch = round(t.avgSinrPucch / cnt, 2)
+                t.avgSinrPusch = round(t.avgSinrPusch / cnt, 2)
+            else:
+                t.avgRssiPucch, t.avgRssiPusch, t.avgSinrPucch, t.avgSinrPusch = ('DIV0', 'DIV0', 'DIV0', 'DIV0')
+                
+            
+            self.m8005AggData[key] = t
+                
+        '''
+        for key,val in self.m8005AggData.items():
+            print('key=%s,val=%s' % (key,val))
+        '''
+    
+    def aggM8006(self):
+        self.ngwin.logEdit.append('Aggregating M8006')
+        qApp.processEvents()
+        
+        for key,val in self.m8006Data.items():
+            t = M8006()
+            for rec in val:
+                try:
+                    t.erabRelQci1Tot = t.erabRelQci1Tot + int(rec.erabRelQci1Tot)
+                    t.erabRelQci1Ina = t.erabRelQci1Ina + int(rec.erabRelQci1Ina)
+                    t.erabRelQci1UeLost = t.erabRelQci1UeLost + int(rec.erabRelQci1UeLost)
+                    t.erabRelQci1Tru = t.erabRelQci1Tru + int(rec.erabRelQci1Tru)
+                    t.erabRelQci1Red = t.erabRelQci1Red + int(rec.erabRelQci1Red)
+                    t.erabRelQci1Eugr = t.erabRelQci1Eugr + int(rec.erabRelQci1Eugr)
+                    t.erabRelQci1Rrna = t.erabRelQci1Rrna + int(rec.erabRelQci1Rrna)
+                    t.erabRelQci1HoFail = t.erabRelQci1HoFail + int(rec.erabRelQci1HoFail)
+                    t.erabRelQci1EpcPs = t.erabRelQci1EpcPs + int(rec.erabRelQci1EpcPs)
+                    t.erabRelQci1TnlUnsp = t.erabRelQci1TnlUnsp + int(rec.erabRelQci1TnlUnsp)
+                except Exception as e:
+                    #ignore ValueError that may raised by int()
+                    continue
+            
+            self.m8006AggData[key] = t
+                
+        '''
+        for key,val in self.m8006AggData.items():
+            print('key=%s,val=%s' % (key,val))
+        '''
+    
+    def aggM8013(self):
+        self.ngwin.logEdit.append('Aggregating M8013')
+        qApp.processEvents()
+        
+        for key,val in self.m8013Data.items():
+            t = M8013()
+            for rec in val:
+                try:
+                    t.rrcMsg3Mos = t.rrcMsg3Mos + int(rec.rrcMsg3Mos)
+                    t.rrcMsg3Mt = t.rrcMsg3Mt + int(rec.rrcMsg3Mt)
+                    t.rrcMsg3Mod = t.rrcMsg3Mod + int(rec.rrcMsg3Mod)
+                    t.rrcMsg3Emg = t.rrcMsg3Emg + int(rec.rrcMsg3Emg)
+                    t.rrcMsg3HiPrio = t.rrcMsg3HiPrio + int(rec.rrcMsg3HiPrio)
+                    t.rrcMsg3DelTol = t.rrcMsg3DelTol + int(rec.rrcMsg3DelTol)
+                    t.rrcMsg5 = t.rrcMsg5 + int(rec.rrcMsg5)
+                except Exception as e:
+                    #ignore ValueError that may raised by int()
+                    continue
+            
+            self.m8013AggData[key] = t
+                
+        '''
+        for key,val in self.m8013AggData.items():
+            print('key=%s,val=%s' % (key,val))
+        '''
+    
+    def aggM8051(self):
+        self.ngwin.logEdit.append('Aggregating M8051')
+        qApp.processEvents()
+        
+        for key,val in self.m8051Data.items():
+            t = M8051()
+            cnt = 0
+            for rec in val:
+                try:
+                    t.avgUeRrcConn = t.avgUeRrcConn + int(rec.avgUeRrcConn)
+                    t.maxUeRrcConn = max(t.maxUeRrcConn, int(rec.maxUeRrcConn))
+                    t.avgUeAct = t.avgUeAct + int(rec.avgUeAct)
+                    t.maxUeAct = max(t.maxUeAct, int(rec.maxUeAct))
+                    cnt = cnt + 1
+                except Exception as e:
+                    #ignore ValueError that may raised by int()
+                    continue
+                
+            if cnt > 0:
+                t.avgUeRrcConn = round(t.avgUeRrcConn / cnt, 2)
+                t.avgUeAct = round(t.avgUeAct / cnt, 2)
+            else:
+                t.avgUeRrcConn, t.avgUeAct = ('DIV0', 'DIV0')
+            
+            self.m8051AggData[key] = t
+                
+        '''
+        for key,val in self.m8051AggData.items():
+            print('key=%s,val=%s' % (key,val))
+        '''
+    
     def aggM8015(self):
         #print('Aggregating M8015')
         self.ngwin.logEdit.append('Aggregating M8015')
@@ -426,23 +841,27 @@ class NgM8015Proc(object):
         for key,val in self.m8015Data.items():
             t = M8015()
             for rec in val:
-                t.iaHoPrepFail = t.iaHoPrepFail + int(rec.iaHoPrepFail)
-                t.iaHoAtt = t.iaHoAtt + int(rec.iaHoAtt)
-                t.iaHoSucc = t.iaHoSucc + int(rec.iaHoSucc)
-                t.iaHoFailTime = t.iaHoFailTime + int(rec.iaHoFailTime)
-                t.irHoPrepFailOth = t.irHoPrepFailOth + int(rec.irHoPrepFailOth)
-                t.irHoPrepFailTime = t.irHoPrepFailTime + int(rec.irHoPrepFailTime)
-                t.irHoPrepFailAc = t.irHoPrepFailAc + int(rec.irHoPrepFailAc)
-                t.irHoPrepFailQci = t.irHoPrepFailQci + int(rec.irHoPrepFailQci)
-                t.irHoAtt = t.irHoAtt + int(rec.irHoAtt)
-                t.irHoSucc = t.irHoSucc + int(rec.irHoSucc)
-                t.irHoFailTime = t.irHoFailTime + int(rec.irHoFailTime)
-                t.mroLateHo = t.mroLateHo + int(rec.mroLateHo)
-                t.mroEarlyType1Ho = t.mroEarlyType1Ho + int(rec.mroEarlyType1Ho)
-                t.mroEarlyType2Ho = t.mroEarlyType2Ho + int(rec.mroEarlyType2Ho)
-                t.mroPingPongHo = t.mroPingPongHo + int(rec.mroPingPongHo)
-                t.ifLbHoAtt = t.ifLbHoAtt + int(rec.ifLbHoAtt)
-                t.ifLbHoSucc = t.ifLbHoSucc + int(rec.ifLbHoSucc)
+                try:
+                    t.iaHoPrepFail = t.iaHoPrepFail + int(rec.iaHoPrepFail)
+                    t.iaHoAtt = t.iaHoAtt + int(rec.iaHoAtt)
+                    t.iaHoSucc = t.iaHoSucc + int(rec.iaHoSucc)
+                    t.iaHoFailTime = t.iaHoFailTime + int(rec.iaHoFailTime)
+                    t.irHoPrepFailOth = t.irHoPrepFailOth + int(rec.irHoPrepFailOth)
+                    t.irHoPrepFailTime = t.irHoPrepFailTime + int(rec.irHoPrepFailTime)
+                    t.irHoPrepFailAc = t.irHoPrepFailAc + int(rec.irHoPrepFailAc)
+                    t.irHoPrepFailQci = t.irHoPrepFailQci + int(rec.irHoPrepFailQci)
+                    t.irHoAtt = t.irHoAtt + int(rec.irHoAtt)
+                    t.irHoSucc = t.irHoSucc + int(rec.irHoSucc)
+                    t.irHoFailTime = t.irHoFailTime + int(rec.irHoFailTime)
+                    t.mroLateHo = t.mroLateHo + int(rec.mroLateHo)
+                    t.mroEarlyType1Ho = t.mroEarlyType1Ho + int(rec.mroEarlyType1Ho)
+                    t.mroEarlyType2Ho = t.mroEarlyType2Ho + int(rec.mroEarlyType2Ho)
+                    t.mroPingPongHo = t.mroPingPongHo + int(rec.mroPingPongHo)
+                    t.ifLbHoAtt = t.ifLbHoAtt + int(rec.ifLbHoAtt)
+                    t.ifLbHoSucc = t.ifLbHoSucc + int(rec.ifLbHoSucc)
+                except Exception as e:
+                    #ignore ValueError that may raised by int()
+                    continue
             
             self.m8015AggData[key] = t
                 
@@ -457,6 +876,8 @@ class NgM8015Proc(object):
         qApp.processEvents()
         
         for key,val in self.lncelData.items():
+            self.lnbtsIdLncelIdMap[val.eci] = val.lnbtsId + '_' + key
+            
             if not val.eci in self.earfcnMap:
                 self.earfcnMap[val.eci] = val.earfcn
                 self.pciMap[val.eci] = val.pci
@@ -508,7 +929,7 @@ class NgM8015Proc(object):
             self.m8015Earfcnxy[key].irHoSucc = self.m8015Earfcnxy[key].irHoSucc + val.irHoSucc
         
         outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
-        with open(os.path.join(outDir, 'm8015_per_earfcn_%s.csv' % time.strftime('%Y%m%d%H%M%S', time.localtime())), 'w') as f:
+        with open(os.path.join(outDir, 'm8015_per_earfcn_%s.csv' % time.strftime('%Y%m%d_%H%M%S', time.localtime())), 'w') as f:
             self.ngwin.logEdit.append('-->Exporting results to: %s' % f.name)
             qApp.processEvents()
                     
@@ -565,7 +986,7 @@ class NgM8015Proc(object):
             self.m8015Ecixy[key].mroPingPongHo= val.mroPingPongHo
             
         outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
-        with open(os.path.join(outDir, 'm8015_topn_%s.csv' % time.strftime('%Y%m%d%H%M%S', time.localtime())), 'w') as f:
+        with open(os.path.join(outDir, 'm8015_topn_%s.csv' % time.strftime('%Y%m%d_%H%M%S', time.localtime())), 'w') as f:
             self.ngwin.logEdit.append('-->Exporting results to: %s' % f.name)
             qApp.processEvents()
                     
@@ -575,6 +996,10 @@ class NgM8015Proc(object):
             header.extend(['DN_LNREL', 'CIO', 'HO_ALLOWED'])
             header.extend(['IA_A3', 'IA_A5', 'IF_A2', 'IF_A1'])
             header.extend(['DN_LNHOIF', 'IF_A3', 'IF_A5'])
+            header.extend(['SRC_ERAB_REL_UEL_QCI1', 'SRC_ERAB_REL_HOFAIL_QCI1'])
+            header.extend(['DST_NUM_MSG1', 'DST_NUM_MSG2', 'DST_RRC_MSG3', 'DST_RRC_MSG5', 'DST_RASR_MSG2', 'DST_RASR_MSG3', 'DST_RRC_SSR'])
+            header.extend(['DST_AVG_UE_RRC_CONN', 'DST_MAX_UE_RRC_CONN', 'DST_AVG_UE_ACT', 'DST_MAX_UE_ACT'])
+            header.extend(['DST_RSSI_PUCCH', 'DST_SINR_PUCCH', 'DST_RSSI_PUSCH', 'DST_SINR_PUSCH'])
             f.write(','.join(header))
             f.write('\n')
             
@@ -675,7 +1100,52 @@ class NgM8015Proc(object):
                 else:
                     dnLnhoif, ifA3, ifA5 = ('NA', 'NA', 'NA')
                 line.extend([dnLnhoif, ifA3, ifA5])
+                
+                #erab abnormal release(cause=ue_lost or ho_fail) for qci1, source cell only
+                m8006Key = val.lnbtsId + '_' + val.lncelId
+                if m8006Key in self.m8006AggData:
+                    ueLost = self.m8006AggData[m8006Key].erabRelQci1UeLost
+                    hoFail = self.m8006AggData[m8006Key].erabRelQci1HoFail
+                else:
+                    ueLost, hoFail = ('NA', 'NA')
+                line.extend([ueLost, hoFail])
+                
+                msg1, msg2, msg3, msg5, rasrMsg2, rasrMsg3, rrcSsr = ('NA', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA')
+                avgUeRrc, maxUeRrc, avgUeAct, maxUeAct = ('NA', 'NA', 'NA', 'NA')
+                rssiPucch, sinrPucch, rssiPusch, sinrPusch = ('NA', 'NA', 'NA', 'NA')
+                if eciDst in self.lnbtsIdLncelIdMap:
+                    #msg1/2/3/5 count, target cell only
+                    m8001Key = self.lnbtsIdLncelIdMap[eciDst]
+                    m8013Key = self.lnbtsIdLncelIdMap[eciDst]
+                    if m8001Key in self.m8001AggData and m8013Key in self.m8013AggData:
+                        msg1 = self.m8001AggData[m8001Key].smallMsg1Att + self.m8001AggData[m8001Key].largeMsg1Att + self.m8001AggData[m8001Key].dedMsg1Att
+                        msg2 = self.m8001AggData[m8001Key].rachMsg2
+                        msg3 = self.m8013AggData[m8013Key].rrcMsg3Mos + self.m8013AggData[m8013Key].rrcMsg3Mt + self.m8013AggData[m8013Key].rrcMsg3Mod + self.m8013AggData[m8013Key].rrcMsg3Emg + self.m8013AggData[m8013Key].rrcMsg3HiPrio + self.m8013AggData[m8013Key].rrcMsg3DelTol
+                        msg5 = self.m8013AggData[m8013Key].rrcMsg5
+                        rasrMsg2 = round(100 * msg2 / msg1, 2) if msg1 > 0 else 'DIV0'
+                        rasrMsg3 = round(100 * msg3 / msg1, 2) if msg1 > 0 else 'DIV0'
+                        rrcSsr = round(100 * msg5 / msg3, 2) if msg3 > 0 else 'DIV0'
                     
+                    #rrc_connected/active ue count, target cell only
+                    m8051Key = self.lnbtsIdLncelIdMap[eciDst]
+                    if m8051Key in self.m8051AggData:
+                        avgUeRrc = self.m8051AggData[m8051Key].avgUeRrcConn
+                        maxUeRrc = self.m8051AggData[m8051Key].maxUeRrcConn
+                        avgUeAct = self.m8051AggData[m8051Key].avgUeAct
+                        maxUeAct = self.m8051AggData[m8051Key].maxUeAct
+                    
+                    #pucch/pusch rssi/sinr, target cell only
+                    m8005Key = self.lnbtsIdLncelIdMap[eciDst]
+                    if m8005Key in self.m8005AggData:
+                        rssiPucch = self.m8005AggData[m8005Key].avgRssiPucch
+                        sinrPucch = self.m8005AggData[m8005Key].avgSinrPucch
+                        rssiPusch = self.m8005AggData[m8005Key].avgRssiPusch
+                        sinrPusch = self.m8005AggData[m8005Key].avgSinrPusch
+                        
+                line.extend([msg1, msg2, msg3, msg5, rasrMsg2, rasrMsg3, rrcSsr])
+                line.extend([avgUeRrc, maxUeRrc, avgUeAct, maxUeAct])
+                line.extend([rssiPucch, sinrPucch, rssiPusch, sinrPusch])
+                
                 line = list(map(str, line))
                 f.write(','.join(line))
                 f.write('\n')

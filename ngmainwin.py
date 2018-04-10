@@ -77,6 +77,7 @@ class NgMainWin(QMainWindow):
             proc.makeEciMap()
             proc.procUserCase01()
             proc.procUserCase02()
+            self.logEdit.append('<font color=blue>Done!</font>')
         
     def onExecLteResGrid(self):
         dlg = NgLteGridUi(self)
