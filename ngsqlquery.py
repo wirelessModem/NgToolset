@@ -21,6 +21,7 @@ class NgSqlQuery(object):
     def __init__(self, ngwin, args):
         self.ngwin = ngwin
         self.args = args
+        self.subsMap = dict()
         self.dbStat = False
         self.queryStat = False
         self.initDb()
@@ -29,6 +30,9 @@ class NgSqlQuery(object):
         confDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config')
         try:
             with open(os.path.join(confDir, self.args['dbConf']), 'r') as f:
+                self.ngwin.logEdit.append('<font color=blue>Parsing DB configuration: %s</font>' % f.name)
+                qApp.processEvents()
+                
                 while True:
                     line = f.readline()
                     if not line:
@@ -97,30 +101,39 @@ class NgSqlQuery(object):
                 f.seek(0)
                 query = f.read()
                 if len(self.names) > 0:
-                    dlg = NgSqlSubUi(self.ngwin, self.names)
-                    if dlg.exec_() == QDialog.Accepted:
-                        self.answers = dlg.answers
-                        valid = True
-                        for an in self.answers:
-                            if len(an) == 0:
-                                valid = False
-                                break
-                        if not valid:
+                    #skip show NgSqlSubUi if self.names already exist in self.subsMap
+                    if self.checkSubMap():
+                        for name in self.names:
+                            self.answers.append(self.subsMap[name])
+                    else:
+                        dlg = NgSqlSubUi(self.ngwin, self.names)
+                        if dlg.exec_() == QDialog.Accepted:
+                            self.answers = dlg.answers
+                            valid = True
+                            for an in self.answers:
+                                if len(an) == 0:
+                                    valid = False
+                                    break
+                            if not valid:
+                                self.ngwin.logEdit.append('<font color=red>-->Query skipped!</font>')
+                                qApp.processEvents()
+                                continue
+                            
+                            #save for later use if possible
+                            if dlg.applyToAllChkBox.isChecked():
+                                for name,answer in zip(self.names, self.answers):
+                                        self.subsMap[name] = answer
+                        else:
                             self.ngwin.logEdit.append('<font color=red>-->Query skipped!</font>')
                             qApp.processEvents()
                             continue
-                        
-                        if self.ngwin.enableDebug:
-                            for name,answer in zip(self.names, self.answers):
-                                self.ngwin.logEdit.append('-->Subsitution: %s=%s' % (name, answer))
-                            qApp.processEvents()
-                            
-                        for index,name in enumerate(self.names):
-                            query = query.replace('&'+name, "'"+self.answers[index]+"'")
-                    else:
-                        self.ngwin.logEdit.append('<font color=red>-->Query skipped!</font>')
+                    
+                    for name, answer in zip(self.names, self.answers):
+                        self.ngwin.logEdit.append('-->Subsitution: [%s=%s]' % (name, answer))
                         qApp.processEvents()
-                        continue
+                        
+                    for index,name in enumerate(self.names):
+                        query = query.replace('&'+name, "'"+self.answers[index]+"'")
                 
                 try:
                     cursor.execute(query)
@@ -149,3 +162,12 @@ class NgSqlQuery(object):
         
         self.queryStat = True
         self.ngwin.logEdit.append('<font color=blue>Done!</font>')
+    
+    def checkSubMap(self):
+        ret = True
+        for name in self.names:
+            if not name in self.subsMap:
+                ret = False
+                break
+        
+        return ret
