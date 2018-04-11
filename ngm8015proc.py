@@ -192,6 +192,20 @@ class Lnhoif(object):
         _list = [self.coDn, self.ifEarfcn, self.ifA3Off, self.ifHysA3Off, self.ifA3RepInt, self.ifA3Ttt,
                  self.ifA5Th3, self.ifA5Th3a, self.ifHysA5Th3, self.ifA5RepInt, self.ifA5Ttt, self.ifMbw]
         return ','.join(_list)
+
+class Irfim(object):
+    def __init__(self):
+        self.coDn = None
+        self.ifEarfcn = None
+        self.ifResPrio = None
+        self.ifRxlevMin = None
+        self.ifThLow = None
+        self.ifThHigh = None
+        self.ifMbw = None
+        
+    def __str__(self):
+        _list = [self.coDn, self.ifEarfcn, self.ifResPrio, self.ifRxlevMin, self.ifThLow, self.ifThHigh, self.ifMbw]
+        return ','.join(_list)
     
 class Lnrel(object):
     def __init__(self):
@@ -257,7 +271,8 @@ class NgM8015Proc(object):
         self.lncelData = dict() #[key=lncel.lncel_id, val=Lncel]
         self.lnadjData = dict() #[key=lnadj.lnbts_id, val=Lnadj]
         self.lnadjlData = dict() #[key=lnadjl.lnbts_id, val=Lnadjl]
-        self.lnhoifData = dict() #[key=lnhoif.lncel_id, val=Lnhoif]
+        self.lnhoifData = dict() #[key=lnhoif.lncel_id+lnhoif.if_earfcn, val=Lnhoif]
+        self.irfimData = dict() #[key=irfim.lncel_id+irfim.if_earfcn, val=Irfim]
         self.lnrelData = dict() #[key='lnrel.lncel_id+lnrel.adj_enb_id+lnrel.adj_lcr_id', val=Lnrel]
         self.gridData = [] #optional data for atu grid, enbid+lcrid
         
@@ -268,6 +283,10 @@ class NgM8015Proc(object):
         
         self.m8015Earfcnxy = dict() #[key='earfcnx+earfcny', val=HoStat]
         self.m8015Ecixy = dict() #[key='ecix+eciy', val=HoStat]
+        
+        self.earfcnLnhoif = dict() #[key=enbid+lcrid, val=list of lnhoif earfcn]
+        self.earfcnIrfim = dict() #[key=enbid+lcrid, val=list of irfim earfcn]
+
         self.ngwin.logEdit.append('<font color=blue>M8015 analyzer initialized!</font>')
     
     def loadCsvData(self):
@@ -275,6 +294,7 @@ class NgM8015Proc(object):
         self.loadLnadj()
         self.loadLnadjl()
         self.loadLnhoif()
+        self.loadIrfim()
         self.loadLnrel()
         self.loadM8015()
         self.loadM8001()
@@ -392,7 +412,7 @@ class NgM8015Proc(object):
                 
                 t = Lnadj()
                 t.coDn = '/'.join(tokens[d['CO_DN']].split('/')[1:])
-                #t.adjEnbId = tokens[d['ADJ_ENB_ID']]
+                t.adjEnbId = tokens[d['ADJ_ENB_ID']]
                 t.adjEnbIp = tokens[d['ADJ_ENB_IP']]
                 t.x2Stat = tokens[d['X2_STAT']]
                 
@@ -448,7 +468,7 @@ class NgM8015Proc(object):
                 
                 t = Lnhoif()
                 t.coDn = '/'.join(tokens[d['CO_DN']].split('/')[1:])
-                #t.ifEarfcn = tokens[d['IF_EARFCN']]
+                t.ifEarfcn = tokens[d['IF_EARFCN']]
                 t.ifA3Off = tokens[d['IF_A3_OFF']]
                 t.ifHysA3Off = tokens[d['IF_HYS_A3_OFF']]
                 t.ifA3RepInt = tokens[d['IF_A3_REP_INT']]
@@ -461,6 +481,36 @@ class NgM8015Proc(object):
                 t.ifMbw = tokens[d['IF_MBW']]
                 
                 self.lnhoifData[tokens[d['LNCEL_ID']] + '_' + tokens[d['IF_EARFCN']]] = t
+    
+    def loadIrfim(self):
+        outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+        with open(os.path.join(outDir, 'neds_irfim.csv'), 'r') as f:
+            #print('Loading %s' % f.name)
+            self.ngwin.logEdit.append('Loading %s' % f.name)
+            qApp.processEvents()
+            
+            line = f.readline().strip()
+            tokens = line.split(',')
+            d = dict(zip(tokens, range(len(tokens))))
+            #print(d)
+            
+            while True:
+                line = f.readline().strip()
+                if not line:
+                    break
+                
+                tokens = line.split(',')
+                
+                t = Irfim()
+                t.coDn = '/'.join(tokens[d['CO_DN']].split('/')[1:])
+                t.ifEarfcn = tokens[d['IF_EARFCN']]
+                t.ifResPrio = tokens[d['IF_RES_PRIO']]
+                t.ifRxlevMin = tokens[d['IF_RXLEV_MIN']]
+                t.ifThLow = tokens[d['IF_TH_LOW']]
+                t.ifThHigh = tokens[d['IF_TH_HIGH']]
+                t.ifMbw = tokens[d['IF_MBW']]
+                
+                self.irfimData[tokens[d['LNCEL_ID']] + '_' + tokens[d['IF_EARFCN']]] = t
     
     def loadLnrel(self):
         outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
@@ -483,8 +533,8 @@ class NgM8015Proc(object):
                 
                 t = Lnrel()
                 t.coDn = '/'.join(tokens[d['CO_DN']].split('/')[1:])
-                #t.adjEnbId = tokens[d['ADJ_ENB_ID']]
-                #t.adjLcrId = tokens[d['ADJ_LCR_ID']]
+                t.adjEnbId = tokens[d['ADJ_ENB_ID']]
+                t.adjLcrId = tokens[d['ADJ_LCR_ID']]
                 t.cio = tokens[d['CIO']]
                 t.hoAllowed = tokens[d['HO_ALLOWED']]
                 t.nrStat = tokens[d['NR_STAT']]
@@ -1194,7 +1244,7 @@ class NgM8015Proc(object):
                 f.write('\n')
                 
     def procUserCase03(self):
-        self.ngwin.logEdit.append('<font color=blue>Performing analysis for user case #0l: clean LNADJ/LNREL</font>')
+        self.ngwin.logEdit.append('<font color=blue>Performing analysis for user case #03: clean LNADJ/LNREL</font>')
         qApp.processEvents()
         
         #user case#3: clean lnadj/lnrel
@@ -1230,6 +1280,101 @@ class NgM8015Proc(object):
                         #redundant NR?
                         pass
             
+    def procUserCase04(self):
+        self.ngwin.logEdit.append('<font color=blue>Performing analysis for user case #04: lnhoif/irfim configuration analysis</font>')
+        qApp.processEvents()
+        
+        earfcnSet = ['37900', '38098', '38400', '38544', '38950', '39148']
+        
+        #check LNHOIF
+        for key in self.lnhoifData.keys():
+            tokens = key.split('_')
+            lncelId = tokens[0]
+            earfcn = tokens[1]
+            
+            if earfcn == 'None':
+                continue
+            
+            if lncelId in self.lncelData:
+                dn = self.lncelData[lncelId].enbId + '_' + self.lncelData[lncelId].lcrId
+                if not dn in self.earfcnLnhoif:
+                    self.earfcnLnhoif[dn] = [earfcn]
+                else:
+                    self.earfcnLnhoif[dn].append(earfcn)
+        
+        #check IRFIM
+        invalidIrfim = ['ENBID,LCRID,EARFCN,IRFIM_DN,IF_EARFCN,IF_RES_PRIO,IF_RXLEV_MIN,IF_TH_LOW,IF_TH_HIGH,IF_MBW']
+        for key in self.irfimData.keys():
+            tokens = key.split('_')
+            lncelId = tokens[0]
+            earfcn = tokens[1]
+            
+            if earfcn == 'None':
+                continue
+            
+            if lncelId in self.lncelData:
+                if earfcn == self.lncelData[lncelId].earfcn:
+                    #invalid IRFIM founded
+                    invalidIrfim.append(','.join([self.lncelData[lncelId].enbId, self.lncelData[lncelId].lcrId, self.lncelData[lncelId].earfcn, str(self.irfimData[key])]))
+                    continue
+                    
+                dn = self.lncelData[lncelId].enbId + '_' + self.lncelData[lncelId].lcrId
+                if not dn in self.earfcnIrfim:
+                    self.earfcnIrfim[dn] = [earfcn]
+                else:
+                    self.earfcnIrfim[dn].append(earfcn)
+                    
+        outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+        with open(os.path.join(outDir, 'lnhoif_irfim_check_%s.csv' % time.strftime('%Y%m%d_%H%M%S', time.localtime())), 'w') as f:
+            self.ngwin.logEdit.append('-->Exporting results to: %s' % f.name)
+            qApp.processEvents()
+            
+            header = ['ENBID', 'LCRID', 'EARFCN', 'LNHOIF_EARFCN', 'MISSED_LNHOIF_EARFCN', 'IRFIM_EARFCN', 'MISSED_IRFIM_EARFCN']
+            f.write(','.join(header))
+            f.write('\n')
+            
+            for key,val in self.lncelData.items():
+                dn = val.enbId + '_' + val.lcrId
+                if not dn in self.earfcnLnhoif and not dn in self.earfcnLnhoif:
+                    continue
+                
+                line = [val.enbId, val.lcrId, val.earfcn]
+                
+                if dn in self.earfcnLnhoif:
+                    configued = '/'.join(self.earfcnLnhoif[dn])
+                    missed = '/'.join([f for f in earfcnSet if not f in self.earfcnLnhoif[dn] and f != val.earfcn])
+                    #special handling for band 38/41
+                    if val.earfcn == '40540':
+                        missed.remove('37900')
+                    elif val.earfcn == '40738':
+                        missed.remove('38098')
+                    line.extend([configued, missed])
+                else:
+                    line.extend(['NA', 'NA'])
+                
+                if dn in self.earfcnIrfim:
+                    configued = '/'.join(self.earfcnIrfim[dn])
+                    missed = '/'.join([f for f in earfcnSet if not f in self.earfcnIrfim[dn] and f != val.earfcn])
+                    #special handling for band 38/41
+                    if val.earfcn == '40540':
+                        missed.remove('37900')
+                    elif val.earfcn == '40738':
+                        missed.remove('38098')
+                    line.extend([configued, missed])
+                else:
+                    line.extend(['NA', 'NA'])
+                
+                f.write(','.join(line))
+                f.write('\n')
+        
+        if len(invalidIrfim) > 1:
+            with open(os.path.join(outDir, 'irfim_problem_%s.csv' % time.strftime('%Y%m%d_%H%M%S', time.localtime())), 'w') as f:
+                self.ngwin.logEdit.append('-->Exporting results to: %s' % f.name)
+                qApp.processEvents()
+                for val in invalidIrfim:
+                    f.write(val)
+                    f.write('\n')
+                
     def checkM8015(self, key):
         if not key in self.m8015AggData:
             return False

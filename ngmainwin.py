@@ -66,7 +66,7 @@ class NgMainWin(QMainWindow):
     def onExecNedsM8015(self):
         args = dict()
         args['dbConf'] = 'dbconfig.txt'
-        args['sqlQuery'] = ['neds_lnadj.sql', 'neds_lnadjl.sql', 'neds_lncel.sql', 'neds_lnhoif.sql', 'neds_lnrel.sql',
+        args['sqlQuery'] = ['neds_lnadj.sql', 'neds_lnadjl.sql', 'neds_lncel.sql', 'neds_lnhoif.sql', 'neds_lnrel.sql', 'neds_irfim.sql',
                             'neds_m8015.sql', 'neds_m8051.sql', 'neds_m8005.sql', 'neds_m8001.sql', 'neds_m8013.sql', 'neds_m8006.sql',]
     
         query = NgSqlQuery(self, args)
@@ -78,6 +78,7 @@ class NgMainWin(QMainWindow):
             proc.makeEciMap()
             proc.procUserCase01()
             proc.procUserCase02()
+            proc.procUserCase04()
             self.logEdit.append('<font color=blue>Done!</font>')
         
     def onExecLteResGrid(self):
