@@ -63,7 +63,7 @@ class NgSqlQuery(object):
         
         dsn = cx_Oracle.makedsn(self.dbHost, self.dbPort, service_name=self.dbService)
         
-        self.ngwin.logEdit.append('<font color=blue>Connecting to Oracle DB</font>(DSN=%s)' % dsn)
+        self.ngwin.logEdit.append('<font color=blue>Connecting to Oracle DB</font>\n-->DSN = %s' % dsn)
         qApp.processEvents()
         try:
             db = cx_Oracle.connect(self.dbUserName, self.dbUserPwd, dsn)

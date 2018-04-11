@@ -259,6 +259,7 @@ class NgM8015Proc(object):
         self.lnadjlData = dict() #[key=lnadjl.lnbts_id, val=Lnadjl]
         self.lnhoifData = dict() #[key=lnhoif.lncel_id, val=Lnhoif]
         self.lnrelData = dict() #[key='lnrel.lncel_id+lnrel.adj_enb_id+lnrel.adj_lcr_id', val=Lnrel]
+        self.gridData = [] #optional data for atu grid, enbid+lcrid
         
         self.lnbtsIdLncelIdMap = dict() #[key=ECI, val=lnbts_id+lncel_id]
         self.earfcnMap = dict() #[key=eci, val=earfcn]
@@ -281,6 +282,7 @@ class NgM8015Proc(object):
         self.loadM8006()
         self.loadM8013()
         self.loadM8051()
+        self.loadOpt()
     
     def print_(self):
         for key,val in self.lncelData.items():
@@ -295,6 +297,32 @@ class NgM8015Proc(object):
             print('key=%s,val=%s' % (key, val))
         for key,val in self.m8015Data.items():
             print('key=%s,val=%s' % (key, val))
+    
+    def loadOpt(self):
+        try:
+            outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+            with open(os.path.join(outDir, 'grid.csv'), 'r') as f:
+                #print('Loading %s' % f.name)
+                self.ngwin.logEdit.append('Loading %s' % f.name)
+                qApp.processEvents()
+                
+                line = f.readline().strip()
+                tokens = line.split(',')
+                d = dict(zip(tokens, range(len(tokens))))
+                
+                while True:
+                    line = f.readline().strip()
+                    if not line:
+                        break
+                    
+                    tokens = line.split(',')
+                    dn = tokens[d['ENBID']] + '_' + tokens[d['LCRID']]
+                    if not dn in self.gridData:
+                        self.gridData.append(dn)
+                    else:
+                        self.ngwin.logEdit.append('-->Duplicate cell found: %s' % dn)
+        except Exception as e:
+            return
         
     def loadLncel(self):
         outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
@@ -1000,6 +1028,7 @@ class NgM8015Proc(object):
             header.extend(['DST_NUM_MSG1', 'DST_NUM_MSG2', 'DST_RRC_MSG3', 'DST_RRC_MSG5', 'DST_RASR_MSG2', 'DST_RASR_MSG3', 'DST_RRC_SSR'])
             header.extend(['DST_AVG_UE_RRC_CONN', 'DST_MAX_UE_RRC_CONN', 'DST_AVG_UE_ACT', 'DST_MAX_UE_ACT'])
             header.extend(['DST_RSSI_PUCCH', 'DST_SINR_PUCCH', 'DST_RSSI_PUSCH', 'DST_SINR_PUSCH'])
+            header.extend(['IS_GRID'])
             f.write(','.join(header))
             f.write('\n')
             
@@ -1145,6 +1174,20 @@ class NgM8015Proc(object):
                 line.extend([msg1, msg2, msg3, msg5, rasrMsg2, rasrMsg3, rrcSsr])
                 line.extend([avgUeRrc, maxUeRrc, avgUeAct, maxUeAct])
                 line.extend([rssiPucch, sinrPucch, rssiPusch, sinrPusch])
+                
+                #for ATU grid info
+                gridSrcKey = str(enbIdSrc) + '_' + str(lcrIdSrc)
+                gridDstKey = str(enbIdDst) + '_' + str(lcrIdDst)
+                if gridSrcKey in self.gridData:
+                    isGrid = 'YES'
+                else:
+                    isGrid = 'NO'
+                isGrid = isGrid + '_'
+                if gridDstKey in self.gridData:
+                    isGrid = isGrid + 'YES'
+                else:
+                    isGrid = isGrid + 'NO'
+                line.extend([isGrid])
                 
                 line = list(map(str, line))
                 f.write(','.join(line))

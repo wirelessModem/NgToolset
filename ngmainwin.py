@@ -88,7 +88,8 @@ class NgMainWin(QMainWindow):
         dlg.exec_()
     
     def onExecNrResGrid(self):
-        pass
+        QMessageBox.information(self, 'NR Resource Grid', '<p><font color=red><b>Oops, NR resource grid is still under development!</b></font></p>'
+                                + '<p>Please visit: <a href="http://www.3gpp.org/ftp/Specs/2018-03/Rel-15/38_series/"> http://www.3gpp.org/ftp/Specs/2018-03/Rel-15/38_series/</a> for latest 5G NSA specifications.</p>')
         
     def createActions(self):
         #File Menu
