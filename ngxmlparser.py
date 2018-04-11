@@ -15,6 +15,7 @@ import xml.etree.ElementTree as ET
 import os
 import time
 import ngmainwin
+from PyQt5.QtWidgets import qApp
 
 
 class NgXmlParser(object):
@@ -28,6 +29,9 @@ class NgXmlParser(object):
         self.data = OrderedDict()
     
     def start(self):
+        self.ngwin.logEdit.append('Default XML directory: %s' % self.inDir)
+        qApp.processEvents()
+        
         ts = time.strftime('%Y%m%d%H%M%S', time.localtime()) 
         for root, dirs, files in os.walk(self.inDir):
             self.xmls = sorted([os.path.join(root, fn) for fn in files if fn.endswith('xml')], key=str.lower) 

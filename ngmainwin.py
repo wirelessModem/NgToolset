@@ -20,6 +20,7 @@ from ngnbiotgridui import NgNbiotGridUi
 from ngxmlparser import NgXmlParser
 from ngsqlquery import NgSqlQuery
 from ngm8015proc import NgM8015Proc
+import os
 
 class NgMainWin(QMainWindow):
     def __init__(self):
@@ -58,7 +59,7 @@ class NgMainWin(QMainWindow):
             self.logEdit.append('Found SQL driver: %s' % e)
     
     def onExecXmlParser(self):
-        indir = '/home/zhenggao/py35/ngtoolset'
+        indir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
         parser = NgXmlParser(self, indir) 
         parser.start()
     
@@ -109,7 +110,7 @@ class NgMainWin(QMainWindow):
         #Misc menu
         self.chkSqlAction = QAction('Check SQL Plugin')
         self.chkSqlAction.triggered.connect(self.onChkSqlPlugin)
-        self.xmlParserAction = QAction('XML Parser')
+        self.xmlParserAction = QAction('SCF/Vendor Parser')
         self.xmlParserAction.triggered.connect(self.onExecXmlParser)
         self.sqlQueryAction = QAction('NEDS (M8015 Analyzer)')
         self.sqlQueryAction.triggered.connect(self.onExecNedsM8015)
