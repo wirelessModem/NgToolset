@@ -1342,24 +1342,30 @@ class NgM8015Proc(object):
                 
                 if dn in self.earfcnLnhoif:
                     configued = '/'.join(self.earfcnLnhoif[dn])
-                    missed = '/'.join([f for f in earfcnSet if not f in self.earfcnLnhoif[dn] and f != val.earfcn])
+                    #missed = '/'.join([f for f in earfcnSet if not f in self.earfcnLnhoif[dn] and f != val.earfcn])
+                    missed = [f for f in earfcnSet if not f in self.earfcnLnhoif[dn] and f != val.earfcn]
                     #special handling for band 38/41
                     if val.earfcn == '40540':
                         missed.remove('37900')
                     elif val.earfcn == '40738':
                         missed.remove('38098')
+                    missed = '/'.join(missed)
+                    
                     line.extend([configued, missed])
                 else:
                     line.extend(['NA', 'NA'])
                 
                 if dn in self.earfcnIrfim:
                     configued = '/'.join(self.earfcnIrfim[dn])
-                    missed = '/'.join([f for f in earfcnSet if not f in self.earfcnIrfim[dn] and f != val.earfcn])
+                    #missed = '/'.join([f for f in earfcnSet if not f in self.earfcnIrfim[dn] and f != val.earfcn])
+                    missed = [f for f in earfcnSet if not f in self.earfcnIrfim[dn] and f != val.earfcn]
                     #special handling for band 38/41
                     if val.earfcn == '40540':
                         missed.remove('37900')
                     elif val.earfcn == '40738':
                         missed.remove('38098')
+                    missed = '/'.join(missed)
+                    
                     line.extend([configued, missed])
                 else:
                     line.extend(['NA', 'NA'])
