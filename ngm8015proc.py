@@ -84,10 +84,14 @@ class M8006(object):
     def __init__(self):
         self.erabSetupAtt = 0
         self.erabSetupSucc = 0
-        self.erabSetupFailRrna = 0
-        self.erabSetupFailTru = 0
-        self.erabSetupFailUel = 0
-        self.erabSetupFailRip = 0
+        self.erabSetupFailRrnaIni = 0
+        self.erabSetupFailRrnaAdd = 0
+        self.erabSetupFailTruIni = 0
+        self.erabSetupFailTruAdd = 0
+        self.erabSetupFailUelIni = 0
+        self.erabSetupFailUelAdd = 0
+        self.erabSetupFailRipIni = 0
+        self.erabSetupFailRipAdd = 0
         self.erabSetupFailUp = 0
         self.erabSetupFailMob = 0
         self.erabRelQci1Tot = 0
@@ -102,8 +106,8 @@ class M8006(object):
         self.erabRelQci1TnlUnsp = 0
         
     def __str__(self):
-        _list = [self.erabSetupAtt, self.erabSetupSucc, self.erabSetupFailRrna, self.erabSetupFailTru, self.erabSetupFailUel, self.erabSetupFailRip,
-                 self.erabSetupFailUp, self.erabSetupFailMob,
+        _list = [self.erabSetupAtt, self.erabSetupSucc, self.erabSetupFailRrnaIni, self.erabSetupFailRrnaAdd, self.erabSetupFailTruIni, self.erabSetupFailTruAdd,
+                 self.erabSetupFailUelIni, self.erabSetupFailUelAdd, self.erabSetupFailRipIni, self.erabSetupFailRipAdd, self.erabSetupFailUp, self.erabSetupFailMob,
                  self.erabRelQci1Tot, self.erabRelQci1Ina, self.erabRelQci1UeLost, self.erabRelQci1Tru, self.erabRelQci1Red,
                  self.erabRelQci1Eugr, self.erabRelQci1Rrna, self.erabRelQci1HoFail, self.erabRelQci1EpcPs, self.erabRelQci1TnlUnsp]
         _list = list(map(str, _list))
@@ -670,7 +674,7 @@ class NgM8015Proc(object):
 
                 t = M8007()
                 t.drbSetupAtt= tokens[d['DATA_RB_STP_ATT']]
-                t.drbSetupSucc= tokens[d['DATA_RB_STP_SUCC']]
+                t.drbSetupSucc= tokens[d['DATA_RB_STP_COMP']]
                 t.drbSetupFailTimer= tokens[d['DATA_RB_STP_FAIL']]
 
                 key = tokens[d['LNBTS_ID']] + '_' + tokens[d['LNCEL_ID']]
@@ -738,10 +742,14 @@ class NgM8015Proc(object):
                 t = M8006()
                 t.erabSetupAtt = tokens[d['EPS_BEARER_SETUP_ATTEMPTS']]
                 t.erabSetupSucc = tokens[d['EPS_BEARER_SETUP_COMPLETIONS']]
-                t.erabSetupFailRrna = tokens[d['ERAB_INI_SETUP_FAIL_RNL_RRNA']] + tokens[d['ERAB_ADD_SETUP_FAIL_RNL_RRNA']]
-                t.erabSetupFailTru = tokens[d['ERAB_INI_SETUP_FAIL_TNL_TRU']] + tokens[d['ERAB_ADD_SETUP_FAIL_TNL_TRU']]
-                t.erabSetupFailUel = tokens[d['ERAB_INI_SETUP_FAIL_RNL_UEL']] + tokens[d['ERAB_ADD_SETUP_FAIL_RNL_UEL']]
-                t.erabSetupFailRip = tokens[d['ERAB_INI_SETUP_FAIL_RNL_RIP']] + tokens[d['ERAB_ADD_SETUP_FAIL_RNL_RIP']]
+                t.erabSetupFailRrnaIni = tokens[d['ERAB_INI_SETUP_FAIL_RNL_RRNA']]
+                t.erabSetupFailRrnaAdd = tokens[d['ERAB_ADD_SETUP_FAIL_RNL_RRNA']]
+                t.erabSetupFailTruIni = tokens[d['ERAB_INI_SETUP_FAIL_TNL_TRU']]
+                t.erabSetupFailTruAdd = tokens[d['ERAB_ADD_SETUP_FAIL_TNL_TRU']]
+                t.erabSetupFailUelIni = tokens[d['ERAB_INI_SETUP_FAIL_RNL_UEL']]
+                t.erabSetupFailUelAdd = tokens[d['ERAB_ADD_SETUP_FAIL_RNL_UEL']]
+                t.erabSetupFailRipIni = tokens[d['ERAB_INI_SETUP_FAIL_RNL_RIP']]
+                t.erabSetupFailRipAdd = tokens[d['ERAB_ADD_SETUP_FAIL_RNL_RIP']]
                 t.erabSetupFailUp = tokens[d['ERAB_ADD_SETUP_FAIL_UP']]
                 t.erabSetupFailMob = tokens[d['ERAB_ADD_SETUP_FAIL_RNL_MOB']]
                 t.erabRelQci1Tot = tokens[d['ERAB_REL_ENB_QCI1']]
@@ -924,10 +932,14 @@ class NgM8015Proc(object):
                 try:
                     t.erabSetupAtt = t.erabSetupAtt + int(rec.erabSetupAtt)
                     t.erabSetupSucc = t.erabSetupSucc + int(rec.erabSetupSucc)
-                    t.erabSetupFailRrna = t.erabSetupFailRrna + int(rec.erabSetupFailRrna)
-                    t.erabSetupFailTru = t.erabSetupFailTru + int(rec.erabSetupFailTru)
-                    t.erabSetupFailUel = t.erabSetupFailUel + int(rec.erabSetupFailUel)
-                    t.erabSetupFailRip = t.erabSetupFailRip + int(rec.erabSetupFailRip)
+                    t.erabSetupFailRrnaIni = t.erabSetupFailRrnaIni + int(rec.erabSetupFailRrnaIni)
+                    t.erabSetupFailRrnaAdd = t.erabSetupFailRrnaAdd + int(rec.erabSetupFailRrnaAdd)
+                    t.erabSetupFailTruIni = t.erabSetupFailTruIni + int(rec.erabSetupFailTruIni)
+                    t.erabSetupFailTruAdd = t.erabSetupFailTruAdd + int(rec.erabSetupFailTruAdd)
+                    t.erabSetupFailUelIni = t.erabSetupFailUelIni + int(rec.erabSetupFailUelIni)
+                    t.erabSetupFailUelAdd = t.erabSetupFailUelAdd + int(rec.erabSetupFailUelAdd)
+                    t.erabSetupFailRipIni = t.erabSetupFailRipIni + int(rec.erabSetupFailRipIni)
+                    t.erabSetupFailRipAdd = t.erabSetupFailRipAdd + int(rec.erabSetupFailRipAdd)
                     t.erabSetupFailUp = t.erabSetupFailUp + int(rec.erabSetupFailUp)
                     t.erabSetupFailMob = t.erabSetupFailMob + int(rec.erabSetupFailMob)
                     t.erabRelQci1Tot = t.erabRelQci1Tot + int(rec.erabRelQci1Tot)
@@ -1309,20 +1321,20 @@ class NgM8015Proc(object):
                     #drb/erab setup count, target cell only
                     m8006Key = self.lnbtsIdLncelIdMap[eciDst]
                     m8007Key = self.lnbtsIdLncelIdMap[eciDst]
-                    if m8006Key in self.m8006AggData and m8007Key in self.m8006AggData:
+                    if m8006Key in self.m8006AggData and m8007Key in self.m8007AggData:
                         drbAtt = self.m8007AggData[m8007Key].drbSetupAtt
                         drbSucc = self.m8007AggData[m8007Key].drbSetupSucc
                         drbFailTim = self.m8007AggData[m8007Key].drbSetupFailTimer
                         drbFailOth = drbAtt - drbSucc - drbFailTim
                         erabAtt = self.m8006AggData[m8006Key].erabSetupAtt
                         erabSucc = self.m8006AggData[m8006Key].erabSetupSucc
-                        erabFailRrna = self.m8006AggData[m8006Key].erabSetupFailRrna
-                        erabFailTru = self.m8006AggData[m8006Key].erabSetupFailTru
-                        erabFailUel = self.m8006AggData[m8006Key].erabSetupFailUel
-                        erabFailRip = self.m8006AggData[m8006Key].erabSetupFailRip
+                        erabFailRrna = self.m8006AggData[m8006Key].erabSetupFailRrnaIni + self.m8006AggData[m8006Key].erabSetupFailRrnaAdd
+                        erabFailTru = self.m8006AggData[m8006Key].erabSetupFailTruIni + self.m8006AggData[m8006Key].erabSetupFailTruAdd
+                        erabFailUel = self.m8006AggData[m8006Key].erabSetupFailUelIni + self.m8006AggData[m8006Key].erabSetupFailUelAdd
+                        erabFailRip = self.m8006AggData[m8006Key].erabSetupFailRipIni + self.m8006AggData[m8006Key].erabSetupFailRipAdd
                         erabFailUp = self.m8006AggData[m8006Key].erabSetupFailUp
                         erabFailMob = self.m8006AggData[m8006Key].erabSetupFailMob
-                        erabFailOth = self.m8006AggData[m8006Key].erabSetupFailOth
+                        erabFailOth = erabAtt - erabSucc - erabFailRrna - erabFailTru - erabFailUel - erabFailRip - erabFailUp - erabFailMob
 
                     #rrc_connected/active ue count, target cell only
                     m8051Key = self.lnbtsIdLncelIdMap[eciDst]
@@ -1341,6 +1353,8 @@ class NgM8015Proc(object):
                         sinrPusch = self.m8005AggData[m8005Key].avgSinrPusch
                         
                 line.extend([msg1, msg2, msg3, msg5, rasrMsg2, rasrMsg3, rrcSsr])
+                line.extend([drbAtt, drbSucc, drbFailTim, drbFailOth])
+                line.extend([erabAtt, erabSucc, erabFailRrna, erabFailTru, erabFailUel, erabFailRip, erabFailUp, erabFailMob, erabFailOth])
                 line.extend([avgUeRrc, maxUeRrc, avgUeAct, maxUeAct])
                 line.extend([rssiPucch, sinrPucch, rssiPusch, sinrPusch])
                 
