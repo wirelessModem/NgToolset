@@ -5,3 +5,11 @@ __pycache__
 *.html
 *.jpg
 *.eml
+venv
+resource
+output
+build
+dist
+*.pyprof
+*.supp
+*.spec

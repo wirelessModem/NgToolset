@@ -56,6 +56,18 @@ class M8001(object):
         _list = list(map(str, _list))
         return ','.join(_list)
 
+
+class M8007(object):
+    def __init__(self):
+        self.drbSetupAtt = 0
+        self.drbSetupSucc = 0
+        self.drbSetupFailTimer = 0
+
+    def __str__(self):
+        _list = [self.drbSetupAtt, self.drbSetupSucc, self.drbSetupFailTimer]
+        _list = list(map(str, _list))
+        return ','.join(_list)
+
 class M8005(object):
     def __init__(self):
         self.avgRssiPucch = 0
@@ -70,6 +82,14 @@ class M8005(object):
 
 class M8006(object):
     def __init__(self):
+        self.erabSetupAtt = 0
+        self.erabSetupSucc = 0
+        self.erabSetupFailRrna = 0
+        self.erabSetupFailTru = 0
+        self.erabSetupFailUel = 0
+        self.erabSetupFailRip = 0
+        self.erabSetupFailUp = 0
+        self.erabSetupFailMob = 0
         self.erabRelQci1Tot = 0
         self.erabRelQci1Ina = 0
         self.erabRelQci1UeLost = 0
@@ -82,7 +102,9 @@ class M8006(object):
         self.erabRelQci1TnlUnsp = 0
         
     def __str__(self):
-        _list = [self.erabRelQci1Tot, self.erabRelQci1Ina, self.erabRelQci1UeLost, self.erabRelQci1Tru, self.erabRelQci1Red,
+        _list = [self.erabSetupAtt, self.erabSetupSucc, self.erabSetupFailRrna, self.erabSetupFailTru, self.erabSetupFailUel, self.erabSetupFailRip,
+                 self.erabSetupFailUp, self.erabSetupFailMob,
+                 self.erabRelQci1Tot, self.erabRelQci1Ina, self.erabRelQci1UeLost, self.erabRelQci1Tru, self.erabRelQci1Red,
                  self.erabRelQci1Eugr, self.erabRelQci1Rrna, self.erabRelQci1HoFail, self.erabRelQci1EpcPs, self.erabRelQci1TnlUnsp]
         _list = list(map(str, _list))
         return ','.join(_list)
@@ -255,7 +277,10 @@ class NgM8015Proc(object):
         
         self.m8001Data= dict() #[key='m8001.lnbts_id+m8001.lncel_id', val=list of M8001]
         self.m8001AggData= dict() #[key='m8001.lnbts_id+m8001.lncel_id', val=aggregated M8001]
-        
+
+        self.m8007Data= dict() #[key='m8007.lnbts_id+m8007.lncel_id', val=list of M8007]
+        self.m8007AggData= dict() #[key='m8007.lnbts_id+m8007.lncel_id', val=aggregated M8007]
+
         self.m8005Data= dict() #[key='m8005.lnbts_id+m8005.lncel_id', val=list of M8005]
         self.m8005AggData= dict() #[key='m8005.lnbts_id+m8005.lncel_id', val=aggregated M8005]
         
@@ -300,6 +325,7 @@ class NgM8015Proc(object):
         self.loadM8001()
         self.loadM8005()
         self.loadM8006()
+        self.loadM8007()
         self.loadM8013()
         self.loadM8051()
         self.loadOpt()
@@ -622,7 +648,40 @@ class NgM8015Proc(object):
                     self.m8001Data[key].append(t)
         
         self.aggM8001()
-    
+
+    def loadM8007(self):
+        outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+        with open(os.path.join(outDir, 'neds_m8007.csv'), 'r') as f:
+            # print('Loading %s' % f.name)
+            self.ngwin.logEdit.append('Loading %s' % f.name)
+            qApp.processEvents()
+
+            line = f.readline().strip()
+            tokens = line.split(',')
+            d = dict(zip(tokens, range(len(tokens))))
+            # print(d)
+
+            while True:
+                line = f.readline().strip()
+                if not line:
+                    break
+
+                tokens = line.split(',')
+
+                t = M8007()
+                t.drbSetupAtt= tokens[d['DATA_RB_STP_ATT']]
+                t.drbSetupSucc= tokens[d['DATA_RB_STP_SUCC']]
+                t.drbSetupFailTimer= tokens[d['DATA_RB_STP_FAIL']]
+
+                key = tokens[d['LNBTS_ID']] + '_' + tokens[d['LNCEL_ID']]
+
+                if not key in self.m8007Data:
+                    self.m8007Data[key] = [t]
+                else:
+                    self.m8007Data[key].append(t)
+
+        self.aggM8007()
+
     def loadM8005(self):
         outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
         with open(os.path.join(outDir, 'neds_m8005.csv'), 'r') as f:
@@ -677,6 +736,14 @@ class NgM8015Proc(object):
                 tokens = line.split(',')
                 
                 t = M8006()
+                t.erabSetupAtt = tokens[d['EPS_BEARER_SETUP_ATTEMPTS']]
+                t.erabSetupSucc = tokens[d['EPS_BEARER_SETUP_COMPLETIONS']]
+                t.erabSetupFailRrna = tokens[d['ERAB_INI_SETUP_FAIL_RNL_RRNA']] + tokens[d['ERAB_ADD_SETUP_FAIL_RNL_RRNA']]
+                t.erabSetupFailTru = tokens[d['ERAB_INI_SETUP_FAIL_TNL_TRU']] + tokens[d['ERAB_ADD_SETUP_FAIL_TNL_TRU']]
+                t.erabSetupFailUel = tokens[d['ERAB_INI_SETUP_FAIL_RNL_UEL']] + tokens[d['ERAB_ADD_SETUP_FAIL_RNL_UEL']]
+                t.erabSetupFailRip = tokens[d['ERAB_INI_SETUP_FAIL_RNL_RIP']] + tokens[d['ERAB_ADD_SETUP_FAIL_RNL_RIP']]
+                t.erabSetupFailUp = tokens[d['ERAB_ADD_SETUP_FAIL_UP']]
+                t.erabSetupFailMob = tokens[d['ERAB_ADD_SETUP_FAIL_RNL_MOB']]
                 t.erabRelQci1Tot = tokens[d['ERAB_REL_ENB_QCI1']]
                 t.erabRelQci1Ina = tokens[d['ERAB_REL_ENB_RNL_INA_QCI1']]
                 t.erabRelQci1UeLost = tokens[d['ERAB_REL_ENB_RNL_UEL_QCI1']]
@@ -790,6 +857,28 @@ class NgM8015Proc(object):
         for key,val in self.m8001AggData.items():
             print('key=%s,val=%s' % (key,val))
         '''
+
+    def aggM8007(self):
+        self.ngwin.logEdit.append('Aggregating M8007')
+        qApp.processEvents()
+
+        for key, val in self.m8007Data.items():
+            t = M8007()
+            for rec in val:
+                try:
+                    t.drbSetupAtt = t.drbSetupAtt + int(rec.drbSetupAtt)
+                    t.drbSetupSucc = t.drbSetupSucc + int(rec.drbSetupSucc)
+                    t.drbSetupFailTimer = t.drbSetupFailTimer + int(rec.drbsetupFailTimer)
+                except Exception as e:
+                    # ignore ValueError that may raised by int()
+                    continue
+
+            self.m8007AggData[key] = t
+
+        '''
+        for key,val in self.m8007AggData.items():
+            print('key=%s,val=%s' % (key,val))
+        '''
         
     def aggM8005(self):
         self.ngwin.logEdit.append('Aggregating M8005')
@@ -833,6 +922,14 @@ class NgM8015Proc(object):
             t = M8006()
             for rec in val:
                 try:
+                    t.erabSetupAtt = t.erabSetupAtt + int(rec.erabSetupAtt)
+                    t.erabSetupSucc = t.erabSetupSucc + int(rec.erabSetupSucc)
+                    t.erabSetupFailRrna = t.erabSetupFailRrna + int(rec.erabSetupFailRrna)
+                    t.erabSetupFailTru = t.erabSetupFailTru + int(rec.erabSetupFailTru)
+                    t.erabSetupFailUel = t.erabSetupFailUel + int(rec.erabSetupFailUel)
+                    t.erabSetupFailRip = t.erabSetupFailRip + int(rec.erabSetupFailRip)
+                    t.erabSetupFailUp = t.erabSetupFailUp + int(rec.erabSetupFailUp)
+                    t.erabSetupFailMob = t.erabSetupFailMob + int(rec.erabSetupFailMob)
                     t.erabRelQci1Tot = t.erabRelQci1Tot + int(rec.erabRelQci1Tot)
                     t.erabRelQci1Ina = t.erabRelQci1Ina + int(rec.erabRelQci1Ina)
                     t.erabRelQci1UeLost = t.erabRelQci1UeLost + int(rec.erabRelQci1UeLost)
@@ -1076,6 +1173,8 @@ class NgM8015Proc(object):
             header.extend(['DN_LNHOIF', 'IF_A3', 'IF_A5'])
             header.extend(['SRC_ERAB_REL_UEL_QCI1', 'SRC_ERAB_REL_HOFAIL_QCI1'])
             header.extend(['DST_NUM_MSG1', 'DST_NUM_MSG2', 'DST_RRC_MSG3', 'DST_RRC_MSG5', 'DST_RASR_MSG2', 'DST_RASR_MSG3', 'DST_RRC_SSR'])
+            header.extend(['DST_DRB_ATT', 'DST_DRB_SUCC', 'DST_DRB_FAIL_TIM', 'DST_DRB_FAIL_OTH', 'DST_ERAB_ATT', 'DST_ERAB_SUCC',
+                           'DST_ERAB_FAIL_RRNA', 'DST_ERAB_FAIL_TRU', 'DST_ERAB_FAIL_UEL', 'DST_ERAB_FAIL_RIP', 'DST_ERAB_FAIL_UP', 'DST_ERAB_FAIL_MOB', 'DST_ERAB_FAIL_OTH'])
             header.extend(['DST_AVG_UE_RRC_CONN', 'DST_MAX_UE_RRC_CONN', 'DST_AVG_UE_ACT', 'DST_MAX_UE_ACT'])
             header.extend(['DST_RSSI_PUCCH', 'DST_SINR_PUCCH', 'DST_RSSI_PUSCH', 'DST_SINR_PUSCH'])
             header.extend(['IS_GRID'])
@@ -1190,6 +1289,8 @@ class NgM8015Proc(object):
                 line.extend([ueLost, hoFail])
                 
                 msg1, msg2, msg3, msg5, rasrMsg2, rasrMsg3, rrcSsr = ('NA', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA')
+                drbAtt, drbSucc, drbFailTim, drbFailOth = ('NA', 'NA', 'NA', 'NA')
+                erabAtt, erabSucc, erabFailRrna, erabFailTru, erabFailUel, erabFailRip, erabFailUp, erabFailMob, erabFailOth = ('NA', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA')
                 avgUeRrc, maxUeRrc, avgUeAct, maxUeAct = ('NA', 'NA', 'NA', 'NA')
                 rssiPucch, sinrPucch, rssiPusch, sinrPusch = ('NA', 'NA', 'NA', 'NA')
                 if eciDst in self.lnbtsIdLncelIdMap:
@@ -1204,7 +1305,25 @@ class NgM8015Proc(object):
                         rasrMsg2 = round(100 * msg2 / msg1, 2) if msg1 > 0 else 'DIV0'
                         rasrMsg3 = round(100 * msg3 / msg1, 2) if msg1 > 0 else 'DIV0'
                         rrcSsr = round(100 * msg5 / msg3, 2) if msg3 > 0 else 'DIV0'
-                    
+
+                    #drb/erab setup count, target cell only
+                    m8006Key = self.lnbtsIdLncelIdMap[eciDst]
+                    m8007Key = self.lnbtsIdLncelIdMap[eciDst]
+                    if m8006Key in self.m8006AggData and m8007Key in self.m8006AggData:
+                        drbAtt = self.m8007AggData[m8007Key].drbSetupAtt
+                        drbSucc = self.m8007AggData[m8007Key].drbSetupSucc
+                        drbFailTim = self.m8007AggData[m8007Key].drbSetupFailTimer
+                        drbFailOth = drbAtt - drbSucc - drbFailTim
+                        erabAtt = self.m8006AggData[m8006Key].erabSetupAtt
+                        erabSucc = self.m8006AggData[m8006Key].erabSetupSucc
+                        erabFailRrna = self.m8006AggData[m8006Key].erabSetupFailRrna
+                        erabFailTru = self.m8006AggData[m8006Key].erabSetupFailTru
+                        erabFailUel = self.m8006AggData[m8006Key].erabSetupFailUel
+                        erabFailRip = self.m8006AggData[m8006Key].erabSetupFailRip
+                        erabFailUp = self.m8006AggData[m8006Key].erabSetupFailUp
+                        erabFailMob = self.m8006AggData[m8006Key].erabSetupFailMob
+                        erabFailOth = self.m8006AggData[m8006Key].erabSetupFailOth
+
                     #rrc_connected/active ue count, target cell only
                     m8051Key = self.lnbtsIdLncelIdMap[eciDst]
                     if m8051Key in self.m8051AggData:
