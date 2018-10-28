@@ -17,6 +17,7 @@ from PyQt5.QtSql import QSqlDatabase
 #-->import plugins
 from ngltegridui import NgLteGridUi
 from ngnbiotgridui import NgNbiotGridUi
+from ngnrgridui import NgNrGridUi
 from ngxmlparser import NgXmlParser
 from ngsqlquery import NgSqlQuery
 from ngm8015proc import NgM8015Proc
@@ -90,8 +91,10 @@ class NgMainWin(QMainWindow):
         dlg.exec_()
     
     def onExecNrResGrid(self):
-        QMessageBox.information(self, 'NR Resource Grid', '<p><font color=red><b>Oops, NR resource grid is still under development!</b></font></p>'
-                                + '<p>Please visit: <a href="http://www.3gpp.org/ftp/Specs/2018-03/Rel-15/38_series/"> http://www.3gpp.org/ftp/Specs/2018-03/Rel-15/38_series/</a> for latest 5G NSA specifications.</p>')
+        #QMessageBox.information(self, 'NR Resource Grid', '<p><font color=red><b>Oops, NR resource grid is still under development!</b></font></p>'
+        #                        + '<p>Please visit: <a href="http://www.3gpp.org/ftp/Specs/2018-03/Rel-15/38_series/"> http://www.3gpp.org/ftp/Specs/2018-03/Rel-15/38_series/</a> for latest 5G NSA specifications.</p>')
+        dlg = NgNrGridUi(self)
+        dlg.exec_()
         
     def createActions(self):
         #File Menu
