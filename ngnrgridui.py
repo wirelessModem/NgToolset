@@ -107,6 +107,8 @@ class NgNrGridUi(QDialog):
 
     def onCarrierBandCombCurrentIndexChanged(self, index):
         #self.ngwin.logEdit.append('inside onCarrierBandCombCurrentIndexChanged, index=%d' % index)
+        if index < 0:
+            return
 
         #update band info
         _ulBand, _dlBand, _mode = self.nrOpBands[self.nrCarrierBandComb.currentText()]
