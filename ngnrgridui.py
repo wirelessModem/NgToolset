@@ -10,8 +10,9 @@ Change History:
     2018-10-28  v0.1    created.    github/zhenggao2
 '''
 
+import time
 from collections import OrderedDict
-from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QComboBox, QPushButton, QGroupBox, QTabWidget
+from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QComboBox, QPushButton, QGroupBox, QTabWidget, QWidget
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QGridLayout
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
@@ -25,6 +26,12 @@ class NgNrGridUi(QDialog):
 
     def initUi(self):
         #TODO
+
+        #-->Resource Grid Config Widget
+        resGridCfgWidget = QWidget()
+        resGridCfgLayout = QVBoxLayout()
+
+        #---->Part I: Carrier Grid Configurations
         #refer to 3GPP 38.104 vf30
         #Table 5.2-1: NR operating bands in FR1
         #Table 5.2-2: NR operating bands in FR2
@@ -55,9 +62,9 @@ class NgNrGridUi(QDialog):
             ('n77', ('3300 MHz-4200 MHz', '3300 MHz-4200 MHz', 'TDD')),
             ('n78', ('3300 MHz-3800 MHz', '3300 MHz-3800 MHz', 'TDD')),
             ('n79', ('4400 MHz-5000 MHz', '4400 MHz-5000 MHz', 'TDD')),
-            ('n80', ('1710 MHz-1785 MHz', 'N/A', 'SUL ')),
-            ('n81', ('880 MHz-915 MHz', 'N/A', 'SUL ')),
-            ('n82', ('832 MHz-862 MHz', 'N/A', 'SUL ')),
+            ('n80', ('1710 MHz-1785 MHz', 'N/A', 'SUL')),
+            ('n81', ('880 MHz-915 MHz', 'N/A', 'SUL')),
+            ('n82', ('832 MHz-862 MHz', 'N/A', 'SUL')),
             ('n83', ('703 MHz-748 MHz', 'N/A', 'SUL')),
             ('n84', ('1920 MHz-1980 MHz', 'N/A', 'SUL')),
             ('n86', ('1710 MHz-1780 MHz', 'N/A', 'SUL')),
@@ -79,28 +86,135 @@ class NgNrGridUi(QDialog):
         self.nrCarrierBwLabel = QLabel('Transmission bandwidth:')
         self.nrCarrierBwComb = QComboBox()
 
-        self.nrCarrierNumRbLabel = QLabel('N_RB:')
+        self.nrCarrierNumRbLabel = QLabel('<font color=blue>carrierBandwidth</font>(N_RB):')
         self.nrCarrierNumRbEdit = QLineEdit()
         #self.nrCarrierNumRbEdit.setFocusPolicy(Qt.NoFocus)
 
+        self.nrMinGuardBandLabel = QLabel('<font color=blue>offsetToCarrier</font>(Min guard band):')
+        self.nrMinGuardBandEdit = QLineEdit()
+
+        carrierGridGrpBox = QGroupBox()
+        carrierGridGrpBox.setTitle('Carrier Grid(SCS-SpecificCarrier)')
+        carrierGridGrpBoxLayout = QGridLayout()
+        carrierGridGrpBoxLayout.addWidget(self.nrCarrierScsLabel, 0, 0)
+        carrierGridGrpBoxLayout.addWidget(self.nrCarrierScsComb, 0, 1)
+        carrierGridGrpBoxLayout.addWidget(self.nrCarrierBwLabel, 1, 0)
+        carrierGridGrpBoxLayout.addWidget(self.nrCarrierBwComb, 1, 1)
+        carrierGridGrpBoxLayout.addWidget(self.nrCarrierNumRbLabel, 2, 0)
+        carrierGridGrpBoxLayout.addWidget(self.nrCarrierNumRbEdit, 2, 1)
+        carrierGridGrpBoxLayout.addWidget(self.nrMinGuardBandLabel, 3, 0)
+        carrierGridGrpBoxLayout.addWidget(self.nrMinGuardBandEdit, 3, 1)
+        carrierGridGrpBox.setLayout(carrierGridGrpBoxLayout)
+
+        #---->Part II: SSB Grid Configurations
+        #refer to 3GPP 38.104 vf30
+        #Table 5.4.3.3-1: Applicable SS raster entries per operating band (FR1)
+        #Table 5.4.3.3-2: Applicable SS raster entries per operating band (FR2)
+        _nrSsbRasters = {
+            'n1': (('15KHz', 'Case A', '5279-<1>-5419'),),
+            'n2': (('15KHz', 'Case A', '4829-<1>-4969'),),
+            'n3': (('15KHz', 'Case A', '4517-<1>-4693'),),
+            'n5': (('15KHz', 'Case A', '2177-<1>-2230'), ('30KHz', 'Case B', '2183-<1>-2224')),
+            'n7': (('15KHz', 'Case A', '6554-<1>-6718'),),
+            'n8': (('15KHz', 'Case A', '2318-<1>-2395'),),
+            'n12': (('15KHz', 'Case A', '1828-<1>-1858'),),
+            'n20': (('15KHz', 'Case A', '1982-<1>-2047'),),
+            'n25': (('15KHz', 'Case A', '4829-<1>-4981'),),
+            'n28': (('15KHz', 'Case A', '1901-<1>-2002'),),
+            'n34': (('15KHz', 'Case A', '5030-<1>-5056'),),
+            'n38': (('15KHz', 'Case A', '6431-<1>-6544'),),
+            'n39': (('15KHz', 'Case A', '4706-<1>-4795'),),
+            'n40': (('15KHz', 'Case A', '5756-<1>-5995'),),
+            'n41': (('15KHz', 'Case A', '6246-<3>-6717'), ('30KHz', 'Case C', '6252-<3>-6714')),
+            'n50': (('15KHz', 'Case A', '3584-<1>-3787'),),
+            'n51': (('15KHz', 'Case A', '3572-<1>-3574'),),
+            'n66': (('15KHz', 'Case A', '5279-<1>-5494'), ('30KHz', 'Case B', '5285-<1>-5488')),
+            'n70': (('15KHz', 'Case A', '4993-<1>-5044'),),
+            'n71': (('15KHz', 'Case A', '1547-<1>-1624'),),
+            'n74': (('15KHz', 'Case A', '3692-<1>-3790'),),
+            'n75': (('15KHz', 'Case A', '3584-<1>-3787'),),
+            'n76': (('15KHz', 'Case A', '3572-<1>-3574'),),
+            'n77': (('30KHz', 'Case C', '7711-<1>-8329'),),
+            'n78': (('30KHz', 'Case C', '7711-<1>-8051'),),
+            'n79': (('30KHz', 'Case C', '8480-<16>-8880'),),
+            'n257': (('120KHz', 'Case D', '22388-<1>-22558'), ('240KHz', 'Case E', '22390-<2>-22556')),
+            'n258': (('120KHz', 'Case D', '22257-<1>-22443'), ('240KHz', 'Case E', '22258-<2>-22442')),
+            'n260': (('120KHz', 'Case D', '22995-<1>-23166'), ('240KHz', 'Case E', '22996-<2>-23164')),
+            'n261': (('120KHz', 'Case D', '22446-<1>-22492'), ('240KHz', 'Case E', '22446-<2>-22490')),
+        }
+        self.nrSsbRasters = OrderedDict(_nrSsbRasters)
+
+        self.nrSsbScsLabel = QLabel('Subcarrier spacing:')
+        self.nrSsbScsComb = QComboBox()
+
+        self.nrSsbPatternLabel = QLabel('SSB pattern:')
+        self.nrSsbPatternEdit = QLineEdit()
+        self.nrSsbPatternEdit.setEnabled(False)
+
+        self.nrSsbMinGuardBandScs240kLabel = QLabel('Min guard band(scs=240K):')
+        self.nrSsbMinGuardBandScs240kEdit = QLineEdit()
+        self.nrSsbMinGuardBandScs240kEdit.setEnabled(False)
+
+        self.nrSsbKssbLabel = QLabel('k_SSB:')
+        self.nrSsbKssbEdit = QLineEdit()
+        self.nrSsbKssbEdit.setPlaceholderText('FR1: 0~31, FR2: 0~15')
+
+        self.nrSsbNCrbSsbLabel = QLabel('n_CRB_SSB:')
+        self.nrSsbNCrbSsbEdit = QLineEdit()
+        #TODO calculate minimum value of n_CRB_SSB
+
+        ssbGridGrpBox = QGroupBox()
+        ssbGridGrpBox.setTitle('SSB Grid')
+        ssbGridGrpBoxLayout = QGridLayout()
+        ssbGridGrpBoxLayout.addWidget(self.nrSsbScsLabel, 0, 0)
+        ssbGridGrpBoxLayout.addWidget(self.nrSsbScsComb, 0, 1)
+        ssbGridGrpBoxLayout.addWidget(self.nrSsbPatternLabel, 1, 0)
+        ssbGridGrpBoxLayout.addWidget(self.nrSsbPatternEdit, 1, 1)
+        ssbGridGrpBoxLayout.addWidget(self.nrSsbMinGuardBandScs240kLabel, 2, 0)
+        ssbGridGrpBoxLayout.addWidget(self.nrSsbMinGuardBandScs240kEdit, 2, 1)
+        ssbGridGrpBoxLayout.addWidget(self.nrSsbKssbLabel, 3, 0)
+        ssbGridGrpBoxLayout.addWidget(self.nrSsbKssbEdit, 3, 1)
+        ssbGridGrpBoxLayout.addWidget(self.nrSsbNCrbSsbLabel, 4, 0)
+        ssbGridGrpBoxLayout.addWidget(self.nrSsbNCrbSsbEdit, 4, 1)
+        ssbGridGrpBox.setLayout(ssbGridGrpBoxLayout)
+
+        #connect signals to slots
         self.nrCarrierBwComb.currentIndexChanged[int].connect(self.onCarrierBwCombCurrentIndexChanged)
         self.nrCarrierScsComb.currentIndexChanged[int].connect(self.onCarrierScsCombCurrentIndexChanged)
         self.nrCarrierBandComb.currentIndexChanged[int].connect(self.onCarrierBandCombCurrentIndexChanged)
+        self.nrSsbScsComb.currentIndexChanged[int].connect(self.onSsbScsCombCurrentIndexChanged)
         self.nrCarrierBandComb.setCurrentText('n77')
 
-        layout1 = QGridLayout()
-        layout1.addWidget(self.nrCarrierBandLabel, 0, 0)
-        layout1.addWidget(self.nrCarrierBandComb, 0, 1)
-        layout1.addWidget(self.nrCarrierBandInfoLabel, 1, 0, 1, 2)
-        layout1.addWidget(self.nrCarrierScsLabel, 2, 0)
-        layout1.addWidget(self.nrCarrierScsComb, 2, 1)
-        layout1.addWidget(self.nrCarrierBwLabel, 3, 0)
-        layout1.addWidget(self.nrCarrierBwComb, 3, 1)
-        layout1.addWidget(self.nrCarrierNumRbLabel, 4, 0)
-        layout1.addWidget(self.nrCarrierNumRbEdit, 4, 1)
+        _gridLayoutResGridCfg = QGridLayout()
+        _gridLayoutResGridCfg.addWidget(self.nrCarrierBandLabel, 0, 0)
+        _gridLayoutResGridCfg.addWidget(self.nrCarrierBandComb, 0, 1)
+        _gridLayoutResGridCfg.addWidget(self.nrCarrierBandInfoLabel, 1, 0, 1, 2)
+        _gridLayoutResGridCfg.addWidget(carrierGridGrpBox, 2, 0, 1, 2)
+        _gridLayoutResGridCfg.addWidget(ssbGridGrpBox, 3, 0, 1, 2)
 
+        resGridCfgLayout.addLayout(_gridLayoutResGridCfg)
+        resGridCfgLayout.addStretch()
+        resGridCfgWidget.setLayout(resGridCfgLayout)
+
+        #-->Tab Widgets
+        tabWidget = QTabWidget()
+        tabWidget.addTab(resGridCfgWidget, 'Resource Grids')
+
+        #-->Buttons
+        self.okBtn = QPushButton('OK')
+        self.cancelBtn = QPushButton('Cancel')
+        self.okBtn.clicked.connect(self.onOkBtnClicked)
+        self.cancelBtn.clicked.connect(self.reject)
+
+        layoutBtns = QHBoxLayout()
+        layoutBtns.addStretch()
+        layoutBtns.addWidget(self.okBtn)
+        layoutBtns.addWidget(self.cancelBtn)
+
+        #-->Main Layout
         layout = QVBoxLayout()
-        layout.addLayout(layout1)
+        layout.addWidget(tabWidget)
+        layout.addLayout(layoutBtns)
 
         self.setLayout(layout)
         self.setWindowTitle('5GNR Resource Grid')
@@ -110,15 +224,27 @@ class NgNrGridUi(QDialog):
         if index < 0:
             return
 
-        #update band info
-        _ulBand, _dlBand, _mode = self.nrOpBands[self.nrCarrierBandComb.currentText()]
+        #(1) update band info
+        _ulBand, _dlBand, self.duplexMode = self.nrOpBands[self.nrCarrierBandComb.currentText()]
         self.freqRange = 'FR1' if int(self.nrCarrierBandComb.currentText()[1:]) <= 256 else 'FR2'
-        if _mode == 'TDD':
-            self.nrCarrierBandInfoLabel.setText('<font color=blue>UL/DL: %s, %s, %s</font>' % (_ulBand, _mode, self.freqRange))
+        if self.duplexMode == 'TDD':
+            self.nrCarrierBandInfoLabel.setText('<font color=green>UL/DL: %s, %s, %s</font>' % (_ulBand, self.duplexMode, self.freqRange))
         else:
-            self.nrCarrierBandInfoLabel.setText('<font color=blue>UL: %s, DL: %s, %s, %s</font>' % (_ulBand, _dlBand, _mode, self.freqRange))
+            self.nrCarrierBandInfoLabel.setText('<font color=green>UL: %s, DL: %s, %s, %s</font>' % (_ulBand, _dlBand, self.duplexMode, self.freqRange))
 
-        #update subcarrier spacing
+        if self.duplexMode in ('SUL', 'SDL'):
+            self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: SUL/SDL bands (3GPP 38.104 vf30, SDL: n75/n76, SUL: n80/n81/n82/n83/n84/n86)'
+                                      ' are not supported!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
+            return
+
+        #(2) update SSB sucarrier spacing
+        # _nrScsSet = ('15Khz', '30KHz', '60KHz', '120KHz', '240KHz')
+        _ssbScsSubset = [v[0] for v in self.nrSsbRasters[self.nrCarrierBandComb.currentText()]]
+        self.nrSsbScsComb.clear()
+        self.nrSsbScsComb.addItems(_ssbScsSubset)
+        self.nrSsbScsComb.setCurrentIndex(0)
+
+        #(3) update carrier subcarrier spacing
         #_nrScsSet = ('15Khz', '30KHz', '60KHz', '120KHz', '240KHz')
         if self.freqRange == 'FR1':
             _scsSubset = ('15KHz', '30KHz', '60KHz')
@@ -127,7 +253,6 @@ class NgNrGridUi(QDialog):
         self.nrCarrierScsComb.clear()
         self.nrCarrierScsComb.addItems(_scsSubset)
         self.nrCarrierScsComb.setCurrentIndex(0)
-
 
     def onCarrierScsCombCurrentIndexChanged(self, index):
         #self.ngwin.logEdit.append('inside onCarrierScsCombCurrentIndexChanged, index=%d' % index)
@@ -266,6 +391,7 @@ class NgNrGridUi(QDialog):
         if index < 0:
             return
 
+        #(1) update N_RB w.r.t carrierScs and carrierBw
         #refer to 3GPP 38.104 vf30
         #Table 5.3.2-1: Transmission bandwidth configuration N_RB for FR1
         _nrNrbFr1 = {
@@ -287,7 +413,69 @@ class NgNrGridUi(QDialog):
             return
 
         if self.freqRange == 'FR1':
-            self.numRb = _nrNrbFr1[_key][_nrBwSetFr1.index(self.nrCarrierBwComb.currentText())]
+            _numRb = _nrNrbFr1[_key][_nrBwSetFr1.index(self.nrCarrierBwComb.currentText())]
         else:
-            self.numRb = _nrNrbFr2[_key][_nrBwSetFr2.index(self.nrCarrierBwComb.currentText())]
-        self.nrCarrierNumRbEdit.setText(str(self.numRb))
+            _numRb = _nrNrbFr2[_key][_nrBwSetFr2.index(self.nrCarrierBwComb.currentText())]
+        self.nrCarrierNumRbEdit.setText(str(_numRb))
+
+        #(2) update minGuardBand w.r.t carrierScs and carrierBw
+        #refer to 3GPP 38.104 vf30
+        #Table 5.3.3-1: Minimum guardband (kHz) (FR1)
+        _nrMinGuardBandFr1 = {
+            15: (2, 2, 3, 3, 3, 4, 4, 4, 0, 0, 0, 0, 0),
+            30: (2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
+            60: (0, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 2, 2),
+        }
+        #Table: 5.3.3-2: Minimum guardband (kHz) (FR2)
+        _nrMinGuardBandFr2 = {
+            60: (2, 4, 7, 0),
+            120: (2, 2, 4, 7),
+        }
+        if self.freqRange == 'FR1':
+            _minGuardBand = _nrMinGuardBandFr1[_key][_nrBwSetFr1.index(self.nrCarrierBwComb.currentText())]
+        else:
+            _minGuardBand = _nrMinGuardBandFr2[_key][_nrBwSetFr2.index(self.nrCarrierBwComb.currentText())]
+        self.nrMinGuardBandEdit.setText(str(_minGuardBand))
+
+        #(3) update minGuardBandScs240k w.r.t. ssbScs and carrierBw
+        if self.freqRange == 'FR2' and self.nrSsbScsComb.currentText() == '240KHz':
+            #refer to 3GPP 38.104 vf30
+            #Table: 5.3.3-3: Minimum guardband (kHz) of SCS 240 kHz SS/PBCH block (FR2)
+            _nrSsbMinGuardBandScs240k = (0, 2, 3, 6)
+            _carrierBw = int(self.nrCarrierBwComb.currentText()[:-3])
+            if _carrierBw < 100:
+                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Minimum transmission bandwidth is 100MHz when SSB'
+                                          ' subcarrier spacing is 240KHz!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
+                self.nrSsbMinGuardBandScs240kEdit.setText('NA')
+            else:
+                self.nrSsbMinGuardBandScs240kEdit.setText(str(_nrSsbMinGuardBandScs240k[self.nrCarrierBwComb.currentIndex()]))
+
+
+    def onSsbScsCombCurrentIndexChanged(self, index):
+        #self.ngwin.logEdit.append('inside onSsbScsCombCurrentIndexChanged, index=%d' % index)
+        if index < 0:
+            return
+
+        #(1) update SSB pattern
+        _ssbScs, _ssbPat, _ssbGscn = self.nrSsbRasters[self.nrCarrierBandComb.currentText()][self.nrSsbScsComb.currentIndex()]
+        self.nrSsbPatternEdit.setText(_ssbPat)
+
+        #(2) update minGuardBandScs240k
+        #refer to 3GPP 38.104 vf30
+        #Table: 5.3.3-3: Minimum guardband (kHz) of SCS 240 kHz SS/PBCH block (FR2)
+        _nrSsbMinGuardBandScs240k = (0, 2, 3, 6)
+        if _ssbScs == '240KHz':
+            _carrierBw = int(self.nrCarrierBwComb.currentText()[:-3])
+            if _carrierBw < 100:
+                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Minimum transmission bandwidth is 100MHz when SSB'
+                                          ' subcarrier spacing is 240KHz!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
+                self.nrSsbMinGuardBandScs240kEdit.setText('NA')
+            else:
+                self.nrSsbMinGuardBandScs240kEdit.setText(str(_nrSsbMinGuardBandScs240k[self.nrCarrierBwComb.currentIndex()]))
+        else:
+            self.nrSsbMinGuardBandScs240kEdit.setText('NA')
+
+    def onOkBtnClicked(self):
+        #TODO
+        self.accept()
+
