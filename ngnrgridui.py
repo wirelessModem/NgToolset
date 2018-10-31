@@ -34,7 +34,6 @@ class NgNrGridUi(QDialog):
         resGridCfgLayout = QVBoxLayout()
 
         #---->Part I: Carrier Grid Configurations
-        
         self.nrCarrierBandLabel = QLabel('Operating band:')
         self.nrCarrierBandComb = QComboBox()
         self.nrCarrierBandComb.addItems(list(self.nrOpBands.keys()))
@@ -68,8 +67,6 @@ class NgNrGridUi(QDialog):
         carrierGridGrpBox.setLayout(carrierGridGrpBoxLayout)
 
         #---->Part II: SSB Grid Configurations
-        
-
         self.nrSsbScsLabel = QLabel('Subcarrier spacing:')
         self.nrSsbScsComb = QComboBox()
 
