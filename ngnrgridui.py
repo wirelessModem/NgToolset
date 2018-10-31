@@ -26,6 +26,7 @@ class NgNrGridUi(QDialog):
 
     def initUi(self):
         #TODO
+        #initialize global parameters
         self.initGlobalPar()
 
         #-->Resource Grid Config Widget
@@ -67,42 +68,7 @@ class NgNrGridUi(QDialog):
         carrierGridGrpBox.setLayout(carrierGridGrpBoxLayout)
 
         #---->Part II: SSB Grid Configurations
-        #refer to 3GPP 38.104 vf30
-        #Table 5.4.3.3-1: Applicable SS raster entries per operating band (FR1)
-        #Table 5.4.3.3-2: Applicable SS raster entries per operating band (FR2)
-        _nrSsbRasters = {
-            'n1': (('15KHz', 'Case A', '5279-<1>-5419'),),
-            'n2': (('15KHz', 'Case A', '4829-<1>-4969'),),
-            'n3': (('15KHz', 'Case A', '4517-<1>-4693'),),
-            'n5': (('15KHz', 'Case A', '2177-<1>-2230'), ('30KHz', 'Case B', '2183-<1>-2224')),
-            'n7': (('15KHz', 'Case A', '6554-<1>-6718'),),
-            'n8': (('15KHz', 'Case A', '2318-<1>-2395'),),
-            'n12': (('15KHz', 'Case A', '1828-<1>-1858'),),
-            'n20': (('15KHz', 'Case A', '1982-<1>-2047'),),
-            'n25': (('15KHz', 'Case A', '4829-<1>-4981'),),
-            'n28': (('15KHz', 'Case A', '1901-<1>-2002'),),
-            'n34': (('15KHz', 'Case A', '5030-<1>-5056'),),
-            'n38': (('15KHz', 'Case A', '6431-<1>-6544'),),
-            'n39': (('15KHz', 'Case A', '4706-<1>-4795'),),
-            'n40': (('15KHz', 'Case A', '5756-<1>-5995'),),
-            'n41': (('15KHz', 'Case A', '6246-<3>-6717'), ('30KHz', 'Case C', '6252-<3>-6714')),
-            'n50': (('15KHz', 'Case A', '3584-<1>-3787'),),
-            'n51': (('15KHz', 'Case A', '3572-<1>-3574'),),
-            'n66': (('15KHz', 'Case A', '5279-<1>-5494'), ('30KHz', 'Case B', '5285-<1>-5488')),
-            'n70': (('15KHz', 'Case A', '4993-<1>-5044'),),
-            'n71': (('15KHz', 'Case A', '1547-<1>-1624'),),
-            'n74': (('15KHz', 'Case A', '3692-<1>-3790'),),
-            'n75': (('15KHz', 'Case A', '3584-<1>-3787'),),
-            'n76': (('15KHz', 'Case A', '3572-<1>-3574'),),
-            'n77': (('30KHz', 'Case C', '7711-<1>-8329'),),
-            'n78': (('30KHz', 'Case C', '7711-<1>-8051'),),
-            'n79': (('30KHz', 'Case C', '8480-<16>-8880'),),
-            'n257': (('120KHz', 'Case D', '22388-<1>-22558'), ('240KHz', 'Case E', '22390-<2>-22556')),
-            'n258': (('120KHz', 'Case D', '22257-<1>-22443'), ('240KHz', 'Case E', '22258-<2>-22442')),
-            'n260': (('120KHz', 'Case D', '22995-<1>-23166'), ('240KHz', 'Case E', '22996-<2>-23164')),
-            'n261': (('120KHz', 'Case D', '22446-<1>-22492'), ('240KHz', 'Case E', '22446-<2>-22490')),
-        }
-        self.nrSsbRasters = OrderedDict(_nrSsbRasters)
+        
 
         self.nrSsbScsLabel = QLabel('Subcarrier spacing:')
         self.nrSsbScsComb = QComboBox()
@@ -368,6 +334,42 @@ class NgNrGridUi(QDialog):
         #Table: 5.3.3-3: Minimum guardband (kHz) of SCS 240 kHz SS/PBCH block (FR2)
         self.nrSsbMinGuardBandScs240k = (0, 2, 3, 6)
         
+        #refer to 3GPP 38.104 vf30
+        #Table 5.4.3.3-1: Applicable SS raster entries per operating band (FR1)
+        #Table 5.4.3.3-2: Applicable SS raster entries per operating band (FR2)
+        self.nrSsbRasters = {
+            'n1': (('15KHz', 'Case A', '5279-<1>-5419'),),
+            'n2': (('15KHz', 'Case A', '4829-<1>-4969'),),
+            'n3': (('15KHz', 'Case A', '4517-<1>-4693'),),
+            'n5': (('15KHz', 'Case A', '2177-<1>-2230'), ('30KHz', 'Case B', '2183-<1>-2224')),
+            'n7': (('15KHz', 'Case A', '6554-<1>-6718'),),
+            'n8': (('15KHz', 'Case A', '2318-<1>-2395'),),
+            'n12': (('15KHz', 'Case A', '1828-<1>-1858'),),
+            'n20': (('15KHz', 'Case A', '1982-<1>-2047'),),
+            'n25': (('15KHz', 'Case A', '4829-<1>-4981'),),
+            'n28': (('15KHz', 'Case A', '1901-<1>-2002'),),
+            'n34': (('15KHz', 'Case A', '5030-<1>-5056'),),
+            'n38': (('15KHz', 'Case A', '6431-<1>-6544'),),
+            'n39': (('15KHz', 'Case A', '4706-<1>-4795'),),
+            'n40': (('15KHz', 'Case A', '5756-<1>-5995'),),
+            'n41': (('15KHz', 'Case A', '6246-<3>-6717'), ('30KHz', 'Case C', '6252-<3>-6714')),
+            'n50': (('15KHz', 'Case A', '3584-<1>-3787'),),
+            'n51': (('15KHz', 'Case A', '3572-<1>-3574'),),
+            'n66': (('15KHz', 'Case A', '5279-<1>-5494'), ('30KHz', 'Case B', '5285-<1>-5488')),
+            'n70': (('15KHz', 'Case A', '4993-<1>-5044'),),
+            'n71': (('15KHz', 'Case A', '1547-<1>-1624'),),
+            'n74': (('15KHz', 'Case A', '3692-<1>-3790'),),
+            'n75': (('15KHz', 'Case A', '3584-<1>-3787'),),
+            'n76': (('15KHz', 'Case A', '3572-<1>-3574'),),
+            'n77': (('30KHz', 'Case C', '7711-<1>-8329'),),
+            'n78': (('30KHz', 'Case C', '7711-<1>-8051'),),
+            'n79': (('30KHz', 'Case C', '8480-<16>-8880'),),
+            'n257': (('120KHz', 'Case D', '22388-<1>-22558'), ('240KHz', 'Case E', '22390-<2>-22556')),
+            'n258': (('120KHz', 'Case D', '22257-<1>-22443'), ('240KHz', 'Case E', '22258-<2>-22442')),
+            'n260': (('120KHz', 'Case D', '22995-<1>-23166'), ('240KHz', 'Case E', '22996-<2>-23164')),
+            'n261': (('120KHz', 'Case D', '22446-<1>-22492'), ('240KHz', 'Case E', '22446-<2>-22490')),
+        }
+        
     def validateScsPerBandFr1(self):
         self.nrScsPerBandFr1 = dict()
         for key,val in self.nrBandScs2BwFr1.items():
@@ -498,4 +500,3 @@ class NgNrGridUi(QDialog):
     def onOkBtnClicked(self):
         #TODO
         self.accept()
-
