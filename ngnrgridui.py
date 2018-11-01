@@ -85,6 +85,23 @@ class NgNrGridUi(QDialog):
         self.nrSsbNCrbSsbLabel = QLabel('n_CRB_SSB:')
         self.nrSsbNCrbSsbEdit = QLineEdit()
         #TODO calculate minimum value of n_CRB_SSB
+        '''
+        For FR1, k_ssb and n_crb_ssb based on 15k
+        For FR2, k_ssb based on carrier_scs, n_crb_ssb based on 60k
+
+        FR1/FR2   carrier_scs   ssb_scs     k_ssb	n_crb_ssb
+        -----------------------------------------------------------
+        FR1	        15k         15k         0~11	minGuardBand
+                    15k         30k         0~11	minGuardBand
+                    30k         15k         0~23	2*minGuardBand
+                    30k         30k         0~23	2*minGuardBand
+        FR2         60k         120k        0~11	minGuardBand
+                    60k         240k        0~11	max(minGuardBand,4*minGuardBand240k)
+                    120k        120k        0~11	2*minGuardBand
+                    120k        240k        0~11	max(2*minGuardBand,4*minGuardBand240k)
+        ------------------------------------------------------------
+        '''
+
 
         ssbGridGrpBox = QGroupBox()
         ssbGridGrpBox.setTitle('SSB Grid')
