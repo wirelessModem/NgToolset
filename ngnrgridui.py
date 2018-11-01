@@ -84,23 +84,7 @@ class NgNrGridUi(QDialog):
 
         self.nrSsbNCrbSsbLabel = QLabel('n_CRB_SSB:')
         self.nrSsbNCrbSsbEdit = QLineEdit()
-        #TODO calculate minimum value of n_CRB_SSB
-        '''
-        For FR1, k_ssb and n_crb_ssb based on 15k
-        For FR2, k_ssb based on carrier_scs, n_crb_ssb based on 60k
-
-        FR1/FR2   carrier_scs   ssb_scs     k_ssb	n_crb_ssb
-        -----------------------------------------------------------
-        FR1	        15k         15k         0~11	minGuardBand
-                    15k         30k         0~11	minGuardBand
-                    30k         15k         0~23	2*minGuardBand
-                    30k         30k         0~23	2*minGuardBand
-        FR2         60k         120k        0~11	minGuardBand
-                    60k         240k        0~11	max(minGuardBand,4*minGuardBand240k)
-                    120k        120k        0~11	2*minGuardBand
-                    120k        240k        0~11	max(2*minGuardBand,4*minGuardBand240k)
-        ------------------------------------------------------------
-        '''
+        self.nrSsbNCrbSsbEdit.setEnabled(False)
 
 
         ssbGridGrpBox = QGroupBox()
@@ -403,18 +387,57 @@ class NgNrGridUi(QDialog):
             self.ngwin.logEdit.append('key=%s,val=%s' % (key,val))
         '''
 
+    def updateKSsbAndNCrbSsb(self):
+        #refer to 3GPP 38.211 vf30
+        #7.4.3.1	Time-frequency structure of an SS/PBCH block
+        '''
+        For FR1, k_ssb and n_crb_ssb based on 15k
+        For FR2, k_ssb based on carrier_scs, n_crb_ssb based on 60k
+
+        FR1/FR2   carrier_scs   ssb_scs     k_ssb	n_crb_ssb
+        -----------------------------------------------------------
+        FR1	        15k         15k         0~11	minGuardBand
+                    15k         30k         0~11	minGuardBand
+                    30k         15k         0~23	2*minGuardBand
+                    30k         30k         0~23	2*minGuardBand
+        FR2         60k         120k        0~11	minGuardBand
+                    60k         240k        0~11	max(minGuardBand,4*minGuardBand240k)
+                    120k        120k        0~11	2*minGuardBand
+                    120k        240k        0~11	max(2*minGuardBand,4*minGuardBand240k)
+        -----------------------------------------------------------
+        '''
+        key = self.nrCarrierScsComb.currentText()[:-3] + '_' + self.nrSsbScsComb.currentText()[:-3]
+        minGuardBand = int(self.nrMinGuardBandEdit.text())
+        if key in ('15_15', '15_30', '60_120'):
+            self.nrSsbKssbEdit.setPlaceholderText('0~11')
+            self.nrSsbNCrbSsbEdit.setText(str(minGuardBand))
+        elif key in ('30_15', '30_30'):
+            self.nrSsbKssbEdit.setPlaceholderText('0~23')
+            self.nrSsbNCrbSsbEdit.setText(str(2*minGuardBand))
+        elif key == '60_240':
+            self.nrSsbKssbEdit.setPlaceholderText('0~11')
+            minGuardBand240k = int(self.nrSsbMinGuardBandScs240kEdit.text())
+            self.nrSsbNCrbSsbEdit.setText(str(max(minGuardBand, 4*minGuardBand240k)))
+        elif key == '120_120':
+            self.nrSsbKssbEdit.setPlaceholderText('0~11')
+            self.nrSsbNCrbSsbEdit.setText(str(2*minGuardBand))
+        elif key == '120_240':
+            self.nrSsbKssbEdit.setPlaceholderText('0~11')
+            minGuardBand240k = int(self.nrSsbMinGuardBandScs240kEdit.text())
+            self.nrSsbNCrbSsbEdit.setText(str(max(2*minGuardBand, 4*minGuardBand240k)))
+    
     def onCarrierBandCombCurrentIndexChanged(self, index):
         #self.ngwin.logEdit.append('inside onCarrierBandCombCurrentIndexChanged, index=%d' % index)
         if index < 0:
             return
 
         #(1) update band info
-        _ulBand, _dlBand, self.duplexMode = self.nrOpBands[self.nrCarrierBandComb.currentText()]
+        ulBand, dlBand, self.duplexMode = self.nrOpBands[self.nrCarrierBandComb.currentText()]
         self.freqRange = 'FR1' if int(self.nrCarrierBandComb.currentText()[1:]) <= 256 else 'FR2'
         if self.duplexMode == 'TDD':
-            self.nrCarrierBandInfoLabel.setText('<font color=green>UL/DL: %s, %s, %s</font>' % (_ulBand, self.duplexMode, self.freqRange))
+            self.nrCarrierBandInfoLabel.setText('<font color=green>UL/DL: %s, %s, %s</font>' % (ulBand, self.duplexMode, self.freqRange))
         else:
-            self.nrCarrierBandInfoLabel.setText('<font color=green>UL: %s, DL: %s, %s, %s</font>' % (_ulBand, _dlBand, self.duplexMode, self.freqRange))
+            self.nrCarrierBandInfoLabel.setText('<font color=green>UL: %s, DL: %s, %s, %s</font>' % (ulBand, dlBand, self.duplexMode, self.freqRange))
 
         if self.duplexMode in ('SUL', 'SDL'):
             self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: SUL/SDL bands (3GPP 38.104 vf30, SDL: n75/n76, SUL: n80/n81/n82/n83/n84/n86)'
@@ -422,20 +445,20 @@ class NgNrGridUi(QDialog):
             return
 
         #(2) update SSB sucarrier spacing
-        # _nrScsSet = ('15Khz', '30KHz', '60KHz', '120KHz', '240KHz')
-        _ssbScsSubset = [v[0] for v in self.nrSsbRasters[self.nrCarrierBandComb.currentText()]]
+        #nrScsSet = ('15Khz', '30KHz', '60KHz', '120KHz', '240KHz')
+        ssbScsSubset = [v[0] for v in self.nrSsbRasters[self.nrCarrierBandComb.currentText()]]
         self.nrSsbScsComb.clear()
-        self.nrSsbScsComb.addItems(_ssbScsSubset)
+        self.nrSsbScsComb.addItems(ssbScsSubset)
         self.nrSsbScsComb.setCurrentIndex(0)
 
         #(3) update carrier subcarrier spacing
-        #_nrScsSet = ('15Khz', '30KHz', '60KHz', '120KHz', '240KHz')
+        #nrScsSet = ('15Khz', '30KHz', '60KHz', '120KHz', '240KHz')
         if self.freqRange == 'FR1':
-            _scsSubset = self.nrScsPerBandFr1[self.nrCarrierBandComb.currentText()]
+            scsSubset = self.nrScsPerBandFr1[self.nrCarrierBandComb.currentText()]
         else:
-            _scsSubset = ('60KHz', '120KHz')
+            scsSubset = ('60KHz', '120KHz')
         self.nrCarrierScsComb.clear()
-        self.nrCarrierScsComb.addItems(_scsSubset)
+        self.nrCarrierScsComb.addItems(scsSubset)
         self.nrCarrierScsComb.setCurrentIndex(0)
 
     def onCarrierScsCombCurrentIndexChanged(self, index):
@@ -443,16 +466,17 @@ class NgNrGridUi(QDialog):
         if index < 0:
             return
 
-        _key = self.nrCarrierBandComb.currentText() + '_' + self.nrCarrierScsComb.currentText()[:-3]
-        if not _key in self.nrBandScs2BwFr1 and not _key in self.nrBandScs2BwFr2:
+        #(1) update transmission bandwidth
+        key = self.nrCarrierBandComb.currentText() + '_' + self.nrCarrierScsComb.currentText()[:-3]
+        if not key in self.nrBandScs2BwFr1 and not key in self.nrBandScs2BwFr2:
             return
         if self.freqRange == 'FR1':
-            _bwSubset = [self.nrBwSetFr1[i] for i in range(len(self.nrBwSetFr1)) if self.nrBandScs2BwFr1[_key][i]]
+            bwSubset = [self.nrBwSetFr1[i] for i in range(len(self.nrBwSetFr1)) if self.nrBandScs2BwFr1[key][i]]
         else:
-            _bwSubset = [self.nrBwSetFr2[i] for i in range(len(self.nrBwSetFr2)) if self.nrBandScs2BwFr2[_key][i]]
+            bwSubset = [self.nrBwSetFr2[i] for i in range(len(self.nrBwSetFr2)) if self.nrBandScs2BwFr2[key][i]]
 
         self.nrCarrierBwComb.clear()
-        self.nrCarrierBwComb.addItems(_bwSubset)
+        self.nrCarrierBwComb.addItems(bwSubset)
         self.nrCarrierBwComb.setCurrentIndex(0)
 
     def onCarrierBwCombCurrentIndexChanged(self, index):
@@ -461,34 +485,35 @@ class NgNrGridUi(QDialog):
             return
 
         #(1) update N_RB w.r.t carrierScs and carrierBw
-        _key = int(self.nrCarrierScsComb.currentText()[:-3])
-        if not _key in self.nrNrbFr1 and not _key in self.nrNrbFr2:
+        key = int(self.nrCarrierScsComb.currentText()[:-3])
+        if not key in self.nrNrbFr1 and not key in self.nrNrbFr2:
             return
 
         if self.freqRange == 'FR1':
-            _numRb = self.nrNrbFr1[_key][self.nrBwSetFr1.index(self.nrCarrierBwComb.currentText())]
+            numRb = self.nrNrbFr1[key][self.nrBwSetFr1.index(self.nrCarrierBwComb.currentText())]
         else:
-            _numRb = self.nrNrbFr2[_key][self.nrBwSetFr2.index(self.nrCarrierBwComb.currentText())]
-        self.nrCarrierNumRbEdit.setText(str(_numRb))
+            numRb = self.nrNrbFr2[key][self.nrBwSetFr2.index(self.nrCarrierBwComb.currentText())]
+        self.nrCarrierNumRbEdit.setText(str(numRb))
 
         #(2) update minGuardBand w.r.t carrierScs and carrierBw
-        
         if self.freqRange == 'FR1':
-            _minGuardBand = self.nrMinGuardBandFr1[_key][self.nrBwSetFr1.index(self.nrCarrierBwComb.currentText())]
+            minGuardBand = self.nrMinGuardBandFr1[key][self.nrBwSetFr1.index(self.nrCarrierBwComb.currentText())]
         else:
-            _minGuardBand = self.nrMinGuardBandFr2[_key][self.nrBwSetFr2.index(self.nrCarrierBwComb.currentText())]
-        self.nrMinGuardBandEdit.setText(str(_minGuardBand))
+            minGuardBand = self.nrMinGuardBandFr2[key][self.nrBwSetFr2.index(self.nrCarrierBwComb.currentText())]
+        self.nrMinGuardBandEdit.setText(str(minGuardBand))
 
         #(3) update minGuardBandScs240k w.r.t. ssbScs and carrierBw
         if self.freqRange == 'FR2' and self.nrSsbScsComb.currentText() == '240KHz':
-            _carrierBw = int(self.nrCarrierBwComb.currentText()[:-3])
-            if _carrierBw < 100:
+            carrierBw = int(self.nrCarrierBwComb.currentText()[:-3])
+            if carrierBw < 100:
                 self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Minimum transmission bandwidth is 100MHz when SSB'
                                           ' subcarrier spacing is 240KHz!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
                 self.nrSsbMinGuardBandScs240kEdit.setText('NA')
             else:
                 self.nrSsbMinGuardBandScs240kEdit.setText(str(self.nrSsbMinGuardBandScs240k[self.nrCarrierBwComb.currentIndex()]))
-
+                
+        #(4) update k_SSB and n_CRB_SSB
+        self.updateKSsbAndNCrbSsb()
 
     def onSsbScsCombCurrentIndexChanged(self, index):
         #self.ngwin.logEdit.append('inside onSsbScsCombCurrentIndexChanged, index=%d' % index)
@@ -496,20 +521,25 @@ class NgNrGridUi(QDialog):
             return
 
         #(1) update SSB pattern
-        _ssbScs, _ssbPat, _ssbGscn = self.nrSsbRasters[self.nrCarrierBandComb.currentText()][self.nrSsbScsComb.currentIndex()]
-        self.nrSsbPatternEdit.setText(_ssbPat)
+        ssbScs, ssbPat, ssbGscn = self.nrSsbRasters[self.nrCarrierBandComb.currentText()][self.nrSsbScsComb.currentIndex()]
+        self.nrSsbPatternEdit.setText(ssbPat)
 
         #(2) update minGuardBandScs240k
-        if _ssbScs == '240KHz':
-            _carrierBw = int(self.nrCarrierBwComb.currentText()[:-3])
-            if _carrierBw < 100:
+        if ssbScs == '240KHz':
+            carrierBw = int(self.nrCarrierBwComb.currentText()[:-3])
+            if carrierBw < 100:
                 self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Minimum transmission bandwidth is 100MHz when SSB'
                                           ' subcarrier spacing is 240KHz!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
                 self.nrSsbMinGuardBandScs240kEdit.setText('NA')
+                return
             else:
                 self.nrSsbMinGuardBandScs240kEdit.setText(str(self.nrSsbMinGuardBandScs240k[self.nrCarrierBwComb.currentIndex()]))
         else:
             self.nrSsbMinGuardBandScs240kEdit.setText('NA')
+        
+        #(3) update k_SSB and n_CRB_SSB
+        if self.nrMinGuardBandEdit.text():
+            self.updateKSsbAndNCrbSsb()
 
     def onOkBtnClicked(self):
         #TODO
