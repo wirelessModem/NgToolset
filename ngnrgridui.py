@@ -29,9 +29,9 @@ class NgNrGridUi(QDialog):
         #initialize global parameters
         self.initGlobalPar()
 
-        #-->(1) Resource Grid Config Widget
-        resGridCfgWidget = QWidget()
-        resGridCfgLayout = QVBoxLayout()
+        #-->(1) Grid settings tab
+        gridCfgWidget = QWidget()
+        gridCfgLayout = QVBoxLayout()
 
         #---->(1.1) Carrier Grid Configurations
         self.nrCarrierBandLabel = QLabel('Operating band:')
@@ -115,11 +115,11 @@ class NgNrGridUi(QDialog):
         gridLayoutResGridCfg.addWidget(carrierGridGrpBox, 2, 0, 1, 2)
         gridLayoutResGridCfg.addWidget(ssbGridGrpBox, 3, 0, 1, 2)
 
-        resGridCfgLayout.addLayout(gridLayoutResGridCfg)
-        resGridCfgLayout.addStretch()
-        resGridCfgWidget.setLayout(resGridCfgLayout)
+        gridCfgLayout.addLayout(gridLayoutResGridCfg)
+        gridCfgLayout.addStretch()
+        gridCfgWidget.setLayout(gridCfgLayout)
         
-        #-->(2) SSB Config Widget
+        #-->(2) SSB settings tab
         ssbCfgWidget = QWidget()
         ssbCfgLayout = QVBoxLayout()
         
@@ -291,7 +291,7 @@ class NgNrGridUi(QDialog):
         ssbCfgLayout.addStretch()
         ssbCfgWidget.setLayout(ssbCfgLayout)
         
-        #-->(3) Coreset/SearchSpace Config Widget
+        #-->(3) PDCCH settings tab
         pdcchCfgWidget = QWidget()
         pdcchCfgLayout = QVBoxLayout()
         
@@ -420,10 +420,24 @@ class NgNrGridUi(QDialog):
         pdcchCfgLayout.addStretch()
         pdcchCfgWidget.setLayout(pdcchCfgLayout)
         
+        #-->(4) PDSCH settings tab
+        
+        #-->(5) PRACH settings tab
+        
+        #-->(6) PUCCH settings tab
+        
+        #-->(7) SRS settings tab
+        
+        #-->(8) PUSCH settings tab
+        
+        #-->(9) BWP settings tab
+        
+        #-->(10) CSI-RS settings tab
+        #TODO CSI-RS is not supported!
 
         #-->Tab Widgets
         tabWidget = QTabWidget()
-        tabWidget.addTab(resGridCfgWidget, 'Grid Settings')
+        tabWidget.addTab(gridCfgWidget, 'Grid Settings')
         tabWidget.addTab(ssbCfgWidget, 'SSB Settings')
         tabWidget.addTab(pdcchCfgWidget, 'PDCCH Settings')
 
