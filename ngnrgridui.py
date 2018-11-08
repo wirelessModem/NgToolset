@@ -29,11 +29,11 @@ class NgNrGridUi(QDialog):
         #initialize global parameters
         self.initGlobalPar()
 
-        #-->Resource Grid Config Widget
+        #-->(1) Resource Grid Config Widget
         resGridCfgWidget = QWidget()
         resGridCfgLayout = QVBoxLayout()
 
-        #---->Part I: Carrier Grid Configurations
+        #---->(1.1) Carrier Grid Configurations
         self.nrCarrierBandLabel = QLabel('Operating band:')
         self.nrCarrierBandComb = QComboBox()
         self.nrCarrierBandComb.addItems(list(self.nrOpBands.keys()))
@@ -46,11 +46,11 @@ class NgNrGridUi(QDialog):
         self.nrCarrierBwLabel = QLabel('Transmission bandwidth:')
         self.nrCarrierBwComb = QComboBox()
 
-        self.nrCarrierNumRbLabel = QLabel('<font color=blue>carrierBandwidth</font>(N_RB):')
+        self.nrCarrierNumRbLabel = QLabel('N_RB(carrierBandwidth):')
         self.nrCarrierNumRbEdit = QLineEdit()
         #self.nrCarrierNumRbEdit.setFocusPolicy(Qt.NoFocus)
 
-        self.nrMinGuardBandLabel = QLabel('<font color=blue>offsetToCarrier</font>(Min guard band):')
+        self.nrMinGuardBandLabel = QLabel('Min guard band(offsetToCarrier):')
         self.nrMinGuardBandEdit = QLineEdit()
 
         carrierGridGrpBox = QGroupBox()
@@ -66,7 +66,7 @@ class NgNrGridUi(QDialog):
         carrierGridGrpBoxLayout.addWidget(self.nrMinGuardBandEdit, 3, 1)
         carrierGridGrpBox.setLayout(carrierGridGrpBoxLayout)
 
-        #---->Part II: SSB Grid Configurations
+        #---->(1.2) SSB Grid Configurations
         self.nrSsbScsLabel = QLabel('Subcarrier spacing:')
         self.nrSsbScsComb = QComboBox()
 
@@ -85,7 +85,6 @@ class NgNrGridUi(QDialog):
         self.nrSsbNCrbSsbLabel = QLabel('n_CRB_SSB:')
         self.nrSsbNCrbSsbEdit = QLineEdit()
         self.nrSsbNCrbSsbEdit.setEnabled(False)
-
 
         ssbGridGrpBox = QGroupBox()
         ssbGridGrpBox.setTitle('SSB Grid')
@@ -109,20 +108,202 @@ class NgNrGridUi(QDialog):
         self.nrSsbScsComb.currentIndexChanged[int].connect(self.onSsbScsCombCurrentIndexChanged)
         self.nrCarrierBandComb.setCurrentText('n77')
 
-        _gridLayoutResGridCfg = QGridLayout()
-        _gridLayoutResGridCfg.addWidget(self.nrCarrierBandLabel, 0, 0)
-        _gridLayoutResGridCfg.addWidget(self.nrCarrierBandComb, 0, 1)
-        _gridLayoutResGridCfg.addWidget(self.nrCarrierBandInfoLabel, 1, 0, 1, 2)
-        _gridLayoutResGridCfg.addWidget(carrierGridGrpBox, 2, 0, 1, 2)
-        _gridLayoutResGridCfg.addWidget(ssbGridGrpBox, 3, 0, 1, 2)
+        gridLayoutResGridCfg = QGridLayout()
+        gridLayoutResGridCfg.addWidget(self.nrCarrierBandLabel, 0, 0)
+        gridLayoutResGridCfg.addWidget(self.nrCarrierBandComb, 0, 1)
+        gridLayoutResGridCfg.addWidget(self.nrCarrierBandInfoLabel, 1, 0, 1, 2)
+        gridLayoutResGridCfg.addWidget(carrierGridGrpBox, 2, 0, 1, 2)
+        gridLayoutResGridCfg.addWidget(ssbGridGrpBox, 3, 0, 1, 2)
 
-        resGridCfgLayout.addLayout(_gridLayoutResGridCfg)
+        resGridCfgLayout.addLayout(gridLayoutResGridCfg)
         resGridCfgLayout.addStretch()
         resGridCfgWidget.setLayout(resGridCfgLayout)
+        
+        #-->(2) SSB Config Widget
+        ssbCfgWidget = QWidget()
+        ssbCfgLayout = QVBoxLayout()
+        
+        #---->(2.1) SSB configurations
+        self.nrSsbInOneGrpLabel = QLabel('inOneGroup:')
+        self.nrSsbInOneGrpEdit = QLineEdit()
+        self.nrSsbInOneGrpEdit.setPlaceholderText('11111111')
+        
+        self.nrSsbGrpPresenceLabel = QLabel('groupPresence:')
+        self.nrSsbGrpPresenceEdit = QLineEdit()
+        self.nrSsbGrpPresenceEdit.setPlaceholderText('11111111')
+        
+        self.nrSsbPeriodicityLabel = QLabel('ssb-PeriodicityServingCell:')
+        self.nrSsbPeriodicityComb = QComboBox()
+        self.nrSsbPeriodicityComb.addItems(['5ms', '10ms', '20ms', '40ms', '80ms', '160ms'])
+        #refer to 3GPP 38.213 4.1
+        #For initial cell selection, a UE may assume that half frames with SS/PBCH blocks occur with a periodicity of 2 frames.
+        self.nrSsbPeriodicityComb.setCurrentIndex(2)    #default to 20ms
+        
+        ssbGrpBox = QGroupBox()
+        ssbGrpBox.setTitle('SSB(ServingCellConfigCommonSIB)')
+        ssbGrpBoxLayout = QGridLayout()
+        ssbGrpBoxLayout.addWidget(self.nrSsbInOneGrpLabel, 0, 0)
+        ssbGrpBoxLayout.addWidget(self.nrSsbInOneGrpEdit, 0, 1)
+        ssbGrpBoxLayout.addWidget(self.nrSsbGrpPresenceLabel, 1, 0)
+        ssbGrpBoxLayout.addWidget(self.nrSsbGrpPresenceEdit, 1, 1)
+        ssbGrpBoxLayout.addWidget(self.nrSsbPeriodicityLabel, 2, 0)
+        ssbGrpBoxLayout.addWidget(self.nrSsbPeriodicityComb, 2, 1)
+        ssbGrpBox.setLayout(ssbGrpBoxLayout)
+        
+        self.nrSsbPciLabel = QLabel('PCI:')
+        self.nrSsbPciEdit = QLineEdit()
+        self.nrSsbPciEdit.setPlaceholderText('0~1007')
+        
+        #---->(2.2) MIB configurations
+        self.nrMibSfnLabel = QLabel('SFN:')
+        self.nrMibSfnEdit = QLineEdit()
+        self.nrMibSfnEdit.setPlaceholderText('0~1023')
+        
+        self.nrMibDmRsTypeAPosLabel = QLabel('dmrs-TypeA-Position:')
+        self.nrMibDmRsTypeAPosComb = QComboBox()
+        self.nrMibDmRsTypeAPosComb.addItems(['pos2', 'pos3'])
+        self.nrMibDmRsTypeAPosComb.setCurrentIndex(0)
+        
+        self.nrMibScsCommonLabel = QLabel('subCarrierSpacingCommon:')
+        self.nrMibScsCommonComb = QComboBox()
+        self.nrMibScsCommonComb.addItems(['15KHz', '30KHz', '60KHz', '120KHz'])
+        self.nrMibScsCommonComb.setEnabled(False)
+        
+        self.nrMibRmsiCoreset0Label = QLabel('coresetZero(PDCCH-ConfigSIB1):')
+        self.nrMibRmsiCoreset0Edit = QLineEdit()
+        self.nrMibRmsiCoreset0Edit.setPlaceholderText('0~15')
+        
+        self.nrMibRmsiCss0Label = QLabel('searchSpaceZero(PDCCH-ConfigSIB1):')
+        self.nrMibRmsiCss0Edit = QLineEdit()
+        self.nrMibRmsiCss0Edit.setPlaceholderText('0~15')
+        
+        mibGrpBox = QGroupBox()
+        mibGrpBox.setTitle('MIB')
+        mibGrpBoxLayout = QGridLayout()
+        mibGrpBoxLayout.addWidget(self.nrMibSfnLabel, 0, 0)
+        mibGrpBoxLayout.addWidget(self.nrMibSfnEdit, 0, 1)
+        mibGrpBoxLayout.addWidget(self.nrMibDmRsTypeAPosLabel, 1, 0)
+        mibGrpBoxLayout.addWidget(self.nrMibDmRsTypeAPosComb, 1, 1)
+        mibGrpBoxLayout.addWidget(self.nrMibScsCommonLabel, 2, 0)
+        mibGrpBoxLayout.addWidget(self.nrMibScsCommonComb, 2, 1)
+        mibGrpBoxLayout.addWidget(self.nrMibRmsiCoreset0Label, 3, 0)
+        mibGrpBoxLayout.addWidget(self.nrMibRmsiCoreset0Edit, 3, 1)
+        mibGrpBoxLayout.addWidget(self.nrMibRmsiCss0Label, 4, 0)
+        mibGrpBoxLayout.addWidget(self.nrMibRmsiCss0Edit, 4, 1)
+        mibGrpBox.setLayout(mibGrpBoxLayout)
+        
+        #---->(2.3) TDD UL/DL Configurations
+        self.nrTddCfgRefScsLabel = QLabel('referenceSubcarrierSpacing:')
+        self.nrTddCfgRefScsComb = QComboBox()
+        self.nrTddCfgRefScsComb.addItems(['15KHz', '30KHz', '60KHz', '120KHz'])
+        self.nrTddCfgRefScsComb.setEnabled(False)
+        
+        self.nrTddCfgPat1PeriodLabel = QLabel('dl-UL-TransmissionPeriodicity:')
+        self.nrTddCfgPat1PeriodComb = QComboBox()
+        self.nrTddCfgPat1PeriodComb.addItems(['0.5ms', '0.625ms', '1ms', '1.25ms', '2ms', '2.5ms', '3ms', '4ms', '5ms', '10ms'])
+        self.nrTddCfgPat1PeriodComb.setCurrentIndex(8)
+        
+        self.nrTddCfgPat1NumDlSlotsLabel = QLabel('nrofDownlinkSlots:')
+        self.nrTddCfgPat1NumDlSlotsEdit = QLineEdit()
+        
+        self.nrTddCfgPat1NumDlSymbsLabel = QLabel('nrofDownlinkSymbols:')
+        self.nrTddCfgPat1NumDlSymbsEdit = QLineEdit()
+        
+        self.nrTddCfgPat1NumUlSymbsLabel = QLabel('nrofUplinkSymbols:')
+        self.nrTddCfgPat1NumUlSymbsEdit = QLineEdit()
+        
+        self.nrTddCfgPat1NumUlSlotsLabel = QLabel('nrofUplinkSlots:')
+        self.nrTddCfgPat1NumUlSlotsEdit = QLineEdit()
+        
+        self.nrTddCfgPat2PeriodLabel = QLabel('dl-UL-TransmissionPeriodicity:')
+        self.nrTddCfgPat2PeriodComb = QComboBox()
+        self.nrTddCfgPat2PeriodComb.addItems(['not used', '0.5ms', '0.625ms', '1ms', '1.25ms', '2ms', '2.5ms', '3ms', '4ms', '5ms', '10ms'])
+        self.nrTddCfgPat2PeriodComb.setCurrentIndex(0)
+        
+        self.nrTddCfgPat2NumDlSlotsLabel = QLabel('nrofDownlinkSlots:')
+        self.nrTddCfgPat2NumDlSlotsEdit = QLineEdit()
+        
+        self.nrTddCfgPat2NumDlSymbsLabel = QLabel('nrofDownlinkSymbols:')
+        self.nrTddCfgPat2NumDlSymbsEdit = QLineEdit()
+        
+        self.nrTddCfgPat2NumUlSymbsLabel = QLabel('nrofUplinkSymbols:')
+        self.nrTddCfgPat2NumUlSymbsEdit = QLineEdit()
+        
+        self.nrTddCfgPat2NumUlSlotsLabel = QLabel('nrofUplinkSlots:')
+        self.nrTddCfgPat2NumUlSlotsEdit = QLineEdit()
+        
+        tddCfgTabWidget = QTabWidget()
+        
+        tddCfgPat1Widget = QWidget()
+        gridLayoutTddCfgPat1 = QGridLayout()
+        gridLayoutTddCfgPat1.addWidget(self.nrTddCfgPat1PeriodLabel, 0, 0)
+        gridLayoutTddCfgPat1.addWidget(self.nrTddCfgPat1PeriodComb, 0, 1)
+        gridLayoutTddCfgPat1.addWidget(self.nrTddCfgPat1NumDlSlotsLabel, 1, 0)
+        gridLayoutTddCfgPat1.addWidget(self.nrTddCfgPat1NumDlSlotsEdit, 1, 1)
+        gridLayoutTddCfgPat1.addWidget(self.nrTddCfgPat1NumDlSymbsLabel, 2, 0)
+        gridLayoutTddCfgPat1.addWidget(self.nrTddCfgPat1NumDlSymbsEdit, 2, 1)
+        gridLayoutTddCfgPat1.addWidget(self.nrTddCfgPat1NumUlSymbsLabel, 3, 0)
+        gridLayoutTddCfgPat1.addWidget(self.nrTddCfgPat1NumUlSymbsEdit, 3, 1)
+        gridLayoutTddCfgPat1.addWidget(self.nrTddCfgPat1NumUlSlotsLabel, 4, 0)
+        gridLayoutTddCfgPat1.addWidget(self.nrTddCfgPat1NumUlSlotsEdit, 4, 1)
+        tddCfgPat1Widget.setLayout(gridLayoutTddCfgPat1)
+        
+        tddCfgPat2Widget = QWidget()
+        gridLayoutTddCfgPat2 = QGridLayout()
+        gridLayoutTddCfgPat2.addWidget(self.nrTddCfgPat2PeriodLabel, 0, 0)
+        gridLayoutTddCfgPat2.addWidget(self.nrTddCfgPat2PeriodComb, 0, 1)
+        gridLayoutTddCfgPat2.addWidget(self.nrTddCfgPat2NumDlSlotsLabel, 1, 0)
+        gridLayoutTddCfgPat2.addWidget(self.nrTddCfgPat2NumDlSlotsEdit, 1, 1)
+        gridLayoutTddCfgPat2.addWidget(self.nrTddCfgPat2NumDlSymbsLabel, 2, 0)
+        gridLayoutTddCfgPat2.addWidget(self.nrTddCfgPat2NumDlSymbsEdit, 2, 1)
+        gridLayoutTddCfgPat2.addWidget(self.nrTddCfgPat2NumUlSymbsLabel, 3, 0)
+        gridLayoutTddCfgPat2.addWidget(self.nrTddCfgPat2NumUlSymbsEdit, 3, 1)
+        gridLayoutTddCfgPat2.addWidget(self.nrTddCfgPat2NumUlSlotsLabel, 4, 0)
+        gridLayoutTddCfgPat2.addWidget(self.nrTddCfgPat2NumUlSlotsEdit, 4, 1)
+        tddCfgPat2Widget.setLayout(gridLayoutTddCfgPat2)
+        
+        tddCfgTabWidget.addTab(tddCfgPat1Widget, 'Pattern 1')
+        tddCfgTabWidget.addTab(tddCfgPat2Widget, 'Pattern 2')
+        
+        tddCfgGrpBox = QGroupBox()
+        tddCfgGrpBox.setTitle('TDD-UL-DL-ConfigCommon')
+        tddCfgGrpBoxLayout = QVBoxLayout()
+        tddCfgRefScsLayout = QHBoxLayout()
+        tddCfgRefScsLayout.addWidget(self.nrTddCfgRefScsLabel)
+        tddCfgRefScsLayout.addWidget(self.nrTddCfgRefScsComb)
+        tddCfgRefScsLayout.addStretch()
+        tddCfgGrpBoxLayout.addLayout(tddCfgRefScsLayout)
+        tddCfgGrpBoxLayout.addWidget(tddCfgTabWidget)
+        tddCfgGrpBox.setLayout(tddCfgGrpBoxLayout)
+        
+        pciLayout = QHBoxLayout()
+        pciLayout.addWidget(self.nrSsbPciLabel)
+        pciLayout.addWidget(self.nrSsbPciEdit)
+        pciLayout.addStretch()
+        
+        gridLayoutSsbCfg = QGridLayout()
+        gridLayoutSsbCfg.addWidget(ssbGrpBox, 0, 0, 1, 2)
+        gridLayoutSsbCfg.addWidget(mibGrpBox, 1, 0, 1, 2)
+        gridLayoutSsbCfg.addWidget(tddCfgGrpBox, 2, 0, 1, 2)
+        
+        ssbCfgLayout.addLayout(pciLayout)
+        ssbCfgLayout.addLayout(gridLayoutSsbCfg)
+        ssbCfgLayout.addStretch()
+        ssbCfgWidget.setLayout(ssbCfgLayout)
+        
+        #-->(3) Coreset/SearchSpace Config Widget
+        pdcchCfgWidget = QWidget()
+        pdcchCfgLayout = QVBoxLayout()
+        
+        #---->(3.1) CSS0 configurations
+        
+        
+        
 
         #-->Tab Widgets
         tabWidget = QTabWidget()
         tabWidget.addTab(resGridCfgWidget, 'Resource Grids')
+        tabWidget.addTab(ssbCfgWidget, 'SSB Settings')
 
         #-->Buttons
         self.okBtn = QPushButton('OK')
@@ -421,7 +602,7 @@ class NgNrGridUi(QDialog):
         elif key == '120_120':
             self.nrSsbKssbEdit.setPlaceholderText('0~11')
             self.nrSsbNCrbSsbEdit.setText(str(2*minGuardBand))
-        elif key == '120_240':
+        else:   #key == '120_240':
             self.nrSsbKssbEdit.setPlaceholderText('0~11')
             minGuardBand240k = int(self.nrSsbMinGuardBandScs240kEdit.text())
             self.nrSsbNCrbSsbEdit.setText(str(max(2*minGuardBand, 4*minGuardBand240k)))
