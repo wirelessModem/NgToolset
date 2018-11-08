@@ -101,13 +101,6 @@ class NgNrGridUi(QDialog):
         ssbGridGrpBoxLayout.addWidget(self.nrSsbNCrbSsbEdit, 4, 1)
         ssbGridGrpBox.setLayout(ssbGridGrpBoxLayout)
 
-        #connect signals to slots
-        self.nrCarrierBwComb.currentIndexChanged[int].connect(self.onCarrierBwCombCurrentIndexChanged)
-        self.nrCarrierScsComb.currentIndexChanged[int].connect(self.onCarrierScsCombCurrentIndexChanged)
-        self.nrCarrierBandComb.currentIndexChanged[int].connect(self.onCarrierBandCombCurrentIndexChanged)
-        self.nrSsbScsComb.currentIndexChanged[int].connect(self.onSsbScsCombCurrentIndexChanged)
-        self.nrCarrierBandComb.setCurrentText('n77')
-
         gridLayoutResGridCfg = QGridLayout()
         gridLayoutResGridCfg.addWidget(self.nrCarrierBandLabel, 0, 0)
         gridLayoutResGridCfg.addWidget(self.nrCarrierBandComb, 0, 1)
@@ -124,11 +117,11 @@ class NgNrGridUi(QDialog):
         ssbCfgLayout = QVBoxLayout()
         
         #---->(2.1) SSB configurations
-        self.nrSsbInOneGrpLabel = QLabel('inOneGroup:')
+        self.nrSsbInOneGrpLabel = QLabel('inOneGroup(ssb-PositionsInBurst):')
         self.nrSsbInOneGrpEdit = QLineEdit()
         self.nrSsbInOneGrpEdit.setPlaceholderText('11111111')
         
-        self.nrSsbGrpPresenceLabel = QLabel('groupPresence:')
+        self.nrSsbGrpPresenceLabel = QLabel('groupPresence(ssb-PositionsInBurst):')
         self.nrSsbGrpPresenceEdit = QLineEdit()
         self.nrSsbGrpPresenceEdit.setPlaceholderText('11111111')
         
@@ -169,7 +162,7 @@ class NgNrGridUi(QDialog):
         self.nrMibScsCommonComb.addItems(['15KHz', '30KHz', '60KHz', '120KHz'])
         self.nrMibScsCommonComb.setEnabled(False)
         
-        self.nrMibRmsiCoreset0Label = QLabel('coresetZero(PDCCH-ConfigSIB1):')
+        self.nrMibRmsiCoreset0Label = QLabel('controlResourceSetZero(PDCCH-ConfigSIB1):')
         self.nrMibRmsiCoreset0Edit = QLineEdit()
         self.nrMibRmsiCoreset0Edit.setPlaceholderText('0~15')
         
@@ -205,15 +198,19 @@ class NgNrGridUi(QDialog):
         
         self.nrTddCfgPat1NumDlSlotsLabel = QLabel('nrofDownlinkSlots:')
         self.nrTddCfgPat1NumDlSlotsEdit = QLineEdit()
+        self.nrTddCfgPat1NumDlSlotsEdit.setPlaceholderText('0~80')
         
         self.nrTddCfgPat1NumDlSymbsLabel = QLabel('nrofDownlinkSymbols:')
         self.nrTddCfgPat1NumDlSymbsEdit = QLineEdit()
+        self.nrTddCfgPat1NumDlSymbsEdit.setPlaceholderText('0~13')
         
         self.nrTddCfgPat1NumUlSymbsLabel = QLabel('nrofUplinkSymbols:')
         self.nrTddCfgPat1NumUlSymbsEdit = QLineEdit()
+        self.nrTddCfgPat1NumUlSymbsEdit.setPlaceholderText('0~13')
         
         self.nrTddCfgPat1NumUlSlotsLabel = QLabel('nrofUplinkSlots:')
         self.nrTddCfgPat1NumUlSlotsEdit = QLineEdit()
+        self.nrTddCfgPat1NumUlSlotsEdit.setPlaceholderText('0~80')
         
         self.nrTddCfgPat2PeriodLabel = QLabel('dl-UL-TransmissionPeriodicity:')
         self.nrTddCfgPat2PeriodComb = QComboBox()
@@ -222,15 +219,19 @@ class NgNrGridUi(QDialog):
         
         self.nrTddCfgPat2NumDlSlotsLabel = QLabel('nrofDownlinkSlots:')
         self.nrTddCfgPat2NumDlSlotsEdit = QLineEdit()
+        self.nrTddCfgPat2NumDlSlotsEdit.setPlaceholderText('0~80')
         
         self.nrTddCfgPat2NumDlSymbsLabel = QLabel('nrofDownlinkSymbols:')
         self.nrTddCfgPat2NumDlSymbsEdit = QLineEdit()
+        self.nrTddCfgPat2NumDlSymbsEdit.setPlaceholderText('0~13')
         
         self.nrTddCfgPat2NumUlSymbsLabel = QLabel('nrofUplinkSymbols:')
         self.nrTddCfgPat2NumUlSymbsEdit = QLineEdit()
+        self.nrTddCfgPat2NumUlSymbsEdit.setPlaceholderText('0~13')
         
         self.nrTddCfgPat2NumUlSlotsLabel = QLabel('nrofUplinkSlots:')
         self.nrTddCfgPat2NumUlSlotsEdit = QLineEdit()
+        self.nrTddCfgPat2NumUlSlotsEdit.setPlaceholderText('0~80')
         
         tddCfgTabWidget = QTabWidget()
         
@@ -355,13 +356,16 @@ class NgNrGridUi(QDialog):
         self.nrUssPeriodicityComb = QComboBox()
         self.nrUssPeriodicityComb.addItems(['sl1', 'sl2', 'sl4', 'sl5', 'sl8', 'sl10', 'sl16', 'sl20',
                                             'sl40', 'sl80', 'sl160', 'sl320', 'sl640', 'sl1280', 'sl2560'])
+        self.nrUssPeriodicityComb.currentIndexChanged[int].connect(self.onUssPeriodicityCombCurrentIndexChanged)
         self.nrUssPeriodicityComb.setCurrentIndex(0)
         
         self.nrUssSlotOffsetLabel = QLabel('monitoringSlotOffset:')
         self.nrUssSlotOffsetEdit = QLineEdit()
+        self.nrUssSlotOffsetEdit.setText('0')
         
         self.nrUssDurationLabel = QLabel('duration:')
         self.nrUssDurationEdit = QLineEdit()
+        self.nrUssDurationEdit.setText('1')
         
         self.nrUssFirstSymbsLabel = QLabel('monitoringSymbolsWithinSlot:')
         self.nrUssFirstSymbsEdit = QLineEdit()
@@ -435,6 +439,13 @@ class NgNrGridUi(QDialog):
         #-->(10) CSI-RS settings tab
         #TODO CSI-RS is not supported!
 
+        #connect signals to slots
+        self.nrCarrierBwComb.currentIndexChanged[int].connect(self.onCarrierBwCombCurrentIndexChanged)
+        self.nrCarrierScsComb.currentIndexChanged[int].connect(self.onCarrierScsCombCurrentIndexChanged)
+        self.nrCarrierBandComb.currentIndexChanged[int].connect(self.onCarrierBandCombCurrentIndexChanged)
+        self.nrSsbScsComb.currentIndexChanged[int].connect(self.onSsbScsCombCurrentIndexChanged)
+        self.nrCarrierBandComb.setCurrentText('n77')
+
         #-->Tab Widgets
         tabWidget = QTabWidget()
         tabWidget.addTab(gridCfgWidget, 'Grid Settings')
@@ -465,43 +476,43 @@ class NgNrGridUi(QDialog):
         #Table 5.2-1: NR operating bands in FR1
         #Table 5.2-2: NR operating bands in FR2
         self.nrOpBands = OrderedDict((
-            ('n1', ('1920 MHz-1980 MHz', '2110 MHz-2170 MHz', 'FDD')),
-            ('n2', ('1850 MHz-1910 MHz', '1930 MHz-1990 MHz', 'FDD')),
-            ('n3', ('1710 MHz-1785 MHz', '1805 MHz-1880 MHz', 'FDD')),
-            ('n5', ('824 MHz-849 MHz', '869 MHz-894 MHz', 'FDD')),
-            ('n7', ('2500 MHz-2570 MHz', '2620 MHz-2690 MHz', 'FDD')),
-            ('n8', ('880 MHz-915 MHz', '925 MHz-960 MHz', 'FDD')),
-            ('n12', ('699 MHz-716 MHz', '729 MHz-746 MHz', 'FDD')),
-            ('n20', ('832 MHz-862 MHz', '791 MHz-821 MHz', 'FDD')),
-            ('n25', ('1850 MHz-1915 MHz', '1930 MHz-1995 MHz', 'FDD')),
-            ('n28', ('703 MHz-748 MHz', '758 MHz-803 MHz', 'FDD')),
-            ('n34', ('2010 MHz-2025 MHz', '2010 MHz-2025 MHz', 'TDD')),
-            ('n38', ('2570 MHz-2620 MHz', '2570 MHz-2620 MHz', 'TDD')),
-            ('n39', ('1880 MHz-1920 MHz', '1880 MHz-1920 MHz', 'TDD')),
-            ('n40', ('2300 MHz-2400 MHz', '2300 MHz-2400 MHz', 'TDD')),
-            ('n41', ('2496 MHz-2690 MHz', '2496 MHz-2690 MHz', 'TDD')),
-            ('n50', ('1432 MHz-1517 MHz', '1432 MHz-1517 MHz', 'TDD')),
-            ('n51', ('1427 MHz-1432 MHz', '1427 MHz-1432 MHz', 'TDD')),
-            ('n66', ('1710 MHz-1780 MHz', '2110 MHz-2200 MHz', 'FDD')),
-            ('n70', ('1695 MHz-1710 MHz', '1995 MHz-2020 MHz', 'FDD')),
-            ('n71', ('663 MHz-698 MHz', '617 MHz-652 MHz', 'FDD')),
-            ('n74', ('1427 MHz-1470 MHz', '1475 MHz-1518 MHz', 'FDD')),
-            ('n75', ('N/A', '1432 MHz-1517 MHz', 'SDL')),
-            ('n76', ('N/A', '1427 MHz-1432 MHz', 'SDL')),
-            ('n77', ('3300 MHz-4200 MHz', '3300 MHz-4200 MHz', 'TDD')),
-            ('n78', ('3300 MHz-3800 MHz', '3300 MHz-3800 MHz', 'TDD')),
-            ('n79', ('4400 MHz-5000 MHz', '4400 MHz-5000 MHz', 'TDD')),
-            ('n80', ('1710 MHz-1785 MHz', 'N/A', 'SUL')),
-            ('n81', ('880 MHz-915 MHz', 'N/A', 'SUL')),
-            ('n82', ('832 MHz-862 MHz', 'N/A', 'SUL')),
-            ('n83', ('703 MHz-748 MHz', 'N/A', 'SUL')),
-            ('n84', ('1920 MHz-1980 MHz', 'N/A', 'SUL')),
-            ('n86', ('1710 MHz-1780 MHz', 'N/A', 'SUL')),
-            ('n257', ('26500 MHz-29500 MHz', '26500 MHz-29500 MHz', 'TDD')),
-            ('n258', ('24250 MHz-27500 MHz', '24250 MHz-27500 MHz', 'TDD')),
-            ('n260', ('37000 MHz-40000 MHz', '37000 MHz-40000 MHz', 'TDD')),
-            ('n261', ('27500 MHz-28350 MHz', '27500 MHz-28350 MHz', 'TDD')),
-            ))
+            ('n1', ('1920 MHz-1980 MHz', '2110 MHz-2170 MHz', 'FDD',4)),
+            ('n2', ('1850 MHz-1910 MHz', '1930 MHz-1990 MHz', 'FDD',4)),
+            ('n3', ('1710 MHz-1785 MHz', '1805 MHz-1880 MHz', 'FDD',4)),
+            ('n5', ('824 MHz-849 MHz', '869 MHz-894 MHz', 'FDD',4)),
+            ('n7', ('2500 MHz-2570 MHz', '2620 MHz-2690 MHz', 'FDD',4)),
+            ('n8', ('880 MHz-915 MHz', '925 MHz-960 MHz', 'FDD',4)),
+            ('n12', ('699 MHz-716 MHz', '729 MHz-746 MHz', 'FDD',4)),
+            ('n20', ('832 MHz-862 MHz', '791 MHz-821 MHz', 'FDD',4)),
+            ('n25', ('1850 MHz-1915 MHz', '1930 MHz-1995 MHz', 'FDD',4)),
+            ('n28', ('703 MHz-748 MHz', '758 MHz-803 MHz', 'FDD',4)),
+            ('n34', ('2010 MHz-2025 MHz', '2010 MHz-2025 MHz', 'TDD',4)),
+            ('n38', ('2570 MHz-2620 MHz', '2570 MHz-2620 MHz', 'TDD',4)),
+            ('n39', ('1880 MHz-1920 MHz', '1880 MHz-1920 MHz', 'TDD',4)),
+            ('n40', ('2300 MHz-2400 MHz', '2300 MHz-2400 MHz', 'TDD',4)),
+            ('n41', ('2496 MHz-2690 MHz', '2496 MHz-2690 MHz', 'TDD',4)),
+            ('n50', ('1432 MHz-1517 MHz', '1432 MHz-1517 MHz', 'TDD',4)),
+            ('n51', ('1427 MHz-1432 MHz', '1427 MHz-1432 MHz', 'TDD',4)),
+            ('n66', ('1710 MHz-1780 MHz', '2110 MHz-2200 MHz', 'FDD',4)),
+            ('n70', ('1695 MHz-1710 MHz', '1995 MHz-2020 MHz', 'FDD',4)),
+            ('n71', ('663 MHz-698 MHz', '617 MHz-652 MHz', 'FDD',4)),
+            ('n74', ('1427 MHz-1470 MHz', '1475 MHz-1518 MHz', 'FDD',4)),
+            ('n75', ('N/A', '1432 MHz-1517 MHz', 'SDL',4)),
+            ('n76', ('N/A', '1427 MHz-1432 MHz', 'SDL',4)),
+            ('n77', ('3300 MHz-4200 MHz', '3300 MHz-4200 MHz', 'TDD',8)),
+            ('n78', ('3300 MHz-3800 MHz', '3300 MHz-3800 MHz', 'TDD',8)),
+            ('n79', ('4400 MHz-5000 MHz', '4400 MHz-5000 MHz', 'TDD',8)),
+            ('n80', ('1710 MHz-1785 MHz', 'N/A', 'SUL ',0)),
+            ('n81', ('880 MHz-915 MHz', 'N/A', 'SUL ',0)),
+            ('n82', ('832 MHz-862 MHz', 'N/A', 'SUL ',0)),
+            ('n83', ('703 MHz-748 MHz', 'N/A', 'SUL',0)),
+            ('n84', ('1920 MHz-1980 MHz', 'N/A', 'SUL',0)),
+            ('n86', ('1710 MHz-1780 MHz', 'N/A', 'SUL',0)),
+            ('n257', ('26500 MHz-29500 MHz', '26500 MHz-29500 MHz', 'TDD',64)),
+            ('n258', ('24250 MHz-27500 MHz', '24250 MHz-27500 MHz', 'TDD',64)),
+            ('n260', ('37000 MHz-40000 MHz', '37000 MHz-40000 MHz', 'TDD',64)),
+            ('n261', ('27500 MHz-28350 MHz', '27500 MHz-28350 MHz', 'TDD',64)),
+        ))
         
         self.nrBwSetFr1 = ('5MHz', '10MHz', '15MHz', '20MHz', '25MHz', '30MHz', '40MHz', '50MHz', '60MHz', '70MHz', '80MHz', '90MHz', '100MHz')
         self.nrBwSetFr2 = ('50MHz', '100MHz', '200MHz', '400MHz')
@@ -741,10 +752,12 @@ class NgNrGridUi(QDialog):
         elif key == '120_120':
             self.nrSsbKssbEdit.setPlaceholderText('0~11')
             self.nrSsbNCrbSsbEdit.setText(str(2*minGuardBand))
-        else:   #key == '120_240':
+        elif key == '120_240':
             self.nrSsbKssbEdit.setPlaceholderText('0~11')
             minGuardBand240k = int(self.nrSsbMinGuardBandScs240kEdit.text())
             self.nrSsbNCrbSsbEdit.setText(str(max(2*minGuardBand, 4*minGuardBand240k)))
+        else:
+            pass
     
     def onCarrierBandCombCurrentIndexChanged(self, index):
         #self.ngwin.logEdit.append('inside onCarrierBandCombCurrentIndexChanged, index=%d' % index)
@@ -752,7 +765,7 @@ class NgNrGridUi(QDialog):
             return
 
         #(1) update band info
-        ulBand, dlBand, self.duplexMode = self.nrOpBands[self.nrCarrierBandComb.currentText()]
+        ulBand, dlBand, self.duplexMode, self.maxL = self.nrOpBands[self.nrCarrierBandComb.currentText()]
         self.freqRange = 'FR1' if int(self.nrCarrierBandComb.currentText()[1:]) <= 256 else 'FR2'
         if self.duplexMode == 'TDD':
             self.nrCarrierBandInfoLabel.setText('<font color=green>UL/DL: %s, %s, %s</font>' % (ulBand, self.duplexMode, self.freqRange))
@@ -780,6 +793,15 @@ class NgNrGridUi(QDialog):
         self.nrCarrierScsComb.clear()
         self.nrCarrierScsComb.addItems(scsSubset)
         self.nrCarrierScsComb.setCurrentIndex(0)
+        
+        #(4) update SSB
+        if self.maxL < 64:
+            self.nrSsbGrpPresenceEdit.setText('NA')
+            self.nrSsbGrpPresenceEdit.setEnabled(False)
+        else:
+            self.nrSsbGrpPresenceEdit.setEnabled(True)
+            self.nrSsbGrpPresenceEdit.clear()
+            self.nrSsbGrpPresenceEdit.setPlaceholderText('11111111')
 
     def onCarrierScsCombCurrentIndexChanged(self, index):
         #self.ngwin.logEdit.append('inside onCarrierScsCombCurrentIndexChanged, index=%d' % index)
@@ -798,6 +820,10 @@ class NgNrGridUi(QDialog):
         self.nrCarrierBwComb.clear()
         self.nrCarrierBwComb.addItems(bwSubset)
         self.nrCarrierBwComb.setCurrentIndex(0)
+        
+        #(2) update scsCommon and refScs
+        self.nrMibScsCommonComb.setCurrentText(self.nrCarrierScsComb.currentText())
+        self.nrTddCfgRefScsComb.setCurrentText(self.nrCarrierScsComb.currentText())
 
     def onCarrierBwCombCurrentIndexChanged(self, index):
         #self.ngwin.logEdit.append('inside onCarrierBwCombCurrentIndexChanged, index=%d' % index)
@@ -860,6 +886,24 @@ class NgNrGridUi(QDialog):
         #(3) update k_SSB and n_CRB_SSB
         if self.nrMinGuardBandEdit.text():
             self.updateKSsbAndNCrbSsb()
+    
+    def onUssPeriodicityCombCurrentIndexChanged(self, index):
+        #self.ngwin.logEdit.append('inside onUssPeriodicityCombCurrentIndexChanged, index=%d' % index)
+        if index < 0:
+            return
+        
+        period = int(self.nrUssPeriodicityComb.currentText()[2:])
+        self.nrUssSlotOffsetEdit.clear()
+        self.nrUssDurationEdit.clear()
+        if period == 1:
+            self.nrUssSlotOffsetEdit.setText('0')
+        else:
+            self.nrUssSlotOffsetEdit.setPlaceholderText('0~%d' % (period-1))
+        
+        if period in (1, 2):
+            self.nrUssDurationEdit.setText('1')
+        else:
+            self.nrUssDurationEdit.setPlaceholderText('1~%d' % (period-1))
 
     def onOkBtnClicked(self):
         #TODO
