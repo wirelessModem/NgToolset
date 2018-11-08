@@ -296,14 +296,136 @@ class NgNrGridUi(QDialog):
         pdcchCfgLayout = QVBoxLayout()
         
         #---->(3.1) CSS0 configurations
+        self.nrCss0AggLevelLabel = QLabel('Aggregation level:')
+        self.nrCss0AggLevelComb = QComboBox()
+        self.nrCss0AggLevelComb.addItems(['4', '8', '16'])
+        self.nrCss0AggLevelComb.setCurrentIndex(0)
         
+        self.nrCss0NumCandidatesLabel = QLabel('Num of candidates:')
+        self.nrCss0NumCandidatesComb = QComboBox()
+        self.nrCss0NumCandidatesComb.addItems(['n1', 'n2', 'n4'])
+        self.nrCss0NumCandidatesComb.setCurrentIndex(2)
         
+        css0GrpBox = QGroupBox()
+        css0GrpBox.setTitle('Type 0 CSS')
+        css0GrpBoxLayout = QGridLayout()
+        css0GrpBoxLayout.addWidget(self.nrCss0AggLevelLabel, 0, 0)
+        css0GrpBoxLayout.addWidget(self.nrCss0AggLevelComb, 0, 1)
+        css0GrpBoxLayout.addWidget(self.nrCss0NumCandidatesLabel, 1, 0)
+        css0GrpBoxLayout.addWidget(self.nrCss0NumCandidatesComb, 1, 1)
+        css0GrpBox.setLayout(css0GrpBoxLayout)
+        
+        #---->(3.2) CORESET1 configurations
+        self.nrCoreset1FreqResourcesLabel = QLabel('frequencyDomainResources:')
+        self.nrCoreset1FreqResourcesEdit = QLineEdit()
+        self.nrCoreset1FreqResourcesEdit.setFixedWidth(52 * self.fontMetrics().width('0'))
+        self.nrCoreset1FreqResourcesEdit.setPlaceholderText('00000000,00000000,00000000,00000000,00000000,00000')
+        
+        self.nrCoreset1DurationLabel = QLabel('duration:')
+        self.nrCoreset1DurationComb = QComboBox()
+        self.nrCoreset1DurationComb.addItems(['1', '2', '3'])
+        self.nrCoreset1DurationComb.setCurrentIndex(0)
+        
+        self.nrCoreset1CceRegMapLabel = QLabel('cce-REG-MappingType:')
+        self.nrCoreset1CceRegMapComb = QComboBox()
+        self.nrCoreset1CceRegMapComb.addItems(['interleaved', 'nonInterleaved'])
+        self.nrCoreset1CceRegMapComb.setCurrentIndex(0)
+        
+        self.nrCoreset1RegBundleSizeLabel = QLabel('reg-BundleSize(L):')
+        self.nrCoreset1RegBundleSizeComb = QComboBox()
+        self.nrCoreset1RegBundleSizeComb.addItems(['n2', 'n3', 'n6'])
+        self.nrCoreset1RegBundleSizeComb.setCurrentIndex(0)
+        
+        self.nrCoreset1InterleaverSizeLabel = QLabel('interleaverSize(R):')
+        self.nrCoreset1InterleaverSizeComb = QComboBox()
+        self.nrCoreset1InterleaverSizeComb.addItems(['n2', 'n3', 'n6'])
+        self.nrCoreset1InterleaverSizeComb.setCurrentIndex(0)
+        
+        self.nrCoreset1ShiftIndexLabel = QLabel('shiftIndex:')
+        self.nrCoreset1ShiftIndexEdit = QLineEdit()
+        self.nrCoreset1ShiftIndexEdit.setPlaceholderText('0~274')
+        
+        self.nrCoreset1PrecoderGranularityLabel = QLabel('precoderGranularity:')
+        self.nrCoreset1PrecoderGranularityComb = QComboBox()
+        self.nrCoreset1PrecoderGranularityComb.addItems(['sameAsREG-bundle', 'allContiguousRBs'])
+        self.nrCoreset1PrecoderGranularityComb.setCurrentIndex(0)
+        
+        #---->(3.3) USS configuratons
+        self.nrUssPeriodicityLabel = QLabel('monitoringSlotPeriodicity:')
+        self.nrUssPeriodicityComb = QComboBox()
+        self.nrUssPeriodicityComb.addItems(['sl1', 'sl2', 'sl4', 'sl5', 'sl8', 'sl10', 'sl16', 'sl20',
+                                            'sl40', 'sl80', 'sl160', 'sl320', 'sl640', 'sl1280', 'sl2560'])
+        self.nrUssPeriodicityComb.setCurrentIndex(0)
+        
+        self.nrUssSlotOffsetLabel = QLabel('monitoringSlotOffset:')
+        self.nrUssSlotOffsetEdit = QLineEdit()
+        
+        self.nrUssDurationLabel = QLabel('duration:')
+        self.nrUssDurationEdit = QLineEdit()
+        
+        self.nrUssFirstSymbsLabel = QLabel('monitoringSymbolsWithinSlot:')
+        self.nrUssFirstSymbsEdit = QLineEdit()
+        self.nrUssFirstSymbsEdit.setPlaceholderText('1111111,1111111')
+        
+        self.nrUssAggLevelLabel = QLabel('aggregationLevel:')
+        self.nrUssAggLevelComb = QComboBox()
+        self.nrUssAggLevelComb.addItems(['1', '2', '4', '8', '16'])
+        self.nrUssAggLevelComb.setCurrentIndex(2)
+        
+        self.nrUssNumCandidatesLabel = QLabel('nrofCandidates:')
+        self.nrUssNumCandidatesComb = QComboBox()
+        self.nrUssNumCandidatesComb.addItems(['n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n8'])
+        
+        pdcchTabWidget = QTabWidget()
+        
+        coreset1Widget = QWidget()
+        coreset1Layout = QGridLayout()
+        coreset1Layout.addWidget(self.nrCoreset1FreqResourcesLabel, 0, 0)
+        coreset1Layout.addWidget(self.nrCoreset1FreqResourcesEdit, 0, 1)
+        coreset1Layout.addWidget(self.nrCoreset1DurationLabel, 1, 0)
+        coreset1Layout.addWidget(self.nrCoreset1DurationComb, 1, 1)
+        coreset1Layout.addWidget(self.nrCoreset1CceRegMapLabel, 2, 0)
+        coreset1Layout.addWidget(self.nrCoreset1CceRegMapComb, 2, 1)
+        coreset1Layout.addWidget(self.nrCoreset1RegBundleSizeLabel, 3, 0)
+        coreset1Layout.addWidget(self.nrCoreset1RegBundleSizeComb, 3, 1)
+        coreset1Layout.addWidget(self.nrCoreset1InterleaverSizeLabel, 4, 0)
+        coreset1Layout.addWidget(self.nrCoreset1InterleaverSizeComb, 4, 1)
+        coreset1Layout.addWidget(self.nrCoreset1ShiftIndexLabel, 5, 0)
+        coreset1Layout.addWidget(self.nrCoreset1ShiftIndexEdit, 5, 1)
+        coreset1Layout.addWidget(self.nrCoreset1PrecoderGranularityLabel, 6, 0)
+        coreset1Layout.addWidget(self.nrCoreset1PrecoderGranularityComb, 6, 1)
+        coreset1Widget.setLayout(coreset1Layout)
+        
+        ussWidget = QWidget()
+        ussLayout = QGridLayout()
+        ussLayout.addWidget(self.nrUssPeriodicityLabel, 0, 0)
+        ussLayout.addWidget(self.nrUssPeriodicityComb, 0, 1)
+        ussLayout.addWidget(self.nrUssSlotOffsetLabel, 1, 0)
+        ussLayout.addWidget(self.nrUssSlotOffsetEdit, 1, 1)
+        ussLayout.addWidget(self.nrUssDurationLabel, 2, 0)
+        ussLayout.addWidget(self.nrUssDurationEdit, 2, 1)
+        ussLayout.addWidget(self.nrUssFirstSymbsLabel, 3, 0)
+        ussLayout.addWidget(self.nrUssFirstSymbsEdit, 3, 1)
+        ussLayout.addWidget(self.nrUssAggLevelLabel, 4, 0)
+        ussLayout.addWidget(self.nrUssAggLevelComb, 4, 1)
+        ussLayout.addWidget(self.nrUssNumCandidatesLabel, 5, 0)
+        ussLayout.addWidget(self.nrUssNumCandidatesComb, 5, 1)
+        ussWidget.setLayout(ussLayout)
+        
+        pdcchTabWidget.addTab(coreset1Widget, 'CORESET 1')
+        pdcchTabWidget.addTab(ussWidget, 'USS')
+        
+        pdcchCfgLayout.addWidget(css0GrpBox)
+        pdcchCfgLayout.addWidget(pdcchTabWidget)
+        pdcchCfgLayout.addStretch()
+        pdcchCfgWidget.setLayout(pdcchCfgLayout)
         
 
         #-->Tab Widgets
         tabWidget = QTabWidget()
-        tabWidget.addTab(resGridCfgWidget, 'Resource Grids')
+        tabWidget.addTab(resGridCfgWidget, 'Grid Settings')
         tabWidget.addTab(ssbCfgWidget, 'SSB Settings')
+        tabWidget.addTab(pdcchCfgWidget, 'PDCCH Settings')
 
         #-->Buttons
         self.okBtn = QPushButton('OK')
@@ -548,6 +670,9 @@ class NgNrGridUi(QDialog):
             'n260': (('120KHz', 'Case D', '22995-<1>-23166'), ('240KHz', 'Case E', '22996-<2>-23164')),
             'n261': (('120KHz', 'Case D', '22446-<1>-22492'), ('240KHz', 'Case E', '22446-<2>-22490')),
         }
+        
+        #TODO
+        
         
     def validateScsPerBandFr1(self):
         self.nrScsPerBandFr1 = dict()
