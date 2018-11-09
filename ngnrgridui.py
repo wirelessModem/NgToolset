@@ -435,6 +435,8 @@ class NgNrGridUi(QDialog):
         #-->(8) PUSCH settings tab
         
         #-->(9) BWP settings tab
+        #including initial active DL BWP, dedicated active DL BWP, initial active UL BWP, dedicated active UL BWP
+        
         
         #-->(10) CSI-RS settings tab
         #TODO CSI-RS is not supported!
@@ -444,6 +446,7 @@ class NgNrGridUi(QDialog):
         self.nrCarrierScsComb.currentIndexChanged[int].connect(self.onCarrierScsCombCurrentIndexChanged)
         self.nrCarrierBandComb.currentIndexChanged[int].connect(self.onCarrierBandCombCurrentIndexChanged)
         self.nrSsbScsComb.currentIndexChanged[int].connect(self.onSsbScsCombCurrentIndexChanged)
+        self.nrMibRmsiCoreset0Edit.editingFinished.connect(self.onMibRmsiCoreset0EditEditingFinished)
         self.nrCarrierBandComb.setCurrentText('n77')
 
         #-->Tab Widgets
@@ -512,7 +515,7 @@ class NgNrGridUi(QDialog):
             ('n258', ('24250 MHz-27500 MHz', '24250 MHz-27500 MHz', 'TDD',64)),
             ('n260', ('37000 MHz-40000 MHz', '37000 MHz-40000 MHz', 'TDD',64)),
             ('n261', ('27500 MHz-28350 MHz', '27500 MHz-28350 MHz', 'TDD',64)),
-        ))
+            ))
         
         self.nrBwSetFr1 = ('5MHz', '10MHz', '15MHz', '20MHz', '25MHz', '30MHz', '40MHz', '50MHz', '60MHz', '70MHz', '80MHz', '90MHz', '100MHz')
         self.nrBwSetFr2 = ('50MHz', '100MHz', '200MHz', '400MHz')
@@ -616,7 +619,7 @@ class NgNrGridUi(QDialog):
             ('n86_15', (1,1,1,1,0,0,1,0,0,0,0,0,0)),
             ('n86_30', (0,1,1,1,0,0,1,0,0,0,0,0,0)),
             ('n86_60', (0,1,1,1,0,0,1,0,0,0,0,0,0)),
-        ))
+            ))
         #Table 5.3.5-2: BS channel bandwidths and SCS per operating band in FR2
         self.nrBandScs2BwFr2 = OrderedDict(( 
             ('n257_60', (1,1,1,0)),
@@ -627,7 +630,7 @@ class NgNrGridUi(QDialog):
             ('n260_120', (1,1,1,1)),
             ('n261_60', (1,1,1,0)),
             ('n261_120', (1,1,1,1)),
-        ))
+            ))
         self.validateScsPerBandFr1()
         
         #refer to 3GPP 38.104 vf30
@@ -636,12 +639,12 @@ class NgNrGridUi(QDialog):
             15: (25, 52, 79, 106, 133, 160, 216, 270, 0, 0, 0, 0, 0),
             30: (11, 24, 38, 51, 65, 78, 106, 133, 162, 189, 217, 245, 273),
             60: (0, 11, 18, 24, 31, 38, 51, 65, 79, 93, 107, 121, 135),
-        }
+            }
         #Table 5.3.2-2: Transmission bandwidth configuration N_RB for FR2
         self.nrNrbFr2 = {
             60: (66, 132, 264, 0),
             120: (32, 66, 132, 264),
-        }
+            }
         
         #refer to 3GPP 38.104 vf30
         #Table 5.3.3-1: Minimum guardband (kHz) (FR1)
@@ -649,12 +652,12 @@ class NgNrGridUi(QDialog):
             15: (2, 2, 3, 3, 3, 4, 4, 4, 0, 0, 0, 0, 0),
             30: (2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
             60: (0, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 2, 2),
-        }
+            }
         #Table: 5.3.3-2: Minimum guardband (kHz) (FR2)
         self.nrMinGuardBandFr2 = {
             60: (2, 4, 7, 0),
             120: (2, 2, 4, 7),
-        }
+            }
         
         #refer to 3GPP 38.104 vf30
         #Table: 5.3.3-3: Minimum guardband (kHz) of SCS 240 kHz SS/PBCH block (FR2)
@@ -694,9 +697,190 @@ class NgNrGridUi(QDialog):
             'n258': (('120KHz', 'Case D', '22257-<1>-22443'), ('240KHz', 'Case E', '22258-<2>-22442')),
             'n260': (('120KHz', 'Case D', '22995-<1>-23166'), ('240KHz', 'Case E', '22996-<2>-23164')),
             'n261': (('120KHz', 'Case D', '22446-<1>-22492'), ('240KHz', 'Case E', '22446-<2>-22490')),
-        }
+            }
         
-        #TODO
+        #refer to 3GPP 38.213 vf30
+        #Table 13-1: Set of resource blocks and slot symbols of control resource set for Type0-PDCCH search space when {SS/PBCH block, PDCCH} subcarrier spacing is {15, 15} kHz for frequency bands with minimum channel bandwidth 5 MHz or 10 MHz
+        #Table 13-2: Set of resource blocks and slot symbols of control resource set for Type0-PDCCH search space when {SS/PBCH block, PDCCH} subcarrier spacing is {15, 30} kHz for frequency bands with minimum channel bandwidth 5 MHz or 10 MHz
+        #Table 13-3: Set of resource blocks and slot symbols of control resource set for Type0-PDCCH search space when {SS/PBCH block, PDCCH} subcarrier spacing is {30, 15} kHz for frequency bands with minimum channel bandwidth 5 MHz or 10 MHz
+        #Table 13-4: Set of resource blocks and slot symbols of control resource set for Type0-PDCCH search space when {SS/PBCH block, PDCCH} subcarrier spacing is {30, 30} kHz for frequency bands with minimum channel bandwidth 5 MHz or 10 MHz
+        #table for FR1 with minimum channel bandwidth of 5MHz/10MHz
+        self.nrCoreset0Fr1MinChBw5m10m = {
+            '15_15_0' : (1,24,2,(0,)),
+            '15_15_1' : (1,24,2,(2,)),
+            '15_15_2' : (1,24,2,(4,)),
+            '15_15_3' : (1,24,3,(0,)),
+            '15_15_4' : (1,24,3,(2,)),
+            '15_15_5' : (1,24,3,(4,)),
+            '15_15_6' : (1,48,1,(12,)),
+            '15_15_7' : (1,48,1,(16,)),
+            '15_15_8' : (1,48,2,(12,)),
+            '15_15_9' : (1,48,2,(16,)),
+            '15_15_10' : (1,48,3,(12,)),
+            '15_15_11' : (1,48,3,(16,)),
+            '15_15_12' : (1,96,1,(38,)),
+            '15_15_13' : (1,96,2,(38,)),
+            '15_15_14' : (1,96,3,(38,)),
+            '15_15_15' : None,
+            '15_30_0' : (1,24,2,(5,)),
+            '15_30_1' : (1,24,2,(6,)),
+            '15_30_2' : (1,24,2,(7,)),
+            '15_30_3' : (1,24,2,(8,)),
+            '15_30_4' : (1,24,3,(5,)),
+            '15_30_5' : (1,24,3,(6,)),
+            '15_30_6' : (1,24,3,(7,)),
+            '15_30_7' : (1,24,3,(8,)),
+            '15_30_8' : (1,48,1,(18,)),
+            '15_30_9' : (1,48,1,(20,)),
+            '15_30_10' : (1,48,2,(18,)),
+            '15_30_11' : (1,48,2,(20,)),
+            '15_30_12' : (1,48,3,(18,)),
+            '15_30_13' : (1,48,3,(20,)),
+            '15_30_14' : None,
+            '15_30_15' : None,
+            '30_15_0' : (1,48,1,(2,)),
+            '30_15_1' : (1,48,1,(6,)),
+            '30_15_2' : (1,48,2,(2,)),
+            '30_15_3' : (1,48,2,(6,)),
+            '30_15_4' : (1,48,3,(2,)),
+            '30_15_5' : (1,48,3,(6,)),
+            '30_15_6' : (1,96,1,(28,)),
+            '30_15_7' : (1,96,2,(28,)),
+            '30_15_8' : (1,96,3,(28,)),
+            '30_15_9' : None,
+            '30_15_10' : None,
+            '30_15_11' : None,
+            '30_15_12' : None,
+            '30_15_13' : None,
+            '30_15_14' : None,
+            '30_15_15' : None,
+            '30_30_0' : (1,24,2,(0,)),
+            '30_30_1' : (1,24,2,(1,)),
+            '30_30_2' : (1,24,2,(2,)),
+            '30_30_3' : (1,24,2,(3,)),
+            '30_30_4' : (1,24,2,(4,)),
+            '30_30_5' : (1,24,3,(0,)),
+            '30_30_6' : (1,24,3,(1,)),
+            '30_30_7' : (1,24,3,(2,)),
+            '30_30_8' : (1,24,3,(3,)),
+            '30_30_9' : (1,24,3,(4,)),
+            '30_30_10' : (1,48,1,(12,)),
+            '30_30_11' : (1,48,1,(14,)),
+            '30_30_12' : (1,48,1,(16,)),
+            '30_30_13' : (1,48,2,(12,)),
+            '30_30_14' : (1,48,2,(14,)),
+            '30_30_15' : (1,48,2,(16,)),
+            }
+            
+        #Table 13-5: Set of resource blocks and slot symbols of control resource set for Type0-PDCCH search space when {SS/PBCH block, PDCCH} subcarrier spacing is {30, 15} kHz for frequency bands with minimum channel bandwidth 40MHz
+        #Table 13-6: Set of resource blocks and slot symbols of control resource set for Type0-PDCCH search space when {SS/PBCH block, PDCCH} subcarrier spacing is {30, 30} kHz for frequency bands with minimum channel bandwidth 40MHz
+        #table for FR1 with minimum channel bandwidth of 40MHz
+        self.nrCoreset0Fr1MinChBw40m = {
+            '30_15_0' : (1,48,1,(4,)),
+            '30_15_1' : (1,48,2,(4,)),
+            '30_15_2' : (1,48,3,(4,)),
+            '30_15_3' : (1,96,1,(0,)),
+            '30_15_4' : (1,96,1,(56,)),
+            '30_15_5' : (1,96,2,(0,)),
+            '30_15_6' : (1,96,2,(56,)),
+            '30_15_7' : (1,96,3,(0,)),
+            '30_15_8' : (1,96,3,(56,)),
+            '30_15_9' : None,
+            '30_15_10' : None,
+            '30_15_11' : None,
+            '30_15_12' : None,
+            '30_15_13' : None,
+            '30_15_14' : None,
+            '30_15_15' : None,
+            '30_30_0' : (1,24,2,(0,)),
+            '30_30_1' : (1,24,2,(4,)),
+            '30_30_2' : (1,24,3,(0,)),
+            '30_30_3' : (1,24,3,(4,)),
+            '30_30_4' : (1,48,1,(0,)),
+            '30_30_5' : (1,48,1,(28,)),
+            '30_30_6' : (1,48,2,(0,)),
+            '30_30_7' : (1,48,2,(28,)),
+            '30_30_8' : (1,48,3,(0,)),
+            '30_30_9' : (1,48,3,(28,)),
+            '30_30_10' : None,
+            '30_30_11' : None,
+            '30_30_12' : None,
+            '30_30_13' : None,
+            '30_30_14' : None,
+            '30_30_15' : None,
+            }
+        
+        #Table 13-7: Set of resource blocks and slot symbols of control resource set for Type0-PDCCH search space when {SS/PBCH block, PDCCH} subcarrier spacing is {120, 60} kHz
+        #Table 13-8: Set of resource blocks and slot symbols of control resource set for Type0-PDCCH search space when {SS/PBCH block, PDCCH} subcarrier spacing is {120, 120} kHz
+        #Table 13-9: Set of resource blocks and slot symbols of control resource set for Type0-PDCCH search space when {SS/PBCH block, PDCCH} subcarrier spacing is {240, 60} kHz
+        #Table 13-10: Set of resource blocks and slot symbols of control resource set for Type0-PDCCH search space when {SS/PBCH block, PDCCH} subcarrier spacing is {240, 120} kHz
+        #table for FR2
+        self.nrCoreset0Fr2 = {
+            '120_60_0' : (1,48,1,(0,)),
+            '120_60_1' : (1,48,1,(8,)),
+            '120_60_2' : (1,48,2,(0,)),
+            '120_60_3' : (1,48,2,(8,)),
+            '120_60_4' : (1,48,3,(0,)),
+            '120_60_5' : (1,48,3,(8,)),
+            '120_60_6' : (1,96,1,(28,)),
+            '120_60_7' : (1,96,2,(28,)),
+            '120_60_8' : (2,48,1,(-41,-42,)),
+            '120_60_9' : (2,48,1,(49,)),
+            '120_60_10' : (2,96,1,(-41,-42,)),
+            '120_60_11' : (2,96,1,(97,)),
+            '120_60_12' : None,
+            '120_60_13' : None,
+            '120_60_14' : None,
+            '120_60_15' : None,
+            '120_120_0' : (1,24,2,(0,)),
+            '120_120_1' : (1,24,2,(4,)),
+            '120_120_2' : (1,48,1,(14,)),
+            '120_120_3' : (1,48,2,(14,)),
+            '120_120_4' : (3,24,2,(-20,-21,)),
+            '120_120_5' : (3,24,2,(24,)),
+            '120_120_6' : (3,48,2,(-20,-21,)),
+            '120_120_7' : (3,48,2,(48,)),
+            '120_120_8' : None,
+            '120_120_9' : None,
+            '120_120_10' : None,
+            '120_120_11' : None,
+            '120_120_12' : None,
+            '120_120_13' : None,
+            '120_120_14' : None,
+            '120_120_15' : None,
+            '240_60_0' : (1,96,1,(0,)),
+            '240_60_1' : (1,96,1,(16,)),
+            '240_60_2' : (1,96,2,(0,)),
+            '240_60_3' : (1,96,2,(16,)),
+            '240_60_4' : None,
+            '240_60_5' : None,
+            '240_60_6' : None,
+            '240_60_7' : None,
+            '240_60_8' : None,
+            '240_60_9' : None,
+            '240_60_10' : None,
+            '240_60_11' : None,
+            '240_60_12' : None,
+            '240_60_13' : None,
+            '240_60_14' : None,
+            '240_60_15' : None,
+            '240_120_0' : (1,48,1,(0,)),
+            '240_120_1' : (1,48,1,(8,)),
+            '240_120_2' : (1,48,2,(0,)),
+            '240_120_3' : (1,48,2,(8,)),
+            '240_120_4' : (2,24,1,(-41,-42,)),
+            '240_120_5' : (2,24,1,(25,)),
+            '240_120_6' : (2,48,1,(-41,-42,)),
+            '240_120_7' : (2,48,1,(49,)),
+            '240_120_8' : None,
+            '240_120_9' : None,
+            '240_120_10' : None,
+            '240_120_11' : None,
+            '240_120_12' : None,
+            '240_120_13' : None,
+            '240_120_14' : None,
+            '240_120_15' : None,
+            }
         
         
     def validateScsPerBandFr1(self):
@@ -816,6 +1000,9 @@ class NgNrGridUi(QDialog):
             bwSubset = [self.nrBwSetFr1[i] for i in range(len(self.nrBwSetFr1)) if self.nrBandScs2BwFr1[key][i]]
         else:
             bwSubset = [self.nrBwSetFr2[i] for i in range(len(self.nrBwSetFr2)) if self.nrBandScs2BwFr2[key][i]]
+        
+        #min channel bw used in Type-0 CSS determination
+        self.minChBw = int(bwSubset[0][:-3]) if len(bwSubset) > 0 else 0 
 
         self.nrCarrierBwComb.clear()
         self.nrCarrierBwComb.addItems(bwSubset)
@@ -904,6 +1091,46 @@ class NgNrGridUi(QDialog):
             self.nrUssDurationEdit.setText('1')
         else:
             self.nrUssDurationEdit.setPlaceholderText('1~%d' % (period-1))
+    
+    def onMibRmsiCoreset0EditEditingFinished(self):
+        #self.ngwin.logEdit.append('inside onMibRmsiCoreset0EditEditingFinished')
+        if self.nrMibRmsiCoreset0Edit.text().strip() is None:
+            return
+        
+        key = self.nrSsbScsComb.currentText()[:-3] + '_' + self.nrMibScsCommonComb.currentText()[:-3] + '_' + self.nrMibRmsiCoreset0Edit.text().strip()
+        if self.freqRange == 'FR1' and self.minChBw in (5, 10):
+            if not key in self.nrCoreset0Fr1MinChBw5m10m.keys():
+                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid key(=%s) when referring nrCoreset0Fr1MinChBw5m10m!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                self.nrMibRmsiCoreset0Edit.clear()
+                self.nrMibRmsiCoreset0Edit.setPlaceholderText('0~15')
+                return
+            
+            if self.nrCoreset0Fr1MinChBw5m10m[key] is None:
+                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of controlResourceSetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibRmsiCoreset0Edit.text().strip()))
+                return 
+        elif self.freqRange == 'FR1' and self.minChBw == 40:
+            if not key in self.nrCoreset0Fr1MinChBw40m.keys():
+                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid key(=%s) when referring nrCoreset0Fr1MinChBw40m!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                self.nrMibRmsiCoreset0Edit.clear()
+                self.nrMibRmsiCoreset0Edit.setPlaceholderText('0~15')
+                return
+            
+            if self.nrCoreset0Fr1MinChBw40m[key] is None:
+                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of controlResourceSetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibRmsiCoreset0Edit.text().strip()))
+                return
+        elif self.freqRange == 'FR2':
+            if not key in self.nrCoreset0Fr2.keys():
+                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid key(=%s) when referring nrCoreset0Fr2!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                self.nrMibRmsiCoreset0Edit.clear()
+                self.nrMibRmsiCoreset0Edit.setPlaceholderText('0~15')
+                return
+            
+            if self.nrCoreset0Fr2[key] is None:
+                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of controlResourceSetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibRmsiCoreset0Edit.text().strip()))
+                return
+        else:
+            pass
+        
 
     def onOkBtnClicked(self):
         #TODO
