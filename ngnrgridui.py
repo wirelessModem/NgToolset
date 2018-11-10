@@ -1097,6 +1097,7 @@ class NgNrGridUi(QDialog):
         if self.nrMibRmsiCoreset0Edit.text().strip() is None:
             return
         
+        #(1) validate controlResourceSetZero
         key = self.nrSsbScsComb.currentText()[:-3] + '_' + self.nrMibScsCommonComb.currentText()[:-3] + '_' + self.nrMibRmsiCoreset0Edit.text().strip()
         if self.freqRange == 'FR1' and self.minChBw in (5, 10):
             if not key in self.nrCoreset0Fr1MinChBw5m10m.keys():
@@ -1108,6 +1109,8 @@ class NgNrGridUi(QDialog):
             if self.nrCoreset0Fr1MinChBw5m10m[key] is None:
                 self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of controlResourceSetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibRmsiCoreset0Edit.text().strip()))
                 return 
+            
+            val = self.nrCoreset0Fr1MinChBw5m10m[key]
         elif self.freqRange == 'FR1' and self.minChBw == 40:
             if not key in self.nrCoreset0Fr1MinChBw40m.keys():
                 self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid key(=%s) when referring nrCoreset0Fr1MinChBw40m!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
@@ -1118,6 +1121,8 @@ class NgNrGridUi(QDialog):
             if self.nrCoreset0Fr1MinChBw40m[key] is None:
                 self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of controlResourceSetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibRmsiCoreset0Edit.text().strip()))
                 return
+            
+            val = self.nrCoreset0Fr1MinChBw40m[key]
         elif self.freqRange == 'FR2':
             if not key in self.nrCoreset0Fr2.keys():
                 self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid key(=%s) when referring nrCoreset0Fr2!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
@@ -1128,9 +1133,20 @@ class NgNrGridUi(QDialog):
             if self.nrCoreset0Fr2[key] is None:
                 self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of controlResourceSetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibRmsiCoreset0Edit.text().strip()))
                 return
+            
+            val = self.nrCoreset0Fr2[key]
         else:
             pass
         
+        #(2) validate CORESET0 bw against carrier bw
+        self.nrSsbCoreset0MultiplexingPat, self.nrCoreset0NumRbs, self.nrCoreset0NumSymbs, self.nrSsbCoreset0OffsetList = val
+        if int(self.nrCarrierNumRbEdit.text()) < self.nrCoreset0NumRbs:
+            self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid CORESET0 setting: CORESET0 numRBs=%d, while carrier numRBs=%s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrCoreset0NumRbs, self.nrCarrierNumRbEdit.text()))
+            return
+        
+        #(3) if k_ssb is configured, further validate CORESET0
+        if self.nrSsbKssbEdit.text() is not None:
+            pass
 
     def onOkBtnClicked(self):
         #TODO
