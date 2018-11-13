@@ -1145,8 +1145,17 @@ class NgNrGridUi(QDialog):
             return
         
         #(3) if k_ssb is configured, further validate CORESET0
-        if self.nrSsbKssbEdit.text() is not None:
-            pass
+        if self.nrSsbKssbEdit.text().strip() is not None:
+            kSsb = int(self.nrSsbKssbEdit.text().strip())
+            if len(self.nrSsbCoreset0OffsetList) == 2:
+                self.nrSsbCoreset0Offset = self.nrSsbCoreset0Offset[0] if kSsb == 0 else self.nrSsbCoreset0Offset[1] 
+            else:
+                self.nrSsbCoreset0Offset = self.nrSsbCoreset0Offset[0]
+                
+            '''
+            if offset > 0, min bw = max(self.nrCoreset0NumRbs, offset + 20 * scsSsb / scsPdcch), and n_CRB_SSB needs update w.r.t to offset
+            if offset <= 0, min bw = self.nrCoreset0NumRbs - offset, and don't have to update n_CRB_SSB
+            '''
 
     def onOkBtnClicked(self):
         #TODO
