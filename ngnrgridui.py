@@ -990,13 +990,14 @@ class NgNrGridUi(QDialog):
         self.nrCarrierScsComb.setCurrentIndex(0)
         
         #(4) update SSB
-        if self.maxL < 64:
+        if self.maxL in (4, 8):
+            self.nrSsbInOneGrpEdit.setText('11110000' if self.maxL == 4 else '11111111')
             self.nrSsbGrpPresenceEdit.setText('NA')
             self.nrSsbGrpPresenceEdit.setEnabled(False)
         else:
+            self.nrSsbInOneGrpEdit.setText('11111111')
+            self.nrSsbGrpPresenceEdit.setText('11111111')
             self.nrSsbGrpPresenceEdit.setEnabled(True)
-            self.nrSsbGrpPresenceEdit.clear()
-            self.nrSsbGrpPresenceEdit.setPlaceholderText('11111111')
 
     def onCarrierScsCombCurrentIndexChanged(self, index):
         self.ngwin.logEdit.append('-->inside onCarrierScsCombCurrentIndexChanged, index=%d' % index)
