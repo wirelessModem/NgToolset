@@ -78,9 +78,9 @@ class NgNrGridUi(QDialog):
         self.nrSsbMinGuardBandScs240kEdit = QLineEdit()
         self.nrSsbMinGuardBandScs240kEdit.setEnabled(False)
 
-        self.nrSsbKssbLabel = QLabel('k_SSB:')
+        self.nrSsbKssbLabel = QLabel('k_SSB[0-23]:')
         self.nrSsbKssbEdit = QLineEdit()
-        self.nrSsbKssbEdit.setPlaceholderText('FR1: 0~23, FR2: 0~11')
+        self.nrSsbKssbEdit.setText('0')
 
         self.nrSsbNCrbSsbLabel = QLabel('n_CRB_SSB:')
         self.nrSsbNCrbSsbEdit = QLineEdit()
@@ -143,14 +143,14 @@ class NgNrGridUi(QDialog):
         ssbGrpBoxLayout.addWidget(self.nrSsbPeriodicityComb, 2, 1)
         ssbGrpBox.setLayout(ssbGrpBoxLayout)
         
-        self.nrSsbPciLabel = QLabel('PCI:')
+        self.nrSsbPciLabel = QLabel('PCI[0-1007]:')
         self.nrSsbPciEdit = QLineEdit()
-        self.nrSsbPciEdit.setPlaceholderText('0~1007')
+        self.nrSsbPciEdit.setText('0')
         
         #---->(2.2) MIB configurations
-        self.nrMibSfnLabel = QLabel('SFN:')
+        self.nrMibSfnLabel = QLabel('SFN[0-1023]:')
         self.nrMibSfnEdit = QLineEdit()
-        self.nrMibSfnEdit.setPlaceholderText('0~1023')
+        self.nrMibSfnEdit.setText('0')
         
         self.nrMibDmRsTypeAPosLabel = QLabel('dmrs-TypeA-Position:')
         self.nrMibDmRsTypeAPosComb = QComboBox()
@@ -162,13 +162,13 @@ class NgNrGridUi(QDialog):
         self.nrMibScsCommonComb.addItems(['15KHz', '30KHz', '60KHz', '120KHz'])
         self.nrMibScsCommonComb.setEnabled(False)
         
-        self.nrMibRmsiCoreset0Label = QLabel('controlResourceSetZero(PDCCH-ConfigSIB1):')
-        self.nrMibRmsiCoreset0Edit = QLineEdit()
-        self.nrMibRmsiCoreset0Edit.setPlaceholderText('0~15')
+        self.nrMibCoreset0Label = QLabel('coresetZero(PDCCH-ConfigSIB1)[0-15]:')
+        self.nrMibCoreset0Edit = QLineEdit()
+        self.nrMibCoreset0Edit.setText('0')
         
-        self.nrMibRmsiCss0Label = QLabel('searchSpaceZero(PDCCH-ConfigSIB1):')
-        self.nrMibRmsiCss0Edit = QLineEdit()
-        self.nrMibRmsiCss0Edit.setPlaceholderText('0~15')
+        self.nrMibCss0Label = QLabel('searchSpaceZero(PDCCH-ConfigSIB1)[0-15]:')
+        self.nrMibCss0Edit = QLineEdit()
+        self.nrMibCss0Edit.setText('0')
         
         mibGrpBox = QGroupBox()
         mibGrpBox.setTitle('MIB')
@@ -179,10 +179,10 @@ class NgNrGridUi(QDialog):
         mibGrpBoxLayout.addWidget(self.nrMibDmRsTypeAPosComb, 1, 1)
         mibGrpBoxLayout.addWidget(self.nrMibScsCommonLabel, 2, 0)
         mibGrpBoxLayout.addWidget(self.nrMibScsCommonComb, 2, 1)
-        mibGrpBoxLayout.addWidget(self.nrMibRmsiCoreset0Label, 3, 0)
-        mibGrpBoxLayout.addWidget(self.nrMibRmsiCoreset0Edit, 3, 1)
-        mibGrpBoxLayout.addWidget(self.nrMibRmsiCss0Label, 4, 0)
-        mibGrpBoxLayout.addWidget(self.nrMibRmsiCss0Edit, 4, 1)
+        mibGrpBoxLayout.addWidget(self.nrMibCoreset0Label, 3, 0)
+        mibGrpBoxLayout.addWidget(self.nrMibCoreset0Edit, 3, 1)
+        mibGrpBoxLayout.addWidget(self.nrMibCss0Label, 4, 0)
+        mibGrpBoxLayout.addWidget(self.nrMibCss0Edit, 4, 1)
         mibGrpBox.setLayout(mibGrpBoxLayout)
         
         #---->(2.3) TDD UL/DL Configurations
@@ -196,21 +196,21 @@ class NgNrGridUi(QDialog):
         self.nrTddCfgPat1PeriodComb.addItems(['0.5ms', '0.625ms', '1ms', '1.25ms', '2ms', '2.5ms', '3ms', '4ms', '5ms', '10ms'])
         self.nrTddCfgPat1PeriodComb.setCurrentIndex(8)
         
-        self.nrTddCfgPat1NumDlSlotsLabel = QLabel('nrofDownlinkSlots:')
+        self.nrTddCfgPat1NumDlSlotsLabel = QLabel('nrofDownlinkSlots[0-80]:')
         self.nrTddCfgPat1NumDlSlotsEdit = QLineEdit()
-        self.nrTddCfgPat1NumDlSlotsEdit.setPlaceholderText('0~80')
+        self.nrTddCfgPat1NumDlSlotsEdit.setText('3')
         
-        self.nrTddCfgPat1NumDlSymbsLabel = QLabel('nrofDownlinkSymbols:')
+        self.nrTddCfgPat1NumDlSymbsLabel = QLabel('nrofDownlinkSymbols[0-13]:')
         self.nrTddCfgPat1NumDlSymbsEdit = QLineEdit()
-        self.nrTddCfgPat1NumDlSymbsEdit.setPlaceholderText('0~13')
+        self.nrTddCfgPat1NumDlSymbsEdit.setText('10')
         
-        self.nrTddCfgPat1NumUlSymbsLabel = QLabel('nrofUplinkSymbols:')
+        self.nrTddCfgPat1NumUlSymbsLabel = QLabel('nrofUplinkSymbols[0-13]:')
         self.nrTddCfgPat1NumUlSymbsEdit = QLineEdit()
-        self.nrTddCfgPat1NumUlSymbsEdit.setPlaceholderText('0~13')
+        self.nrTddCfgPat1NumUlSymbsEdit.setText('2')
         
-        self.nrTddCfgPat1NumUlSlotsLabel = QLabel('nrofUplinkSlots:')
+        self.nrTddCfgPat1NumUlSlotsLabel = QLabel('nrofUplinkSlots[0-80]:')
         self.nrTddCfgPat1NumUlSlotsEdit = QLineEdit()
-        self.nrTddCfgPat1NumUlSlotsEdit.setPlaceholderText('0~80')
+        self.nrTddCfgPat1NumUlSlotsEdit.setText('1')
         
         self.nrTddCfgPat2PeriodLabel = QLabel('dl-UL-TransmissionPeriodicity:')
         self.nrTddCfgPat2PeriodComb = QComboBox()
@@ -342,9 +342,9 @@ class NgNrGridUi(QDialog):
         self.nrCoreset1InterleaverSizeComb.addItems(['n2', 'n3', 'n6'])
         self.nrCoreset1InterleaverSizeComb.setCurrentIndex(0)
         
-        self.nrCoreset1ShiftIndexLabel = QLabel('shiftIndex:')
+        self.nrCoreset1ShiftIndexLabel = QLabel('shiftIndex[0-274]:')
         self.nrCoreset1ShiftIndexEdit = QLineEdit()
-        self.nrCoreset1ShiftIndexEdit.setPlaceholderText('0~274')
+        self.nrCoreset1ShiftIndexEdit.setText('0')
         
         self.nrCoreset1PrecoderGranularityLabel = QLabel('precoderGranularity:')
         self.nrCoreset1PrecoderGranularityComb = QComboBox()
@@ -446,7 +446,7 @@ class NgNrGridUi(QDialog):
         self.nrCarrierScsComb.currentIndexChanged[int].connect(self.onCarrierScsCombCurrentIndexChanged)
         self.nrCarrierBandComb.currentIndexChanged[int].connect(self.onCarrierBandCombCurrentIndexChanged)
         self.nrSsbScsComb.currentIndexChanged[int].connect(self.onSsbScsCombCurrentIndexChanged)
-        self.nrMibRmsiCoreset0Edit.editingFinished.connect(self.onMibRmsiCoreset0EditEditingFinished)
+        self.nrMibCoreset0Edit.editingFinished.connect(self.onMibCoreset0EditEditingFinished)
         self.nrCarrierBandComb.setCurrentText('n77')
 
         #-->Tab Widgets
@@ -882,6 +882,10 @@ class NgNrGridUi(QDialog):
             '240_120_15' : None,
             }
         
+        #offset of CORESET0 w.r.t. SSB
+        self.nrCoreset0Offset = 0
+        #minimum channel bandwidth
+        self.minChBw = 0
         
     def validateScsPerBandFr1(self):
         self.nrScsPerBandFr1 = dict()
@@ -902,7 +906,13 @@ class NgNrGridUi(QDialog):
             self.ngwin.logEdit.append('key=%s,val=%s' % (key,val))
         '''
 
-    def updateKSsbAndNCrbSsb(self):
+    def updateKSsbAndNCrbSsb(self, offset):
+        #NOTE:
+        #(a) offset in scsCommon, which equals to scsCarrier;
+        #(b) and offset > 0;
+        if not self.nrMinGuardBandEdit.text():
+            return
+        
         #refer to 3GPP 38.211 vf30
         #7.4.3.1	Time-frequency structure of an SS/PBCH block
         '''
@@ -911,40 +921,40 @@ class NgNrGridUi(QDialog):
 
         FR1/FR2   carrier_scs   ssb_scs     k_ssb	n_crb_ssb
         -----------------------------------------------------------
-        FR1	        15k         15k         0~11	minGuardBand
-                    15k         30k         0~11	minGuardBand
-                    30k         15k         0~23	2*minGuardBand
-                    30k         30k         0~23	2*minGuardBand
-        FR2         60k         120k        0~11	minGuardBand
-                    60k         240k        0~11	max(minGuardBand,4*minGuardBand240k)
-                    120k        120k        0~11	2*minGuardBand
-                    120k        240k        0~11	max(2*minGuardBand,4*minGuardBand240k)
+        FR1	        15k         15k         0~11	minGuardBand+offset
+                    15k         30k         0~11	minGuardBand+offset
+                    30k         15k         0~23	2*(minGuardBand+offset)
+                    30k         30k         0~23	2*(minGuardBand+offset)
+        FR2         60k         120k        0~11	minGuardBand+offset
+                    60k         240k        0~11	max(minGuardBand+offset,4*minGuardBand240k)
+                    120k        120k        0~11	2*(minGuardBand+offset)
+                    120k        240k        0~11	max(2*(minGuardBand+offset),4*minGuardBand240k)
         -----------------------------------------------------------
         '''
         key = self.nrCarrierScsComb.currentText()[:-3] + '_' + self.nrSsbScsComb.currentText()[:-3]
         minGuardBand = int(self.nrMinGuardBandEdit.text())
         if key in ('15_15', '15_30', '60_120'):
-            self.nrSsbKssbEdit.setPlaceholderText('0~11')
-            self.nrSsbNCrbSsbEdit.setText(str(minGuardBand))
+            self.nrSsbKssbLabel.setText('k_SSB[0-11]:')
+            self.nrSsbNCrbSsbEdit.setText(str(minGuardBand+offset))
         elif key in ('30_15', '30_30'):
-            self.nrSsbKssbEdit.setPlaceholderText('0~23')
-            self.nrSsbNCrbSsbEdit.setText(str(2*minGuardBand))
+            self.nrSsbKssbLabel.setText('k_SSB[0-23]:')
+            self.nrSsbNCrbSsbEdit.setText(str(2*(minGuardBand+offset)))
         elif key == '60_240':
-            self.nrSsbKssbEdit.setPlaceholderText('0~11')
+            self.nrSsbKssbLabel.setText('k_SSB[0-11]:')
             minGuardBand240k = int(self.nrSsbMinGuardBandScs240kEdit.text())
-            self.nrSsbNCrbSsbEdit.setText(str(max(minGuardBand, 4*minGuardBand240k)))
+            self.nrSsbNCrbSsbEdit.setText(str(max(minGuardBand+offset, 4*minGuardBand240k)))
         elif key == '120_120':
-            self.nrSsbKssbEdit.setPlaceholderText('0~11')
-            self.nrSsbNCrbSsbEdit.setText(str(2*minGuardBand))
+            self.nrSsbKssbLabel.setText('k_SSB[0-11]:')
+            self.nrSsbNCrbSsbEdit.setText(str(2*(minGuardBand+offset)))
         elif key == '120_240':
-            self.nrSsbKssbEdit.setPlaceholderText('0~11')
+            self.nrSsbKssbLabel.setText('k_SSB[0-11]:')
             minGuardBand240k = int(self.nrSsbMinGuardBandScs240kEdit.text())
-            self.nrSsbNCrbSsbEdit.setText(str(max(2*minGuardBand, 4*minGuardBand240k)))
+            self.nrSsbNCrbSsbEdit.setText(str(max(2*(minGuardBand+offset), 4*minGuardBand240k)))
         else:
             pass
     
     def onCarrierBandCombCurrentIndexChanged(self, index):
-        #self.ngwin.logEdit.append('inside onCarrierBandCombCurrentIndexChanged, index=%d' % index)
+        self.ngwin.logEdit.append('-->inside onCarrierBandCombCurrentIndexChanged, index=%d' % index)
         if index < 0:
             return
 
@@ -988,11 +998,15 @@ class NgNrGridUi(QDialog):
             self.nrSsbGrpPresenceEdit.setPlaceholderText('11111111')
 
     def onCarrierScsCombCurrentIndexChanged(self, index):
-        #self.ngwin.logEdit.append('inside onCarrierScsCombCurrentIndexChanged, index=%d' % index)
+        self.ngwin.logEdit.append('-->inside onCarrierScsCombCurrentIndexChanged, index=%d' % index)
         if index < 0:
             return
+        
+        #(1) update scsCommon and refScs
+        self.nrMibScsCommonComb.setCurrentText(self.nrCarrierScsComb.currentText())
+        self.nrTddCfgRefScsComb.setCurrentText(self.nrCarrierScsComb.currentText())
 
-        #(1) update transmission bandwidth
+        #(2) update transmission bandwidth
         key = self.nrCarrierBandComb.currentText() + '_' + self.nrCarrierScsComb.currentText()[:-3]
         if not key in self.nrBandScs2BwFr1 and not key in self.nrBandScs2BwFr2:
             return
@@ -1008,12 +1022,14 @@ class NgNrGridUi(QDialog):
         self.nrCarrierBwComb.addItems(bwSubset)
         self.nrCarrierBwComb.setCurrentIndex(0)
         
-        #(2) update scsCommon and refScs
-        self.nrMibScsCommonComb.setCurrentText(self.nrCarrierScsComb.currentText())
-        self.nrTddCfgRefScsComb.setCurrentText(self.nrCarrierScsComb.currentText())
+        #(3) validate CORESET0 and update n_CRB_SSB when necessary
+        if self.nrMibCoreset0Edit.text():
+            self.flagCoreset0 = self.validateCoreset0()
+            if self.flagCoreset0:
+                self.updateKSsbAndNCrbSsb(offset=0 if self.nrCoreset0Offset <= 0 else self.nrCoreset0Offset)
 
     def onCarrierBwCombCurrentIndexChanged(self, index):
-        #self.ngwin.logEdit.append('inside onCarrierBwCombCurrentIndexChanged, index=%d' % index)
+        self.ngwin.logEdit.append('-->inside onCarrierBwCombCurrentIndexChanged, index=%d' % index)
         if index < 0:
             return
 
@@ -1045,11 +1061,14 @@ class NgNrGridUi(QDialog):
             else:
                 self.nrSsbMinGuardBandScs240kEdit.setText(str(self.nrSsbMinGuardBandScs240k[self.nrCarrierBwComb.currentIndex()]))
                 
-        #(4) update k_SSB and n_CRB_SSB
-        self.updateKSsbAndNCrbSsb()
+        #(4) validate CORESET0 and update n_CRB_SSB when necessary
+        if self.nrMibCoreset0Edit.text():
+            self.flagCoreset0 = self.validateCoreset0()
+            if self.flagCoreset0:
+                self.updateKSsbAndNCrbSsb(offset=0 if self.nrCoreset0Offset <= 0 else self.nrCoreset0Offset)
 
     def onSsbScsCombCurrentIndexChanged(self, index):
-        #self.ngwin.logEdit.append('inside onSsbScsCombCurrentIndexChanged, index=%d' % index)
+        self.ngwin.logEdit.append('-->inside onSsbScsCombCurrentIndexChanged, index=%d' % index)
         if index < 0:
             return
 
@@ -1062,7 +1081,7 @@ class NgNrGridUi(QDialog):
             carrierBw = int(self.nrCarrierBwComb.currentText()[:-3])
             if carrierBw < 100:
                 self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Minimum transmission bandwidth is 100MHz when SSB'
-                                          ' subcarrier spacing is 240KHz!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
+                                          'subcarrier spacing is 240KHz!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
                 self.nrSsbMinGuardBandScs240kEdit.setText('NA')
                 return
             else:
@@ -1070,93 +1089,110 @@ class NgNrGridUi(QDialog):
         else:
             self.nrSsbMinGuardBandScs240kEdit.setText('NA')
         
-        #(3) update k_SSB and n_CRB_SSB
-        if self.nrMinGuardBandEdit.text():
-            self.updateKSsbAndNCrbSsb()
+        #(3) validate CORESET0 and update n_CRB_SSB when necessary
+        if self.nrMibCoreset0Edit.text():
+            self.flagCoreset0 = self.validateCoreset0()
+            if self.flagCoreset0:
+                self.updateKSsbAndNCrbSsb(offset=0 if self.nrCoreset0Offset <= 0 else self.nrCoreset0Offset)
     
     def onUssPeriodicityCombCurrentIndexChanged(self, index):
-        #self.ngwin.logEdit.append('inside onUssPeriodicityCombCurrentIndexChanged, index=%d' % index)
+        self.ngwin.logEdit.append('-->inside onUssPeriodicityCombCurrentIndexChanged, index=%d' % index)
         if index < 0:
             return
         
         period = int(self.nrUssPeriodicityComb.currentText()[2:])
         self.nrUssSlotOffsetEdit.clear()
         self.nrUssDurationEdit.clear()
-        if period == 1:
-            self.nrUssSlotOffsetEdit.setText('0')
+        if period > 1:
+            self.nrUssSlotOffsetLabel.setText('monitoringSlotOffset[0-%s]:' % str(period-1))
         else:
-            self.nrUssSlotOffsetEdit.setPlaceholderText('0~%d' % (period-1))
+            self.nrUssSlotOffsetLabel.setText('monitoringSlotOffset[0]:')
+                
+        self.nrUssSlotOffsetEdit.setText('0')
         
         if period in (1, 2):
+            self.nrUssDurationLabel.setText('duration[1]:')
             self.nrUssDurationEdit.setText('1')
         else:
-            self.nrUssDurationEdit.setPlaceholderText('1~%d' % (period-1))
-    
-    def onMibRmsiCoreset0EditEditingFinished(self):
-        #self.ngwin.logEdit.append('inside onMibRmsiCoreset0EditEditingFinished')
-        if self.nrMibRmsiCoreset0Edit.text().strip() is None:
-            return
-        
+            self.nrUssDurationLabel.setText('duration[1-%s]:' % str(period-1))
+            self.nrUssDurationEdit.setText(str(period-1))
+            
+    def validateCoreset0(self):
+        self.ngwin.logEdit.append('-->inside validateCoreset0')
         #(1) validate controlResourceSetZero
-        key = self.nrSsbScsComb.currentText()[:-3] + '_' + self.nrMibScsCommonComb.currentText()[:-3] + '_' + self.nrMibRmsiCoreset0Edit.text().strip()
+        key = self.nrSsbScsComb.currentText()[:-3] + '_' + self.nrMibScsCommonComb.currentText()[:-3] + '_' + self.nrMibCoreset0Edit.text()
         if self.freqRange == 'FR1' and self.minChBw in (5, 10):
             if not key in self.nrCoreset0Fr1MinChBw5m10m.keys():
                 self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid key(=%s) when referring nrCoreset0Fr1MinChBw5m10m!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
-                self.nrMibRmsiCoreset0Edit.clear()
-                self.nrMibRmsiCoreset0Edit.setPlaceholderText('0~15')
-                return
+                return False 
             
             if self.nrCoreset0Fr1MinChBw5m10m[key] is None:
-                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of controlResourceSetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibRmsiCoreset0Edit.text().strip()))
-                return 
+                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of controlResourceSetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibCoreset0Edit.text()))
+                return False
             
             val = self.nrCoreset0Fr1MinChBw5m10m[key]
         elif self.freqRange == 'FR1' and self.minChBw == 40:
             if not key in self.nrCoreset0Fr1MinChBw40m.keys():
                 self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid key(=%s) when referring nrCoreset0Fr1MinChBw40m!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
-                self.nrMibRmsiCoreset0Edit.clear()
-                self.nrMibRmsiCoreset0Edit.setPlaceholderText('0~15')
-                return
+                return False
             
             if self.nrCoreset0Fr1MinChBw40m[key] is None:
-                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of controlResourceSetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibRmsiCoreset0Edit.text().strip()))
-                return
+                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of controlResourceSetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibCoreset0Edit.text()))
+                return False
             
             val = self.nrCoreset0Fr1MinChBw40m[key]
         elif self.freqRange == 'FR2':
             if not key in self.nrCoreset0Fr2.keys():
                 self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid key(=%s) when referring nrCoreset0Fr2!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
-                self.nrMibRmsiCoreset0Edit.clear()
-                self.nrMibRmsiCoreset0Edit.setPlaceholderText('0~15')
-                return
+                return False
             
             if self.nrCoreset0Fr2[key] is None:
-                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of controlResourceSetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibRmsiCoreset0Edit.text().strip()))
-                return
+                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of controlResourceSetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibCoreset0Edit.text()))
+                return False
             
             val = self.nrCoreset0Fr2[key]
         else:
-            pass
-        
+            return False
+            
         #(2) validate CORESET0 bw against carrier bw
-        self.nrSsbCoreset0MultiplexingPat, self.nrCoreset0NumRbs, self.nrCoreset0NumSymbs, self.nrSsbCoreset0OffsetList = val
+        self.nrSsbCoreset0MultiplexingPat, self.nrCoreset0NumRbs, self.nrCoreset0NumSymbs, self.nrCoreset0OffsetList = val
         if int(self.nrCarrierNumRbEdit.text()) < self.nrCoreset0NumRbs:
             self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid CORESET0 setting: CORESET0 numRBs=%d, while carrier numRBs=%s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrCoreset0NumRbs, self.nrCarrierNumRbEdit.text()))
-            return
+            return False
         
         #(3) if k_ssb is configured, further validate CORESET0
-        if self.nrSsbKssbEdit.text().strip() is not None:
-            kSsb = int(self.nrSsbKssbEdit.text().strip())
-            if len(self.nrSsbCoreset0OffsetList) == 2:
-                self.nrSsbCoreset0Offset = self.nrSsbCoreset0Offset[0] if kSsb == 0 else self.nrSsbCoreset0Offset[1] 
+        if self.nrSsbKssbEdit.text():
+            kSsb = int(self.nrSsbKssbEdit.text())
+            if len(self.nrCoreset0OffsetList) == 2:
+                self.nrCoreset0Offset = self.nrCoreset0OffsetList[0] if kSsb == 0 else self.nrCoreset0OffsetList[1] 
             else:
-                self.nrSsbCoreset0Offset = self.nrSsbCoreset0Offset[0]
+                self.nrCoreset0Offset = self.nrCoreset0OffsetList[0]
                 
             '''
             if offset > 0, min bw = max(self.nrCoreset0NumRbs, offset + 20 * scsSsb / scsPdcch), and n_CRB_SSB needs update w.r.t to offset
             if offset <= 0, min bw = self.nrCoreset0NumRbs - offset, and don't have to update n_CRB_SSB
             '''
+            if self.nrCoreset0Offset > 0:
+                minBw = max(self.nrCoreset0NumRbs, self.nrCoreset0Offset + 20 * int(self.nrSsbScsComb.currentText()[:-3]) / int(self.nrCarrierScsComb.currentText()[:-3]))
+            else:
+                minBw = self.nrCoreset0NumRbs - self.nrCoreset0Offset
+            
+            if int(self.nrCarrierNumRbEdit.text()) < minBw:
+                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid CORESET0 setting: CORESET0 numRBs=%d, offset=%d, minBw = %d, while carrier numRBs=%s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrCoreset0NumRbs, self.nrCoreset0Offset, minBw, self.nrCarrierNumRbEdit.text()))
+                return False
+        
+        #when validation passed
+        return True
+    
+    def onMibCoreset0EditEditingFinished(self):
+        self.ngwin.logEdit.append('-->inside onMibCoreset0EditEditingFinished')
+        #(1) validate CORESET0 and update n_CRB_SSB when necessary
+        if self.nrMibCoreset0Edit.text():
+            self.flagCoreset0 = self.validateCoreset0()
+            if self.flagCoreset0:
+                self.updateKSsbAndNCrbSsb(offset=0 if self.nrCoreset0Offset <= 0 else self.nrCoreset0Offset)
 
     def onOkBtnClicked(self):
+        self.ngwin.logEdit.append('-->inside onOkBtnClicked')
         #TODO
         self.accept()
