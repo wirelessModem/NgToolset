@@ -447,6 +447,7 @@ class NgNrGridUi(QDialog):
         self.nrCarrierBandComb.currentIndexChanged[int].connect(self.onCarrierBandCombCurrentIndexChanged)
         self.nrSsbScsComb.currentIndexChanged[int].connect(self.onSsbScsCombCurrentIndexChanged)
         self.nrMibCoreset0Edit.editingFinished.connect(self.onMibCoreset0EditEditingFinished)
+        self.nrSsbKssbEdit.editingFinished.connect(self.onSsbKssbEditEditingFinished)
         self.nrCarrierBandComb.setCurrentText('n77')
 
         #-->Tab Widgets
@@ -1186,6 +1187,14 @@ class NgNrGridUi(QDialog):
     
     def onMibCoreset0EditEditingFinished(self):
         self.ngwin.logEdit.append('-->inside onMibCoreset0EditEditingFinished')
+        #(1) validate CORESET0 and update n_CRB_SSB when necessary
+        if self.nrMibCoreset0Edit.text():
+            self.flagCoreset0 = self.validateCoreset0()
+            if self.flagCoreset0:
+                self.updateKSsbAndNCrbSsb(offset=0 if self.nrCoreset0Offset <= 0 else self.nrCoreset0Offset)
+                
+    def onSsbKssbEditEditingFinished(self):
+        self.ngwin.logEdit.append('-->inside onSsbKssbEditEditingFinished')
         #(1) validate CORESET0 and update n_CRB_SSB when necessary
         if self.nrMibCoreset0Edit.text():
             self.flagCoreset0 = self.validateCoreset0()
