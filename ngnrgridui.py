@@ -480,13 +480,12 @@ class NgNrGridUi(QDialog):
         self.nrDci10Sib1FreqAllocType1VrbPrbMappingTypeComb.addItems(['nonInterleaved', 'interleaved'])
         self.nrDci10Sib1FreqAllocType1VrbPrbMappingTypeComb.setCurrentIndex(1)
         
-        
         self.nrDci10Sib1FreqAllocType1BundleSizeLabel = QLabel('L(vrb-ToPRB-Interleaver):')
         self.nrDci10Sib1FreqAllocType1BundleSizeComb = QComboBox()
         self.nrDci10Sib1FreqAllocType1BundleSizeComb.addItems(['n2', 'n4'])
         self.nrDci10Sib1FreqAllocType1BundleSizeComb.setCurrentIndex(0)
         
-        self.nrDci10Sib1McsLabel = QLabel('Modulation and coding scheme[0-31]:')
+        self.nrDci10Sib1McsLabel = QLabel('Modulation and coding scheme(CW0)[0-31]:')
         self.nrDci10Sib1McsEdit = QLineEdit()
         
         self.nrDci10Sib1TbsLabel = QLabel('Transport block size(bits):')
@@ -603,13 +602,12 @@ class NgNrGridUi(QDialog):
         self.nrDci10Msg2FreqAllocType1VrbPrbMappingTypeComb.addItems(['nonInterleaved', 'interleaved'])
         self.nrDci10Msg2FreqAllocType1VrbPrbMappingTypeComb.setCurrentIndex(1)
         
-        
         self.nrDci10Msg2FreqAllocType1BundleSizeLabel = QLabel('L(vrb-ToPRB-Interleaver):')
         self.nrDci10Msg2FreqAllocType1BundleSizeComb = QComboBox()
         self.nrDci10Msg2FreqAllocType1BundleSizeComb.addItems(['n2', 'n4'])
         self.nrDci10Msg2FreqAllocType1BundleSizeComb.setCurrentIndex(0)
         
-        self.nrDci10Msg2McsLabel = QLabel('Modulation and coding scheme[0-31]:')
+        self.nrDci10Msg2McsLabel = QLabel('Modulation and coding scheme(CW0)[0-31]:')
         self.nrDci10Msg2McsEdit = QLineEdit()
         
         self.nrDci10Msg2TbScalingLabel = QLabel('TB Scaling[0-3]:')
@@ -731,17 +729,13 @@ class NgNrGridUi(QDialog):
         self.nrDci10Msg4FreqAllocType1VrbPrbMappingTypeComb.addItems(['nonInterleaved', 'interleaved'])
         self.nrDci10Msg4FreqAllocType1VrbPrbMappingTypeComb.setCurrentIndex(1)
         
-        
         self.nrDci10Msg4FreqAllocType1BundleSizeLabel = QLabel('L(vrb-ToPRB-Interleaver):')
         self.nrDci10Msg4FreqAllocType1BundleSizeComb = QComboBox()
         self.nrDci10Msg4FreqAllocType1BundleSizeComb.addItems(['n2', 'n4'])
         self.nrDci10Msg4FreqAllocType1BundleSizeComb.setCurrentIndex(0)
         
-        self.nrDci10Msg4McsLabel = QLabel('Modulation and coding scheme[0-31]:')
+        self.nrDci10Msg4McsLabel = QLabel('Modulation and coding scheme(CW0)[0-31]:')
         self.nrDci10Msg4McsEdit = QLineEdit()
-        
-        self.nrDci10Msg4TbScalingLabel = QLabel('TB Scaling[0-3]:')
-        self.nrDci10Msg4TbScalingEdit = QLineEdit()
         
         self.nrDci10Msg4TbsLabel = QLabel('Transport block size(bits):')
         self.nrDci10Msg4TbsEdit = QLineEdit()
@@ -800,14 +794,12 @@ class NgNrGridUi(QDialog):
         dci10Msg4GridLayout.addWidget(dci10Msg4RaTabWidget, 3, 0, 1, 2)
         dci10Msg4GridLayout.addWidget(self.nrDci10Msg4McsLabel, 4, 0)
         dci10Msg4GridLayout.addWidget(self.nrDci10Msg4McsEdit, 4, 1)
-        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4TbScalingLabel, 5, 0)
-        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4TbScalingEdit, 5, 1)
-        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4TbsLabel, 6, 0)
-        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4TbsEdit, 6, 1)
-        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4DeltaPriLabel, 7, 0)
-        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4DeltaPriEdit, 7, 1)
-        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4K1Label, 8, 0)
-        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4K1Edit, 8, 1)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4TbsLabel, 5, 0)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4TbsEdit, 5, 1)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4DeltaPriLabel, 6, 0)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4DeltaPriEdit, 6, 1)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4K1Label, 7, 0)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4K1Edit, 7, 1)
         dci10Msg4Layout = QVBoxLayout()
         dci10Msg4Layout.addLayout(dci10Msg4GridLayout)
         dci10Msg4Layout.addStretch()
@@ -819,16 +811,423 @@ class NgNrGridUi(QDialog):
         dci10Msg4Scroll.setWidgetResizable(True)
         dci10Msg4Scroll.setWidget(dci10Msg4Widget)
         
+        #DCI 1_1 with C-RNTI for normal PDSCH
+        self.nrDci11PdschRntiLabel = QLabel('RNTI(C-RNTI)[0x0001-FFEF]:')
+        self.nrDci11PdschRntiEdit = QLineEdit('0x0001')
+        
+        self.nrDci11PdschMuPdcchLabel = QLabel('u_PDCCH[0-3]:')
+        self.nrDci11PdschMuPdcchEdit = QLineEdit()
+        self.nrDci11PdschMuPdcchEdit.setEnabled(False)
+        
+        self.nrDci11PdschMuPdschLabel = QLabel('u_PDSCH[0-3]:')
+        self.nrDci11PdschMuPdschEdit = QLineEdit()
+        self.nrDci11PdschMuPdschEdit.setEnabled(False)
+        
+        self.nrDci11PdschActBwpLabel= QLabel('Active DL BWP[0-1]:')
+        self.nrDci11PdschActBwpEdit = QLineEdit()
+        self.nrDci11PdschActBwpEdit.setEnabled(False)
+        
+        self.nrDci11PdschIndicatedBwpLabel = QLabel('Bandwidth part indicator[0-1]:')
+        self.nrDci11PdschIndicatedBwpEdit = QLineEdit()
+        self.nrDci11PdschIndicatedBwpEdit.setEnabled(False)
+        
+        self.nrDci11PdschTimeAllocFieldLabel = QLabel('Time domain resource assignment[0-15]:')
+        self.nrDci11PdschTimeAllocFieldEdit = QLineEdit()
+        
+        self.nrDci11PdschTimeAllocMappingTypeLabel = QLabel('Mapping type:')
+        self.nrDci11PdschTimeAllocMappingTypeComb = QComboBox()
+        self.nrDci11PdschTimeAllocMappingTypeComb.addItems(['Type A', 'Type B'])
+        
+        self.nrDci11PdschTimeAllocK0Label = QLabel('K0:')
+        self.nrDci11PdschTimeAllocK0Edit = QLineEdit()
+        
+        self.nrDci11PdschTimeAllocSlivLabel = QLabel('SLIV:')
+        self.nrDci11PdschTimeAllocSlivEdit = QLineEdit()
+        
+        self.nrDci11PdschTimeAllocSLabel = QLabel('S(of SLIV):')
+        self.nrDci11PdschTimeAllocSEdit = QLineEdit()
+        
+        self.nrDci11PdschTimeAllocLLabel = QLabel('L(of SLIV):')
+        self.nrDci11PdschTimeAllocLEdit = QLineEdit()
+        
+        self.nrDci11PdschFreqAllocTypeLabel = QLabel('resourceAllocation:')
+        self.nrDci11PdschFreqAllocTypeComb = QComboBox()
+        self.nrDci11PdschFreqAllocTypeComb.addItems(['RA Type0', 'RA Type1'])
+        self.nrDci11PdschFreqAllocTypeComb.setCurrentIndex(1)
+        
+        self.nrDci11PdschFreqAllocFieldLabel = QLabel('Frequency domain resource assignment:')
+        self.nrDci11PdschFreqAllocFieldEdit = QLineEdit()
+        
+        self.nrDci11PdschFreqAllocType1RbStartLabel = QLabel('RB_start(of RIV):')
+        self.nrDci11PdschFreqAllocType1RbStartEdit = QLineEdit()
+        
+        self.nrDci11PdschFreqAllocType1LRbsLabel = QLabel('L_RBs(of RIV):')
+        self.nrDci11PdschFreqAllocType1LRbsEdit = QLineEdit()
+        
+        self.nrDci11PdschFreqAllocType1VrbPrbMapppingTypeLabel = QLabel('VRB-to-PRB mapping type:')
+        self.nrDci11PdschFreqAllocType1VrbPrbMappingTypeComb = QComboBox()
+        self.nrDci11PdschFreqAllocType1VrbPrbMappingTypeComb.addItems(['nonInterleaved', 'interleaved'])
+        self.nrDci11PdschFreqAllocType1VrbPrbMappingTypeComb.setCurrentIndex(1)
+        
+        self.nrDci11PdschFreqAllocType1BundleSizeLabel = QLabel('L(vrb-ToPRB-Interleaver):')
+        self.nrDci11PdschFreqAllocType1BundleSizeComb = QComboBox()
+        self.nrDci11PdschFreqAllocType1BundleSizeComb.addItems(['n2', 'n4'])
+        self.nrDci11PdschFreqAllocType1BundleSizeComb.setCurrentIndex(0)
+        
+        self.nrDci11PdschCw0McsLabel = QLabel('Modulation and coding scheme(CW0)[0-31]:')
+        self.nrDci11PdschCw0McsEdit = QLineEdit()
+        
+        self.nrDci11PdschCw1McsLabel = QLabel('Modulation and coding scheme(CW1)[0-31]:')
+        self.nrDci11PdschCw1McsEdit = QLineEdit()
+        
+        self.nrDci11PdschTbsLabel = QLabel('Transport block size(bits):')
+        self.nrDci11PdschTbsEdit = QLineEdit()
+        self.nrDci11PdschTbsEdit.setEnabled(False)
+        
+        self.nrDci11PdschDeltaPriLabel = QLabel('PUCCH resource indicator[0-7]:')
+        self.nrDci11PdschDeltaPriEdit = QLineEdit()
+        
+        self.nrDci11PdschK1Label = QLabel('K1(PDSCH-to-HARQ_feedback timing indicator)[0-7]:')
+        self.nrDci11PdschK1Edit = QLineEdit()
+        
+        self.nrDci11PdschAntPortsFieldLabel = QLabel('Antenna port(s)[0-15/0-31/0-63]:')
+        self.nrDci11PdschAntPortsFieldEdit = QLineEdit('0')
+        
+        dci11PdschTimeAllocWidget = QWidget()
+        dci11PdschTimeAllocLayout = QGridLayout()
+        dci11PdschTimeAllocLayout.addWidget(self.nrDci11PdschTimeAllocFieldLabel, 0, 0)
+        dci11PdschTimeAllocLayout.addWidget(self.nrDci11PdschTimeAllocFieldEdit, 0, 1)
+        dci11PdschTimeAllocLayout.addWidget(self.nrDci11PdschTimeAllocMappingTypeLabel, 1, 0)
+        dci11PdschTimeAllocLayout.addWidget(self.nrDci11PdschTimeAllocMappingTypeComb, 1, 1)
+        dci11PdschTimeAllocLayout.addWidget(self.nrDci11PdschTimeAllocK0Label, 2, 0)
+        dci11PdschTimeAllocLayout.addWidget(self.nrDci11PdschTimeAllocK0Edit, 2, 1)
+        dci11PdschTimeAllocLayout.addWidget(self.nrDci11PdschTimeAllocSlivLabel, 3, 0)
+        dci11PdschTimeAllocLayout.addWidget(self.nrDci11PdschTimeAllocSlivEdit, 3, 1)
+        dci11PdschTimeAllocLayout.addWidget(self.nrDci11PdschTimeAllocSLabel, 4, 0)
+        dci11PdschTimeAllocLayout.addWidget(self.nrDci11PdschTimeAllocSEdit, 4, 1)
+        dci11PdschTimeAllocLayout.addWidget(self.nrDci11PdschTimeAllocLLabel, 5, 0)
+        dci11PdschTimeAllocLayout.addWidget(self.nrDci11PdschTimeAllocLEdit, 5, 1)
+        dci11PdschTimeAllocWidget.setLayout(dci11PdschTimeAllocLayout)
+        
+        dci11PdschFreqAllocWidget = QWidget()
+        dci11PdschFreqAllocLayout = QGridLayout()
+        dci11PdschFreqAllocLayout.addWidget(self.nrDci11PdschFreqAllocTypeLabel, 0, 0)
+        dci11PdschFreqAllocLayout.addWidget(self.nrDci11PdschFreqAllocTypeComb, 0, 1)
+        dci11PdschFreqAllocLayout.addWidget(self.nrDci11PdschFreqAllocFieldLabel, 1, 0)
+        dci11PdschFreqAllocLayout.addWidget(self.nrDci11PdschFreqAllocFieldEdit, 1, 1)
+        dci11PdschFreqAllocLayout.addWidget(self.nrDci11PdschFreqAllocType1RbStartLabel, 2, 0)
+        dci11PdschFreqAllocLayout.addWidget(self.nrDci11PdschFreqAllocType1RbStartEdit, 2, 1)
+        dci11PdschFreqAllocLayout.addWidget(self.nrDci11PdschFreqAllocType1LRbsLabel, 3, 0)
+        dci11PdschFreqAllocLayout.addWidget(self.nrDci11PdschFreqAllocType1LRbsEdit, 3, 1)
+        dci11PdschFreqAllocLayout.addWidget(self.nrDci11PdschFreqAllocType1VrbPrbMapppingTypeLabel, 4, 0)
+        dci11PdschFreqAllocLayout.addWidget(self.nrDci11PdschFreqAllocType1VrbPrbMappingTypeComb, 4, 1)
+        dci11PdschFreqAllocLayout.addWidget(self.nrDci11PdschFreqAllocType1BundleSizeLabel, 5, 0)
+        dci11PdschFreqAllocLayout.addWidget(self.nrDci11PdschFreqAllocType1BundleSizeComb, 5, 1)
+        dci11PdschFreqAllocWidget.setLayout(dci11PdschFreqAllocLayout)
+        
+        dci11PdschRaTabWidget = QTabWidget()
+        dci11PdschRaTabWidget.addTab(dci11PdschTimeAllocWidget, 'Time-domain assignment')
+        dci11PdschRaTabWidget.addTab(dci11PdschFreqAllocWidget, 'Frequency-domain assignment')
+        
+        dci11PdschWidget = QWidget()
+        dci11PdschGridLayout = QGridLayout()
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschRntiLabel, 0, 0)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschRntiEdit, 0, 1)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschMuPdcchLabel, 1, 0)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschMuPdcchEdit, 1, 1)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschMuPdschLabel, 2, 0)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschMuPdschEdit, 2, 1)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschActBwpLabel, 3, 0)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschActBwpEdit, 3, 1)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschIndicatedBwpLabel, 4, 0)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschIndicatedBwpEdit, 4, 1)
+        dci11PdschGridLayout.addWidget(dci11PdschRaTabWidget, 5, 0, 1, 2)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschCw0McsLabel, 6, 0)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschCw0McsEdit, 6, 1)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschCw1McsLabel, 7, 0)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschCw1McsEdit, 7, 1)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschTbsLabel, 8, 0)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschTbsEdit, 8, 1)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschDeltaPriLabel, 9, 0)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschDeltaPriEdit, 9, 1)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschK1Label, 10, 0)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschK1Edit, 10, 1)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschAntPortsFieldLabel, 11, 0)
+        dci11PdschGridLayout.addWidget(self.nrDci11PdschAntPortsFieldEdit, 11, 1)
+        dci11PdschLayout = QVBoxLayout()
+        dci11PdschLayout.addLayout(dci11PdschGridLayout)
+        dci11PdschLayout.addStretch()
+        dci11PdschWidget.setLayout(dci11PdschLayout)
+        
+        dci11PdschScroll = QScrollArea()
+        dci11PdschScroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        dci11PdschScroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        dci11PdschScroll.setWidgetResizable(True)
+        dci11PdschScroll.setWidget(dci11PdschWidget)
+        
+        #DCI 0_1 with C-RNTI for normal PUSCH
+        self.nrDci01PuschRntiLabel = QLabel('RNTI(C-RNTI)[0x0001-FFEF]:')
+        self.nrDci01PuschRntiEdit = QLineEdit('0x0001')
+        
+        self.nrDci01PuschMuPdcchLabel = QLabel('u_PDCCH[0-3]:')
+        self.nrDci01PuschMuPdcchEdit = QLineEdit()
+        self.nrDci01PuschMuPdcchEdit.setEnabled(False)
+        
+        self.nrDci01PuschMuPuschLabel = QLabel('u_PUSCH[0-3]:')
+        self.nrDci01PuschMuPuschEdit = QLineEdit()
+        self.nrDci01PuschMuPuschEdit.setEnabled(False)
+        
+        self.nrDci01PuschActBwpLabel= QLabel('Active UL BWP[0-1]:')
+        self.nrDci01PuschActBwpEdit = QLineEdit()
+        self.nrDci01PuschActBwpEdit.setEnabled(False)
+        
+        self.nrDci01PuschIndicatedBwpLabel = QLabel('Bandwidth part indicator[0-1]:')
+        self.nrDci01PuschIndicatedBwpEdit = QLineEdit()
+        self.nrDci01PuschIndicatedBwpEdit.setEnabled(False)
+        
+        self.nrDci01PuschTimeAllocFieldLabel = QLabel('Time domain resource assignment[0-15]:')
+        self.nrDci01PuschTimeAllocFieldEdit = QLineEdit()
+        
+        self.nrDci01PuschTimeAllocMappingTypeLabel = QLabel('Mapping type:')
+        self.nrDci01PuschTimeAllocMappingTypeComb = QComboBox()
+        self.nrDci01PuschTimeAllocMappingTypeComb.addItems(['Type A', 'Type B'])
+        
+        self.nrDci01PuschTimeAllocK2Label = QLabel('K2:')
+        self.nrDci01PuschTimeAllocK2Edit = QLineEdit()
+        
+        self.nrDci01PuschTimeAllocSlivLabel = QLabel('SLIV:')
+        self.nrDci01PuschTimeAllocSlivEdit = QLineEdit()
+        
+        self.nrDci01PuschTimeAllocSLabel = QLabel('S(of SLIV):')
+        self.nrDci01PuschTimeAllocSEdit = QLineEdit()
+        
+        self.nrDci01PuschTimeAllocLLabel = QLabel('L(of SLIV):')
+        self.nrDci01PuschTimeAllocLEdit = QLineEdit()
+        
+        self.nrDci01PuschFreqAllocTypeLabel = QLabel('resourceAllocation:')
+        self.nrDci01PuschFreqAllocTypeComb = QComboBox()
+        self.nrDci01PuschFreqAllocTypeComb.addItems(['RA Type0', 'RA Type1'])
+        self.nrDci01PuschFreqAllocTypeComb.setCurrentIndex(1)
+        
+        self.nrDci01PuschFreqAllocFhLabel= QLabel('Frequency hopping flag:')
+        self.nrDci01PuschFreqAllocFhComb = QComboBox()
+        self.nrDci01PuschFreqAllocFhComb.addItems(['disabled', 'intra-slot', 'inter-slot'])
+        self.nrDci01PuschFreqAllocFhComb.setCurrentIndex(0)
+        
+        self.nrDci01PuschFreqAllocFieldLabel = QLabel('Frequency domain resource assignment:')
+        self.nrDci01PuschFreqAllocFieldEdit = QLineEdit()
+        
+        self.nrDci01PuschFreqAllocType1RbStartLabel = QLabel('RB_start(of RIV):')
+        self.nrDci01PuschFreqAllocType1RbStartEdit = QLineEdit()
+        
+        self.nrDci01PuschFreqAllocType1LRbsLabel = QLabel('L_RBs(of RIV):')
+        self.nrDci01PuschFreqAllocType1LRbsEdit = QLineEdit()
+        
+        self.nrDci01PuschCw0McsLabel = QLabel('Modulation and coding scheme(CW0)[0-31]:')
+        self.nrDci01PuschCw0McsEdit = QLineEdit()
+        
+        self.nrDci01PuschTbsLabel = QLabel('Transport block size(bits):')
+        self.nrDci01PuschTbsEdit = QLineEdit()
+        self.nrDci01PuschTbsEdit.setEnabled(False)
+        
+        self.nrDci01PuschSriFieldLabel = QLabel('SRS resource indicator[0-1/0-3/0-7/0-15]:')
+        self.nrDci01PuschSriFieldEdit = QLineEdit('0')
+        
+        self.nrDci01PuschAntPortsFieldLabel = QLabel('Antenna port(s)[0-15/0-31/0-63]:')
+        self.nrDci01PuschAntPortsFieldEdit = QLineEdit('0')
+        
+        dci01PuschTimeAllocWidget = QWidget()
+        dci01PuschTimeAllocLayout = QGridLayout()
+        dci01PuschTimeAllocLayout.addWidget(self.nrDci01PuschTimeAllocFieldLabel, 0, 0)
+        dci01PuschTimeAllocLayout.addWidget(self.nrDci01PuschTimeAllocFieldEdit, 0, 1)
+        dci01PuschTimeAllocLayout.addWidget(self.nrDci01PuschTimeAllocMappingTypeLabel, 1, 0)
+        dci01PuschTimeAllocLayout.addWidget(self.nrDci01PuschTimeAllocMappingTypeComb, 1, 1)
+        dci01PuschTimeAllocLayout.addWidget(self.nrDci01PuschTimeAllocK2Label, 2, 0)
+        dci01PuschTimeAllocLayout.addWidget(self.nrDci01PuschTimeAllocK2Edit, 2, 1)
+        dci01PuschTimeAllocLayout.addWidget(self.nrDci01PuschTimeAllocSlivLabel, 3, 0)
+        dci01PuschTimeAllocLayout.addWidget(self.nrDci01PuschTimeAllocSlivEdit, 3, 1)
+        dci01PuschTimeAllocLayout.addWidget(self.nrDci01PuschTimeAllocSLabel, 4, 0)
+        dci01PuschTimeAllocLayout.addWidget(self.nrDci01PuschTimeAllocSEdit, 4, 1)
+        dci01PuschTimeAllocLayout.addWidget(self.nrDci01PuschTimeAllocLLabel, 5, 0)
+        dci01PuschTimeAllocLayout.addWidget(self.nrDci01PuschTimeAllocLEdit, 5, 1)
+        dci01PuschTimeAllocWidget.setLayout(dci01PuschTimeAllocLayout)
+        
+        dci01PuschFreqAllocWidget = QWidget()
+        dci01PuschFreqAllocLayout = QGridLayout()
+        dci01PuschFreqAllocLayout.addWidget(self.nrDci01PuschFreqAllocTypeLabel, 0, 0)
+        dci01PuschFreqAllocLayout.addWidget(self.nrDci01PuschFreqAllocTypeComb, 0, 1)
+        dci01PuschFreqAllocLayout.addWidget(self.nrDci01PuschFreqAllocFhLabel, 1, 0)
+        dci01PuschFreqAllocLayout.addWidget(self.nrDci01PuschFreqAllocFhComb, 1, 1)
+        dci01PuschFreqAllocLayout.addWidget(self.nrDci01PuschFreqAllocFieldLabel, 2, 0)
+        dci01PuschFreqAllocLayout.addWidget(self.nrDci01PuschFreqAllocFieldEdit, 2, 1)
+        dci01PuschFreqAllocLayout.addWidget(self.nrDci01PuschFreqAllocType1RbStartLabel, 3, 0)
+        dci01PuschFreqAllocLayout.addWidget(self.nrDci01PuschFreqAllocType1RbStartEdit, 3, 1)
+        dci01PuschFreqAllocLayout.addWidget(self.nrDci01PuschFreqAllocType1LRbsLabel, 4, 0)
+        dci01PuschFreqAllocLayout.addWidget(self.nrDci01PuschFreqAllocType1LRbsEdit, 4, 1)
+        dci01PuschFreqAllocWidget.setLayout(dci01PuschFreqAllocLayout)
+        
+        dci01PuschRaTabWidget = QTabWidget()
+        dci01PuschRaTabWidget.addTab(dci01PuschTimeAllocWidget, 'Time-domain assignment')
+        dci01PuschRaTabWidget.addTab(dci01PuschFreqAllocWidget, 'Frequency-domain assignment')
+        
+        dci01PuschWidget = QWidget()
+        dci01PuschGridLayout = QGridLayout()
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschRntiLabel, 0, 0)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschRntiEdit, 0, 1)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschMuPdcchLabel, 1, 0)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschMuPdcchEdit, 1, 1)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschMuPuschLabel, 2, 0)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschMuPuschEdit, 2, 1)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschActBwpLabel, 3, 0)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschActBwpEdit, 3, 1)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschIndicatedBwpLabel, 4, 0)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschIndicatedBwpEdit, 4, 1)
+        dci01PuschGridLayout.addWidget(dci01PuschRaTabWidget, 5, 0, 1, 2)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschCw0McsLabel, 6, 0)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschCw0McsEdit, 6, 1)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschTbsLabel, 7, 0)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschTbsEdit, 7, 1)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschSriFieldLabel, 8, 0)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschSriFieldEdit, 8, 1)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschAntPortsFieldLabel, 9, 0)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschAntPortsFieldEdit, 9, 1)
+        dci01PuschLayout = QVBoxLayout()
+        dci01PuschLayout.addLayout(dci01PuschGridLayout)
+        dci01PuschLayout.addStretch()
+        dci01PuschWidget.setLayout(dci01PuschLayout)
+        
+        dci01PuschScroll = QScrollArea()
+        dci01PuschScroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        dci01PuschScroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        dci01PuschScroll.setWidgetResizable(True)
+        dci01PuschScroll.setWidget(dci01PuschWidget)
+        
+        #RAR UL grant for Msg3 PUSCH
+        self.nrMsg3PuschMuPuschLabel = QLabel('u_PUSCH[0-3]:')
+        self.nrMsg3PuschMuPuschEdit = QLineEdit()
+        self.nrMsg3PuschMuPuschEdit.setEnabled(False)
+        
+        self.nrMsg3PuschTimeAllocFieldLabel = QLabel('Time domain resource assignment[0-15]:')
+        self.nrMsg3PuschTimeAllocFieldEdit = QLineEdit()
+        
+        self.nrMsg3PuschTimeAllocMappingTypeLabel = QLabel('Mapping type:')
+        self.nrMsg3PuschTimeAllocMappingTypeComb = QComboBox()
+        self.nrMsg3PuschTimeAllocMappingTypeComb.addItems(['Type A', 'Type B'])
+        
+        self.nrMsg3PuschTimeAllocK2Label = QLabel('K2:')
+        self.nrMsg3PuschTimeAllocK2Edit = QLineEdit()
+        
+        self.nrMsg3PuschTimeAllocDeltaLabel= QLabel('Delta:')
+        self.nrMsg3PuschTimeAllocDeltaEdit = QLineEdit()
+        
+        self.nrMsg3PuschTimeAllocSlivLabel = QLabel('SLIV:')
+        self.nrMsg3PuschTimeAllocSlivEdit = QLineEdit()
+        
+        self.nrMsg3PuschTimeAllocSLabel = QLabel('S(of SLIV):')
+        self.nrMsg3PuschTimeAllocSEdit = QLineEdit()
+        
+        self.nrMsg3PuschTimeAllocLLabel = QLabel('L(of SLIV):')
+        self.nrMsg3PuschTimeAllocLEdit = QLineEdit()
+        
+        self.nrMsg3PuschFreqAllocTypeLabel = QLabel('resourceAllocation:')
+        self.nrMsg3PuschFreqAllocTypeComb = QComboBox()
+        self.nrMsg3PuschFreqAllocTypeComb.addItems(['RA Type0', 'RA Type1'])
+        self.nrMsg3PuschFreqAllocTypeComb.setCurrentIndex(1)
+        
+        self.nrMsg3PuschFreqAllocFhLabel= QLabel('Frequency hopping flag:')
+        self.nrMsg3PuschFreqAllocFhComb = QComboBox()
+        self.nrMsg3PuschFreqAllocFhComb.addItems(['disabled', 'enabled'])
+        self.nrMsg3PuschFreqAllocFhComb.setCurrentIndex(0)
+        
+        self.nrMsg3PuschFreqAllocFieldLabel = QLabel('Frequency domain resource assignment:')
+        self.nrMsg3PuschFreqAllocFieldEdit = QLineEdit()
+        
+        self.nrMsg3PuschFreqAllocType1RbStartLabel = QLabel('RB_start(of RIV):')
+        self.nrMsg3PuschFreqAllocType1RbStartEdit = QLineEdit()
+        
+        self.nrMsg3PuschFreqAllocType1LRbsLabel = QLabel('L_RBs(of RIV):')
+        self.nrMsg3PuschFreqAllocType1LRbsEdit = QLineEdit()
+        
+        self.nrMsg3PuschCw0McsLabel = QLabel('Modulation and coding scheme(CW0)[0-31]:')
+        self.nrMsg3PuschCw0McsEdit = QLineEdit()
+        
+        self.nrMsg3PuschTbsLabel = QLabel('Transport block size(bits):')
+        self.nrMsg3PuschTbsEdit = QLineEdit()
+        self.nrMsg3PuschTbsEdit.setEnabled(False)
+        
+        msg3PuschTimeAllocWidget = QWidget()
+        msg3PuschTimeAllocLayout = QGridLayout()
+        msg3PuschTimeAllocLayout.addWidget(self.nrMsg3PuschTimeAllocFieldLabel, 0, 0)
+        msg3PuschTimeAllocLayout.addWidget(self.nrMsg3PuschTimeAllocFieldEdit, 0, 1)
+        msg3PuschTimeAllocLayout.addWidget(self.nrMsg3PuschTimeAllocMappingTypeLabel, 1, 0)
+        msg3PuschTimeAllocLayout.addWidget(self.nrMsg3PuschTimeAllocMappingTypeComb, 1, 1)
+        msg3PuschTimeAllocLayout.addWidget(self.nrMsg3PuschTimeAllocK2Label, 2, 0)
+        msg3PuschTimeAllocLayout.addWidget(self.nrMsg3PuschTimeAllocK2Edit, 2, 1)
+        msg3PuschTimeAllocLayout.addWidget(self.nrMsg3PuschTimeAllocDeltaLabel, 3, 0)
+        msg3PuschTimeAllocLayout.addWidget(self.nrMsg3PuschTimeAllocDeltaEdit, 3, 1)
+        msg3PuschTimeAllocLayout.addWidget(self.nrMsg3PuschTimeAllocSlivLabel, 4, 0)
+        msg3PuschTimeAllocLayout.addWidget(self.nrMsg3PuschTimeAllocSlivEdit, 4, 1)
+        msg3PuschTimeAllocLayout.addWidget(self.nrMsg3PuschTimeAllocSLabel, 5, 0)
+        msg3PuschTimeAllocLayout.addWidget(self.nrMsg3PuschTimeAllocSEdit, 5, 1)
+        msg3PuschTimeAllocLayout.addWidget(self.nrMsg3PuschTimeAllocLLabel, 6, 0)
+        msg3PuschTimeAllocLayout.addWidget(self.nrMsg3PuschTimeAllocLEdit, 6, 1)
+        msg3PuschTimeAllocWidget.setLayout(msg3PuschTimeAllocLayout)
+        
+        msg3PuschFreqAllocWidget = QWidget()
+        msg3PuschFreqAllocLayout = QGridLayout()
+        msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocTypeLabel, 0, 0)
+        msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocTypeComb, 0, 1)
+        msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocFhLabel, 1, 0)
+        msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocFhComb, 1, 1)
+        msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocFieldLabel, 2, 0)
+        msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocFieldEdit, 2, 1)
+        msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocType1RbStartLabel, 3, 0)
+        msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocType1RbStartEdit, 3, 1)
+        msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocType1LRbsLabel, 4, 0)
+        msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocType1LRbsEdit, 4, 1)
+        msg3PuschFreqAllocWidget.setLayout(msg3PuschFreqAllocLayout)
+        
+        msg3PuschRaTabWidget = QTabWidget()
+        msg3PuschRaTabWidget.addTab(msg3PuschTimeAllocWidget, 'Time-domain assignment')
+        msg3PuschRaTabWidget.addTab(msg3PuschFreqAllocWidget, 'Frequency-domain assignment')
+        
+        msg3PuschWidget = QWidget()
+        msg3PuschGridLayout = QGridLayout()
+        msg3PuschGridLayout.addWidget(self.nrMsg3PuschMuPuschLabel, 0, 0)
+        msg3PuschGridLayout.addWidget(self.nrMsg3PuschMuPuschEdit, 0, 1)
+        msg3PuschGridLayout.addWidget(msg3PuschRaTabWidget, 1, 0, 1, 2)
+        msg3PuschGridLayout.addWidget(self.nrMsg3PuschCw0McsLabel, 2, 0)
+        msg3PuschGridLayout.addWidget(self.nrMsg3PuschCw0McsEdit, 2, 1)
+        msg3PuschGridLayout.addWidget(self.nrMsg3PuschTbsLabel, 3, 0)
+        msg3PuschGridLayout.addWidget(self.nrMsg3PuschTbsEdit, 3, 1)
+        msg3PuschLayout = QVBoxLayout()
+        msg3PuschLayout.addLayout(msg3PuschGridLayout)
+        msg3PuschLayout.addStretch()
+        msg3PuschWidget.setLayout(msg3PuschLayout)
+        
+        msg3PuschScroll = QScrollArea()
+        msg3PuschScroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        msg3PuschScroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        msg3PuschScroll.setWidgetResizable(True)
+        msg3PuschScroll.setWidget(msg3PuschWidget)
+        
         dciTabWidget = QTabWidget()
         dciTabWidget.addTab(dci10Sib1Scroll, 'DCI 1_0(SIB1)')
         dciTabWidget.addTab(dci10Msg2Scroll, 'DCI 1_0(Msg2)')
         dciTabWidget.addTab(dci10Msg4Scroll, 'DCI 1_0(Msg4)')
+        dciTabWidget.addTab(dci11PdschScroll, 'DCI 1_1(PDSCH)')
+        dciTabWidget.addTab(msg3PuschScroll, 'Msg3 PUSCH')
+        dciTabWidget.addTab(dci01PuschScroll, 'DCI 0_1(PUSCH)')
         
         pdcchCfgLayout.addWidget(css0GrpBox)
         pdcchCfgLayout.addWidget(pdcchTabWidget)
         pdcchCfgLayout.addWidget(dciTabWidget)
         pdcchCfgLayout.addStretch()
         pdcchCfgWidget.setLayout(pdcchCfgLayout)
+        
+        #-->(4) BWP settings tab
+        #including initial active DL BWP, dedicated active DL BWP, initial active UL BWP, dedicated active UL BWP
+        #---->(4.1) initial active DL BWP by CORESET0/SIB1
         
         #-->(4) PDSCH settings tab
         
@@ -840,8 +1239,6 @@ class NgNrGridUi(QDialog):
         
         #-->(8) PUSCH settings tab
         
-        #-->(9) BWP settings tab
-        #including initial active DL BWP, dedicated active DL BWP, initial active UL BWP, dedicated active UL BWP
         
         
         #-->(10) CSI-RS settings tab
