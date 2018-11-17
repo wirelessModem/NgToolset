@@ -1226,7 +1226,13 @@ class NgNrGridUi(QDialog):
         pdcchCfgWidget.setLayout(pdcchCfgLayout)
         
         #-->(4) BWP settings tab
-        #including initial active DL BWP, dedicated active DL BWP, initial active UL BWP, dedicated active UL BWP
+        '''
+        initial active DL BWP(CORESET0): dmrs for sib1
+        initial active DL BWP(SIB1): dmrs for msg2/msg4
+        initial active UL BWP(SIB1): prach for msg1, pucch for msg4 harq, dmrs for msg3 pusch
+        dedicated active DL BWP: dmrs for normal pdsch, ptrs for pdsch, csi-rs(?), pdcch(defined in CORESET1/USS)
+        dedicated active UL BWP: dmrs for normal pusch, ptrs for pusch, srs, pucch for harq/csi feedback 
+        '''
         #---->(4.1) initial active DL BWP by CORESET0/SIB1
         
         #-->(4) PDSCH settings tab
