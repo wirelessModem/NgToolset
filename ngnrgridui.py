@@ -12,7 +12,7 @@ Change History:
 
 import time
 from collections import OrderedDict
-from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QComboBox, QPushButton, QGroupBox, QTabWidget, QWidget
+from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QComboBox, QPushButton, QGroupBox, QTabWidget, QWidget, QScrollArea
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QGridLayout
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
@@ -351,6 +351,24 @@ class NgNrGridUi(QDialog):
         self.nrCoreset1PrecoderGranularityComb.addItems(['sameAsREG-bundle', 'allContiguousRBs'])
         self.nrCoreset1PrecoderGranularityComb.setCurrentIndex(0)
         
+        coreset1Widget = QWidget()
+        coreset1Layout = QGridLayout()
+        coreset1Layout.addWidget(self.nrCoreset1FreqResourcesLabel, 0, 0)
+        coreset1Layout.addWidget(self.nrCoreset1FreqResourcesEdit, 0, 1)
+        coreset1Layout.addWidget(self.nrCoreset1DurationLabel, 1, 0)
+        coreset1Layout.addWidget(self.nrCoreset1DurationComb, 1, 1)
+        coreset1Layout.addWidget(self.nrCoreset1CceRegMapLabel, 2, 0)
+        coreset1Layout.addWidget(self.nrCoreset1CceRegMapComb, 2, 1)
+        coreset1Layout.addWidget(self.nrCoreset1RegBundleSizeLabel, 3, 0)
+        coreset1Layout.addWidget(self.nrCoreset1RegBundleSizeComb, 3, 1)
+        coreset1Layout.addWidget(self.nrCoreset1InterleaverSizeLabel, 4, 0)
+        coreset1Layout.addWidget(self.nrCoreset1InterleaverSizeComb, 4, 1)
+        coreset1Layout.addWidget(self.nrCoreset1ShiftIndexLabel, 5, 0)
+        coreset1Layout.addWidget(self.nrCoreset1ShiftIndexEdit, 5, 1)
+        coreset1Layout.addWidget(self.nrCoreset1PrecoderGranularityLabel, 6, 0)
+        coreset1Layout.addWidget(self.nrCoreset1PrecoderGranularityComb, 6, 1)
+        coreset1Widget.setLayout(coreset1Layout) 
+        
         #---->(3.3) USS configuratons
         self.nrUssPeriodicityLabel = QLabel('monitoringSlotPeriodicity:')
         self.nrUssPeriodicityComb = QComboBox()
@@ -380,26 +398,6 @@ class NgNrGridUi(QDialog):
         self.nrUssNumCandidatesComb = QComboBox()
         self.nrUssNumCandidatesComb.addItems(['n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n8'])
         
-        pdcchTabWidget = QTabWidget()
-        
-        coreset1Widget = QWidget()
-        coreset1Layout = QGridLayout()
-        coreset1Layout.addWidget(self.nrCoreset1FreqResourcesLabel, 0, 0)
-        coreset1Layout.addWidget(self.nrCoreset1FreqResourcesEdit, 0, 1)
-        coreset1Layout.addWidget(self.nrCoreset1DurationLabel, 1, 0)
-        coreset1Layout.addWidget(self.nrCoreset1DurationComb, 1, 1)
-        coreset1Layout.addWidget(self.nrCoreset1CceRegMapLabel, 2, 0)
-        coreset1Layout.addWidget(self.nrCoreset1CceRegMapComb, 2, 1)
-        coreset1Layout.addWidget(self.nrCoreset1RegBundleSizeLabel, 3, 0)
-        coreset1Layout.addWidget(self.nrCoreset1RegBundleSizeComb, 3, 1)
-        coreset1Layout.addWidget(self.nrCoreset1InterleaverSizeLabel, 4, 0)
-        coreset1Layout.addWidget(self.nrCoreset1InterleaverSizeComb, 4, 1)
-        coreset1Layout.addWidget(self.nrCoreset1ShiftIndexLabel, 5, 0)
-        coreset1Layout.addWidget(self.nrCoreset1ShiftIndexEdit, 5, 1)
-        coreset1Layout.addWidget(self.nrCoreset1PrecoderGranularityLabel, 6, 0)
-        coreset1Layout.addWidget(self.nrCoreset1PrecoderGranularityComb, 6, 1)
-        coreset1Widget.setLayout(coreset1Layout)
-        
         ussWidget = QWidget()
         ussLayout = QGridLayout()
         ussLayout.addWidget(self.nrUssPeriodicityLabel, 0, 0)
@@ -416,11 +414,419 @@ class NgNrGridUi(QDialog):
         ussLayout.addWidget(self.nrUssNumCandidatesComb, 5, 1)
         ussWidget.setLayout(ussLayout)
         
+        pdcchTabWidget = QTabWidget()
         pdcchTabWidget.addTab(coreset1Widget, 'CORESET 1')
         pdcchTabWidget.addTab(ussWidget, 'USS')
         
+        #---->(3.4) DCI configurations
+        #refer to 3GPP 38.321 vf30
+        #Table 7.1-1: RNTI values.
+        '''
+        Value (hexa-decimal)	RNTI
+        0                       N/A
+        0001–FFEF               RA-RNTI, Temporary C-RNTI, C-RNTI, MCS-C-RNTI, CS-RNTI, TPC-PUCCH-RNTI, TPC-PUSCH-RNTI, TPC-SRS-RNTI, INT-RNTI, SFI-RNTI, and SP-CSI-RNTI
+        FFF0–FFFD               Reserved
+        FFFE                    P-RNTI
+        FFFF                    SI-RNTI
+        '''
+        #DCI 1_0 with SI-RNTI for SIB1
+        self.nrDci10Sib1RntiLabel = QLabel('RNTI(SI-RNTI):')
+        self.nrDci10Sib1RntiEdit = QLineEdit('0xFFFF')
+        self.nrDci10Sib1RntiEdit.setEnabled(False)
+        
+        self.nrDci10Sib1MuPdcchLabel = QLabel('u_PDCCH[0-3]:')
+        self.nrDci10Sib1MuPdcchEdit = QLineEdit()
+        self.nrDci10Sib1MuPdcchEdit.setEnabled(False)
+        
+        self.nrDci10Sib1MuPdschLabel = QLabel('u_PDSCH[0-3]:')
+        self.nrDci10Sib1MuPdschEdit = QLineEdit()
+        self.nrDci10Sib1MuPdschEdit.setEnabled(False)
+        
+        self.nrDci10Sib1TimeAllocFieldLabel = QLabel('Time domain resource assignment[0-15]:')
+        self.nrDci10Sib1TimeAllocFieldEdit = QLineEdit()
+        
+        self.nrDci10Sib1TimeAllocMappingTypeLabel = QLabel('Mapping type:')
+        self.nrDci10Sib1TimeAllocMappingTypeComb = QComboBox()
+        self.nrDci10Sib1TimeAllocMappingTypeComb.addItems(['Type A', 'Type B'])
+        
+        self.nrDci10Sib1TimeAllocK0Label = QLabel('K0:')
+        self.nrDci10Sib1TimeAllocK0Edit = QLineEdit()
+        
+        self.nrDci10Sib1TimeAllocSlivLabel = QLabel('SLIV:')
+        self.nrDci10Sib1TimeAllocSlivEdit = QLineEdit()
+        
+        self.nrDci10Sib1TimeAllocSLabel = QLabel('S(of SLIV):')
+        self.nrDci10Sib1TimeAllocSEdit = QLineEdit()
+        
+        self.nrDci10Sib1TimeAllocLLabel = QLabel('L(of SLIV):')
+        self.nrDci10Sib1TimeAllocLEdit = QLineEdit()
+        
+        self.nrDci10Sib1FreqAllocTypeLabel = QLabel('resourceAllocation:')
+        self.nrDci10Sib1FreqAllocTypeComb = QComboBox()
+        self.nrDci10Sib1FreqAllocTypeComb.addItems(['RA Type0', 'RA Type1'])
+        self.nrDci10Sib1FreqAllocTypeComb.setCurrentIndex(1)
+        
+        self.nrDci10Sib1FreqAllocFieldLabel = QLabel('Frequency domain resource assignment:')
+        self.nrDci10Sib1FreqAllocFieldEdit = QLineEdit()
+        
+        self.nrDci10Sib1FreqAllocType1RbStartLabel = QLabel('RB_start(of RIV):')
+        self.nrDci10Sib1FreqAllocType1RbStartEdit = QLineEdit()
+        
+        self.nrDci10Sib1FreqAllocType1LRbsLabel = QLabel('L_RBs(of RIV):')
+        self.nrDci10Sib1FreqAllocType1LRbsEdit = QLineEdit()
+        
+        self.nrDci10Sib1FreqAllocType1VrbPrbMapppingTypeLabel = QLabel('VRB-to-PRB mapping type:')
+        self.nrDci10Sib1FreqAllocType1VrbPrbMappingTypeComb = QComboBox()
+        self.nrDci10Sib1FreqAllocType1VrbPrbMappingTypeComb.addItems(['nonInterleaved', 'interleaved'])
+        self.nrDci10Sib1FreqAllocType1VrbPrbMappingTypeComb.setCurrentIndex(1)
+        
+        
+        self.nrDci10Sib1FreqAllocType1BundleSizeLabel = QLabel('L(vrb-ToPRB-Interleaver):')
+        self.nrDci10Sib1FreqAllocType1BundleSizeComb = QComboBox()
+        self.nrDci10Sib1FreqAllocType1BundleSizeComb.addItems(['n2', 'n4'])
+        self.nrDci10Sib1FreqAllocType1BundleSizeComb.setCurrentIndex(0)
+        
+        self.nrDci10Sib1McsLabel = QLabel('Modulation and coding scheme[0-31]:')
+        self.nrDci10Sib1McsEdit = QLineEdit()
+        
+        self.nrDci10Sib1TbsLabel = QLabel('Transport block size(bits):')
+        self.nrDci10Sib1TbsEdit = QLineEdit()
+        self.nrDci10Sib1TbsEdit.setEnabled(False)
+        
+        dci10Sib1TimeAllocWidget = QWidget()
+        dci10Sib1TimeAllocLayout = QGridLayout()
+        dci10Sib1TimeAllocLayout.addWidget(self.nrDci10Sib1TimeAllocFieldLabel, 0, 0)
+        dci10Sib1TimeAllocLayout.addWidget(self.nrDci10Sib1TimeAllocFieldEdit, 0, 1)
+        dci10Sib1TimeAllocLayout.addWidget(self.nrDci10Sib1TimeAllocMappingTypeLabel, 1, 0)
+        dci10Sib1TimeAllocLayout.addWidget(self.nrDci10Sib1TimeAllocMappingTypeComb, 1, 1)
+        dci10Sib1TimeAllocLayout.addWidget(self.nrDci10Sib1TimeAllocK0Label, 2, 0)
+        dci10Sib1TimeAllocLayout.addWidget(self.nrDci10Sib1TimeAllocK0Edit, 2, 1)
+        dci10Sib1TimeAllocLayout.addWidget(self.nrDci10Sib1TimeAllocSlivLabel, 3, 0)
+        dci10Sib1TimeAllocLayout.addWidget(self.nrDci10Sib1TimeAllocSlivEdit, 3, 1)
+        dci10Sib1TimeAllocLayout.addWidget(self.nrDci10Sib1TimeAllocSLabel, 4, 0)
+        dci10Sib1TimeAllocLayout.addWidget(self.nrDci10Sib1TimeAllocSEdit, 4, 1)
+        dci10Sib1TimeAllocLayout.addWidget(self.nrDci10Sib1TimeAllocLLabel, 5, 0)
+        dci10Sib1TimeAllocLayout.addWidget(self.nrDci10Sib1TimeAllocLEdit, 5, 1)
+        dci10Sib1TimeAllocWidget.setLayout(dci10Sib1TimeAllocLayout)
+        
+        dci10Sib1FreqAllocWidget = QWidget()
+        dci10Sib1FreqAllocLayout = QGridLayout()
+        dci10Sib1FreqAllocLayout.addWidget(self.nrDci10Sib1FreqAllocTypeLabel, 0, 0)
+        dci10Sib1FreqAllocLayout.addWidget(self.nrDci10Sib1FreqAllocTypeComb, 0, 1)
+        dci10Sib1FreqAllocLayout.addWidget(self.nrDci10Sib1FreqAllocFieldLabel, 1, 0)
+        dci10Sib1FreqAllocLayout.addWidget(self.nrDci10Sib1FreqAllocFieldEdit, 1, 1)
+        dci10Sib1FreqAllocLayout.addWidget(self.nrDci10Sib1FreqAllocType1RbStartLabel, 2, 0)
+        dci10Sib1FreqAllocLayout.addWidget(self.nrDci10Sib1FreqAllocType1RbStartEdit, 2, 1)
+        dci10Sib1FreqAllocLayout.addWidget(self.nrDci10Sib1FreqAllocType1LRbsLabel, 3, 0)
+        dci10Sib1FreqAllocLayout.addWidget(self.nrDci10Sib1FreqAllocType1LRbsEdit, 3, 1)
+        dci10Sib1FreqAllocLayout.addWidget(self.nrDci10Sib1FreqAllocType1VrbPrbMapppingTypeLabel, 4, 0)
+        dci10Sib1FreqAllocLayout.addWidget(self.nrDci10Sib1FreqAllocType1VrbPrbMappingTypeComb, 4, 1)
+        dci10Sib1FreqAllocLayout.addWidget(self.nrDci10Sib1FreqAllocType1BundleSizeLabel, 5, 0)
+        dci10Sib1FreqAllocLayout.addWidget(self.nrDci10Sib1FreqAllocType1BundleSizeComb, 5, 1)
+        dci10Sib1FreqAllocWidget.setLayout(dci10Sib1FreqAllocLayout)
+        
+        dci10Sib1RaTabWidget = QTabWidget()
+        dci10Sib1RaTabWidget.addTab(dci10Sib1TimeAllocWidget, 'Time-domain assignment')
+        dci10Sib1RaTabWidget.addTab(dci10Sib1FreqAllocWidget, 'Frequency-domain assignment')
+        
+        dci10Sib1Widget = QWidget()
+        dci10Sib1GridLayout = QGridLayout()
+        dci10Sib1GridLayout.addWidget(self.nrDci10Sib1RntiLabel, 0, 0)
+        dci10Sib1GridLayout.addWidget(self.nrDci10Sib1RntiEdit, 0, 1)
+        dci10Sib1GridLayout.addWidget(self.nrDci10Sib1MuPdcchLabel, 1, 0)
+        dci10Sib1GridLayout.addWidget(self.nrDci10Sib1MuPdcchEdit, 1, 1)
+        dci10Sib1GridLayout.addWidget(self.nrDci10Sib1MuPdschLabel, 2, 0)
+        dci10Sib1GridLayout.addWidget(self.nrDci10Sib1MuPdschEdit, 2, 1)
+        dci10Sib1GridLayout.addWidget(dci10Sib1RaTabWidget, 3, 0, 1, 2)
+        dci10Sib1GridLayout.addWidget(self.nrDci10Sib1McsLabel, 4, 0)
+        dci10Sib1GridLayout.addWidget(self.nrDci10Sib1McsEdit, 4, 1)
+        dci10Sib1GridLayout.addWidget(self.nrDci10Sib1TbsLabel, 5, 0)
+        dci10Sib1GridLayout.addWidget(self.nrDci10Sib1TbsEdit, 5, 1)
+        dci10Sib1Layout = QVBoxLayout()
+        dci10Sib1Layout.addLayout(dci10Sib1GridLayout)
+        dci10Sib1Layout.addStretch()
+        dci10Sib1Widget.setLayout(dci10Sib1Layout)
+        
+        dci10Sib1Scroll = QScrollArea()
+        dci10Sib1Scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        dci10Sib1Scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        dci10Sib1Scroll.setWidgetResizable(True)
+        dci10Sib1Scroll.setWidget(dci10Sib1Widget)
+        
+        #DCI 1_0 with RA-RNTI for Msg2(RAR)
+        self.nrDci10Msg2RntiLabel = QLabel('RNTI(RA-RNTI)[0x0001-FFEF]:')
+        self.nrDci10Msg2RntiEdit = QLineEdit('0x0001')
+        
+        self.nrDci10Msg2MuPdcchLabel = QLabel('u_PDCCH[0-3]:')
+        self.nrDci10Msg2MuPdcchEdit = QLineEdit()
+        self.nrDci10Msg2MuPdcchEdit.setEnabled(False)
+        
+        self.nrDci10Msg2MuPdschLabel = QLabel('u_PDSCH[0-3]:')
+        self.nrDci10Msg2MuPdschEdit = QLineEdit()
+        self.nrDci10Msg2MuPdschEdit.setEnabled(False)
+        
+        self.nrDci10Msg2TimeAllocFieldLabel = QLabel('Time domain resource assignment[0-15]:')
+        self.nrDci10Msg2TimeAllocFieldEdit = QLineEdit()
+        
+        self.nrDci10Msg2TimeAllocMappingTypeLabel = QLabel('Mapping type:')
+        self.nrDci10Msg2TimeAllocMappingTypeComb = QComboBox()
+        self.nrDci10Msg2TimeAllocMappingTypeComb.addItems(['Type A', 'Type B'])
+        
+        self.nrDci10Msg2TimeAllocK0Label = QLabel('K0:')
+        self.nrDci10Msg2TimeAllocK0Edit = QLineEdit()
+        
+        self.nrDci10Msg2TimeAllocSlivLabel = QLabel('SLIV:')
+        self.nrDci10Msg2TimeAllocSlivEdit = QLineEdit()
+        
+        self.nrDci10Msg2TimeAllocSLabel = QLabel('S(of SLIV):')
+        self.nrDci10Msg2TimeAllocSEdit = QLineEdit()
+        
+        self.nrDci10Msg2TimeAllocLLabel = QLabel('L(of SLIV):')
+        self.nrDci10Msg2TimeAllocLEdit = QLineEdit()
+        
+        self.nrDci10Msg2FreqAllocTypeLabel = QLabel('resourceAllocation:')
+        self.nrDci10Msg2FreqAllocTypeComb = QComboBox()
+        self.nrDci10Msg2FreqAllocTypeComb.addItems(['RA Type0', 'RA Type1'])
+        self.nrDci10Msg2FreqAllocTypeComb.setCurrentIndex(1)
+        
+        self.nrDci10Msg2FreqAllocFieldLabel = QLabel('Frequency domain resource assignment:')
+        self.nrDci10Msg2FreqAllocFieldEdit = QLineEdit()
+        
+        self.nrDci10Msg2FreqAllocType1RbStartLabel = QLabel('RB_start(of RIV):')
+        self.nrDci10Msg2FreqAllocType1RbStartEdit = QLineEdit()
+        
+        self.nrDci10Msg2FreqAllocType1LRbsLabel = QLabel('L_RBs(of RIV):')
+        self.nrDci10Msg2FreqAllocType1LRbsEdit = QLineEdit()
+        
+        self.nrDci10Msg2FreqAllocType1VrbPrbMapppingTypeLabel = QLabel('VRB-to-PRB mapping type:')
+        self.nrDci10Msg2FreqAllocType1VrbPrbMappingTypeComb = QComboBox()
+        self.nrDci10Msg2FreqAllocType1VrbPrbMappingTypeComb.addItems(['nonInterleaved', 'interleaved'])
+        self.nrDci10Msg2FreqAllocType1VrbPrbMappingTypeComb.setCurrentIndex(1)
+        
+        
+        self.nrDci10Msg2FreqAllocType1BundleSizeLabel = QLabel('L(vrb-ToPRB-Interleaver):')
+        self.nrDci10Msg2FreqAllocType1BundleSizeComb = QComboBox()
+        self.nrDci10Msg2FreqAllocType1BundleSizeComb.addItems(['n2', 'n4'])
+        self.nrDci10Msg2FreqAllocType1BundleSizeComb.setCurrentIndex(0)
+        
+        self.nrDci10Msg2McsLabel = QLabel('Modulation and coding scheme[0-31]:')
+        self.nrDci10Msg2McsEdit = QLineEdit()
+        
+        self.nrDci10Msg2TbScalingLabel = QLabel('TB Scaling[0-3]:')
+        self.nrDci10Msg2TbScalingEdit = QLineEdit()
+        
+        self.nrDci10Msg2TbsLabel = QLabel('Transport block size(bits):')
+        self.nrDci10Msg2TbsEdit = QLineEdit()
+        self.nrDci10Msg2TbsEdit.setEnabled(False)
+        
+        dci10Msg2TimeAllocWidget = QWidget()
+        dci10Msg2TimeAllocLayout = QGridLayout()
+        dci10Msg2TimeAllocLayout.addWidget(self.nrDci10Msg2TimeAllocFieldLabel, 0, 0)
+        dci10Msg2TimeAllocLayout.addWidget(self.nrDci10Msg2TimeAllocFieldEdit, 0, 1)
+        dci10Msg2TimeAllocLayout.addWidget(self.nrDci10Msg2TimeAllocMappingTypeLabel, 1, 0)
+        dci10Msg2TimeAllocLayout.addWidget(self.nrDci10Msg2TimeAllocMappingTypeComb, 1, 1)
+        dci10Msg2TimeAllocLayout.addWidget(self.nrDci10Msg2TimeAllocK0Label, 2, 0)
+        dci10Msg2TimeAllocLayout.addWidget(self.nrDci10Msg2TimeAllocK0Edit, 2, 1)
+        dci10Msg2TimeAllocLayout.addWidget(self.nrDci10Msg2TimeAllocSlivLabel, 3, 0)
+        dci10Msg2TimeAllocLayout.addWidget(self.nrDci10Msg2TimeAllocSlivEdit, 3, 1)
+        dci10Msg2TimeAllocLayout.addWidget(self.nrDci10Msg2TimeAllocSLabel, 4, 0)
+        dci10Msg2TimeAllocLayout.addWidget(self.nrDci10Msg2TimeAllocSEdit, 4, 1)
+        dci10Msg2TimeAllocLayout.addWidget(self.nrDci10Msg2TimeAllocLLabel, 5, 0)
+        dci10Msg2TimeAllocLayout.addWidget(self.nrDci10Msg2TimeAllocLEdit, 5, 1)
+        dci10Msg2TimeAllocWidget.setLayout(dci10Msg2TimeAllocLayout)
+        
+        dci10Msg2FreqAllocWidget = QWidget()
+        dci10Msg2FreqAllocLayout = QGridLayout()
+        dci10Msg2FreqAllocLayout.addWidget(self.nrDci10Msg2FreqAllocTypeLabel, 0, 0)
+        dci10Msg2FreqAllocLayout.addWidget(self.nrDci10Msg2FreqAllocTypeComb, 0, 1)
+        dci10Msg2FreqAllocLayout.addWidget(self.nrDci10Msg2FreqAllocFieldLabel, 1, 0)
+        dci10Msg2FreqAllocLayout.addWidget(self.nrDci10Msg2FreqAllocFieldEdit, 1, 1)
+        dci10Msg2FreqAllocLayout.addWidget(self.nrDci10Msg2FreqAllocType1RbStartLabel, 2, 0)
+        dci10Msg2FreqAllocLayout.addWidget(self.nrDci10Msg2FreqAllocType1RbStartEdit, 2, 1)
+        dci10Msg2FreqAllocLayout.addWidget(self.nrDci10Msg2FreqAllocType1LRbsLabel, 3, 0)
+        dci10Msg2FreqAllocLayout.addWidget(self.nrDci10Msg2FreqAllocType1LRbsEdit, 3, 1)
+        dci10Msg2FreqAllocLayout.addWidget(self.nrDci10Msg2FreqAllocType1VrbPrbMapppingTypeLabel, 4, 0)
+        dci10Msg2FreqAllocLayout.addWidget(self.nrDci10Msg2FreqAllocType1VrbPrbMappingTypeComb, 4, 1)
+        dci10Msg2FreqAllocLayout.addWidget(self.nrDci10Msg2FreqAllocType1BundleSizeLabel, 5, 0)
+        dci10Msg2FreqAllocLayout.addWidget(self.nrDci10Msg2FreqAllocType1BundleSizeComb, 5, 1)
+        dci10Msg2FreqAllocWidget.setLayout(dci10Msg2FreqAllocLayout)
+        
+        dci10Msg2RaTabWidget = QTabWidget()
+        dci10Msg2RaTabWidget.addTab(dci10Msg2TimeAllocWidget, 'Time-domain assignment')
+        dci10Msg2RaTabWidget.addTab(dci10Msg2FreqAllocWidget, 'Frequency-domain assignment')
+        
+        dci10Msg2Widget = QWidget()
+        dci10Msg2GridLayout = QGridLayout()
+        dci10Msg2GridLayout.addWidget(self.nrDci10Msg2RntiLabel, 0, 0)
+        dci10Msg2GridLayout.addWidget(self.nrDci10Msg2RntiEdit, 0, 1)
+        dci10Msg2GridLayout.addWidget(self.nrDci10Msg2MuPdcchLabel, 1, 0)
+        dci10Msg2GridLayout.addWidget(self.nrDci10Msg2MuPdcchEdit, 1, 1)
+        dci10Msg2GridLayout.addWidget(self.nrDci10Msg2MuPdschLabel, 2, 0)
+        dci10Msg2GridLayout.addWidget(self.nrDci10Msg2MuPdschEdit, 2, 1)
+        dci10Msg2GridLayout.addWidget(dci10Msg2RaTabWidget, 3, 0, 1, 2)
+        dci10Msg2GridLayout.addWidget(self.nrDci10Msg2McsLabel, 4, 0)
+        dci10Msg2GridLayout.addWidget(self.nrDci10Msg2McsEdit, 4, 1)
+        dci10Msg2GridLayout.addWidget(self.nrDci10Msg2TbScalingLabel, 5, 0)
+        dci10Msg2GridLayout.addWidget(self.nrDci10Msg2TbScalingEdit, 5, 1)
+        dci10Msg2GridLayout.addWidget(self.nrDci10Msg2TbsLabel, 6, 0)
+        dci10Msg2GridLayout.addWidget(self.nrDci10Msg2TbsEdit, 6, 1)
+        dci10Msg2Layout = QVBoxLayout()
+        dci10Msg2Layout.addLayout(dci10Msg2GridLayout)
+        dci10Msg2Layout.addStretch()
+        dci10Msg2Widget.setLayout(dci10Msg2Layout)
+        
+        dci10Msg2Scroll = QScrollArea()
+        dci10Msg2Scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        dci10Msg2Scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        dci10Msg2Scroll.setWidgetResizable(True)
+        dci10Msg2Scroll.setWidget(dci10Msg2Widget)
+        
+        #DCI 1_0 with TC-RNTI for Msg4
+        self.nrDci10Msg4RntiLabel = QLabel('RNTI(TC-RNTI)[0x0001-FFEF]:')
+        self.nrDci10Msg4RntiEdit = QLineEdit('0x0001')
+        
+        self.nrDci10Msg4MuPdcchLabel = QLabel('u_PDCCH[0-3]:')
+        self.nrDci10Msg4MuPdcchEdit = QLineEdit()
+        self.nrDci10Msg4MuPdcchEdit.setEnabled(False)
+        
+        self.nrDci10Msg4MuPdschLabel = QLabel('u_PDSCH[0-3]:')
+        self.nrDci10Msg4MuPdschEdit = QLineEdit()
+        self.nrDci10Msg4MuPdschEdit.setEnabled(False)
+        
+        self.nrDci10Msg4TimeAllocFieldLabel = QLabel('Time domain resource assignment[0-15]:')
+        self.nrDci10Msg4TimeAllocFieldEdit = QLineEdit()
+        
+        self.nrDci10Msg4TimeAllocMappingTypeLabel = QLabel('Mapping type:')
+        self.nrDci10Msg4TimeAllocMappingTypeComb = QComboBox()
+        self.nrDci10Msg4TimeAllocMappingTypeComb.addItems(['Type A', 'Type B'])
+        
+        self.nrDci10Msg4TimeAllocK0Label = QLabel('K0:')
+        self.nrDci10Msg4TimeAllocK0Edit = QLineEdit()
+        
+        self.nrDci10Msg4TimeAllocSlivLabel = QLabel('SLIV:')
+        self.nrDci10Msg4TimeAllocSlivEdit = QLineEdit()
+        
+        self.nrDci10Msg4TimeAllocSLabel = QLabel('S(of SLIV):')
+        self.nrDci10Msg4TimeAllocSEdit = QLineEdit()
+        
+        self.nrDci10Msg4TimeAllocLLabel = QLabel('L(of SLIV):')
+        self.nrDci10Msg4TimeAllocLEdit = QLineEdit()
+        
+        self.nrDci10Msg4FreqAllocTypeLabel = QLabel('resourceAllocation:')
+        self.nrDci10Msg4FreqAllocTypeComb = QComboBox()
+        self.nrDci10Msg4FreqAllocTypeComb.addItems(['RA Type0', 'RA Type1'])
+        self.nrDci10Msg4FreqAllocTypeComb.setCurrentIndex(1)
+        
+        self.nrDci10Msg4FreqAllocFieldLabel = QLabel('Frequency domain resource assignment:')
+        self.nrDci10Msg4FreqAllocFieldEdit = QLineEdit()
+        
+        self.nrDci10Msg4FreqAllocType1RbStartLabel = QLabel('RB_start(of RIV):')
+        self.nrDci10Msg4FreqAllocType1RbStartEdit = QLineEdit()
+        
+        self.nrDci10Msg4FreqAllocType1LRbsLabel = QLabel('L_RBs(of RIV):')
+        self.nrDci10Msg4FreqAllocType1LRbsEdit = QLineEdit()
+        
+        self.nrDci10Msg4FreqAllocType1VrbPrbMapppingTypeLabel = QLabel('VRB-to-PRB mapping type:')
+        self.nrDci10Msg4FreqAllocType1VrbPrbMappingTypeComb = QComboBox()
+        self.nrDci10Msg4FreqAllocType1VrbPrbMappingTypeComb.addItems(['nonInterleaved', 'interleaved'])
+        self.nrDci10Msg4FreqAllocType1VrbPrbMappingTypeComb.setCurrentIndex(1)
+        
+        
+        self.nrDci10Msg4FreqAllocType1BundleSizeLabel = QLabel('L(vrb-ToPRB-Interleaver):')
+        self.nrDci10Msg4FreqAllocType1BundleSizeComb = QComboBox()
+        self.nrDci10Msg4FreqAllocType1BundleSizeComb.addItems(['n2', 'n4'])
+        self.nrDci10Msg4FreqAllocType1BundleSizeComb.setCurrentIndex(0)
+        
+        self.nrDci10Msg4McsLabel = QLabel('Modulation and coding scheme[0-31]:')
+        self.nrDci10Msg4McsEdit = QLineEdit()
+        
+        self.nrDci10Msg4TbScalingLabel = QLabel('TB Scaling[0-3]:')
+        self.nrDci10Msg4TbScalingEdit = QLineEdit()
+        
+        self.nrDci10Msg4TbsLabel = QLabel('Transport block size(bits):')
+        self.nrDci10Msg4TbsEdit = QLineEdit()
+        self.nrDci10Msg4TbsEdit.setEnabled(False)
+        
+        self.nrDci10Msg4DeltaPriLabel = QLabel('PUCCH resource indicator[0-7]:')
+        self.nrDci10Msg4DeltaPriEdit = QLineEdit()
+        
+        self.nrDci10Msg4K1Label = QLabel('K1(PDSCH-to-HARQ_feedback timing indicator)[0-7]:')
+        self.nrDci10Msg4K1Edit = QLineEdit()
+        
+        dci10Msg4TimeAllocWidget = QWidget()
+        dci10Msg4TimeAllocLayout = QGridLayout()
+        dci10Msg4TimeAllocLayout.addWidget(self.nrDci10Msg4TimeAllocFieldLabel, 0, 0)
+        dci10Msg4TimeAllocLayout.addWidget(self.nrDci10Msg4TimeAllocFieldEdit, 0, 1)
+        dci10Msg4TimeAllocLayout.addWidget(self.nrDci10Msg4TimeAllocMappingTypeLabel, 1, 0)
+        dci10Msg4TimeAllocLayout.addWidget(self.nrDci10Msg4TimeAllocMappingTypeComb, 1, 1)
+        dci10Msg4TimeAllocLayout.addWidget(self.nrDci10Msg4TimeAllocK0Label, 2, 0)
+        dci10Msg4TimeAllocLayout.addWidget(self.nrDci10Msg4TimeAllocK0Edit, 2, 1)
+        dci10Msg4TimeAllocLayout.addWidget(self.nrDci10Msg4TimeAllocSlivLabel, 3, 0)
+        dci10Msg4TimeAllocLayout.addWidget(self.nrDci10Msg4TimeAllocSlivEdit, 3, 1)
+        dci10Msg4TimeAllocLayout.addWidget(self.nrDci10Msg4TimeAllocSLabel, 4, 0)
+        dci10Msg4TimeAllocLayout.addWidget(self.nrDci10Msg4TimeAllocSEdit, 4, 1)
+        dci10Msg4TimeAllocLayout.addWidget(self.nrDci10Msg4TimeAllocLLabel, 5, 0)
+        dci10Msg4TimeAllocLayout.addWidget(self.nrDci10Msg4TimeAllocLEdit, 5, 1)
+        dci10Msg4TimeAllocWidget.setLayout(dci10Msg4TimeAllocLayout)
+        
+        dci10Msg4FreqAllocWidget = QWidget()
+        dci10Msg4FreqAllocLayout = QGridLayout()
+        dci10Msg4FreqAllocLayout.addWidget(self.nrDci10Msg4FreqAllocTypeLabel, 0, 0)
+        dci10Msg4FreqAllocLayout.addWidget(self.nrDci10Msg4FreqAllocTypeComb, 0, 1)
+        dci10Msg4FreqAllocLayout.addWidget(self.nrDci10Msg4FreqAllocFieldLabel, 1, 0)
+        dci10Msg4FreqAllocLayout.addWidget(self.nrDci10Msg4FreqAllocFieldEdit, 1, 1)
+        dci10Msg4FreqAllocLayout.addWidget(self.nrDci10Msg4FreqAllocType1RbStartLabel, 2, 0)
+        dci10Msg4FreqAllocLayout.addWidget(self.nrDci10Msg4FreqAllocType1RbStartEdit, 2, 1)
+        dci10Msg4FreqAllocLayout.addWidget(self.nrDci10Msg4FreqAllocType1LRbsLabel, 3, 0)
+        dci10Msg4FreqAllocLayout.addWidget(self.nrDci10Msg4FreqAllocType1LRbsEdit, 3, 1)
+        dci10Msg4FreqAllocLayout.addWidget(self.nrDci10Msg4FreqAllocType1VrbPrbMapppingTypeLabel, 4, 0)
+        dci10Msg4FreqAllocLayout.addWidget(self.nrDci10Msg4FreqAllocType1VrbPrbMappingTypeComb, 4, 1)
+        dci10Msg4FreqAllocLayout.addWidget(self.nrDci10Msg4FreqAllocType1BundleSizeLabel, 5, 0)
+        dci10Msg4FreqAllocLayout.addWidget(self.nrDci10Msg4FreqAllocType1BundleSizeComb, 5, 1)
+        dci10Msg4FreqAllocWidget.setLayout(dci10Msg4FreqAllocLayout)
+        
+        dci10Msg4RaTabWidget = QTabWidget()
+        dci10Msg4RaTabWidget.addTab(dci10Msg4TimeAllocWidget, 'Time-domain assignment')
+        dci10Msg4RaTabWidget.addTab(dci10Msg4FreqAllocWidget, 'Frequency-domain assignment')
+        
+        dci10Msg4Widget = QWidget()
+        dci10Msg4GridLayout = QGridLayout()
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4RntiLabel, 0, 0)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4RntiEdit, 0, 1)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4MuPdcchLabel, 1, 0)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4MuPdcchEdit, 1, 1)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4MuPdschLabel, 2, 0)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4MuPdschEdit, 2, 1)
+        dci10Msg4GridLayout.addWidget(dci10Msg4RaTabWidget, 3, 0, 1, 2)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4McsLabel, 4, 0)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4McsEdit, 4, 1)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4TbScalingLabel, 5, 0)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4TbScalingEdit, 5, 1)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4TbsLabel, 6, 0)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4TbsEdit, 6, 1)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4DeltaPriLabel, 7, 0)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4DeltaPriEdit, 7, 1)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4K1Label, 8, 0)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4K1Edit, 8, 1)
+        dci10Msg4Layout = QVBoxLayout()
+        dci10Msg4Layout.addLayout(dci10Msg4GridLayout)
+        dci10Msg4Layout.addStretch()
+        dci10Msg4Widget.setLayout(dci10Msg4Layout)
+        
+        dci10Msg4Scroll = QScrollArea()
+        dci10Msg4Scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        dci10Msg4Scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        dci10Msg4Scroll.setWidgetResizable(True)
+        dci10Msg4Scroll.setWidget(dci10Msg4Widget)
+        
+        dciTabWidget = QTabWidget()
+        dciTabWidget.addTab(dci10Sib1Scroll, 'DCI 1_0(SIB1)')
+        dciTabWidget.addTab(dci10Msg2Scroll, 'DCI 1_0(Msg2)')
+        dciTabWidget.addTab(dci10Msg4Scroll, 'DCI 1_0(Msg4)')
+        
         pdcchCfgLayout.addWidget(css0GrpBox)
         pdcchCfgLayout.addWidget(pdcchTabWidget)
+        pdcchCfgLayout.addWidget(dciTabWidget)
         pdcchCfgLayout.addStretch()
         pdcchCfgWidget.setLayout(pdcchCfgLayout)
         
