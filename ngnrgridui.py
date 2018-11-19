@@ -30,9 +30,6 @@ class NgNrGridUi(QDialog):
         self.initGlobalPar()
 
         #-->(1) Grid settings tab
-        gridCfgWidget = QWidget()
-        gridCfgLayout = QVBoxLayout()
-
         #---->(1.1) Carrier Grid Configurations
         self.nrCarrierBandLabel = QLabel('Operating band:')
         self.nrCarrierBandComb = QComboBox()
@@ -108,14 +105,13 @@ class NgNrGridUi(QDialog):
         gridLayoutResGridCfg.addWidget(carrierGridGrpBox, 2, 0, 1, 2)
         gridLayoutResGridCfg.addWidget(ssbGridGrpBox, 3, 0, 1, 2)
 
+        gridCfgWidget = QWidget()
+        gridCfgLayout = QVBoxLayout()
         gridCfgLayout.addLayout(gridLayoutResGridCfg)
         gridCfgLayout.addStretch()
         gridCfgWidget.setLayout(gridCfgLayout)
         
         #-->(2) SSB settings tab
-        ssbCfgWidget = QWidget()
-        ssbCfgLayout = QVBoxLayout()
-        
         #---->(2.1) SSB configurations
         self.nrSsbInOneGrpLabel = QLabel('inOneGroup(ssb-PositionsInBurst):')
         self.nrSsbInOneGrpEdit = QLineEdit()
@@ -287,15 +283,14 @@ class NgNrGridUi(QDialog):
         gridLayoutSsbCfg.addWidget(mibGrpBox, 1, 0, 1, 2)
         gridLayoutSsbCfg.addWidget(tddCfgGrpBox, 2, 0, 1, 2)
         
+        ssbCfgWidget = QWidget()
+        ssbCfgLayout = QVBoxLayout()
         ssbCfgLayout.addLayout(pciLayout)
         ssbCfgLayout.addLayout(gridLayoutSsbCfg)
         ssbCfgLayout.addStretch()
         ssbCfgWidget.setLayout(ssbCfgLayout)
         
         #-->(3) PDCCH settings tab
-        pdcchCfgWidget = QWidget()
-        pdcchCfgLayout = QVBoxLayout()
-        
         #---->(3.1) CSS0 configurations
         self.nrCss0AggLevelLabel = QLabel('Aggregation level:')
         self.nrCss0AggLevelComb = QComboBox()
@@ -1219,6 +1214,8 @@ class NgNrGridUi(QDialog):
         dciTabWidget.addTab(msg3PuschScroll, 'Msg3 PUSCH')
         dciTabWidget.addTab(dci01PuschScroll, 'DCI 0_1(PUSCH)')
         
+        pdcchCfgWidget = QWidget()
+        pdcchCfgLayout = QVBoxLayout()
         pdcchCfgLayout.addWidget(css0GrpBox)
         pdcchCfgLayout.addWidget(pdcchTabWidget)
         pdcchCfgLayout.addWidget(dciTabWidget)
@@ -1228,12 +1225,163 @@ class NgNrGridUi(QDialog):
         #-->(4) BWP settings tab
         '''
         initial active DL BWP(CORESET0): dmrs for sib1
-        initial active DL BWP(SIB1): dmrs for msg2/msg4
-        initial active UL BWP(SIB1): prach for msg1, pucch for msg4 harq, dmrs for msg3 pusch
-        dedicated active DL BWP: dmrs for normal pdsch, ptrs for pdsch, csi-rs(?), pdcch(defined in CORESET1/USS)
-        dedicated active UL BWP: dmrs for normal pusch, ptrs for pusch, srs, pucch for harq/csi feedback 
+        initial active DL BWP(SIB1): bwp generic and dmrs for msg2/msg4
+        initial active UL BWP(SIB1): bwo generic and prach for msg1, pucch for msg4 harq, dmrs for msg3 pusch
+        dedicated active DL BWP: bwp generic and dmrs for normal pdsch, ptrs for pdsch, csi-rs(?), pdcch(defined in CORESET1/USS)
+        dedicated active UL BWP: bwp generic and dmrs for normal pusch, ptrs for pusch, srs, pucch for harq/csi feedback 
         '''
         #---->(4.1) initial active DL BWP by CORESET0/SIB1
+        #DM-RS for SIB1
+        self.nrDmrsSib1DmrsTypeLabel = QLabel('dmrs-Type:')
+        self.nrDmrsSib1DmrsTypeComb = QComboBox()
+        self.nrDmrsSib1DmrsTypeComb.addItems(['Type 1', 'Type 2'])
+        self.nrDmrsSib1DmrsTypeComb.setCurrentIndex(0)
+        
+        self.nrDmrsSib1AddPosLabel = QLabel('dmrs-additionalPosition:')
+        self.nrDmrsSib1AddPosComb = QComboBox()
+        self.nrDmrsSib1AddPosComb.addItems(['pos0', 'pos1', 'pos2', 'pos3'])
+        
+        self.nrDmrsSib1MaxLengthLabel = QLabel('maxLength:')
+        self.nrDmrsSib1MaxLengthComb = QComboBox()
+        self.nrDmrsSib1MaxLengthComb.addItems(['len1', 'len2'])
+        self.nrDmrsSib1MaxLengthComb.setCurrentIndex(0)
+        
+        self.nrDmrsSib1DmrsPortsLabel = QLabel('DMRS port(s)[1000+x]:')
+        self.nrDmrsSib1DmrsPortsEdit = QLineEdit()
+        self.nrDmrsSib1DmrsPortsEdit.setEnabled(False)
+        
+        self.nrDmrsSib1CdmGroupsWoDataLabel = QLabel('CDM group(s) without data:')
+        self.nrDmrsSib1CdmGroupsWoDataEdit = QLineEdit()
+        self.nrDmrsSib1CdmGroupsWoDataEdit.setEnabled(False)
+        
+        self.nrDmrsSib1FrontLoadSymbsLabel = QLabel('Number of front-load symbols:')
+        self.nrDmrsSib1FrontLoadSymbsEdit = QLineEdit('1')
+        self.nrDmrsSib1FrontLoadSymbsEdit.setEnabled(False)
+        
+        dmrsSib1Widget = QWidget()
+        dmrsSib1GridLayout = QGridLayout()
+        dmrsSib1GridLayout.addWidget(self.nrDmrsSib1DmrsTypeLabel, 0, 0)
+        dmrsSib1GridLayout.addWidget(self.nrDmrsSib1DmrsTypeComb, 0, 1)
+        dmrsSib1GridLayout.addWidget(self.nrDmrsSib1AddPosLabel, 1, 0)
+        dmrsSib1GridLayout.addWidget(self.nrDmrsSib1AddPosComb, 1, 1)
+        dmrsSib1GridLayout.addWidget(self.nrDmrsSib1MaxLengthLabel, 2, 0)
+        dmrsSib1GridLayout.addWidget(self.nrDmrsSib1MaxLengthComb, 2, 1)
+        dmrsSib1GridLayout.addWidget(self.nrDmrsSib1DmrsPortsLabel, 3, 0)
+        dmrsSib1GridLayout.addWidget(self.nrDmrsSib1DmrsPortsEdit, 3, 1)
+        dmrsSib1GridLayout.addWidget(self.nrDmrsSib1CdmGroupsWoDataLabel, 4, 0)
+        dmrsSib1GridLayout.addWidget(self.nrDmrsSib1CdmGroupsWoDataEdit, 4, 1)
+        dmrsSib1GridLayout.addWidget(self.nrDmrsSib1FrontLoadSymbsLabel, 5, 0)
+        dmrsSib1GridLayout.addWidget(self.nrDmrsSib1FrontLoadSymbsEdit, 5, 1)
+        dmrsSib1Layout = QVBoxLayout()
+        dmrsSib1Layout.addLayout(dmrsSib1GridLayout)
+        dmrsSib1Layout.addStretch()
+        dmrsSib1Widget.setLayout(dmrsSib1Layout)
+        
+        #DM-RS for Msg2
+        self.nrDmrsMsg2DmrsTypeLabel = QLabel('dmrs-Type:')
+        self.nrDmrsMsg2DmrsTypeComb = QComboBox()
+        self.nrDmrsMsg2DmrsTypeComb.addItems(['Type 1', 'Type 2'])
+        self.nrDmrsMsg2DmrsTypeComb.setCurrentIndex(0)
+        
+        self.nrDmrsMsg2AddPosLabel = QLabel('dmrs-additionalPosition:')
+        self.nrDmrsMsg2AddPosComb = QComboBox()
+        self.nrDmrsMsg2AddPosComb.addItems(['pos0', 'pos1', 'pos2', 'pos3'])
+        
+        self.nrDmrsMsg2MaxLengthLabel = QLabel('maxLength:')
+        self.nrDmrsMsg2MaxLengthComb = QComboBox()
+        self.nrDmrsMsg2MaxLengthComb.addItems(['len1', 'len2'])
+        self.nrDmrsMsg2MaxLengthComb.setCurrentIndex(0)
+        
+        self.nrDmrsMsg2DmrsPortsLabel = QLabel('DMRS port(s)[1000+x]:')
+        self.nrDmrsMsg2DmrsPortsEdit = QLineEdit()
+        self.nrDmrsMsg2DmrsPortsEdit.setEnabled(False)
+        
+        self.nrDmrsMsg2CdmGroupsWoDataLabel = QLabel('CDM group(s) without data:')
+        self.nrDmrsMsg2CdmGroupsWoDataEdit = QLineEdit()
+        self.nrDmrsMsg2CdmGroupsWoDataEdit.setEnabled(False)
+        
+        self.nrDmrsMsg2FrontLoadSymbsLabel = QLabel('Number of front-load symbols:')
+        self.nrDmrsMsg2FrontLoadSymbsEdit = QLineEdit('1')
+        self.nrDmrsMsg2FrontLoadSymbsEdit.setEnabled(False)
+        
+        dmrsMsg2Widget = QWidget()
+        dmrsMsg2GridLayout = QGridLayout()
+        dmrsMsg2GridLayout.addWidget(self.nrDmrsMsg2DmrsTypeLabel, 0, 0)
+        dmrsMsg2GridLayout.addWidget(self.nrDmrsMsg2DmrsTypeComb, 0, 1)
+        dmrsMsg2GridLayout.addWidget(self.nrDmrsMsg2AddPosLabel, 1, 0)
+        dmrsMsg2GridLayout.addWidget(self.nrDmrsMsg2AddPosComb, 1, 1)
+        dmrsMsg2GridLayout.addWidget(self.nrDmrsMsg2MaxLengthLabel, 2, 0)
+        dmrsMsg2GridLayout.addWidget(self.nrDmrsMsg2MaxLengthComb, 2, 1)
+        dmrsMsg2GridLayout.addWidget(self.nrDmrsMsg2DmrsPortsLabel, 3, 0)
+        dmrsMsg2GridLayout.addWidget(self.nrDmrsMsg2DmrsPortsEdit, 3, 1)
+        dmrsMsg2GridLayout.addWidget(self.nrDmrsMsg2CdmGroupsWoDataLabel, 4, 0)
+        dmrsMsg2GridLayout.addWidget(self.nrDmrsMsg2CdmGroupsWoDataEdit, 4, 1)
+        dmrsMsg2GridLayout.addWidget(self.nrDmrsMsg2FrontLoadSymbsLabel, 5, 0)
+        dmrsMsg2GridLayout.addWidget(self.nrDmrsMsg2FrontLoadSymbsEdit, 5, 1)
+        dmrsMsg2Layout = QVBoxLayout()
+        dmrsMsg2Layout.addLayout(dmrsMsg2GridLayout)
+        dmrsMsg2Layout.addStretch()
+        dmrsMsg2Widget.setLayout(dmrsMsg2Layout)
+        
+        #DM-RS for Msg4
+        self.nrDmrsMsg4DmrsTypeLabel = QLabel('dmrs-Type:')
+        self.nrDmrsMsg4DmrsTypeComb = QComboBox()
+        self.nrDmrsMsg4DmrsTypeComb.addItems(['Type 1', 'Type 2'])
+        self.nrDmrsMsg4DmrsTypeComb.setCurrentIndex(0)
+        
+        self.nrDmrsMsg4AddPosLabel = QLabel('dmrs-additionalPosition:')
+        self.nrDmrsMsg4AddPosComb = QComboBox()
+        self.nrDmrsMsg4AddPosComb.addItems(['pos0', 'pos1', 'pos2', 'pos3'])
+        
+        self.nrDmrsMsg4MaxLengthLabel = QLabel('maxLength:')
+        self.nrDmrsMsg4MaxLengthComb = QComboBox()
+        self.nrDmrsMsg4MaxLengthComb.addItems(['len1', 'len2'])
+        self.nrDmrsMsg4MaxLengthComb.setCurrentIndex(0)
+        
+        self.nrDmrsMsg4DmrsPortsLabel = QLabel('DMRS port(s)[1000+x]:')
+        self.nrDmrsMsg4DmrsPortsEdit = QLineEdit()
+        self.nrDmrsMsg4DmrsPortsEdit.setEnabled(False)
+        
+        self.nrDmrsMsg4CdmGroupsWoDataLabel = QLabel('CDM group(s) without data:')
+        self.nrDmrsMsg4CdmGroupsWoDataEdit = QLineEdit()
+        self.nrDmrsMsg4CdmGroupsWoDataEdit.setEnabled(False)
+        
+        self.nrDmrsMsg4FrontLoadSymbsLabel = QLabel('Number of front-load symbols:')
+        self.nrDmrsMsg4FrontLoadSymbsEdit = QLineEdit('1')
+        self.nrDmrsMsg4FrontLoadSymbsEdit.setEnabled(False)
+        
+        dmrsMsg4Widget = QWidget()
+        dmrsMsg4GridLayout = QGridLayout()
+        dmrsMsg4GridLayout.addWidget(self.nrDmrsMsg4DmrsTypeLabel, 0, 0)
+        dmrsMsg4GridLayout.addWidget(self.nrDmrsMsg4DmrsTypeComb, 0, 1)
+        dmrsMsg4GridLayout.addWidget(self.nrDmrsMsg4AddPosLabel, 1, 0)
+        dmrsMsg4GridLayout.addWidget(self.nrDmrsMsg4AddPosComb, 1, 1)
+        dmrsMsg4GridLayout.addWidget(self.nrDmrsMsg4MaxLengthLabel, 2, 0)
+        dmrsMsg4GridLayout.addWidget(self.nrDmrsMsg4MaxLengthComb, 2, 1)
+        dmrsMsg4GridLayout.addWidget(self.nrDmrsMsg4DmrsPortsLabel, 3, 0)
+        dmrsMsg4GridLayout.addWidget(self.nrDmrsMsg4DmrsPortsEdit, 3, 1)
+        dmrsMsg4GridLayout.addWidget(self.nrDmrsMsg4CdmGroupsWoDataLabel, 4, 0)
+        dmrsMsg4GridLayout.addWidget(self.nrDmrsMsg4CdmGroupsWoDataEdit, 4, 1)
+        dmrsMsg4GridLayout.addWidget(self.nrDmrsMsg4FrontLoadSymbsLabel, 5, 0)
+        dmrsMsg4GridLayout.addWidget(self.nrDmrsMsg4FrontLoadSymbsEdit, 5, 1)
+        dmrsMsg4Layout = QVBoxLayout()
+        dmrsMsg4Layout.addLayout(dmrsMsg4GridLayout)
+        dmrsMsg4Layout.addStretch()
+        dmrsMsg4Widget.setLayout(dmrsMsg4Layout)
+        
+        iniDlBwpDmrsTabWidget = QTabWidget()
+        iniDlBwpDmrsTabWidget.addTab(dmrsSib1Widget, 'DM-RS(SIB1)')
+        iniDlBwpDmrsTabWidget.addTab(dmrsMsg2Widget, 'DM-RS(Msg2)')
+        iniDlBwpDmrsTabWidget.addTab(dmrsMsg4Widget, 'DM-RS(Msg4)')
+        
+        iniDlBwpWidget = QWidget()
+        iniDlBwpLayout = QVBoxLayout()
+        iniDlBwpLayout.addWidget(iniDlBwpDmrsTabWidget)
+        iniDlBwpLayout.addStretch()
+        iniDlBwpWidget.setLayout(iniDlBwpLayout)
+        
+        bwpCfgTabWidget = QTabWidget()
+        bwpCfgTabWidget.addTab(iniDlBwpWidget, 'Initial DL BWP')
         
         #-->(4) PDSCH settings tab
         
@@ -1261,9 +1409,10 @@ class NgNrGridUi(QDialog):
 
         #-->Tab Widgets
         tabWidget = QTabWidget()
-        tabWidget.addTab(gridCfgWidget, 'Grid Settings')
-        tabWidget.addTab(ssbCfgWidget, 'SSB Settings')
-        tabWidget.addTab(pdcchCfgWidget, 'PDCCH Settings')
+        tabWidget.addTab(gridCfgWidget, 'Grid')
+        tabWidget.addTab(ssbCfgWidget, 'SSB')
+        tabWidget.addTab(pdcchCfgWidget, 'PDCCH')
+        tabWidget.addTab(bwpCfgTabWidget, 'BWP')
 
         #-->Buttons
         self.okBtn = QPushButton('OK')
