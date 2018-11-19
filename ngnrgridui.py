@@ -1374,6 +1374,22 @@ class NgNrGridUi(QDialog):
         iniDlBwpDmrsTabWidget.addTab(dmrsMsg2Widget, 'DM-RS(Msg2)')
         iniDlBwpDmrsTabWidget.addTab(dmrsMsg4Widget, 'DM-RS(Msg4)')
         
+        #initial dl bwp as indicated in sib1
+        self.nrIniDlBwpGenericBwpIdLabel = QLabel('bwp-Id[0-3]:')
+        self.nrIniDlBwpGenericBwpIdEdit = QLineEdit()
+        self.nrIniDlBwpGenericBwpIdEdit.setCurrentText('0')
+        
+        self.nrIniDlBwpGenericScsLabel = QLabel('subcarrierSpacing:')
+        self.nrIniDlBwpGenericScsComb = QComboBox()
+        self.nrIniDlBwpGenericScsComb.addItems(['15KHz', '30KHz', '60KHz', '120KHz'])
+        
+        self.nrIniDlBwpGenericCpLabel = QLabel('cyclicPrefix:')
+        self.nrIniDlBwpGenericCpComb = QComboBox()
+        self.nrIniDlBwpGenericCpComb.addItems(['normal', 'extended'])
+        self.nrIniDlBwpGenericCpComb.setCurrentIndex(0)
+        
+        
+        
         iniDlBwpWidget = QWidget()
         iniDlBwpLayout = QVBoxLayout()
         iniDlBwpLayout.addWidget(iniDlBwpDmrsTabWidget)
@@ -1409,10 +1425,10 @@ class NgNrGridUi(QDialog):
 
         #-->Tab Widgets
         tabWidget = QTabWidget()
-        tabWidget.addTab(gridCfgWidget, 'Grid')
-        tabWidget.addTab(ssbCfgWidget, 'SSB')
-        tabWidget.addTab(pdcchCfgWidget, 'PDCCH')
-        tabWidget.addTab(bwpCfgTabWidget, 'BWP')
+        tabWidget.addTab(gridCfgWidget, 'Grid Settings')
+        tabWidget.addTab(ssbCfgWidget, 'SSB Settings')
+        tabWidget.addTab(pdcchCfgWidget, 'PDCCH Settings')
+        tabWidget.addTab(bwpCfgTabWidget, 'BWP Settings')
 
         #-->Buttons
         self.okBtn = QPushButton('OK')
