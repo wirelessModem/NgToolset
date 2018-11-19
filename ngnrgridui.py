@@ -1226,11 +1226,11 @@ class NgNrGridUi(QDialog):
         '''
         initial active DL BWP(CORESET0): dmrs for sib1
         initial active DL BWP(SIB1): bwp generic and dmrs for msg2/msg4
-        initial active UL BWP(SIB1): bwo generic and prach for msg1, pucch for msg4 harq, dmrs for msg3 pusch
+        initial active UL BWP(SIB1): bwp generic and prach for msg1, pucch for msg4 harq, dmrs for msg3 pusch
         dedicated active DL BWP: bwp generic and dmrs for normal pdsch, ptrs for pdsch, csi-rs(?), pdcch(defined in CORESET1/USS)
         dedicated active UL BWP: bwp generic and dmrs for normal pusch, ptrs for pusch, srs, pucch for harq/csi feedback 
         '''
-        #---->(4.1) initial active DL BWP by CORESET0/SIB1
+        #---->(4.1) initial active DL BWP as specified in CORESET0/SIB1
         #DM-RS for SIB1
         self.nrDmrsSib1DmrsTypeLabel = QLabel('dmrs-Type:')
         self.nrDmrsSib1DmrsTypeComb = QComboBox()
@@ -1377,7 +1377,7 @@ class NgNrGridUi(QDialog):
         #initial dl bwp as indicated in sib1
         self.nrIniDlBwpGenericBwpIdLabel = QLabel('bwp-Id[0-3]:')
         self.nrIniDlBwpGenericBwpIdEdit = QLineEdit()
-        self.nrIniDlBwpGenericBwpIdEdit.setCurrentText('0')
+        self.nrIniDlBwpGenericBwpIdEdit.setText('0')
         
         self.nrIniDlBwpGenericScsLabel = QLabel('subcarrierSpacing:')
         self.nrIniDlBwpGenericScsComb = QComboBox()
@@ -1388,16 +1388,147 @@ class NgNrGridUi(QDialog):
         self.nrIniDlBwpGenericCpComb.addItems(['normal', 'extended'])
         self.nrIniDlBwpGenericCpComb.setCurrentIndex(0)
         
+        self.nrIniDlBwpGenericLocAndBwLabel = QLabel('locationAndBandwidth[0-37949]:')
+        self.nrIniDlBwpGenericLocAndBwEdit = QLineEdit()
         
+        self.nrIniDlBwpGenericRbStartLabel = QLabel('RB_start:')
+        self.nrIniDlBwpGenericRbStartEdit = QLineEdit()
+        self.nrIniDlBwpGenericRbStartEdit.setEnabled(False)
+        
+        self.nrIniDlBwpGenericLRbsLabel = QLabel('L_RBs:')
+        self.nrIniDlBwpGenericLRbsEdit = QLineEdit()
+        self.nrIniDlBwpGenericLRbsEdit.setEnabled(False)
+        
+        iniDlBwpSib1GrpBox = QGroupBox()
+        iniDlBwpSib1GrpBox.setTitle('Initial active DL BWP(SIB1)')
+        iniDlBwpSib1GrpBoxGridLayout = QGridLayout()
+        iniDlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniDlBwpGenericBwpIdLabel, 0, 0)
+        iniDlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniDlBwpGenericBwpIdEdit, 0, 1)
+        iniDlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniDlBwpGenericScsLabel, 1, 0)
+        iniDlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniDlBwpGenericScsComb, 1, 1)
+        iniDlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniDlBwpGenericCpLabel, 2, 0)
+        iniDlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniDlBwpGenericCpComb, 2, 1)
+        iniDlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniDlBwpGenericLocAndBwLabel, 3, 0)
+        iniDlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniDlBwpGenericLocAndBwEdit, 3, 1)
+        iniDlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniDlBwpGenericRbStartLabel, 4, 0)
+        iniDlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniDlBwpGenericRbStartEdit, 4, 1)
+        iniDlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniDlBwpGenericLRbsLabel, 5, 0)
+        iniDlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniDlBwpGenericLRbsEdit, 5, 1)
+        iniDlBwpSib1GrpBox.setLayout(iniDlBwpSib1GrpBoxGridLayout)
         
         iniDlBwpWidget = QWidget()
         iniDlBwpLayout = QVBoxLayout()
+        iniDlBwpLayout.addWidget(iniDlBwpSib1GrpBox)
         iniDlBwpLayout.addWidget(iniDlBwpDmrsTabWidget)
         iniDlBwpLayout.addStretch()
         iniDlBwpWidget.setLayout(iniDlBwpLayout)
         
+        #---->(4.2) initial active ul bwp as specified in SIB1
+        #initial ul bwp as indicated in sib1
+        self.nrIniUlBwpGenericBwpIdLabel = QLabel('bwp-Id[0-3]:')
+        self.nrIniUlBwpGenericBwpIdEdit = QLineEdit()
+        self.nrIniUlBwpGenericBwpIdEdit.setText('0')
+        
+        self.nrIniUlBwpGenericScsLabel = QLabel('subcarrierSpacing:')
+        self.nrIniUlBwpGenericScsComb = QComboBox()
+        self.nrIniUlBwpGenericScsComb.addItems(['15KHz', '30KHz', '60KHz', '120KHz'])
+        
+        self.nrIniUlBwpGenericCpLabel = QLabel('cyclicPrefix:')
+        self.nrIniUlBwpGenericCpComb = QComboBox()
+        self.nrIniUlBwpGenericCpComb.addItems(['normal', 'extended'])
+        self.nrIniUlBwpGenericCpComb.setCurrentIndex(0)
+        
+        self.nrIniUlBwpGenericLocAndBwLabel = QLabel('locationAndBandwidth[0-37949]:')
+        self.nrIniUlBwpGenericLocAndBwEdit = QLineEdit()
+        
+        self.nrIniUlBwpGenericRbStartLabel = QLabel('RB_start:')
+        self.nrIniUlBwpGenericRbStartEdit = QLineEdit()
+        self.nrIniUlBwpGenericRbStartEdit.setEnabled(False)
+        
+        self.nrIniUlBwpGenericLRbsLabel = QLabel('L_RBs:')
+        self.nrIniUlBwpGenericLRbsEdit = QLineEdit()
+        self.nrIniUlBwpGenericLRbsEdit.setEnabled(False)
+        
+        iniUlBwpSib1GrpBox = QGroupBox()
+        iniUlBwpSib1GrpBox.setTitle('Initial active UL BWP(SIB1)')
+        iniUlBwpSib1GrpBoxGridLayout = QGridLayout()
+        iniUlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniUlBwpGenericBwpIdLabel, 0, 0)
+        iniUlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniUlBwpGenericBwpIdEdit, 0, 1)
+        iniUlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniUlBwpGenericScsLabel, 1, 0)
+        iniUlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniUlBwpGenericScsComb, 1, 1)
+        iniUlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniUlBwpGenericCpLabel, 2, 0)
+        iniUlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniUlBwpGenericCpComb, 2, 1)
+        iniUlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniUlBwpGenericLocAndBwLabel, 3, 0)
+        iniUlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniUlBwpGenericLocAndBwEdit, 3, 1)
+        iniUlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniUlBwpGenericRbStartLabel, 4, 0)
+        iniUlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniUlBwpGenericRbStartEdit, 4, 1)
+        iniUlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniUlBwpGenericLRbsLabel, 5, 0)
+        iniUlBwpSib1GrpBoxGridLayout.addWidget(self.nrIniUlBwpGenericLRbsEdit, 5, 1)
+        iniUlBwpSib1GrpBox.setLayout(iniUlBwpSib1GrpBoxGridLayout)
+        
+        #prach for msg1
+        self.nrRachGenericPrachConfIdLabel = QLabel('prach-ConfigurationIndex[0-255]:')
+        self.nrrachgenericPrachConfIdEdit = QLineEdit()
+        self.nrrachgenericPrachConfIdEdit.setText('0')
+        
+        self.nrRachGenericPrachFmtLabel = QLabel('Preamble format:')
+        self.nrRachGenericPrachFmtEdit = QLineEdit()
+        self.nrRachGenericPrachFmtEdit.setEnabled(False)
+        
+        self.nrRachGenericScsLabel = QLabel('msg1-SubcarrierSpacing:')
+        self.nrrachgenericScsComb = QComboBox()
+        self.nrrachgenericScsComb.addItems(['1.25KHz', '5KHz', '15KHz', '30KHz', '60KHz', '120KHz'])
+        
+        self.nrRachGenericMsg1FdmLabel = QLabel('msg1-FDM:')
+        self.nrRachGenericMsg1FdmComb = QComboBox()
+        self.nrRachGenericMsg1FdmComb.addItems(['1', '2', '4', '8'])
+        
+        self.nrRachGenericMsg1FreqStartLabel = QLabel('msg1-FrequencyStart[0-274]:')
+        self.nrRachGenericMsg1FreqStartEdit = QLineEdit()
+        
+        rachGenericGrpBox = QGroupBox()
+        rachGenericGrpBoxGridLayout = QGridLayout()
+        rachGenericGrpBoxGridLayout.addWidget(self.nrRachGenericPrachConfIdLabel, 0, 0)
+        rachGenericGrpBoxGridLayout.addWidget(self.nrrachgenericPrachConfIdEdit, 0, 1)
+        rachGenericGrpBoxGridLayout.addWidget(self.nrRachGenericPrachFmtLabel, 1, 0)
+        rachGenericGrpBoxGridLayout.addWidget(self.nrRachGenericPrachFmtEdit, 1, 1)
+        rachGenericGrpBoxGridLayout.addWidget(self.nrRachGenericScsLabel, 2, 0)
+        rachGenericGrpBoxGridLayout.addWidget(self.nrrachgenericScsComb, 2, 1)
+        rachGenericGrpBoxGridLayout.addWidget(self.nrRachGenericMsg1FdmLabel, 3, 0)
+        rachGenericGrpBoxGridLayout.addWidget(self.nrRachGenericMsg1FdmComb, 3, 1)
+        rachGenericGrpBoxGridLayout.addWidget(self.nrRachGenericMsg1FreqStartLabel, 4, 0)
+        rachGenericGrpBoxGridLayout.addWidget(self.nrRachGenericMsg1FreqStartEdit, 4, 1)
+        rachGenericGrpBox.setLayout(rachGenericGrpBoxGridLayout)
+        
+        self.nrRachNumRaPreamblesLabel = QLabel('totalNumberOfRA-Preambles[1-64]:')
+        self.nrRachNumRaPreamblesEdit = QLineEdit()
+        self.nrRachNumRaPreamblesEdit.setText('64')
+        
+        self.nrRachSsbPerRachOccasionLabel = QLabel('ssb-perRACH-Occasion:')
+        self.nrRachSsbPerRachOccasionComb = QComboBox()
+        self.nrRachSsbPerRachOccasionComb.addItems(['1/8', '1/4', '1/2', '1', '2', '4', '8' '16'])
+        
+        self.nrRachCbPreamblesPerSsbLabel = QLabel('CB-PreamblesPerSSB:')
+        self.nrRachCbPreamblesPerSsbEdit = QLineEdit()
+        
+        #prach time-domain allocation
+        
+        #prach freq-domain allocation
+        
+        
+        
+        
+        iniUlBwpWidget = QWidget()
+        iniUlBwpLayout = QVBoxLayout()
+        iniUlBwpLayout.addWidget(iniUlBwpSib1GrpBox)
+        #iniUlBwpLayout.addWidget(iniUlBwpDmrsTabWidget)
+        iniUlBwpLayout.addStretch()
+        iniUlBwpWidget.setLayout(iniUlBwpLayout)
+        
+        
         bwpCfgTabWidget = QTabWidget()
         bwpCfgTabWidget.addTab(iniDlBwpWidget, 'Initial DL BWP')
+        bwpCfgTabWidget.addTab(iniUlBwpWidget, 'Initial UL BWP')
         
         #-->(4) PDSCH settings tab
         
