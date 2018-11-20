@@ -1004,10 +1004,10 @@ class NgNrGridUi(QDialog):
         self.nrDci01PuschFreqAllocTypeComb.addItems(['RA Type0', 'RA Type1'])
         self.nrDci01PuschFreqAllocTypeComb.setCurrentIndex(1)
         
-        self.nrDci01PuschFreqAllocFhLabel= QLabel('Frequency hopping flag:')
-        self.nrDci01PuschFreqAllocFhComb = QComboBox()
-        self.nrDci01PuschFreqAllocFhComb.addItems(['disabled', 'intra-slot', 'inter-slot'])
-        self.nrDci01PuschFreqAllocFhComb.setCurrentIndex(0)
+        self.nrDci01PuschFreqAllocFreqHopLabel= QLabel('Frequency hopping flag:')
+        self.nrDci01PuschFreqAllocFreqHopComb = QComboBox()
+        self.nrDci01PuschFreqAllocFreqHopComb.addItems(['disabled', 'intra-slot', 'inter-slot'])
+        self.nrDci01PuschFreqAllocFreqHopComb.setCurrentIndex(0)
         
         self.nrDci01PuschFreqAllocFieldLabel = QLabel('Frequency domain resource assignment:')
         self.nrDci01PuschFreqAllocFieldEdit = QLineEdit()
@@ -1051,8 +1051,8 @@ class NgNrGridUi(QDialog):
         dci01PuschFreqAllocLayout = QGridLayout()
         dci01PuschFreqAllocLayout.addWidget(self.nrDci01PuschFreqAllocTypeLabel, 0, 0)
         dci01PuschFreqAllocLayout.addWidget(self.nrDci01PuschFreqAllocTypeComb, 0, 1)
-        dci01PuschFreqAllocLayout.addWidget(self.nrDci01PuschFreqAllocFhLabel, 1, 0)
-        dci01PuschFreqAllocLayout.addWidget(self.nrDci01PuschFreqAllocFhComb, 1, 1)
+        dci01PuschFreqAllocLayout.addWidget(self.nrDci01PuschFreqAllocFreqHopLabel, 1, 0)
+        dci01PuschFreqAllocLayout.addWidget(self.nrDci01PuschFreqAllocFreqHopComb, 1, 1)
         dci01PuschFreqAllocLayout.addWidget(self.nrDci01PuschFreqAllocFieldLabel, 2, 0)
         dci01PuschFreqAllocLayout.addWidget(self.nrDci01PuschFreqAllocFieldEdit, 2, 1)
         dci01PuschFreqAllocLayout.addWidget(self.nrDci01PuschFreqAllocType1RbStartLabel, 3, 0)
@@ -1129,10 +1129,10 @@ class NgNrGridUi(QDialog):
         self.nrMsg3PuschFreqAllocTypeComb.addItems(['RA Type0', 'RA Type1'])
         self.nrMsg3PuschFreqAllocTypeComb.setCurrentIndex(1)
         
-        self.nrMsg3PuschFreqAllocFhLabel= QLabel('Frequency hopping flag:')
-        self.nrMsg3PuschFreqAllocFhComb = QComboBox()
-        self.nrMsg3PuschFreqAllocFhComb.addItems(['disabled', 'enabled'])
-        self.nrMsg3PuschFreqAllocFhComb.setCurrentIndex(0)
+        self.nrMsg3PuschFreqAllocFreqHopLabel= QLabel('Frequency hopping flag:')
+        self.nrMsg3PuschFreqAllocFreqHopComb = QComboBox()
+        self.nrMsg3PuschFreqAllocFreqHopComb.addItems(['disabled', 'enabled'])
+        self.nrMsg3PuschFreqAllocFreqHopComb.setCurrentIndex(0)
         
         self.nrMsg3PuschFreqAllocFieldLabel = QLabel('Frequency domain resource assignment:')
         self.nrMsg3PuschFreqAllocFieldEdit = QLineEdit()
@@ -1172,8 +1172,8 @@ class NgNrGridUi(QDialog):
         msg3PuschFreqAllocLayout = QGridLayout()
         msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocTypeLabel, 0, 0)
         msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocTypeComb, 0, 1)
-        msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocFhLabel, 1, 0)
-        msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocFhComb, 1, 1)
+        msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocFreqHopLabel, 1, 0)
+        msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocFreqHopComb, 1, 1)
         msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocFieldLabel, 2, 0)
         msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocFieldEdit, 2, 1)
         msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocType1RbStartLabel, 3, 0)
@@ -1219,7 +1219,7 @@ class NgNrGridUi(QDialog):
         pdcchCfgLayout.addWidget(css0GrpBox)
         pdcchCfgLayout.addWidget(pdcchTabWidget)
         pdcchCfgLayout.addWidget(dciTabWidget)
-        pdcchCfgLayout.addStretch()
+        #pdcchCfgLayout.addStretch()
         pdcchCfgWidget.setLayout(pdcchCfgLayout)
         
         #-->(4) BWP settings tab
@@ -1512,6 +1512,11 @@ class NgNrGridUi(QDialog):
         self.nrRachCbPreamblesPerSsbLabel = QLabel('CB-PreamblesPerSSB:')
         self.nrRachCbPreamblesPerSsbEdit = QLineEdit()
         
+        self.nrRachMsg3TpLabel = QLabel('msg3-transformPrecoder:')
+        self.nrRachMsg3TpComb = QComboBox()
+        self.nrRachMsg3TpComb.addItems(['enabled', 'disabled'])
+        self.nrRachMsg3TpComb.setCurrentIndex(1)
+        
         #prach time-domain allocation and freq-domain allocation are determined internally
         
         prachWidget = QWidget()
@@ -1523,6 +1528,8 @@ class NgNrGridUi(QDialog):
         prachWidgetGridLayout.addWidget(self.nrRachSsbPerRachOccasionComb, 2, 1)
         prachWidgetGridLayout.addWidget(self.nrRachCbPreamblesPerSsbLabel, 3, 0)
         prachWidgetGridLayout.addWidget(self.nrRachCbPreamblesPerSsbEdit, 3, 1)
+        prachWidgetGridLayout.addWidget(self.nrRachMsg3TpLabel, 4, 0)
+        prachWidgetGridLayout.addWidget(self.nrRachMsg3TpComb, 4, 1)
         prachWidget.setLayout(prachWidgetGridLayout)
         
         #dmrs for msg3 pusch
@@ -1626,9 +1633,413 @@ class NgNrGridUi(QDialog):
         iniUlBwpLayout.addStretch()
         iniUlBwpWidget.setLayout(iniUlBwpLayout)
         
+        #---->(4.3) dedicated active dl bwp as specified in ServingCellConfig IE
+        #dedicated dl bwp
+        self.nrDedDlBwpGenericBwpIdLabel = QLabel('bwp-Id[0-3]:')
+        self.nrDedDlBwpGenericBwpIdEdit = QLineEdit()
+        self.nrDedDlBwpGenericBwpIdEdit.setText('1')
+        
+        self.nrDedDlBwpGenericScsLabel = QLabel('subcarrierSpacing:')
+        self.nrDedDlBwpGenericScsComb = QComboBox()
+        self.nrDedDlBwpGenericScsComb.addItems(['15KHz', '30KHz', '60KHz', '120KHz'])
+        
+        self.nrDedDlBwpGenericCpLabel = QLabel('cyclicPrefix:')
+        self.nrDedDlBwpGenericCpComb = QComboBox()
+        self.nrDedDlBwpGenericCpComb.addItems(['normal', 'extended'])
+        self.nrDedDlBwpGenericCpComb.setCurrentIndex(0)
+        
+        self.nrDedDlBwpGenericLocAndBwLabel = QLabel('locationAndBandwidth[0-37949]:')
+        self.nrDedDlBwpGenericLocAndBwEdit = QLineEdit()
+        
+        self.nrDedDlBwpGenericRbStartLabel = QLabel('RB_start:')
+        self.nrDedDlBwpGenericRbStartEdit = QLineEdit()
+        self.nrDedDlBwpGenericRbStartEdit.setEnabled(False)
+        
+        self.nrDedDlBwpGenericLRbsLabel = QLabel('L_RBs:')
+        self.nrDedDlBwpGenericLRbsEdit = QLineEdit()
+        self.nrDedDlBwpGenericLRbsEdit.setEnabled(False)
+        
+        dedDlBwpGrpBox = QGroupBox()
+        dedDlBwpGrpBox.setTitle('Dedicated active DL BWP')
+        dedDlBwpGrpBoxGridLayout = QGridLayout()
+        dedDlBwpGrpBoxGridLayout.addWidget(self.nrDedDlBwpGenericBwpIdLabel, 0, 0)
+        dedDlBwpGrpBoxGridLayout.addWidget(self.nrDedDlBwpGenericBwpIdEdit, 0, 1)
+        dedDlBwpGrpBoxGridLayout.addWidget(self.nrDedDlBwpGenericScsLabel, 1, 0)
+        dedDlBwpGrpBoxGridLayout.addWidget(self.nrDedDlBwpGenericScsComb, 1, 1)
+        dedDlBwpGrpBoxGridLayout.addWidget(self.nrDedDlBwpGenericCpLabel, 2, 0)
+        dedDlBwpGrpBoxGridLayout.addWidget(self.nrDedDlBwpGenericCpComb, 2, 1)
+        dedDlBwpGrpBoxGridLayout.addWidget(self.nrDedDlBwpGenericLocAndBwLabel, 3, 0)
+        dedDlBwpGrpBoxGridLayout.addWidget(self.nrDedDlBwpGenericLocAndBwEdit, 3, 1)
+        dedDlBwpGrpBoxGridLayout.addWidget(self.nrDedDlBwpGenericRbStartLabel, 4, 0)
+        dedDlBwpGrpBoxGridLayout.addWidget(self.nrDedDlBwpGenericRbStartEdit, 4, 1)
+        dedDlBwpGrpBoxGridLayout.addWidget(self.nrDedDlBwpGenericLRbsLabel, 5, 0)
+        dedDlBwpGrpBoxGridLayout.addWidget(self.nrDedDlBwpGenericLRbsEdit, 5, 1)
+        dedDlBwpGrpBox.setLayout(dedDlBwpGrpBoxGridLayout)
+        
+        #dedicated pdsch settings as specified in PDSCH-Config IE
+        #assume there is only one entry in pdsch-TimeDomainAllocationList, and it can be accessed by setting the 'Time domain resource assignment' field of DCI 1_1 to a value other than 0~15
+        #that's, use default common time-domain allocation if 'Time domain resource assignment' field is 0-15, and use self-defined (dedicated) time-domain allocation otherwise
+        self.nrDedPdschCfgAggFactorLabel = QLabel('pdsch-AggregationFactor:')
+        self.nrDedPdschCfgAggFactorComb = QComboBox()
+        self.nrDedPdschCfgAggFactorComb.addItems(['n1', 'n2', 'n4', 'n8'])
+        self.nrDedPdschCfgAggFactorComb.setCurrentIndex(0)
+        
+        self.nrDedPdschCfgRbgConfigLabel = QLabel('rbg-Size:')
+        self.nrDedPdschCfgRbgConfigComb = QComboBox()
+        self.nrDedPdschCfgRbgConfigComb.addItems(['config1', 'config2'])
+        self.nrDedPdschCfgRbgConfigComb.setCurrentIndex(0)
+        
+        self.nrDedPdschCfgRbgSizeLabel = QLabel('Nominal size of RBG(P):')
+        self.nrDedPdschCfgRbgSizeEdit = QLineEdit()
+        
+        self.nrDedPdschCfgMcsTableLabel = QLabel('mcs-Table:')
+        self.nrDedPdschCfgMcsTableComb = QComboBox()
+        self.nrDedPdschCfgMcsTableComb.addItems(['64QAM', '256QAM', '64QAMLowSE'])
+        self.nrDedPdschCfgMcsTableComb.setCurrentIndex(0)
+        
+        dedPdschCfgGrpBox = QGroupBox()
+        dedPdschCfgGrpBox.setTitle('PDSCH-Config')
+        dedPdschCfgGrpBoxGridLayout = QGridLayout()
+        dedPdschCfgGrpBoxGridLayout.addWidget(self.nrDedPdschCfgAggFactorLabel, 0, 0)
+        dedPdschCfgGrpBoxGridLayout.addWidget(self.nrDedPdschCfgAggFactorComb, 0, 1)
+        dedPdschCfgGrpBoxGridLayout.addWidget(self.nrDedPdschCfgRbgConfigLabel, 1, 0)
+        dedPdschCfgGrpBoxGridLayout.addWidget(self.nrDedPdschCfgRbgConfigComb, 1, 1)
+        dedPdschCfgGrpBoxGridLayout.addWidget(self.nrDedPdschCfgRbgSizeLabel, 2, 0)
+        dedPdschCfgGrpBoxGridLayout.addWidget(self.nrDedPdschCfgRbgSizeEdit, 2, 1)
+        dedPdschCfgGrpBoxGridLayout.addWidget(self.nrDedPdschCfgMcsTableLabel, 3, 0)
+        dedPdschCfgGrpBoxGridLayout.addWidget(self.nrDedPdschCfgMcsTableComb, 3, 1)
+        dedPdschCfgGrpBox.setLayout(dedPdschCfgGrpBoxGridLayout)
+        
+        #DM-RS for dedicated pdsch, including PT-RS
+        self.nrDmrsDedPdschDmrsTypeLabel = QLabel('dmrs-Type:')
+        self.nrDmrsDedPdschDmrsTypeComb = QComboBox()
+        self.nrDmrsDedPdschDmrsTypeComb.addItems(['Type 1', 'Type 2'])
+        self.nrDmrsDedPdschDmrsTypeComb.setCurrentIndex(0)
+        
+        self.nrDmrsDedPdschAddPosLabel = QLabel('dmrs-additionalPosition:')
+        self.nrDmrsDedPdschAddPosComb = QComboBox()
+        self.nrDmrsDedPdschAddPosComb.addItems(['pos0', 'pos1', 'pos2', 'pos3'])
+        
+        self.nrDmrsDedPdschMaxLengthLabel = QLabel('maxLength:')
+        self.nrDmrsDedPdschMaxLengthComb = QComboBox()
+        self.nrDmrsDedPdschMaxLengthComb.addItems(['len1', 'len2'])
+        self.nrDmrsDedPdschMaxLengthComb.setCurrentIndex(0)
+        
+        self.nrPtrsPdschTimeDensityLabel = QLabel('timeDensity(L_PTRS):')
+        self.nrPtrsPdschTimeDensityComb = QComboBox()
+        self.nrPtrsPdschTimeDensityComb.addItems(['1', '2', '4'])
+        
+        self.nrPtrsPdschFreqDensityLabel = QLabel('frequencyDensity(K_PTRS):')
+        self.nrPtrsPdschFreqDensityComb = QComboBox()
+        self.nrPtrsPdschFreqDensityComb.addItems(['2', '4'])
+        
+        self.nrPtrsPdschReOffsetLabel = QLabel('resourceElementOffset')
+        self.nrPtrsPdschReOffsetComb = QComboBox()
+        self.nrPtrsPdschReOffsetComb.addItems(['offset00', 'offset01', 'offset10', 'offset11'])
+        
+        self.nrPtrsPdschAntPortLabel = QLabel('Antenna port[1000+x]:')
+        self.nrPtrsPdschAntPortEdit = QLineEdit()
+        
+        self.nrDmrsDedPdschDmrsPortsLabel = QLabel('DMRS port(s)[1000+x]:')
+        self.nrDmrsDedPdschDmrsPortsEdit = QLineEdit()
+        
+        self.nrDmrsDedPdschCdmGroupsWoDataLabel = QLabel('CDM group(s) without data:')
+        self.nrDmrsDedPdschCdmGroupsWoDataEdit = QLineEdit()
+        
+        self.nrDmrsDedPdschFrontLoadSymbsLabel = QLabel('Number of front-load symbols:')
+        self.nrDmrsDedPdschFrontLoadSymbsEdit = QLineEdit()
+        
+        ptrsPdschWidget = QGroupBox()
+        ptrsPdschWidget.setTitle('PT-RS for PDSCH')
+        ptrsPdschWidgetGridLayout = QGridLayout()
+        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschTimeDensityLabel, 0, 0)
+        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschTimeDensityComb, 0, 1)
+        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschFreqDensityLabel, 1, 0)
+        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschFreqDensityComb, 1, 1)
+        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschReOffsetLabel, 2, 0)
+        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschReOffsetComb, 2, 1)
+        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschAntPortLabel, 3, 0)
+        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschAntPortEdit, 3, 1)
+        ptrsPdschWidget.setLayout(ptrsPdschWidgetGridLayout)
+        
+        dmrsDedPdschWidget = QWidget()
+        dmrsDedPdschGridLayout = QGridLayout()
+        dmrsDedPdschGridLayout.addWidget(self.nrDmrsDedPdschDmrsTypeLabel, 0, 0)
+        dmrsDedPdschGridLayout.addWidget(self.nrDmrsDedPdschDmrsTypeComb, 0, 1)
+        dmrsDedPdschGridLayout.addWidget(self.nrDmrsDedPdschAddPosLabel, 1, 0)
+        dmrsDedPdschGridLayout.addWidget(self.nrDmrsDedPdschAddPosComb, 1, 1)
+        dmrsDedPdschGridLayout.addWidget(self.nrDmrsDedPdschMaxLengthLabel, 2, 0)
+        dmrsDedPdschGridLayout.addWidget(self.nrDmrsDedPdschMaxLengthComb, 2, 1)
+        dmrsDedPdschGridLayout.addWidget(ptrsPdschWidget, 3, 0, 1, 2)
+        dmrsDedPdschGridLayout.addWidget(self.nrDmrsDedPdschDmrsPortsLabel, 4, 0)
+        dmrsDedPdschGridLayout.addWidget(self.nrDmrsDedPdschDmrsPortsEdit, 4, 1)
+        dmrsDedPdschGridLayout.addWidget(self.nrDmrsDedPdschCdmGroupsWoDataLabel, 5, 0)
+        dmrsDedPdschGridLayout.addWidget(self.nrDmrsDedPdschCdmGroupsWoDataEdit, 5, 1)
+        dmrsDedPdschGridLayout.addWidget(self.nrDmrsDedPdschFrontLoadSymbsLabel, 6, 0)
+        dmrsDedPdschGridLayout.addWidget(self.nrDmrsDedPdschFrontLoadSymbsEdit, 6, 1)
+        dmrsDedPdschLayout = QVBoxLayout()
+        dmrsDedPdschLayout.addLayout(dmrsDedPdschGridLayout)
+        dmrsDedPdschLayout.addStretch()
+        dmrsDedPdschWidget.setLayout(dmrsDedPdschLayout)
+        
+        #csi-rs settings
+        #TODO
+        self.csirsTempLabel = QLabel('<font color=red>Note: CSI-RS will be implemented later!</font>')
+        
+        csirsWidget = QWidget()
+        csirsGridLayout = QGridLayout()
+        csirsGridLayout.addWidget(self.csirsTempLabel, 0, 0)
+        csirsLayout = QVBoxLayout()
+        csirsLayout.addLayout(csirsGridLayout)
+        csirsLayout.addStretch()
+        csirsWidget.setLayout(csirsLayout)
+        
+        dedDlBwpDmrsCsirsTabWidget = QTabWidget()
+        dedDlBwpDmrsCsirsTabWidget.addTab(dmrsDedPdschWidget, 'DM-RS(PDSCH)')
+        dedDlBwpDmrsCsirsTabWidget.addTab(csirsWidget, 'CSI-RS')
+        
+        dedDlBwpWidget = QWidget()
+        dedDlBwpLayout = QVBoxLayout()
+        dedDlBwpLayout.addWidget(dedDlBwpGrpBox)
+        dedDlBwpLayout.addWidget(dedPdschCfgGrpBox)
+        dedDlBwpLayout.addWidget(dedDlBwpDmrsCsirsTabWidget)
+        dedDlBwpLayout.addStretch()
+        dedDlBwpWidget.setLayout(dedDlBwpLayout)
+        
+        #---->(4.4) dedicated active ul bwp as specified in ServingCellConfig IE
+        #dedicated ul bwp
+        self.nrDedUlBwpGenericBwpIdLabel = QLabel('bwp-Id[0-3]:')
+        self.nrDedUlBwpGenericBwpIdEdit = QLineEdit()
+        self.nrDedUlBwpGenericBwpIdEdit.setText('1')
+        
+        self.nrDedUlBwpGenericScsLabel = QLabel('subcarrierSpacing:')
+        self.nrDedUlBwpGenericScsComb = QComboBox()
+        self.nrDedUlBwpGenericScsComb.addItems(['15KHz', '30KHz', '60KHz', '120KHz'])
+        
+        self.nrDedUlBwpGenericCpLabel = QLabel('cyclicPrefix:')
+        self.nrDedUlBwpGenericCpComb = QComboBox()
+        self.nrDedUlBwpGenericCpComb.addItems(['normal', 'extended'])
+        self.nrDedUlBwpGenericCpComb.setCurrentIndex(0)
+        
+        self.nrDedUlBwpGenericLocAndBwLabel = QLabel('locationAndBandwidth[0-37949]:')
+        self.nrDedUlBwpGenericLocAndBwEdit = QLineEdit()
+        
+        self.nrDedUlBwpGenericRbStartLabel = QLabel('RB_start:')
+        self.nrDedUlBwpGenericRbStartEdit = QLineEdit()
+        self.nrDedUlBwpGenericRbStartEdit.setEnabled(False)
+        
+        self.nrDedUlBwpGenericLRbsLabel = QLabel('L_RBs:')
+        self.nrDedUlBwpGenericLRbsEdit = QLineEdit()
+        self.nrDedUlBwpGenericLRbsEdit.setEnabled(False)
+        
+        dedUlBwpGrpBox = QGroupBox()
+        dedUlBwpGrpBox.setTitle('Dedicated active UL BWP')
+        dedUlBwpGrpBoxGridLayout = QGridLayout()
+        dedUlBwpGrpBoxGridLayout.addWidget(self.nrDedUlBwpGenericBwpIdLabel, 0, 0)
+        dedUlBwpGrpBoxGridLayout.addWidget(self.nrDedUlBwpGenericBwpIdEdit, 0, 1)
+        dedUlBwpGrpBoxGridLayout.addWidget(self.nrDedUlBwpGenericScsLabel, 1, 0)
+        dedUlBwpGrpBoxGridLayout.addWidget(self.nrDedUlBwpGenericScsComb, 1, 1)
+        dedUlBwpGrpBoxGridLayout.addWidget(self.nrDedUlBwpGenericCpLabel, 2, 0)
+        dedUlBwpGrpBoxGridLayout.addWidget(self.nrDedUlBwpGenericCpComb, 2, 1)
+        dedUlBwpGrpBoxGridLayout.addWidget(self.nrDedUlBwpGenericLocAndBwLabel, 3, 0)
+        dedUlBwpGrpBoxGridLayout.addWidget(self.nrDedUlBwpGenericLocAndBwEdit, 3, 1)
+        dedUlBwpGrpBoxGridLayout.addWidget(self.nrDedUlBwpGenericRbStartLabel, 4, 0)
+        dedUlBwpGrpBoxGridLayout.addWidget(self.nrDedUlBwpGenericRbStartEdit, 4, 1)
+        dedUlBwpGrpBoxGridLayout.addWidget(self.nrDedUlBwpGenericLRbsLabel, 5, 0)
+        dedUlBwpGrpBoxGridLayout.addWidget(self.nrDedUlBwpGenericLRbsEdit, 5, 1)
+        dedUlBwpGrpBox.setLayout(dedUlBwpGrpBoxGridLayout)
+        
+        #dedicated pusch settings as specified in PUSCH-Config IE
+        #assume there is only one entry in pusch-TimeDomainAllocationList, and it can be accessed by setting the 'Time domain resource assignment' field of DCI 1_1 to a value other than 0~15
+        #that's, use default common time-domain allocation if 'Time domain resource assignment' field is 0-15, and use self-defined (dedicated) time-domain allocation otherwise
+        self.nrDedPuschCfgTxCfgLabel = QLabel('txConfig:')
+        self.nrDedPuschCfgTxCfgComb = QComboBox()
+        self.nrDedPuschCfgTxCfgComb.addItems(['codebook', 'nonCodebook'])
+        self.nrDedPuschCfgTxCfgComb.setCurrentIndex(0)
+        
+        self.nrDedPuschCfgCbSubsetLabel = QLabel('codebookSubset:')
+        self.nrDedPuschCfgCbSubsetComb = QComboBox()
+        self.nrDedPuschCfgCbSubsetComb.addItems(['fullyAndPartialAndNonCoherent', 'partialAndNonCoherent', 'nonCoherent'])
+        self.nrDedPuschCfgCbSubsetComb.setCurrentIndex(0)
+        
+        self.nrDedPuschCfgCbMaxRankLabel = QLabel('CB maxRank[1-4]:')
+        self.nrDedPuschCfgCbMaxRankEdit = QLineEdit()
+        
+        #note: Lmax is the number of srs resources transmitted by ue, which is ue capability as defined in 38.306
+        self.nrDedPuschCfgNonCbMaxLayersLabel = QLabel('non-CB maxLayers(Lmax)[1-4]:')
+        self.nrDedPuschCfgNonCbMaxLayersEdit = QLineEdit()
+        
+        self.nrDedPuschCfgFreqHopOffsetLabel = QLabel('frequencyHoppingOffset[0-274]:')
+        self.nrDedPuschCfgFreqHopOffsetEdit = QLineEdit()
+        
+        self.nrDedPuschCfgTpLabel = QLabel('transformPrecoder:')
+        self.nrDedPuschCfgTpComb = QComboBox()
+        self.nrDedPuschCfgTpComb.addItems(['enabled', 'disabled'])
+        self.nrDedPuschCfgTpComb.setCurrentIndex(1)
+        
+        self.nrDedPuschCfgAggFactorLabel = QLabel('pusch-AggregationFactor:')
+        self.nrDedPuschCfgAggFactorComb = QComboBox()
+        self.nrDedPuschCfgAggFactorComb.addItems(['n1', 'n2', 'n4', 'n8'])
+        self.nrDedPuschCfgAggFactorComb.setCurrentIndex(0)
+        
+        self.nrDedPuschCfgRbgConfigLabel = QLabel('rbg-Size:')
+        self.nrDedPuschCfgRbgConfigComb = QComboBox()
+        self.nrDedPuschCfgRbgConfigComb.addItems(['config1', 'config2'])
+        self.nrDedPuschCfgRbgConfigComb.setCurrentIndex(0)
+        
+        self.nrDedPuschCfgRbgSizeLabel = QLabel('Nominal size of RBG(P):')
+        self.nrDedPuschCfgRbgSizeEdit = QLineEdit()
+        
+        self.nrDedPuschCfgMcsTableLabel = QLabel('mcs-Table:')
+        self.nrDedPuschCfgMcsTableComb = QComboBox()
+        self.nrDedPuschCfgMcsTableComb.addItems(['64QAM', '256QAM', '64QAMLowSE'])
+        self.nrDedPuschCfgMcsTableComb.setCurrentIndex(0)
+        
+        dedPuschCfgWidget = QWidget()
+        dedPuschCfgGridLayout = QGridLayout()
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgTxCfgLabel, 0, 0)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgTxCfgComb, 0, 1)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgCbSubsetLabel, 1, 0)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgCbSubsetComb, 1, 1)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgCbMaxRankLabel, 2, 0)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgCbMaxRankEdit, 2, 1)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgNonCbMaxLayersLabel, 3, 0)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgNonCbMaxLayersEdit, 3, 1)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgFreqHopOffsetLabel, 4, 0)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgFreqHopOffsetEdit, 4, 1)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgTpLabel, 5, 0)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgTpComb, 5, 1)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgAggFactorLabel, 6, 0)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgAggFactorComb, 6, 1)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgRbgConfigLabel, 7, 0)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgRbgConfigComb, 7, 1)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgRbgSizeLabel, 8, 0)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgRbgSizeEdit, 8, 1)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgMcsTableLabel, 9, 0)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgMcsTableComb, 9, 1)
+        dedPuschCfgWidget.setLayout(dedPuschCfgGridLayout)
+        
+        dedPuschCfgScroll = QScrollArea()
+        dedPuschCfgScroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        dedPuschCfgScroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        dedPuschCfgScroll.setWidgetResizable(True)
+        dedPuschCfgScroll.setWidget(dedPuschCfgWidget)
+        
+        dedPuschCfgGrpBox = QGroupBox()
+        dedPuschCfgGrpBox.setTitle('PUSCH-Config')
+        dedPuschCfgGrpBoxLayout = QVBoxLayout()
+        dedPuschCfgGrpBoxLayout.addWidget(dedPuschCfgScroll)
+        dedPuschCfgGrpBox.setLayout(dedPuschCfgGrpBoxLayout)
+        
+        #DM-RS for dedicated pusch, including PT-RS
+        self.nrDmrsDedPuschDmrsTypeLabel = QLabel('dmrs-Type:')
+        self.nrDmrsDedPuschDmrsTypeComb = QComboBox()
+        self.nrDmrsDedPuschDmrsTypeComb.addItems(['Type 1', 'Type 2'])
+        self.nrDmrsDedPuschDmrsTypeComb.setCurrentIndex(0)
+        
+        self.nrDmrsDedPuschAddPosLabel = QLabel('dmrs-additionalPosition:')
+        self.nrDmrsDedPuschAddPosComb = QComboBox()
+        self.nrDmrsDedPuschAddPosComb.addItems(['pos0', 'pos1', 'pos2', 'pos3'])
+        
+        self.nrDmrsDedPuschMaxLengthLabel = QLabel('maxLength:')
+        self.nrDmrsDedPuschMaxLengthComb = QComboBox()
+        self.nrDmrsDedPuschMaxLengthComb.addItems(['len1', 'len2'])
+        self.nrDmrsDedPuschMaxLengthComb.setCurrentIndex(0)
+        
+        self.nrDmrsDedPuschRankLabel = QLabel('Transmission rank:')
+        self.nrDmrsDedPuschRankEdit = QLineEdit()
+        
+        self.nrPtrsPuschTimeDensityLabel = QLabel('timeDensity(L_PTRS):')
+        self.nrPtrsPuschTimeDensityComb = QComboBox()
+        self.nrPtrsPuschTimeDensityComb.addItems(['1', '2', '4'])
+        
+        self.nrPtrsPuschFreqDensityLabel = QLabel('frequencyDensity(K_PTRS):')
+        self.nrPtrsPuschFreqDensityComb = QComboBox()
+        self.nrPtrsPuschFreqDensityComb.addItems(['2', '4'])
+        
+        self.nrPtrsPuschReOffsetLabel = QLabel('resourceElementOffset')
+        self.nrPtrsPuschReOffsetComb = QComboBox()
+        self.nrPtrsPuschReOffsetComb.addItems(['offset00', 'offset01', 'offset10', 'offset11'])
+        
+        self.nrPtrsPuschAntPortLabel = QLabel('Antenna port[x]:')
+        self.nrPtrsPuschAntPortEdit = QLineEdit()
+        
+        self.nrDmrsDedPuschDmrsPortsLabel = QLabel('DMRS port(s)[x]:')
+        self.nrDmrsDedPuschDmrsPortsEdit = QLineEdit()
+        
+        self.nrDmrsDedPuschCdmGroupsWoDataLabel = QLabel('CDM group(s) without data:')
+        self.nrDmrsDedPuschCdmGroupsWoDataEdit = QLineEdit()
+        
+        self.nrDmrsDedPuschFrontLoadSymbsLabel = QLabel('Number of front-load symbols:')
+        self.nrDmrsDedPuschFrontLoadSymbsEdit = QLineEdit()
+        
+        ptrsPuschWidget = QGroupBox()
+        ptrsPuschWidget.setTitle('PT-RS for PUSCH')
+        ptrsPuschWidgetGridLayout = QGridLayout()
+        ptrsPuschWidgetGridLayout.addWidget(self.nrPtrsPuschTimeDensityLabel, 0, 0)
+        ptrsPuschWidgetGridLayout.addWidget(self.nrPtrsPuschTimeDensityComb, 0, 1)
+        ptrsPuschWidgetGridLayout.addWidget(self.nrPtrsPuschFreqDensityLabel, 1, 0)
+        ptrsPuschWidgetGridLayout.addWidget(self.nrPtrsPuschFreqDensityComb, 1, 1)
+        ptrsPuschWidgetGridLayout.addWidget(self.nrPtrsPuschReOffsetLabel, 2, 0)
+        ptrsPuschWidgetGridLayout.addWidget(self.nrPtrsPuschReOffsetComb, 2, 1)
+        ptrsPuschWidgetGridLayout.addWidget(self.nrPtrsPuschAntPortLabel, 3, 0)
+        ptrsPuschWidgetGridLayout.addWidget(self.nrPtrsPuschAntPortEdit, 3, 1)
+        ptrsPuschWidget.setLayout(ptrsPuschWidgetGridLayout)
+        
+        dmrsDedPuschWidget = QWidget()
+        dmrsDedPuschGridLayout = QGridLayout()
+        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschDmrsTypeLabel, 0, 0)
+        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschDmrsTypeComb, 0, 1)
+        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschAddPosLabel, 1, 0)
+        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschAddPosComb, 1, 1)
+        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschMaxLengthLabel, 2, 0)
+        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschMaxLengthComb, 2, 1)
+        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschRankLabel, 3, 0)
+        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschRankEdit, 3, 1)
+        dmrsDedPuschGridLayout.addWidget(ptrsPuschWidget, 4, 0, 1, 2)
+        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschDmrsPortsLabel, 5, 0)
+        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschDmrsPortsEdit, 5, 1)
+        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschCdmGroupsWoDataLabel, 6, 0)
+        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschCdmGroupsWoDataEdit, 6, 1)
+        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschFrontLoadSymbsLabel, 7, 0)
+        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschFrontLoadSymbsEdit, 7, 1)
+        dmrsDedPuschLayout = QVBoxLayout()
+        dmrsDedPuschLayout.addLayout(dmrsDedPuschGridLayout)
+        dmrsDedPuschLayout.addStretch()
+        dmrsDedPuschWidget.setLayout(dmrsDedPuschLayout)
+        
+        #srs settings
+        #TODO
+        self.csirsTempLabel = QLabel('<font color=red>Note: CSI-RS will be implemented later!</font>')
+        
+        srsWidget = QWidget()
+        srsGridLayout = QGridLayout()
+        srsGridLayout.addWidget(self.csirsTempLabel, 0, 0)
+        srsLayout = QVBoxLayout()
+        srsLayout.addLayout(srsGridLayout)
+        srsLayout.addStretch()
+        srsWidget.setLayout(srsLayout)
+        
+        #pucch settings
+        #TODO
+        
+        dedUlBwpDmrsCsirsTabWidget = QTabWidget()
+        dedUlBwpDmrsCsirsTabWidget.addTab(dmrsDedPuschWidget, 'DM-RS(PUSCH)')
+        dedUlBwpDmrsCsirsTabWidget.addTab(srsWidget, 'SRS')
+        
+        dedUlBwpWidget = QWidget()
+        dedUlBwpLayout = QVBoxLayout()
+        dedUlBwpLayout.addWidget(dedUlBwpGrpBox)
+        dedUlBwpLayout.addWidget(dedPuschCfgGrpBox)
+        dedUlBwpLayout.addWidget(dedUlBwpDmrsCsirsTabWidget)
+        dedUlBwpLayout.addStretch()
+        dedUlBwpWidget.setLayout(dedUlBwpLayout)
+        
         bwpCfgTabWidget = QTabWidget()
         bwpCfgTabWidget.addTab(iniDlBwpWidget, 'Initial DL BWP')
         bwpCfgTabWidget.addTab(iniUlBwpWidget, 'Initial UL BWP')
+        bwpCfgTabWidget.addTab(dedDlBwpWidget, 'Dedicated DL BWP')
+        bwpCfgTabWidget.addTab(dedUlBwpWidget, 'Dedicated UL BWP')
         
         #-->(4) PDSCH settings tab
         
