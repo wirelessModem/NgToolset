@@ -1487,6 +1487,7 @@ class NgNrGridUi(QDialog):
         self.nrRachGenericMsg1FreqStartEdit = QLineEdit()
         
         rachGenericGrpBox = QGroupBox()
+        rachGenericGrpBox.setTitle('RACH-ConfigGeneric')
         rachGenericGrpBoxGridLayout = QGridLayout()
         rachGenericGrpBoxGridLayout.addWidget(self.nrRachGenericPrachConfIdLabel, 0, 0)
         rachGenericGrpBoxGridLayout.addWidget(self.nrrachgenericPrachConfIdEdit, 0, 1)
@@ -1511,20 +1512,119 @@ class NgNrGridUi(QDialog):
         self.nrRachCbPreamblesPerSsbLabel = QLabel('CB-PreamblesPerSSB:')
         self.nrRachCbPreamblesPerSsbEdit = QLineEdit()
         
-        #prach time-domain allocation
+        #prach time-domain allocation and freq-domain allocation are determined internally
         
-        #prach freq-domain allocation
+        prachWidget = QWidget()
+        prachWidgetGridLayout = QGridLayout()
+        prachWidgetGridLayout.addWidget(rachGenericGrpBox, 0, 0, 1, 2)
+        prachWidgetGridLayout.addWidget(self.nrRachNumRaPreamblesLabel, 1, 0)
+        prachWidgetGridLayout.addWidget(self.nrRachNumRaPreamblesEdit, 1, 1)
+        prachWidgetGridLayout.addWidget(self.nrRachSsbPerRachOccasionLabel, 2, 0)
+        prachWidgetGridLayout.addWidget(self.nrRachSsbPerRachOccasionComb, 2, 1)
+        prachWidgetGridLayout.addWidget(self.nrRachCbPreamblesPerSsbLabel, 3, 0)
+        prachWidgetGridLayout.addWidget(self.nrRachCbPreamblesPerSsbEdit, 3, 1)
+        prachWidget.setLayout(prachWidgetGridLayout)
         
+        #dmrs for msg3 pusch
+        self.nrDmrsMsg3DmrsTypeLabel = QLabel('dmrs-Type:')
+        self.nrDmrsMsg3DmrsTypeComb = QComboBox()
+        self.nrDmrsMsg3DmrsTypeComb.addItems(['Type 1', 'Type 2'])
+        self.nrDmrsMsg3DmrsTypeComb.setCurrentIndex(0)
         
+        self.nrDmrsMsg3AddPosLabel = QLabel('dmrs-additionalPosition:')
+        self.nrDmrsMsg3AddPosComb = QComboBox()
+        self.nrDmrsMsg3AddPosComb.addItems(['pos0', 'pos1', 'pos2', 'pos3'])
         
+        self.nrDmrsMsg3MaxLengthLabel = QLabel('maxLength:')
+        self.nrDmrsMsg3MaxLengthComb = QComboBox()
+        self.nrDmrsMsg3MaxLengthComb.addItems(['len1', 'len2'])
+        self.nrDmrsMsg3MaxLengthComb.setCurrentIndex(0)
+        
+        self.nrDmrsMsg3DmrsPortsLabel = QLabel('DMRS port(s)[x]:')
+        self.nrDmrsMsg3DmrsPortsEdit = QLineEdit()
+        self.nrDmrsMsg3DmrsPortsEdit.setEnabled(False)
+        
+        self.nrDmrsMsg3CdmGroupsWoDataLabel = QLabel('CDM group(s) without data:')
+        self.nrDmrsMsg3CdmGroupsWoDataEdit = QLineEdit()
+        self.nrDmrsMsg3CdmGroupsWoDataEdit.setEnabled(False)
+        
+        self.nrDmrsMsg3FrontLoadSymbsLabel = QLabel('Number of front-load symbols:')
+        self.nrDmrsMsg3FrontLoadSymbsEdit = QLineEdit('1')
+        self.nrDmrsMsg3FrontLoadSymbsEdit.setEnabled(False)
+        
+        dmrsMsg3Widget = QWidget()
+        dmrsMsg3GridLayout = QGridLayout()
+        dmrsMsg3GridLayout.addWidget(self.nrDmrsMsg3DmrsTypeLabel, 0, 0)
+        dmrsMsg3GridLayout.addWidget(self.nrDmrsMsg3DmrsTypeComb, 0, 1)
+        dmrsMsg3GridLayout.addWidget(self.nrDmrsMsg3AddPosLabel, 1, 0)
+        dmrsMsg3GridLayout.addWidget(self.nrDmrsMsg3AddPosComb, 1, 1)
+        dmrsMsg3GridLayout.addWidget(self.nrDmrsMsg3MaxLengthLabel, 2, 0)
+        dmrsMsg3GridLayout.addWidget(self.nrDmrsMsg3MaxLengthComb, 2, 1)
+        dmrsMsg3GridLayout.addWidget(self.nrDmrsMsg3DmrsPortsLabel, 3, 0)
+        dmrsMsg3GridLayout.addWidget(self.nrDmrsMsg3DmrsPortsEdit, 3, 1)
+        dmrsMsg3GridLayout.addWidget(self.nrDmrsMsg3CdmGroupsWoDataLabel, 4, 0)
+        dmrsMsg3GridLayout.addWidget(self.nrDmrsMsg3CdmGroupsWoDataEdit, 4, 1)
+        dmrsMsg3GridLayout.addWidget(self.nrDmrsMsg3FrontLoadSymbsLabel, 5, 0)
+        dmrsMsg3GridLayout.addWidget(self.nrDmrsMsg3FrontLoadSymbsEdit, 5, 1)
+        dmrsMsg3Layout = QVBoxLayout()
+        dmrsMsg3Layout.addLayout(dmrsMsg3GridLayout)
+        dmrsMsg3Layout.addStretch()
+        dmrsMsg3Widget.setLayout(dmrsMsg3Layout)
+        
+        #pucch for msg4 harq feedback
+        self.nrPucchSib1PucchResCommonLabel = QLabel('pucch-ResourceCommon[0-15]:')
+        self.nrPucchSib1PucchResCommonEdit = QLineEdit('0')
+        
+        self.nrPucchSib1PucchFmtLabel = QLabel('PUCCH format:')
+        self.nrPucchSib1PucchFmtComb = QComboBox()
+        self.nrPucchSib1PucchFmtComb.addItems(['format 0', 'format 1', 'format 2', 'format 3', 'format 4'])
+        self.nrPucchSib1PucchFmtComb.setCurrentIndex(0)
+        self.nrPucchSib1PucchFmtComb.setEnabled(False)
+        
+        self.nrPucchSib1StartingSymbLabel = QLabel('First symbol:')
+        self.nrPucchSib1StartingSymbEdit = QLineEdit('12')
+        self.nrPucchSib1StartingSymbEdit.setEnabled(False)
+        
+        self.nrPucchSib1NumSymbsLabel = QLabel('Number of symbols:')
+        self.nrPucchSib1NumSymbsEdit = QLineEdit('2')
+        self.nrPucchSib1NumSymbsEdit.setEnabled(False)
+        
+        self.nrPucchSib1PrbOffsetLabel = QLabel('PRB offset:')
+        self.nrPucchSib1PrbOffsetEdit = QLineEdit('0')
+        self.nrPucchSib1PrbOffsetEdit.setEnabled(False)
+        
+        self.nrPucchSib1IniCsIndexesSetLabel = QLabel('Set of initial CS indexes:')
+        self.nrPucchSib1IniCsIndexesSetEdit = QLineEdit('{0, 3}')
+        self.nrPucchSib1IniCsIndexesSetEdit.setEnabled(False)
+        
+        pucchSib1Widget = QWidget()
+        pucchSib1WidgetGridLayout = QGridLayout()
+        pucchSib1WidgetGridLayout.addWidget(self.nrPucchSib1PucchResCommonLabel, 0, 0)
+        pucchSib1WidgetGridLayout.addWidget(self.nrPucchSib1PucchResCommonEdit, 0, 1)
+        pucchSib1WidgetGridLayout.addWidget(self.nrPucchSib1PucchFmtLabel, 1, 0)
+        pucchSib1WidgetGridLayout.addWidget(self.nrPucchSib1PucchFmtComb, 1, 1)
+        pucchSib1WidgetGridLayout.addWidget(self.nrPucchSib1StartingSymbLabel, 2, 0)
+        pucchSib1WidgetGridLayout.addWidget(self.nrPucchSib1StartingSymbEdit, 2, 1)
+        pucchSib1WidgetGridLayout.addWidget(self.nrPucchSib1NumSymbsLabel, 3, 0)
+        pucchSib1WidgetGridLayout.addWidget(self.nrPucchSib1NumSymbsEdit, 3, 1)
+        pucchSib1WidgetGridLayout.addWidget(self.nrPucchSib1IniCsIndexesSetLabel, 4, 0)
+        pucchSib1WidgetGridLayout.addWidget(self.nrPucchSib1IniCsIndexesSetEdit, 4, 1)
+        pucchSib1WidgetLayout = QVBoxLayout()
+        pucchSib1WidgetLayout.addLayout(pucchSib1WidgetGridLayout)
+        pucchSib1WidgetLayout.addStretch()
+        pucchSib1Widget.setLayout(pucchSib1WidgetLayout)
+        
+        iniUlBwpMsg1DmrsPucchTabWidget = QTabWidget()
+        iniUlBwpMsg1DmrsPucchTabWidget.addTab(prachWidget, 'RACH-ConfigCommon(Msg1)')
+        iniUlBwpMsg1DmrsPucchTabWidget.addTab(dmrsMsg3Widget, 'DM-RS(Msg3)')
+        iniUlBwpMsg1DmrsPucchTabWidget.addTab(pucchSib1Widget, 'PUCCH-ConfigCommon(Msg4 HARQ)')
         
         iniUlBwpWidget = QWidget()
         iniUlBwpLayout = QVBoxLayout()
         iniUlBwpLayout.addWidget(iniUlBwpSib1GrpBox)
-        #iniUlBwpLayout.addWidget(iniUlBwpDmrsTabWidget)
+        iniUlBwpLayout.addWidget(iniUlBwpMsg1DmrsPucchTabWidget)
         iniUlBwpLayout.addStretch()
         iniUlBwpWidget.setLayout(iniUlBwpLayout)
-        
         
         bwpCfgTabWidget = QTabWidget()
         bwpCfgTabWidget.addTab(iniDlBwpWidget, 'Initial DL BWP')
