@@ -25,7 +25,6 @@ class NgNrGridUi(QDialog):
         self.initUi()
 
     def initUi(self):
-        #TODO
         #initialize global parameters
         self.initGlobalPar()
 
@@ -3089,21 +3088,6 @@ class NgNrGridUi(QDialog):
         bwpCfgTabWidget.addTab(iniUlBwpWidget, 'Initial UL BWP')
         bwpCfgTabWidget.addTab(dedDlBwpWidget, 'Dedicated DL BWP')
         bwpCfgTabWidget.addTab(dedUlBwpWidget, 'Dedicated UL BWP')
-        
-        #-->(4) PDSCH settings tab
-        
-        #-->(5) PRACH settings tab
-        
-        #-->(6) PUCCH settings tab
-        
-        #-->(7) SRS settings tab
-        
-        #-->(8) PUSCH settings tab
-        
-        
-        
-        #-->(10) CSI-RS settings tab
-        #TODO CSI-RS is not supported!
 
         #connect signals to slots
         self.nrCarrierBwComb.currentIndexChanged[int].connect(self.onCarrierBwCombCurrentIndexChanged)
