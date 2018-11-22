@@ -3125,6 +3125,7 @@ class NgNrGridUi(QDialog):
         self.nrCarrierBandComb.currentIndexChanged[int].connect(self.onCarrierBandCombCurrentIndexChanged)
         self.nrSsbScsComb.currentIndexChanged[int].connect(self.onSsbScsCombCurrentIndexChanged)
         self.nrMibCoreset0Edit.editingFinished.connect(self.onMibCoreset0EditEditingFinished)
+        self.nrMibCss0Edit.editingFinished.connect(self.onMibCss0EditEditingFinished)
         self.nrSsbKssbEdit.editingFinished.connect(self.onSsbKssbEditEditingFinished)
         self.nrCarrierBandComb.setCurrentText('n77')
 
@@ -3870,8 +3871,8 @@ class NgNrGridUi(QDialog):
         #when validation passed
         return True
     
-    def validateSearchSpaceZero(self):
-        self.ngwin.logEdit.append('-->inside validateSearchSpaceZero')
+    def validateCss0(self):
+        self.ngwin.logEdit.append('-->inside validateCss0')
         if not self.nrMibCss0Edit.text():
             return False
         
@@ -3901,6 +3902,11 @@ class NgNrGridUi(QDialog):
         self.flagCoreset0 = self.validateCoreset0()
         if self.flagCoreset0:
             self.updateKSsbAndNCrbSsb(offset=0 if self.coreset0Offset <= 0 else self.coreset0Offset)
+            
+    def onMibCss0EditEditingFinished(self):
+        self.ngwin.logEdit.append('-->inside onMibCss0EditEditingFinished')
+        #(1) validate CSS0
+        self.flagCss0 = self.validateCss0()
                 
     def onSsbKssbEditEditingFinished(self):
         self.ngwin.logEdit.append('-->inside onSsbKssbEditEditingFinished')
