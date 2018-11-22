@@ -14,7 +14,7 @@ import time
 from collections import OrderedDict
 from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QComboBox, QPushButton, QGroupBox, QTabWidget, QWidget, QScrollArea
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QGridLayout
-from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QColor, QIntValidator
 from PyQt5.QtCore import Qt
 
 class NgNrGridUi(QDialog):
@@ -44,10 +44,11 @@ class NgNrGridUi(QDialog):
 
         self.nrCarrierNumRbLabel = QLabel('N_RB(carrierBandwidth):')
         self.nrCarrierNumRbEdit = QLineEdit()
-        #self.nrCarrierNumRbEdit.setFocusPolicy(Qt.NoFocus)
+        self.nrCarrierNumRbEdit.setEnabled(False)
 
         self.nrMinGuardBandLabel = QLabel('Min guard band(offsetToCarrier):')
         self.nrMinGuardBandEdit = QLineEdit()
+        self.nrMinGuardBandEdit.setEnabled(False)
 
         carrierGridGrpBox = QGroupBox()
         carrierGridGrpBox.setTitle('Carrier Grid(SCS-SpecificCarrier)')
@@ -75,8 +76,8 @@ class NgNrGridUi(QDialog):
         self.nrSsbMinGuardBandScs240kEdit.setEnabled(False)
 
         self.nrSsbKssbLabel = QLabel('k_SSB[0-23]:')
-        self.nrSsbKssbEdit = QLineEdit()
-        self.nrSsbKssbEdit.setText('0')
+        self.nrSsbKssbEdit = QLineEdit('0')
+        self.nrSsbKssbEdit.setValidator(QIntValidator(0, 23))
 
         self.nrSsbNCrbSsbLabel = QLabel('n_CRB_SSB:')
         self.nrSsbNCrbSsbEdit = QLineEdit()
@@ -139,13 +140,13 @@ class NgNrGridUi(QDialog):
         ssbGrpBox.setLayout(ssbGrpBoxLayout)
         
         self.nrSsbPciLabel = QLabel('PCI[0-1007]:')
-        self.nrSsbPciEdit = QLineEdit()
-        self.nrSsbPciEdit.setText('0')
+        self.nrSsbPciEdit = QLineEdit('0')
+        self.nrSsbPciEdit.setValidator(QIntValidator(0, 1007))
         
         #---->(2.2) MIB configurations
         self.nrMibSfnLabel = QLabel('SFN[0-1023]:')
-        self.nrMibSfnEdit = QLineEdit()
-        self.nrMibSfnEdit.setText('0')
+        self.nrMibSfnEdit = QLineEdit('0')
+        self.nrMibSfnEdit.setValidator(QIntValidator(0, 1023))
         
         self.nrMibDmRsTypeAPosLabel = QLabel('dmrs-TypeA-Position:')
         self.nrMibDmRsTypeAPosComb = QComboBox()
@@ -158,12 +159,12 @@ class NgNrGridUi(QDialog):
         self.nrMibScsCommonComb.setEnabled(False)
         
         self.nrMibCoreset0Label = QLabel('coresetZero(PDCCH-ConfigSIB1)[0-15]:')
-        self.nrMibCoreset0Edit = QLineEdit()
-        self.nrMibCoreset0Edit.setText('0')
+        self.nrMibCoreset0Edit = QLineEdit('0')
+        self.nrMibCoreset0Edit.setValidator(QIntValidator(0, 15))
         
         self.nrMibCss0Label = QLabel('searchSpaceZero(PDCCH-ConfigSIB1)[0-15]:')
-        self.nrMibCss0Edit = QLineEdit()
-        self.nrMibCss0Edit.setText('0')
+        self.nrMibCss0Edit = QLineEdit('0')
+        self.nrMibCss0Edit.setValidator(QIntValidator(0, 15))
         
         mibGrpBox = QGroupBox()
         mibGrpBox.setTitle('MIB')
@@ -192,41 +193,41 @@ class NgNrGridUi(QDialog):
         self.nrTddCfgPat1PeriodComb.setCurrentIndex(8)
         
         self.nrTddCfgPat1NumDlSlotsLabel = QLabel('nrofDownlinkSlots[0-80]:')
-        self.nrTddCfgPat1NumDlSlotsEdit = QLineEdit()
-        self.nrTddCfgPat1NumDlSlotsEdit.setText('3')
+        self.nrTddCfgPat1NumDlSlotsEdit = QLineEdit('3')
+        self.nrTddCfgPat1NumDlSlotsEdit.setValidator(QIntValidator(0, 80))
         
         self.nrTddCfgPat1NumDlSymbsLabel = QLabel('nrofDownlinkSymbols[0-13]:')
-        self.nrTddCfgPat1NumDlSymbsEdit = QLineEdit()
-        self.nrTddCfgPat1NumDlSymbsEdit.setText('10')
+        self.nrTddCfgPat1NumDlSymbsEdit = QLineEdit('10')
+        self.nrTddCfgPat1NumDlSymbsEdit.setValidator(QIntValidator(0, 13))
         
         self.nrTddCfgPat1NumUlSymbsLabel = QLabel('nrofUplinkSymbols[0-13]:')
-        self.nrTddCfgPat1NumUlSymbsEdit = QLineEdit()
-        self.nrTddCfgPat1NumUlSymbsEdit.setText('2')
+        self.nrTddCfgPat1NumUlSymbsEdit = QLineEdit('2')
+        self.nrTddCfgPat1NumUlSymbsEdit.setValidator(QIntValidator(0, 13))
         
         self.nrTddCfgPat1NumUlSlotsLabel = QLabel('nrofUplinkSlots[0-80]:')
-        self.nrTddCfgPat1NumUlSlotsEdit = QLineEdit()
-        self.nrTddCfgPat1NumUlSlotsEdit.setText('1')
+        self.nrTddCfgPat1NumUlSlotsEdit = QLineEdit('1')
+        self.nrTddCfgPat1NumUlSlotsEdit.setValidator(QIntValidator(0, 80))
         
         self.nrTddCfgPat2PeriodLabel = QLabel('dl-UL-TransmissionPeriodicity:')
         self.nrTddCfgPat2PeriodComb = QComboBox()
         self.nrTddCfgPat2PeriodComb.addItems(['not used', '0.5ms', '0.625ms', '1ms', '1.25ms', '2ms', '2.5ms', '3ms', '4ms', '5ms', '10ms'])
         self.nrTddCfgPat2PeriodComb.setCurrentIndex(0)
         
-        self.nrTddCfgPat2NumDlSlotsLabel = QLabel('nrofDownlinkSlots:')
+        self.nrTddCfgPat2NumDlSlotsLabel = QLabel('nrofDownlinkSlots[0-80]:')
         self.nrTddCfgPat2NumDlSlotsEdit = QLineEdit()
-        self.nrTddCfgPat2NumDlSlotsEdit.setPlaceholderText('0~80')
+        self.nrTddCfgPat2NumDlSlotsEdit.setValidator(QIntValidator(0, 80))
         
-        self.nrTddCfgPat2NumDlSymbsLabel = QLabel('nrofDownlinkSymbols:')
+        self.nrTddCfgPat2NumDlSymbsLabel = QLabel('nrofDownlinkSymbols[0-13]:')
         self.nrTddCfgPat2NumDlSymbsEdit = QLineEdit()
-        self.nrTddCfgPat2NumDlSymbsEdit.setPlaceholderText('0~13')
+        self.nrTddCfgPat2NumDlSymbsEdit.setValidator(QIntValidator(0, 13))
         
-        self.nrTddCfgPat2NumUlSymbsLabel = QLabel('nrofUplinkSymbols:')
+        self.nrTddCfgPat2NumUlSymbsLabel = QLabel('nrofUplinkSymbols[0-13]:')
         self.nrTddCfgPat2NumUlSymbsEdit = QLineEdit()
-        self.nrTddCfgPat2NumUlSymbsEdit.setPlaceholderText('0~13')
+        self.nrTddCfgPat2NumUlSymbsEdit.setValidator(QIntValidator(0, 13))
         
-        self.nrTddCfgPat2NumUlSlotsLabel = QLabel('nrofUplinkSlots:')
+        self.nrTddCfgPat2NumUlSlotsLabel = QLabel('nrofUplinkSlots[0-80]:')
         self.nrTddCfgPat2NumUlSlotsEdit = QLineEdit()
-        self.nrTddCfgPat2NumUlSlotsEdit.setPlaceholderText('0~80')
+        self.nrTddCfgPat2NumUlSlotsEdit.setValidator(QIntValidator(0, 80))
         
         tddCfgTabWidget = QTabWidget()
         
@@ -337,8 +338,8 @@ class NgNrGridUi(QDialog):
         self.nrCoreset1InterleaverSizeComb.setCurrentIndex(0)
         
         self.nrCoreset1ShiftIndexLabel = QLabel('shiftIndex[0-274]:')
-        self.nrCoreset1ShiftIndexEdit = QLineEdit()
-        self.nrCoreset1ShiftIndexEdit.setText('0')
+        self.nrCoreset1ShiftIndexEdit = QLineEdit('0')
+        self.nrCoreset1ShiftIndexEdit.setValidator(QIntValidator(0, 274))
         
         self.nrCoreset1PrecoderGranularityLabel = QLabel('precoderGranularity:')
         self.nrCoreset1PrecoderGranularityComb = QComboBox()
@@ -375,12 +376,10 @@ class NgNrGridUi(QDialog):
         self.nrUssPeriodicityComb.setCurrentIndex(0)
         
         self.nrUssSlotOffsetLabel = QLabel('monitoringSlotOffset:')
-        self.nrUssSlotOffsetEdit = QLineEdit()
-        self.nrUssSlotOffsetEdit.setText('0')
+        self.nrUssSlotOffsetEdit = QLineEdit('0')
         
         self.nrUssDurationLabel = QLabel('duration:')
-        self.nrUssDurationEdit = QLineEdit()
-        self.nrUssDurationEdit.setText('1')
+        self.nrUssDurationEdit = QLineEdit('1')
         
         self.nrUssFirstSymbsLabel = QLabel('monitoringSymbolsWithinSlot:')
         self.nrUssFirstSymbsEdit = QLineEdit()
@@ -487,6 +486,7 @@ class NgNrGridUi(QDialog):
         
         self.nrDci10Sib1McsLabel = QLabel('Modulation and coding scheme(CW0)[0-31]:')
         self.nrDci10Sib1McsEdit = QLineEdit()
+        self.nrDci10Sib1McsEdit.setValidator(QIntValidator(0, 31))
         
         self.nrDci10Sib1TbsLabel = QLabel('Transport block size(bits):')
         self.nrDci10Sib1TbsEdit = QLineEdit()
@@ -609,9 +609,11 @@ class NgNrGridUi(QDialog):
         
         self.nrDci10Msg2McsLabel = QLabel('Modulation and coding scheme(CW0)[0-31]:')
         self.nrDci10Msg2McsEdit = QLineEdit()
+        self.nrDci10Msg2McsEdit.setValidator(QIntValidator(0, 31))
         
         self.nrDci10Msg2TbScalingLabel = QLabel('TB Scaling[0-3]:')
         self.nrDci10Msg2TbScalingEdit = QLineEdit()
+        self.nrDci10Msg2TbScalingEdit.setValidator(QIntValidator(0, 3))
         
         self.nrDci10Msg2TbsLabel = QLabel('Transport block size(bits):')
         self.nrDci10Msg2TbsEdit = QLineEdit()
@@ -736,6 +738,7 @@ class NgNrGridUi(QDialog):
         
         self.nrDci10Msg4McsLabel = QLabel('Modulation and coding scheme(CW0)[0-31]:')
         self.nrDci10Msg4McsEdit = QLineEdit()
+        self.nrDci10Msg4McsEdit.setValidator(QIntValidator(0, 31))
         
         self.nrDci10Msg4TbsLabel = QLabel('Transport block size(bits):')
         self.nrDci10Msg4TbsEdit = QLineEdit()
@@ -743,9 +746,11 @@ class NgNrGridUi(QDialog):
         
         self.nrDci10Msg4DeltaPriLabel = QLabel('PUCCH resource indicator[0-7]:')
         self.nrDci10Msg4DeltaPriEdit = QLineEdit()
+        self.nrDci10Msg4DeltaPriEdit.setValidator(QIntValidator(0, 7))
         
         self.nrDci10Msg4K1Label = QLabel('K1(PDSCH-to-HARQ_feedback timing indicator)[0-7]:')
         self.nrDci10Msg4K1Edit = QLineEdit()
+        self.nrDci10Msg4K1Edit.setValidator(QIntValidator(0, 7))
         
         dci10Msg4TimeAllocWidget = QWidget()
         dci10Msg4TimeAllocLayout = QGridLayout()
@@ -876,9 +881,11 @@ class NgNrGridUi(QDialog):
         
         self.nrDci11PdschCw0McsLabel = QLabel('Modulation and coding scheme(CW0)[0-31]:')
         self.nrDci11PdschCw0McsEdit = QLineEdit()
+        self.nrDci11PdschCw0McsEdit.setValidator(QIntValidator(0, 31))
         
         self.nrDci11PdschCw1McsLabel = QLabel('Modulation and coding scheme(CW1)[0-31]:')
         self.nrDci11PdschCw1McsEdit = QLineEdit()
+        self.nrDci11PdschCw1McsEdit.setValidator(QIntValidator(0, 31))
         
         self.nrDci11PdschTbsLabel = QLabel('Transport block size(bits):')
         self.nrDci11PdschTbsEdit = QLineEdit()
@@ -886,9 +893,11 @@ class NgNrGridUi(QDialog):
         
         self.nrDci11PdschDeltaPriLabel = QLabel('PUCCH resource indicator[0-7]:')
         self.nrDci11PdschDeltaPriEdit = QLineEdit()
+        self.nrDci11PdschDeltaPriEdit.setValidator(QIntValidator(0, 7))
         
         self.nrDci11PdschK1Label = QLabel('K1(PDSCH-to-HARQ_feedback timing indicator)[0-7]:')
         self.nrDci11PdschK1Edit = QLineEdit()
+        self.nrDci11PdschK1Edit.setValidator(QIntValidator(0, 7))
         
         self.nrDci11PdschAntPortsFieldLabel = QLabel('Antenna port(s)[0-15/0-31/0-63]:')
         self.nrDci11PdschAntPortsFieldEdit = QLineEdit('0')
@@ -1025,6 +1034,7 @@ class NgNrGridUi(QDialog):
         
         self.nrDci01PuschCw0McsLabel = QLabel('Modulation and coding scheme(CW0)[0-31]:')
         self.nrDci01PuschCw0McsEdit = QLineEdit()
+        self.nrDci01PuschCw0McsEdit.setValidator(QIntValidator(0, 31))
         
         self.nrDci01PuschTbsLabel = QLabel('Transport block size(bits):')
         self.nrDci01PuschTbsEdit = QLineEdit()
@@ -1038,6 +1048,7 @@ class NgNrGridUi(QDialog):
         
         self.nrDci01PuschPtrsDmrsMappingLabel = QLabel('PTRS-DMRS association[0-3]:')
         self.nrDci01PuschPtrsDmrsMappingEdit = QLineEdit('0')
+        self.nrDci01PuschPtrsDmrsMappingEdit.setValidator(QIntValidator(0, 3))
         
         dci01PuschTimeAllocWidget = QWidget()
         dci01PuschTimeAllocLayout = QGridLayout()
@@ -1155,6 +1166,7 @@ class NgNrGridUi(QDialog):
         
         self.nrMsg3PuschCw0McsLabel = QLabel('Modulation and coding scheme(CW0)[0-31]:')
         self.nrMsg3PuschCw0McsEdit = QLineEdit()
+        self.nrMsg3PuschCw0McsEdit.setValidator(QIntValidator(0, 31))
         
         self.nrMsg3PuschTbsLabel = QLabel('Transport block size(bits):')
         self.nrMsg3PuschTbsEdit = QLineEdit()
@@ -1479,6 +1491,7 @@ class NgNrGridUi(QDialog):
         #prach for msg1
         self.nrRachGenericPrachConfIdLabel = QLabel('prach-ConfigurationIndex[0-255]:')
         self.nrrachgenericPrachConfIdEdit = QLineEdit()
+        self.nrrachgenericPrachConfIdEdit.setValidator(QIntValidator(0, 255))
         self.nrrachgenericPrachConfIdEdit.setText('0')
         
         self.nrRachGenericPrachFmtLabel = QLabel('Preamble format:')
@@ -1513,6 +1526,7 @@ class NgNrGridUi(QDialog):
         
         self.nrRachNumRaPreamblesLabel = QLabel('totalNumberOfRA-Preambles[1-64]:')
         self.nrRachNumRaPreamblesEdit = QLineEdit()
+        self.nrRachNumRaPreamblesEdit.setValidator(QIntValidator(1, 64))
         self.nrRachNumRaPreamblesEdit.setText('64')
         
         self.nrRachSsbPerRachOccasionLabel = QLabel('ssb-perRACH-Occasion:')
@@ -1591,6 +1605,7 @@ class NgNrGridUi(QDialog):
         #pucch for msg4 harq feedback
         self.nrPucchSib1PucchResCommonLabel = QLabel('pucch-ResourceCommon[0-15]:')
         self.nrPucchSib1PucchResCommonEdit = QLineEdit('0')
+        self.nrPucchSib1PucchResCommonEdit.setValidator(QIntValidator(0, 15))
         
         self.nrPucchSib1PucchFmtLabel = QLabel('PUCCH format:')
         self.nrPucchSib1PucchFmtComb = QComboBox()
@@ -1838,6 +1853,7 @@ class NgNrGridUi(QDialog):
         
         self.nrDedUlBwpGenericLocAndBwLabel = QLabel('locationAndBandwidth[0-37949]:')
         self.nrDedUlBwpGenericLocAndBwEdit = QLineEdit()
+        self.nrDedUlBwpGenericLocAndBwEdit.setValidator(QIntValidator(0, 37949))
         
         self.nrDedUlBwpGenericRbStartLabel = QLabel('RB_start:')
         self.nrDedUlBwpGenericRbStartEdit = QLineEdit()
@@ -1879,13 +1895,16 @@ class NgNrGridUi(QDialog):
         
         self.nrDedPuschCfgCbMaxRankLabel = QLabel('CB maxRank[1-4]:')
         self.nrDedPuschCfgCbMaxRankEdit = QLineEdit()
+        self.nrDedPuschCfgCbMaxRankEdit.setValidator(QIntValidator(1, 4))
         
         #note: Lmax is the number of srs resources transmitted by ue, which is ue capability as defined in 38.306
         self.nrDedPuschCfgNonCbMaxLayersLabel = QLabel('non-CB maxLayers(Lmax)[1-4]:')
         self.nrDedPuschCfgNonCbMaxLayersEdit = QLineEdit()
+        self.nrDedPuschCfgNonCbMaxLayersEdit.setValidator(QIntValidator(1, 4))
         
         self.nrDedPuschCfgFreqHopOffsetLabel = QLabel('frequencyHoppingOffset[0-274]:')
         self.nrDedPuschCfgFreqHopOffsetEdit = QLineEdit()
+        self.nrDedPuschCfgFreqHopOffsetEdit.setValidator(QIntValidator(0, 274))
         
         self.nrDedPuschCfgTpLabel = QLabel('transformPrecoder:')
         self.nrDedPuschCfgTpComb = QComboBox()
@@ -2094,10 +2113,11 @@ class NgNrGridUi(QDialog):
         
         self.nrSrsRes0CombOffsetLabel = QLabel('combOffset[0-1]:')
         self.nrSrsRes0CombOffsetEdit = QLineEdit('0')
+        self.nrSrsRes0CombOffsetEdit.setValidator(QIntValidator(0, 1))
         
         self.nrSrsRes0StartPosLabel = QLabel('startPosition[0-5]:')
-        self.nrSrsRes0StartPosEdit = QLineEdit()
-        self.nrSrsRes0StartPosEdit.setText('0')
+        self.nrSrsRes0StartPosEdit = QLineEdit('0')
+        self.nrSrsRes0StartPosEdit.setValidator(QIntValidator(0, 5))
         
         self.nrSrsRes0NumSymbsLabel = QLabel('nrofSymbols:')
         self.nrSrsRes0NumSymbsComb = QComboBox()
@@ -2110,24 +2130,24 @@ class NgNrGridUi(QDialog):
         self.nrSrsRes0RepFactorComb.setCurrentIndex(0)
         
         self.nrSrsRes0FreqPosLabel = QLabel('freqDomainPosition[0-67]:')
-        self.nrSrsRes0FreqPosEdit = QLineEdit()
-        self.nrSrsRes0FreqPosEdit.setText('0')
+        self.nrSrsRes0FreqPosEdit = QLineEdit('0')
+        self.nrSrsRes0FreqPosEdit.setValidator(QIntValidator(0, 67))
         
         self.nrSrsRes0FreqShiftLabel = QLabel('freqDomainShift[0-268]:')
-        self.nrSrsRes0FreqShiftEdit = QLineEdit()
-        self.nrSrsRes0FreqShiftEdit.setText('0')
+        self.nrSrsRes0FreqShiftEdit = QLineEdit('0')
+        self.nrSrsRes0FreqShiftEdit.setValidator(QIntValidator(0, 268))
         
         self.nrSrsRes0FreqHopCSrsLabel = QLabel('c-SRS[0-63]:')
-        self.nrSrsRes0FreqHopCSrsEdit = QLineEdit()
-        self.nrSrsRes0FreqHopCSrsEdit.setText('0')
+        self.nrSrsRes0FreqHopCSrsEdit = QLineEdit('0')
+        self.nrSrsRes0FreqHopCSrsEdit.setValidator(QIntValidator(0, 63))
         
         self.nrSrsRes0FreqHopBSrsLabel = QLabel('b-SRS[0-3]:')
-        self.nrSrsRes0FreqHopBSrsEdit = QLineEdit()
-        self.nrSrsRes0FreqHopBSrsEdit.setText('0')
+        self.nrSrsRes0FreqHopBSrsEdit = QLineEdit('0')
+        self.nrSrsRes0FreqHopBSrsEdit.setValidator(QIntValidator(0, 3))
         
         self.nrSrsRes0FreqHopBHopLabel = QLabel('b-hop[0-3]:')
-        self.nrSrsRes0FreqHopBHopEdit = QLineEdit()
-        self.nrSrsRes0FreqHopBHopEdit.setText('0')
+        self.nrSrsRes0FreqHopBHopEdit = QLineEdit('0')
+        self.nrSrsRes0FreqHopBHopEdit.setValidator(QIntValidator(0, 3))
         
         self.nrSrsRes0ResTypeLabel = QLabel('resourceType:')
         self.nrSrsRes0ResTypeComb = QComboBox()
@@ -2142,8 +2162,8 @@ class NgNrGridUi(QDialog):
         self.nrSrsRes0PeriodComb.setCurrentIndex(3)
         
         self.nrSrsRes0OffsetLabel = QLabel('SRS-Offset[0-4]:')
-        self.nrSrsRes0OffsetEdit = QLineEdit()
-        self.nrSrsRes0OffsetEdit.setText('0')
+        self.nrSrsRes0OffsetEdit = QLineEdit('0')
+        self.nrSrsRes0OffsetEdit.setValidator(QIntValidator(0, 4))
         
         srsRes0Widget = QWidget()
         srsRes0GridLayout = QGridLayout()
@@ -2206,10 +2226,11 @@ class NgNrGridUi(QDialog):
         
         self.nrSrsRes1CombOffsetLabel = QLabel('combOffset[0-1]:')
         self.nrSrsRes1CombOffsetEdit = QLineEdit('0')
+        self.nrSrsRes1CombOffsetEdit.setValidator(QIntValidator(0, 1))
         
         self.nrSrsRes1StartPosLabel = QLabel('startPosition[0-5]:')
-        self.nrSrsRes1StartPosEdit = QLineEdit()
-        self.nrSrsRes1StartPosEdit.setText('0')
+        self.nrSrsRes1StartPosEdit = QLineEdit('0')
+        self.nrSrsRes1StartPosEdit.setValidator(QIntValidator(0, 5))
         
         self.nrSrsRes1NumSymbsLabel = QLabel('nrofSymbols:')
         self.nrSrsRes1NumSymbsComb = QComboBox()
@@ -2222,24 +2243,24 @@ class NgNrGridUi(QDialog):
         self.nrSrsRes1RepFactorComb.setCurrentIndex(0)
         
         self.nrSrsRes1FreqPosLabel = QLabel('freqDomainPosition[0-67]:')
-        self.nrSrsRes1FreqPosEdit = QLineEdit()
-        self.nrSrsRes1FreqPosEdit.setText('0')
+        self.nrSrsRes1FreqPosEdit = QLineEdit('0')
+        self.nrSrsRes1FreqPosEdit.setValidator(QIntValidator(0, 67))
         
         self.nrSrsRes1FreqShiftLabel = QLabel('freqDomainShift[0-268]:')
-        self.nrSrsRes1FreqShiftEdit = QLineEdit()
-        self.nrSrsRes1FreqShiftEdit.setText('0')
+        self.nrSrsRes1FreqShiftEdit = QLineEdit('0')
+        self.nrSrsRes1FreqShiftEdit.setValidator(QIntValidator(0, 268))
         
         self.nrSrsRes1FreqHopCSrsLabel = QLabel('c-SRS[0-63]:')
-        self.nrSrsRes1FreqHopCSrsEdit = QLineEdit()
-        self.nrSrsRes1FreqHopCSrsEdit.setText('0')
+        self.nrSrsRes1FreqHopCSrsEdit = QLineEdit('0')
+        self.nrSrsRes1FreqHopCSrsEdit.setValidator(QIntValidator(0, 63))
         
         self.nrSrsRes1FreqHopBSrsLabel = QLabel('b-SRS[0-3]:')
-        self.nrSrsRes1FreqHopBSrsEdit = QLineEdit()
-        self.nrSrsRes1FreqHopBSrsEdit.setText('0')
+        self.nrSrsRes1FreqHopBSrsEdit = QLineEdit('0')
+        self.nrSrsRes1FreqHopBSrsEdit.setValidator(QIntValidator(0, 3))
         
         self.nrSrsRes1FreqHopBHopLabel = QLabel('b-hop[0-3]:')
-        self.nrSrsRes1FreqHopBHopEdit = QLineEdit()
-        self.nrSrsRes1FreqHopBHopEdit.setText('0')
+        self.nrSrsRes1FreqHopBHopEdit = QLineEdit('0')
+        self.nrSrsRes1FreqHopBHopEdit.setValidator(QIntValidator(0, 3))
         
         self.nrSrsRes1ResTypeLabel = QLabel('resourceType:')
         self.nrSrsRes1ResTypeComb = QComboBox()
@@ -2254,8 +2275,8 @@ class NgNrGridUi(QDialog):
         self.nrSrsRes1PeriodComb.setCurrentIndex(3)
         
         self.nrSrsRes1OffsetLabel = QLabel('SRS-Offset[0-4]:')
-        self.nrSrsRes1OffsetEdit = QLineEdit()
-        self.nrSrsRes1OffsetEdit.setText('0')
+        self.nrSrsRes1OffsetEdit = QLineEdit('0')
+        self.nrSrsRes1OffsetEdit.setValidator(QIntValidator(0, 4))
         
         srsRes1Widget = QWidget()
         srsRes1GridLayout = QGridLayout()
@@ -2318,10 +2339,11 @@ class NgNrGridUi(QDialog):
         
         self.nrSrsRes2CombOffsetLabel = QLabel('combOffset[0-1]:')
         self.nrSrsRes2CombOffsetEdit = QLineEdit('0')
+        self.nrSrsRes2CombOffsetEdit.setValidator(QIntValidator(0, 1))
         
         self.nrSrsRes2StartPosLabel = QLabel('startPosition[0-5]:')
-        self.nrSrsRes2StartPosEdit = QLineEdit()
-        self.nrSrsRes2StartPosEdit.setText('0')
+        self.nrSrsRes2StartPosEdit = QLineEdit('0')
+        self.nrSrsRes2StartPosEdit.setValidator(QIntValidator(0, 5))
         
         self.nrSrsRes2NumSymbsLabel = QLabel('nrofSymbols:')
         self.nrSrsRes2NumSymbsComb = QComboBox()
@@ -2334,24 +2356,24 @@ class NgNrGridUi(QDialog):
         self.nrSrsRes2RepFactorComb.setCurrentIndex(0)
         
         self.nrSrsRes2FreqPosLabel = QLabel('freqDomainPosition[0-67]:')
-        self.nrSrsRes2FreqPosEdit = QLineEdit()
-        self.nrSrsRes2FreqPosEdit.setText('0')
+        self.nrSrsRes2FreqPosEdit = QLineEdit('0')
+        self.nrSrsRes2FreqPosEdit.setValidator(QIntValidator(0, 67))
         
         self.nrSrsRes2FreqShiftLabel = QLabel('freqDomainShift[0-268]:')
-        self.nrSrsRes2FreqShiftEdit = QLineEdit()
-        self.nrSrsRes2FreqShiftEdit.setText('0')
+        self.nrSrsRes2FreqShiftEdit = QLineEdit('0')
+        self.nrSrsRes2FreqShiftEdit.setValidator(QIntValidator(0, 268))
         
         self.nrSrsRes2FreqHopCSrsLabel = QLabel('c-SRS[0-63]:')
-        self.nrSrsRes2FreqHopCSrsEdit = QLineEdit()
-        self.nrSrsRes2FreqHopCSrsEdit.setText('0')
+        self.nrSrsRes2FreqHopCSrsEdit = QLineEdit('0')
+        self.nrSrsRes2FreqHopCSrsEdit.setValidator(QIntValidator(0, 63))
         
         self.nrSrsRes2FreqHopBSrsLabel = QLabel('b-SRS[0-3]:')
-        self.nrSrsRes2FreqHopBSrsEdit = QLineEdit()
-        self.nrSrsRes2FreqHopBSrsEdit.setText('0')
+        self.nrSrsRes2FreqHopBSrsEdit = QLineEdit('0')
+        self.nrSrsRes2FreqHopBSrsEdit.setValidator(QIntValidator(0, 3))
         
         self.nrSrsRes2FreqHopBHopLabel = QLabel('b-hop[0-3]:')
-        self.nrSrsRes2FreqHopBHopEdit = QLineEdit()
-        self.nrSrsRes2FreqHopBHopEdit.setText('0')
+        self.nrSrsRes2FreqHopBHopEdit = QLineEdit('0')
+        self.nrSrsRes2FreqHopBHopEdit.setValidator(QIntValidator(0, 3))
         
         self.nrSrsRes2ResTypeLabel = QLabel('resourceType:')
         self.nrSrsRes2ResTypeComb = QComboBox()
@@ -2366,8 +2388,8 @@ class NgNrGridUi(QDialog):
         self.nrSrsRes2PeriodComb.setCurrentIndex(3)
         
         self.nrSrsRes2OffsetLabel = QLabel('SRS-Offset[0-4]:')
-        self.nrSrsRes2OffsetEdit = QLineEdit()
-        self.nrSrsRes2OffsetEdit.setText('0')
+        self.nrSrsRes2OffsetEdit = QLineEdit('0')
+        self.nrSrsRes2OffsetEdit.setValidator(QIntValidator(0, 4))
         
         srsRes2Widget = QWidget()
         srsRes2GridLayout = QGridLayout()
@@ -2430,10 +2452,11 @@ class NgNrGridUi(QDialog):
         
         self.nrSrsRes3CombOffsetLabel = QLabel('combOffset[0-1]:')
         self.nrSrsRes3CombOffsetEdit = QLineEdit('0')
+        self.nrSrsRes3CombOffsetEdit.setValidator(QIntValidator(0, 1))
         
         self.nrSrsRes3StartPosLabel = QLabel('startPosition[0-5]:')
-        self.nrSrsRes3StartPosEdit = QLineEdit()
-        self.nrSrsRes3StartPosEdit.setText('0')
+        self.nrSrsRes3StartPosEdit = QLineEdit('0')
+        self.nrSrsRes3StartPosEdit.setValidator(QIntValidator(0, 5))
         
         self.nrSrsRes3NumSymbsLabel = QLabel('nrofSymbols:')
         self.nrSrsRes3NumSymbsComb = QComboBox()
@@ -2446,24 +2469,24 @@ class NgNrGridUi(QDialog):
         self.nrSrsRes3RepFactorComb.setCurrentIndex(0)
         
         self.nrSrsRes3FreqPosLabel = QLabel('freqDomainPosition[0-67]:')
-        self.nrSrsRes3FreqPosEdit = QLineEdit()
-        self.nrSrsRes3FreqPosEdit.setText('0')
+        self.nrSrsRes3FreqPosEdit = QLineEdit('0')
+        self.nrSrsRes3FreqPosEdit.setValidator(QIntValidator(0, 67))
         
         self.nrSrsRes3FreqShiftLabel = QLabel('freqDomainShift[0-268]:')
-        self.nrSrsRes3FreqShiftEdit = QLineEdit()
-        self.nrSrsRes3FreqShiftEdit.setText('0')
+        self.nrSrsRes3FreqShiftEdit = QLineEdit('0')
+        self.nrSrsRes3FreqShiftEdit.setValidator(QIntValidator(0, 268))
         
         self.nrSrsRes3FreqHopCSrsLabel = QLabel('c-SRS[0-63]:')
-        self.nrSrsRes3FreqHopCSrsEdit = QLineEdit()
-        self.nrSrsRes3FreqHopCSrsEdit.setText('0')
+        self.nrSrsRes3FreqHopCSrsEdit = QLineEdit('0')
+        self.nrSrsRes3FreqHopCSrsEdit.setValidator(QIntValidator(0, 63))
         
         self.nrSrsRes3FreqHopBSrsLabel = QLabel('b-SRS[0-3]:')
-        self.nrSrsRes3FreqHopBSrsEdit = QLineEdit()
-        self.nrSrsRes3FreqHopBSrsEdit.setText('0')
+        self.nrSrsRes3FreqHopBSrsEdit = QLineEdit('0')
+        self.nrSrsRes3FreqHopBSrsEdit.setValidator(QIntValidator(0, 3))
         
         self.nrSrsRes3FreqHopBHopLabel = QLabel('b-hop[0-3]:')
-        self.nrSrsRes3FreqHopBHopEdit = QLineEdit()
-        self.nrSrsRes3FreqHopBHopEdit.setText('0')
+        self.nrSrsRes3FreqHopBHopEdit = QLineEdit('0')
+        self.nrSrsRes3FreqHopBHopEdit.setValidator(QIntValidator(0, 3))
         
         self.nrSrsRes3ResTypeLabel = QLabel('resourceType:')
         self.nrSrsRes3ResTypeComb = QComboBox()
@@ -2478,8 +2501,8 @@ class NgNrGridUi(QDialog):
         self.nrSrsRes3PeriodComb.setCurrentIndex(3)
         
         self.nrSrsRes3OffsetLabel = QLabel('SRS-Offset[0-4]:')
-        self.nrSrsRes3OffsetEdit = QLineEdit()
-        self.nrSrsRes3OffsetEdit.setText('0')
+        self.nrSrsRes3OffsetEdit = QLineEdit('0')
+        self.nrSrsRes3OffsetEdit.setValidator(QIntValidator(0, 4))
         
         srsRes3Widget = QWidget()
         srsRes3GridLayout = QGridLayout()
@@ -2671,6 +2694,7 @@ class NgNrGridUi(QDialog):
         
         self.nrDedPucchRes0StartingPrbLabel = QLabel('startingPRB[0-274]:')
         self.nrDedPucchRes0StartingPrbEdit = QLineEdit()
+        self.nrDedPucchRes0StartingPrbEdit.setValidator(QIntValidator(0, 274))
         
         self.nrDedPucchRes0IntraSlotFreqHopLabel = QLabel('intraSlotFrequencyHopping:')
         self.nrDedPucchRes0IntraSlotFreqHopComb = QComboBox()
@@ -2679,19 +2703,19 @@ class NgNrGridUi(QDialog):
         
         self.nrDedPucchRes0SecondHopPrbLabel = QLabel('secondHopPRB[0-274]:')
         self.nrDedPucchRes0SecondHopPrbEdit = QLineEdit()
+        self.nrDedPucchRes0SecondHopPrbEdit.setValidator(QIntValidator(0, 274))
         
         self.nrDedPucchRes0NumPrbsLabel = QLabel('nrofPRBs[1]:')
-        self.nrDedPucchRes0NumPrbsEdit = QLineEdit()
-        self.nrDedPucchRes0NumPrbsEdit.setText('1')
+        self.nrDedPucchRes0NumPrbsEdit = QLineEdit('1')
         self.nrDedPucchRes0NumPrbsEdit.setEnabled(False)
         
         self.nrDedPucchRes0StartingSymbLabel = QLabel('startingSymbolIndex[0-13]:')
-        self.nrDedPucchRes0StartingSymbEdit = QLineEdit()
-        self.nrDedPucchRes0StartingSymbEdit.setText('0')
+        self.nrDedPucchRes0StartingSymbEdit = QLineEdit('0')
+        self.nrDedPucchRes0StartingSymbEdit.setValidator(QIntValidator(0, 13))
         
         self.nrDedPucchRes0NumSymbsLabel = QLabel('nrofSymbols[1-2]:')
-        self.nrDedPucchRes0NumSymbEdit = QLineEdit()
-        self.nrDedPucchRes0NumSymbEdit.setText('1')
+        self.nrDedPucchRes0NumSymbEdit = QLineEdit('1')
+        self.nrDedPucchRes0NumSymbEdit.setValidator(QIntValidator(1, 2))
         
         dedPucchRes0Widget = QWidget()
         dedPucchRes0GridLayout = QGridLayout()
@@ -2737,6 +2761,7 @@ class NgNrGridUi(QDialog):
         
         self.nrDedPucchRes1StartingPrbLabel = QLabel('startingPRB[0-274]:')
         self.nrDedPucchRes1StartingPrbEdit = QLineEdit()
+        self.nrDedPucchRes1StartingPrbEdit.setValidator(QIntValidator(0, 274))
         
         self.nrDedPucchRes1IntraSlotFreqHopLabel = QLabel('intraSlotFrequencyHopping:')
         self.nrDedPucchRes1IntraSlotFreqHopComb = QComboBox()
@@ -2745,19 +2770,19 @@ class NgNrGridUi(QDialog):
         
         self.nrDedPucchRes1SecondHopPrbLabel = QLabel('secondHopPRB[0-274]:')
         self.nrDedPucchRes1SecondHopPrbEdit = QLineEdit()
+        self.nrDedPucchRes1SecondHopPrbEdit.setValidator(QIntValidator(0, 274))
         
         self.nrDedPucchRes1NumPrbsLabel = QLabel('nrofPRBs[1]:')
-        self.nrDedPucchRes1NumPrbsEdit = QLineEdit()
-        self.nrDedPucchRes1NumPrbsEdit.setText('1')
+        self.nrDedPucchRes1NumPrbsEdit = QLineEdit('1')
         self.nrDedPucchRes1NumPrbsEdit.setEnabled(False)
         
         self.nrDedPucchRes1StartingSymbLabel = QLabel('startingSymbolIndex[0-10]:')
-        self.nrDedPucchRes1StartingSymbEdit = QLineEdit()
-        self.nrDedPucchRes1StartingSymbEdit.setText('0')
+        self.nrDedPucchRes1StartingSymbEdit = QLineEdit('0')
+        self.nrDedPucchRes1StartingSymbEdit.setValidator(QIntValidator(0, 10))
         
         self.nrDedPucchRes1NumSymbsLabel = QLabel('nrofSymbols[4-14]:')
-        self.nrDedPucchRes1NumSymbEdit = QLineEdit()
-        self.nrDedPucchRes1NumSymbEdit.setText('4')
+        self.nrDedPucchRes1NumSymbEdit = QLineEdit('4')
+        self.nrDedPucchRes1NumSymbEdit.setValidator(QIntValidator(4, 14))
         
         dedPucchRes1Widget = QWidget()
         dedPucchRes1GridLayout = QGridLayout()
@@ -2803,6 +2828,7 @@ class NgNrGridUi(QDialog):
         
         self.nrDedPucchRes2StartingPrbLabel = QLabel('startingPRB[0-274]:')
         self.nrDedPucchRes2StartingPrbEdit = QLineEdit()
+        self.nrDedPucchRes2StartingPrbEdit.setValidator(QIntValidator(0, 274))
         
         self.nrDedPucchRes2IntraSlotFreqHopLabel = QLabel('intraSlotFrequencyHopping:')
         self.nrDedPucchRes2IntraSlotFreqHopComb = QComboBox()
@@ -2811,18 +2837,19 @@ class NgNrGridUi(QDialog):
         
         self.nrDedPucchRes2SecondHopPrbLabel = QLabel('secondHopPRB[0-274]:')
         self.nrDedPucchRes2SecondHopPrbEdit = QLineEdit()
+        self.nrDedPucchRes2SecondHopPrbEdit.setValidator(QIntValidator(0, 274))
         
         self.nrDedPucchRes2NumPrbsLabel = QLabel('nrofPRBs[1-16]:')
-        self.nrDedPucchRes2NumPrbsEdit = QLineEdit()
-        self.nrDedPucchRes2NumPrbsEdit.setText('1')
+        self.nrDedPucchRes2NumPrbsEdit = QLineEdit('1')
+        self.nrDedPucchRes2NumPrbsEdit.setValidator(QIntValidator(1, 16))
         
         self.nrDedPucchRes2StartingSymbLabel = QLabel('startingSymbolIndex[0-13]:')
-        self.nrDedPucchRes2StartingSymbEdit = QLineEdit()
-        self.nrDedPucchRes2StartingSymbEdit.setText('0')
+        self.nrDedPucchRes2StartingSymbEdit = QLineEdit('0')
+        self.nrDedPucchRes2StartingSymbEdit.setValidator(QIntValidator(0, 13))
         
         self.nrDedPucchRes2NumSymbsLabel = QLabel('nrofSymbols[1-2]:')
-        self.nrDedPucchRes2NumSymbEdit = QLineEdit()
-        self.nrDedPucchRes2NumSymbEdit.setText('1')
+        self.nrDedPucchRes2NumSymbEdit = QLineEdit('1')
+        self.nrDedPucchRes2NumSymbEdit.setValidator(QIntValidator(1, 2))
         
         dedPucchRes2Widget = QWidget()
         dedPucchRes2GridLayout = QGridLayout()
@@ -2868,6 +2895,7 @@ class NgNrGridUi(QDialog):
         
         self.nrDedPucchRes3StartingPrbLabel = QLabel('startingPRB[0-274]:')
         self.nrDedPucchRes3StartingPrbEdit = QLineEdit()
+        self.nrDedPucchRes3StartingPrbEdit.setValidator(QIntValidator(0, 274))
         
         self.nrDedPucchRes3IntraSlotFreqHopLabel = QLabel('intraSlotFrequencyHopping:')
         self.nrDedPucchRes3IntraSlotFreqHopComb = QComboBox()
@@ -2876,18 +2904,19 @@ class NgNrGridUi(QDialog):
         
         self.nrDedPucchRes3SecondHopPrbLabel = QLabel('secondHopPRB[0-274]:')
         self.nrDedPucchRes3SecondHopPrbEdit = QLineEdit()
+        self.nrDedPucchRes3SecondHopPrbEdit.setValidator(QIntValidator(0, 274))
         
         self.nrDedPucchRes3NumPrbsLabel = QLabel('nrofPRBs[1-16]:')
-        self.nrDedPucchRes3NumPrbsEdit = QLineEdit()
-        self.nrDedPucchRes3NumPrbsEdit.setText('1')
+        self.nrDedPucchRes3NumPrbsEdit = QLineEdit('1')
+        self.nrDedPucchRes3NumPrbsEdit.setValidator(QIntValidator(1, 16))
         
         self.nrDedPucchRes3StartingSymbLabel = QLabel('startingSymbolIndex[0-10]:')
-        self.nrDedPucchRes3StartingSymbEdit = QLineEdit()
-        self.nrDedPucchRes3StartingSymbEdit.setText('0')
+        self.nrDedPucchRes3StartingSymbEdit = QLineEdit('0')
+        self.nrDedPucchRes3StartingSymbEdit.setValidator(QIntValidator(0, 10))
         
         self.nrDedPucchRes3NumSymbsLabel = QLabel('nrofSymbols[4-14]:')
-        self.nrDedPucchRes3NumSymbEdit = QLineEdit()
-        self.nrDedPucchRes3NumSymbEdit.setText('4')
+        self.nrDedPucchRes3NumSymbEdit = QLineEdit('4')
+        self.nrDedPucchRes3NumSymbEdit.setValidator(QIntValidator(4, 14))
         
         dedPucchRes3Widget = QWidget()
         dedPucchRes3GridLayout = QGridLayout()
@@ -2933,6 +2962,7 @@ class NgNrGridUi(QDialog):
         
         self.nrDedPucchRes4StartingPrbLabel = QLabel('startingPRB[0-274]:')
         self.nrDedPucchRes4StartingPrbEdit = QLineEdit()
+        self.nrDedPucchRes4StartingPrbEdit.setValidator(QIntValidator(0, 274))
         
         self.nrDedPucchRes4IntraSlotFreqHopLabel = QLabel('intraSlotFrequencyHopping:')
         self.nrDedPucchRes4IntraSlotFreqHopComb = QComboBox()
@@ -2941,19 +2971,19 @@ class NgNrGridUi(QDialog):
         
         self.nrDedPucchRes4SecondHopPrbLabel = QLabel('secondHopPRB[0-274]:')
         self.nrDedPucchRes4SecondHopPrbEdit = QLineEdit()
+        self.nrDedPucchRes4SecondHopPrbEdit.setValidator(QIntValidator(0, 274))
         
         self.nrDedPucchRes4NumPrbsLabel = QLabel('nrofPRBs[1]:')
-        self.nrDedPucchRes4NumPrbsEdit = QLineEdit()
-        self.nrDedPucchRes4NumPrbsEdit.setText('1')
+        self.nrDedPucchRes4NumPrbsEdit = QLineEdit('1')
         self.nrDedPucchRes4NumPrbsEdit.setEnabled(False)
         
         self.nrDedPucchRes4StartingSymbLabel = QLabel('startingSymbolIndex[0-10]:')
-        self.nrDedPucchRes4StartingSymbEdit = QLineEdit()
-        self.nrDedPucchRes4StartingSymbEdit.setText('0')
+        self.nrDedPucchRes4StartingSymbEdit = QLineEdit('0')
+        self.nrDedPucchRes4StartingSymbEdit.setValidator(QIntValidator(0, 10))
         
         self.nrDedPucchRes4NumSymbsLabel = QLabel('nrofSymbols[4-14]:')
-        self.nrDedPucchRes4NumSymbEdit = QLineEdit()
-        self.nrDedPucchRes4NumSymbEdit.setText('4')
+        self.nrDedPucchRes4NumSymbEdit = QLineEdit('4')
+        self.nrDedPucchRes4NumSymbEdit.setValidator(QIntValidator(4, 14))
         
         dedPucchRes4Widget = QWidget()
         dedPucchRes4GridLayout = QGridLayout()
@@ -2998,8 +3028,8 @@ class NgNrGridUi(QDialog):
         self.nrDsrRes0PeriodicityComb.setCurrentIndex(5)
         
         self.nrDsrRes0OffsetLabel = QLabel('offset(in slots)[0-4]:')
-        self.nrDsrRes0OffsetEdit = QLineEdit()
-        self.nrDsrRes0OffsetEdit.setText('0')
+        self.nrDsrRes0OffsetEdit = QLineEdit('0')
+        self.nrDsrRes0OffsetEdit.setValidator(QIntValidator(0, 4))
         
         dsrRes0Widget = QWidget()
         dsrRes0GridLayout = QGridLayout()
@@ -3034,8 +3064,8 @@ class NgNrGridUi(QDialog):
         self.nrDsrRes1PeriodicityComb.setCurrentIndex(5)
         
         self.nrDsrRes1OffsetLabel = QLabel('offset(in slots)[0-4]:')
-        self.nrDsrRes1OffsetEdit = QLineEdit()
-        self.nrDsrRes1OffsetEdit.setText('0')
+        self.nrDsrRes1OffsetEdit = QLineEdit('0')
+        self.nrDsrRes1OffsetEdit.setValidator(QIntValidator(0, 4))
         
         dsrRes1Widget = QWidget()
         dsrRes1GridLayout = QGridLayout()
@@ -3533,7 +3563,7 @@ class NgNrGridUi(QDialog):
             }
         
         #offset of CORESET0 w.r.t. SSB
-        self.nrCoreset0Offset = 0
+        self.coreset0Offset = 0
         #minimum channel bandwidth
         self.minChBw = 0
         
@@ -3585,19 +3615,24 @@ class NgNrGridUi(QDialog):
         minGuardBand = int(self.nrMinGuardBandEdit.text())
         if key in ('15_15', '15_30', '60_120'):
             self.nrSsbKssbLabel.setText('k_SSB[0-11]:')
+            self.nrSsbKssbEdit.setValidator(QIntValidator(0, 11))
             self.nrSsbNCrbSsbEdit.setText(str(minGuardBand+offset))
         elif key in ('30_15', '30_30'):
             self.nrSsbKssbLabel.setText('k_SSB[0-23]:')
+            self.nrSsbKssbEdit.setValidator(QIntValidator(0, 23))
             self.nrSsbNCrbSsbEdit.setText(str(2*(minGuardBand+offset)))
         elif key == '60_240':
             self.nrSsbKssbLabel.setText('k_SSB[0-11]:')
+            self.nrSsbKssbEdit.setValidator(QIntValidator(0, 11))
             minGuardBand240k = int(self.nrSsbMinGuardBandScs240kEdit.text())
             self.nrSsbNCrbSsbEdit.setText(str(max(minGuardBand+offset, 4*minGuardBand240k)))
         elif key == '120_120':
             self.nrSsbKssbLabel.setText('k_SSB[0-11]:')
+            self.nrSsbKssbEdit.setValidator(QIntValidator(0, 11))
             self.nrSsbNCrbSsbEdit.setText(str(2*(minGuardBand+offset)))
         elif key == '120_240':
             self.nrSsbKssbLabel.setText('k_SSB[0-11]:')
+            self.nrSsbKssbEdit.setValidator(QIntValidator(0, 11))
             minGuardBand240k = int(self.nrSsbMinGuardBandScs240kEdit.text())
             self.nrSsbNCrbSsbEdit.setText(str(max(2*(minGuardBand+offset), 4*minGuardBand240k)))
         else:
@@ -3674,10 +3709,9 @@ class NgNrGridUi(QDialog):
         self.nrCarrierBwComb.setCurrentIndex(0)
         
         #(3) validate CORESET0 and update n_CRB_SSB when necessary
-        if self.nrMibCoreset0Edit.text():
-            self.flagCoreset0 = self.validateCoreset0()
-            if self.flagCoreset0:
-                self.updateKSsbAndNCrbSsb(offset=0 if self.nrCoreset0Offset <= 0 else self.nrCoreset0Offset)
+        self.flagCoreset0 = self.validateCoreset0()
+        if self.flagCoreset0:
+            self.updateKSsbAndNCrbSsb(offset=0 if self.coreset0Offset <= 0 else self.coreset0Offset)
 
     def onCarrierBwCombCurrentIndexChanged(self, index):
         self.ngwin.logEdit.append('-->inside onCarrierBwCombCurrentIndexChanged, index=%d' % index)
@@ -3713,10 +3747,9 @@ class NgNrGridUi(QDialog):
                 self.nrSsbMinGuardBandScs240kEdit.setText(str(self.nrSsbMinGuardBandScs240k[self.nrCarrierBwComb.currentIndex()]))
                 
         #(4) validate CORESET0 and update n_CRB_SSB when necessary
-        if self.nrMibCoreset0Edit.text():
-            self.flagCoreset0 = self.validateCoreset0()
-            if self.flagCoreset0:
-                self.updateKSsbAndNCrbSsb(offset=0 if self.nrCoreset0Offset <= 0 else self.nrCoreset0Offset)
+        self.flagCoreset0 = self.validateCoreset0()
+        if self.flagCoreset0:
+            self.updateKSsbAndNCrbSsb(offset=0 if self.coreset0Offset <= 0 else self.coreset0Offset)
 
     def onSsbScsCombCurrentIndexChanged(self, index):
         self.ngwin.logEdit.append('-->inside onSsbScsCombCurrentIndexChanged, index=%d' % index)
@@ -3741,10 +3774,9 @@ class NgNrGridUi(QDialog):
             self.nrSsbMinGuardBandScs240kEdit.setText('NA')
         
         #(3) validate CORESET0 and update n_CRB_SSB when necessary
-        if self.nrMibCoreset0Edit.text():
-            self.flagCoreset0 = self.validateCoreset0()
-            if self.flagCoreset0:
-                self.updateKSsbAndNCrbSsb(offset=0 if self.nrCoreset0Offset <= 0 else self.nrCoreset0Offset)
+        self.flagCoreset0 = self.validateCoreset0()
+        if self.flagCoreset0:
+            self.updateKSsbAndNCrbSsb(offset=0 if self.coreset0Offset <= 0 else self.coreset0Offset)
     
     def onUssPeriodicityCombCurrentIndexChanged(self, index):
         self.ngwin.logEdit.append('-->inside onUssPeriodicityCombCurrentIndexChanged, index=%d' % index)
@@ -3770,6 +3802,9 @@ class NgNrGridUi(QDialog):
             
     def validateCoreset0(self):
         self.ngwin.logEdit.append('-->inside validateCoreset0')
+        if not self.nrMibCoreset0Edit.text():
+            return False
+        
         #(1) validate controlResourceSetZero
         key = self.nrSsbScsComb.currentText()[:-3] + '_' + self.nrMibScsCommonComb.currentText()[:-3] + '_' + self.nrMibCoreset0Edit.text()
         if self.freqRange == 'FR1' and self.minChBw in (5, 10):
@@ -3806,50 +3841,73 @@ class NgNrGridUi(QDialog):
             return False
             
         #(2) validate CORESET0 bw against carrier bw
-        self.nrSsbCoreset0MultiplexingPat, self.nrCoreset0NumRbs, self.nrCoreset0NumSymbs, self.nrCoreset0OffsetList = val
-        if int(self.nrCarrierNumRbEdit.text()) < self.nrCoreset0NumRbs:
-            self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid CORESET0 setting: CORESET0 numRBs=%d, while carrier numRBs=%s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrCoreset0NumRbs, self.nrCarrierNumRbEdit.text()))
+        self.coreset0MultiplexingPat, self.coreset0NumRbs, self.coreset0NumSymbs, self.coreset0OffsetList = val
+        if int(self.nrCarrierNumRbEdit.text()) < self.coreset0NumRbs:
+            self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid CORESET0 setting: CORESET0 numRBs=%d, while carrier numRBs=%s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0NumRbs, self.nrCarrierNumRbEdit.text()))
             return False
         
         #(3) if k_ssb is configured, further validate CORESET0
         if self.nrSsbKssbEdit.text():
             kSsb = int(self.nrSsbKssbEdit.text())
-            if len(self.nrCoreset0OffsetList) == 2:
-                self.nrCoreset0Offset = self.nrCoreset0OffsetList[0] if kSsb == 0 else self.nrCoreset0OffsetList[1] 
+            if len(self.coreset0OffsetList) == 2:
+                self.coreset0Offset = self.coreset0OffsetList[0] if kSsb == 0 else self.coreset0OffsetList[1] 
             else:
-                self.nrCoreset0Offset = self.nrCoreset0OffsetList[0]
+                self.coreset0Offset = self.coreset0OffsetList[0]
                 
             '''
-            if offset > 0, min bw = max(self.nrCoreset0NumRbs, offset + 20 * scsSsb / scsPdcch), and n_CRB_SSB needs update w.r.t to offset
-            if offset <= 0, min bw = self.nrCoreset0NumRbs - offset, and don't have to update n_CRB_SSB
+            if offset > 0, min bw = max(self.coreset0NumRbs, offset + 20 * scsSsb / scsPdcch), and n_CRB_SSB needs update w.r.t to offset
+            if offset <= 0, min bw = self.coreset0NumRbs - offset, and don't have to update n_CRB_SSB
             '''
-            if self.nrCoreset0Offset > 0:
-                minBw = max(self.nrCoreset0NumRbs, self.nrCoreset0Offset + 20 * int(self.nrSsbScsComb.currentText()[:-3]) / int(self.nrCarrierScsComb.currentText()[:-3]))
+            if self.coreset0Offset > 0:
+                minBw = max(self.coreset0NumRbs, self.coreset0Offset + 20 * int(self.nrSsbScsComb.currentText()[:-3]) / int(self.nrCarrierScsComb.currentText()[:-3]))
             else:
-                minBw = self.nrCoreset0NumRbs - self.nrCoreset0Offset
+                minBw = self.coreset0NumRbs - self.coreset0Offset
             
             if int(self.nrCarrierNumRbEdit.text()) < minBw:
-                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid CORESET0 setting: CORESET0 numRBs=%d, offset=%d, minBw = %d, while carrier numRBs=%s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrCoreset0NumRbs, self.nrCoreset0Offset, minBw, self.nrCarrierNumRbEdit.text()))
+                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid CORESET0 setting: CORESET0 numRBs=%d, offset=%d, minBw = %d, while carrier numRBs=%s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0NumRbs, self.coreset0Offset, minBw, self.nrCarrierNumRbEdit.text()))
                 return False
         
         #when validation passed
         return True
     
+    def validateSearchSpaceZero(self):
+        self.ngwin.logEdit.append('-->inside validateSearchSpaceZero')
+        if not self.nrMibCss0Edit.text():
+            return False
+        
+        if not self.flagCoreset0:
+            self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid CORESET0 setting!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
+            return False
+        
+        if self.coreset0MultiplexingPat == '1':
+            if self.freqRange == 'FR1':
+                return True
+        
+            if self.freqRange == 'FR2' and int(self.nrMibCss0Edit.text()) in range(14):
+                return True
+            else:
+                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid CSS0 setting: searchSpaceZero can be [0, 13] for CORESET0/CSS0 with multiplexing pattern 1 and FR2!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
+                return False
+        else:   #self.coreset0MultiplexingPat = '2' or '3'
+            if int(self.nrMibCss0Edit.text()) == 0:
+                return True
+            else:
+                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid CSS0 setting: searchSpaceZero can be [0] for CORESET0/CSS0 with multiplexing pattern 2/3!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
+                return False
+    
     def onMibCoreset0EditEditingFinished(self):
         self.ngwin.logEdit.append('-->inside onMibCoreset0EditEditingFinished')
         #(1) validate CORESET0 and update n_CRB_SSB when necessary
-        if self.nrMibCoreset0Edit.text():
-            self.flagCoreset0 = self.validateCoreset0()
-            if self.flagCoreset0:
-                self.updateKSsbAndNCrbSsb(offset=0 if self.nrCoreset0Offset <= 0 else self.nrCoreset0Offset)
+        self.flagCoreset0 = self.validateCoreset0()
+        if self.flagCoreset0:
+            self.updateKSsbAndNCrbSsb(offset=0 if self.coreset0Offset <= 0 else self.coreset0Offset)
                 
     def onSsbKssbEditEditingFinished(self):
         self.ngwin.logEdit.append('-->inside onSsbKssbEditEditingFinished')
         #(1) validate CORESET0 and update n_CRB_SSB when necessary
-        if self.nrMibCoreset0Edit.text():
-            self.flagCoreset0 = self.validateCoreset0()
-            if self.flagCoreset0:
-                self.updateKSsbAndNCrbSsb(offset=0 if self.nrCoreset0Offset <= 0 else self.nrCoreset0Offset)
+        self.flagCoreset0 = self.validateCoreset0()
+        if self.flagCoreset0:
+            self.updateKSsbAndNCrbSsb(offset=0 if self.coreset0Offset <= 0 else self.coreset0Offset)
 
     def onOkBtnClicked(self):
         self.ngwin.logEdit.append('-->inside onOkBtnClicked')
