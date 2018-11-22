@@ -3640,9 +3640,10 @@ class NgNrGridUi(QDialog):
             pass
     
     def onCarrierBandCombCurrentIndexChanged(self, index):
-        self.ngwin.logEdit.append('-->inside onCarrierBandCombCurrentIndexChanged, index=%d' % index)
         if index < 0:
             return
+        
+        self.ngwin.logEdit.append('-->inside onCarrierBandCombCurrentIndexChanged, index=%d' % index)
 
         #(1) update band info
         ulBand, dlBand, self.duplexMode, self.maxL = self.nrOpBands[self.nrCarrierBandComb.currentText()]
@@ -3685,9 +3686,10 @@ class NgNrGridUi(QDialog):
             self.nrSsbGrpPresenceEdit.setEnabled(True)
 
     def onCarrierScsCombCurrentIndexChanged(self, index):
-        self.ngwin.logEdit.append('-->inside onCarrierScsCombCurrentIndexChanged, index=%d' % index)
         if index < 0:
             return
+        
+        self.ngwin.logEdit.append('-->inside onCarrierScsCombCurrentIndexChanged, index=%d' % index)
         
         #(1) update scsCommon and refScs
         self.nrMibScsCommonComb.setCurrentText(self.nrCarrierScsComb.currentText())
@@ -3713,11 +3715,13 @@ class NgNrGridUi(QDialog):
         self.flagCoreset0 = self.validateCoreset0()
         if self.flagCoreset0:
             self.updateKSsbAndNCrbSsb(offset=0 if self.coreset0Offset <= 0 else self.coreset0Offset)
+            self.flagCss0 = self.validateCss0()
 
     def onCarrierBwCombCurrentIndexChanged(self, index):
-        self.ngwin.logEdit.append('-->inside onCarrierBwCombCurrentIndexChanged, index=%d' % index)
         if index < 0:
             return
+        
+        self.ngwin.logEdit.append('-->inside onCarrierBwCombCurrentIndexChanged, index=%d' % index)
 
         #(1) update N_RB w.r.t carrierScs and carrierBw
         key = int(self.nrCarrierScsComb.currentText()[:-3])
@@ -3751,12 +3755,14 @@ class NgNrGridUi(QDialog):
         self.flagCoreset0 = self.validateCoreset0()
         if self.flagCoreset0:
             self.updateKSsbAndNCrbSsb(offset=0 if self.coreset0Offset <= 0 else self.coreset0Offset)
+            self.flagCss0 = self.validateCss0()
 
     def onSsbScsCombCurrentIndexChanged(self, index):
-        self.ngwin.logEdit.append('-->inside onSsbScsCombCurrentIndexChanged, index=%d' % index)
         if index < 0:
             return
-
+        
+        self.ngwin.logEdit.append('-->inside onSsbScsCombCurrentIndexChanged, index=%d' % index)
+        
         #(1) update SSB pattern
         ssbScs, ssbPat, ssbGscn = self.nrSsbRasters[self.nrCarrierBandComb.currentText()][self.nrSsbScsComb.currentIndex()]
         self.nrSsbPatternEdit.setText(ssbPat)
@@ -3778,11 +3784,13 @@ class NgNrGridUi(QDialog):
         self.flagCoreset0 = self.validateCoreset0()
         if self.flagCoreset0:
             self.updateKSsbAndNCrbSsb(offset=0 if self.coreset0Offset <= 0 else self.coreset0Offset)
+            self.flagCss0 = self.validateCss0()
     
     def onUssPeriodicityCombCurrentIndexChanged(self, index):
-        self.ngwin.logEdit.append('-->inside onUssPeriodicityCombCurrentIndexChanged, index=%d' % index)
         if index < 0:
             return
+        
+        self.ngwin.logEdit.append('-->inside onUssPeriodicityCombCurrentIndexChanged, index=%d' % index)
         
         period = int(self.nrUssPeriodicityComb.currentText()[2:])
         self.nrUssSlotOffsetEdit.clear()
@@ -3802,11 +3810,21 @@ class NgNrGridUi(QDialog):
             self.nrUssDurationEdit.setText(str(period-1))
             
     def validateCoreset0(self):
-        self.ngwin.logEdit.append('-->inside validateCoreset0')
         if not self.nrMibCoreset0Edit.text():
             return False
         
-        #(1) validate controlResourceSetZero
+        ssbScsSubset = [v[0] for v in self.nrSsbRasters[self.nrCarrierBandComb.currentText()]]
+        if self.freqRange == 'FR1':
+            scsSubset = self.nrScsPerBandFr1[self.nrCarrierBandComb.currentText()]
+        else:
+            scsSubset = ('60KHz', '120KHz')
+        #avoid error when changing 'operating band' from FR1 to FR2
+        if not (self.nrSsbScsComb.currentText() in ssbScsSubset and self.nrMibScsCommonComb.currentText() in scsSubset):
+            return False
+        
+        self.ngwin.logEdit.append('-->inside validateCoreset0')
+        
+        #(1) validate coresetZero
         key = self.nrSsbScsComb.currentText()[:-3] + '_' + self.nrMibScsCommonComb.currentText()[:-3] + '_' + self.nrMibCoreset0Edit.text()
         if self.freqRange == 'FR1' and self.minChBw in (5, 10):
             if not key in self.nrCoreset0Fr1MinChBw5m10m.keys():
@@ -3814,7 +3832,7 @@ class NgNrGridUi(QDialog):
                 return False 
             
             if self.nrCoreset0Fr1MinChBw5m10m[key] is None:
-                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of controlResourceSetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibCoreset0Edit.text()))
+                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of coresetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibCoreset0Edit.text()))
                 return False
             
             val = self.nrCoreset0Fr1MinChBw5m10m[key]
@@ -3824,7 +3842,7 @@ class NgNrGridUi(QDialog):
                 return False
             
             if self.nrCoreset0Fr1MinChBw40m[key] is None:
-                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of controlResourceSetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibCoreset0Edit.text()))
+                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of coresetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibCoreset0Edit.text()))
                 return False
             
             val = self.nrCoreset0Fr1MinChBw40m[key]
@@ -3834,7 +3852,7 @@ class NgNrGridUi(QDialog):
                 return False
             
             if self.nrCoreset0Fr2[key] is None:
-                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of controlResourceSetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibCoreset0Edit.text()))
+                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of coresetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibCoreset0Edit.text()))
                 return False
             
             val = self.nrCoreset0Fr2[key]
@@ -3867,20 +3885,22 @@ class NgNrGridUi(QDialog):
             if int(self.nrCarrierNumRbEdit.text()) < minBw:
                 self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid CORESET0 setting: CORESET0 numRBs=%d, offset=%d, minBw = %d, while carrier numRBs=%s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0NumRbs, self.coreset0Offset, minBw, self.nrCarrierNumRbEdit.text()))
                 return False
-        
-        #when validation passed
+            
+        #when validation passed, print CORESET0 info
+        self.ngwin.logEdit.append('[%s]<font color=green>INFO</font>: CORESET0 setting: multiplexingPattern = %d, numRBs=%d, numSymbs=%d, offset=%d.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0MultiplexingPat, self.coreset0NumRbs, self.coreset0NumSymbs, self.coreset0Offset))
         return True
     
     def validateCss0(self):
-        self.ngwin.logEdit.append('-->inside validateCss0')
         if not self.nrMibCss0Edit.text():
             return False
+        
+        self.ngwin.logEdit.append('-->inside validateCss0')
         
         if not self.flagCoreset0:
             self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid CORESET0 setting!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
             return False
         
-        if self.coreset0MultiplexingPat == '1':
+        if self.coreset0MultiplexingPat == 1:
             if self.freqRange == 'FR1':
                 return True
         
@@ -3889,11 +3909,11 @@ class NgNrGridUi(QDialog):
             else:
                 self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid CSS0 setting: searchSpaceZero can be [0, 13] for CORESET0/CSS0 with multiplexing pattern 1 and FR2!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
                 return False
-        else:   #self.coreset0MultiplexingPat = '2' or '3'
+        else:   #self.coreset0MultiplexingPat = 2/3
             if int(self.nrMibCss0Edit.text()) == 0:
                 return True
             else:
-                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid CSS0 setting: searchSpaceZero can be [0] for CORESET0/CSS0 with multiplexing pattern 2/3!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
+                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid CSS0 setting: searchSpaceZero can be [0] for CORESET0/CSS0 with multiplexing pattern %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0MultiplexingPat))
                 return False
     
     def onMibCoreset0EditEditingFinished(self):
@@ -3902,6 +3922,7 @@ class NgNrGridUi(QDialog):
         self.flagCoreset0 = self.validateCoreset0()
         if self.flagCoreset0:
             self.updateKSsbAndNCrbSsb(offset=0 if self.coreset0Offset <= 0 else self.coreset0Offset)
+            self.flagCss0 = self.validateCss0()
             
     def onMibCss0EditEditingFinished(self):
         self.ngwin.logEdit.append('-->inside onMibCss0EditEditingFinished')
