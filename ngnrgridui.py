@@ -829,11 +829,11 @@ class NgNrGridUi(QDialog):
         self.nrDci11PdschMuPdschEdit.setEnabled(False)
         
         self.nrDci11PdschActBwpLabel= QLabel('Active DL BWP[0-1]:')
-        self.nrDci11PdschActBwpEdit = QLineEdit()
+        self.nrDci11PdschActBwpEdit = QLineEdit('1')
         self.nrDci11PdschActBwpEdit.setEnabled(False)
         
         self.nrDci11PdschIndicatedBwpLabel = QLabel('Bandwidth part indicator[0-1]:')
-        self.nrDci11PdschIndicatedBwpEdit = QLineEdit()
+        self.nrDci11PdschIndicatedBwpEdit = QLineEdit('1')
         self.nrDci11PdschIndicatedBwpEdit.setEnabled(False)
         
         self.nrDci11PdschTimeAllocFieldLabel = QLabel('Time domain resource assignment[0-15]:')
@@ -987,11 +987,11 @@ class NgNrGridUi(QDialog):
         self.nrDci01PuschMuPuschEdit.setEnabled(False)
         
         self.nrDci01PuschActBwpLabel= QLabel('Active UL BWP[0-1]:')
-        self.nrDci01PuschActBwpEdit = QLineEdit()
+        self.nrDci01PuschActBwpEdit = QLineEdit('1')
         self.nrDci01PuschActBwpEdit.setEnabled(False)
         
         self.nrDci01PuschIndicatedBwpLabel = QLabel('Bandwidth part indicator[0-1]:')
-        self.nrDci01PuschIndicatedBwpEdit = QLineEdit()
+        self.nrDci01PuschIndicatedBwpEdit = QLineEdit('1')
         self.nrDci01PuschIndicatedBwpEdit.setEnabled(False)
         
         self.nrDci01PuschTimeAllocFieldLabel = QLabel('Time domain resource assignment[0-15]:')
@@ -1399,10 +1399,12 @@ class NgNrGridUi(QDialog):
         #initial dl bwp as indicated in sib1
         self.nrIniDlBwpGenericBwpIdLabel = QLabel('bwp-Id[0-3]:')
         self.nrIniDlBwpGenericBwpIdEdit = QLineEdit('0')
+        self.nrIniDlBwpGenericBwpIdEdit.setEnabled(False)
         
         self.nrIniDlBwpGenericScsLabel = QLabel('subcarrierSpacing:')
         self.nrIniDlBwpGenericScsComb = QComboBox()
         self.nrIniDlBwpGenericScsComb.addItems(['15KHz', '30KHz', '60KHz', '120KHz'])
+        self.nrIniDlBwpGenericScsComb.setEnabled(False)
         
         self.nrIniDlBwpGenericCpLabel = QLabel('cyclicPrefix:')
         self.nrIniDlBwpGenericCpComb = QComboBox()
@@ -1448,10 +1450,12 @@ class NgNrGridUi(QDialog):
         #initial ul bwp as indicated in sib1
         self.nrIniUlBwpGenericBwpIdLabel = QLabel('bwp-Id[0-3]:')
         self.nrIniUlBwpGenericBwpIdEdit = QLineEdit('0')
+        self.nrIniUlBwpGenericBwpIdEdit.setEnabled(False)
         
         self.nrIniUlBwpGenericScsLabel = QLabel('subcarrierSpacing:')
         self.nrIniUlBwpGenericScsComb = QComboBox()
         self.nrIniUlBwpGenericScsComb.addItems(['15KHz', '30KHz', '60KHz', '120KHz'])
+        self.nrIniUlBwpGenericScsComb.setEnabled(False)
         
         self.nrIniUlBwpGenericCpLabel = QLabel('cyclicPrefix:')
         self.nrIniUlBwpGenericCpComb = QComboBox()
@@ -1659,10 +1663,12 @@ class NgNrGridUi(QDialog):
         #dedicated dl bwp
         self.nrDedDlBwpGenericBwpIdLabel = QLabel('bwp-Id[0-3]:')
         self.nrDedDlBwpGenericBwpIdEdit = QLineEdit('1')
+        self.nrDedDlBwpGenericBwpIdEdit.setEnabled(False)
         
         self.nrDedDlBwpGenericScsLabel = QLabel('subcarrierSpacing:')
         self.nrDedDlBwpGenericScsComb = QComboBox()
         self.nrDedDlBwpGenericScsComb.addItems(['15KHz', '30KHz', '60KHz', '120KHz'])
+        self.nrDedDlBwpGenericScsComb.setEnabled(False)
         
         self.nrDedDlBwpGenericCpLabel = QLabel('cyclicPrefix:')
         self.nrDedDlBwpGenericCpComb = QComboBox()
@@ -1836,10 +1842,12 @@ class NgNrGridUi(QDialog):
         #dedicated ul bwp
         self.nrDedUlBwpGenericBwpIdLabel = QLabel('bwp-Id[0-3]:')
         self.nrDedUlBwpGenericBwpIdEdit = QLineEdit('1')
+        self.nrDedUlBwpGenericBwpIdEdit.setEnabled(False)
         
         self.nrDedUlBwpGenericScsLabel = QLabel('subcarrierSpacing:')
         self.nrDedUlBwpGenericScsComb = QComboBox()
         self.nrDedUlBwpGenericScsComb.addItems(['15KHz', '30KHz', '60KHz', '120KHz'])
+        self.nrDedUlBwpGenericScsComb.setEnabled(False)
         
         self.nrDedUlBwpGenericCpLabel = QLabel('cyclicPrefix:')
         self.nrDedUlBwpGenericCpComb = QComboBox()
@@ -3127,6 +3135,8 @@ class NgNrGridUi(QDialog):
         self.nrCss0AggLevelComb.currentIndexChanged[int].connect(self.onCss0AggLevelCombCurIndChanged)
         self.nrCss0NumCandidatesComb.currentIndexChanged[int].connect(self.onCss0NumCandidatesCombCurIndChanged)
         self.nrRachGenericPrachConfIdEdit.textChanged.connect(self.onPrachConfIndEditTextChanged)
+        self.nrDsrRes0PeriodicityComb.currentIndexChanged[int].connect(self.onDsrRes0PeriodicityCombCurIndChanged)
+        self.nrDsrRes1PeriodicityComb.currentIndexChanged[int].connect(self.onDsrRes1PeriodicityCombCurIndChanged)
         self.nrCarrierBandComb.setCurrentText('n77')
 
         #-->Tab Widgets
@@ -4531,9 +4541,25 @@ class NgNrGridUi(QDialog):
         
         self.ngwin.logEdit.append('-->inside onCarrierScsCombCurIndChanged, index=%d' % index)
         
-        #(1) update scsCommon and refScs
+        #(1) update scsCommon and refScs, u_PDCCH/u_PDSCH/u_PUSCH in DCIs and scs of initial/dedicated ul/dl bwp
         self.nrMibScsCommonComb.setCurrentText(self.nrCarrierScsComb.currentText())
         self.nrTddCfgRefScsComb.setCurrentText(self.nrCarrierScsComb.currentText())
+        self.nrIniDlBwpGenericScsComb.setCurrentText(self.nrCarrierScsComb.currentText())
+        self.nrIniUlBwpGenericScsComb.setCurrentText(self.nrCarrierScsComb.currentText())
+        self.nrDedDlBwpGenericScsComb.setCurrentText(self.nrCarrierScsComb.currentText())
+        self.nrDedUlBwpGenericScsComb.setCurrentText(self.nrCarrierScsComb.currentText())
+        u = {'15KHz':0, '30KHz':1, '60KHz':2, '120KHz':3, '240KHz':4}[self.nrCarrierScsComb.currentText()]
+        self.nrDci10Sib1MuPdcchEdit.setText(str(u))
+        self.nrDci10Sib1MuPdschEdit.setText(str(u))
+        self.nrDci10Msg2MuPdcchEdit.setText(str(u))
+        self.nrDci10Msg2MuPdschEdit.setText(str(u))
+        self.nrDci10Msg4MuPdcchEdit.setText(str(u))
+        self.nrDci10Msg4MuPdschEdit.setText(str(u))
+        self.nrDci11PdschMuPdcchEdit.setText(str(u))
+        self.nrDci11PdschMuPdschEdit.setText(str(u))
+        self.nrMsg3PuschMuPuschEdit.setText(str(u))
+        self.nrDci01PuschMuPdcchEdit.setText(str(u))
+        self.nrDci01PuschMuPuschEdit.setText(str(u))
 
         #(2) update transmission bandwidth
         key = self.nrCarrierBandComb.currentText() + '_' + self.nrCarrierScsComb.currentText()[:-3]
@@ -4556,6 +4582,28 @@ class NgNrGridUi(QDialog):
         if self.flagCoreset0:
             self.updateKSsbAndNCrbSsb(offset=0 if self.coreset0Offset <= 0 else self.coreset0Offset)
             self.flagCss0 = self.validateCss0()
+        
+        #(4) update SR periodicity and offset
+        srPeriodSet = {
+            '15KHz': ('sym2', 'sym6or7', 'sl1', 'sl2', 'sl4', 'sl5', 'sl8', 'sl10', 'sl16', 'sl20', 'sl40', 'sl80'),
+            '30KHz': ('sym2', 'sym6or7', 'sl1', 'sl2', 'sl4', 'sl8', 'sl10', 'sl16', 'sl20', 'sl40', 'sl80', 'sl160'),
+            '60KHz': ('sym2', 'sym6or7', 'sl1', 'sl2', 'sl4', 'sl8', 'sl16', 'sl20', 'sl40', 'sl80', 'sl160', 'sl320'),
+            '120KHz': ('sym2', 'sym6or7', 'sl1', 'sl2', 'sl4', 'sl8', 'sl16', 'sl40', 'sl80', 'sl160', 'sl320', 'sl640'),
+            }
+        self.nrDsrRes0PeriodicityComb.clear()
+        self.nrDsrRes0PeriodicityComb.addItems(srPeriodSet[self.nrCarrierScsComb.currentText()])
+        self.nrDsrRes0PeriodicityComb.setCurrentIndex(0)
+        self.nrDsrRes0OffsetLabel.setText('offset(in slots)[0]:')
+        self.nrDsrRes0OffsetEdit.setText('0')
+        self.nrDsrRes0OffsetEdit.setValidator(QIntValidator(0, 0))
+        
+        self.nrDsrRes1PeriodicityComb.clear()
+        self.nrDsrRes1PeriodicityComb.addItems(srPeriodSet[self.nrCarrierScsComb.currentText()])
+        self.nrDsrRes1PeriodicityComb.setCurrentIndex(0)
+        self.nrDsrRes1OffsetLabel.setText('offset(in slots)[0]:')
+        self.nrDsrRes1OffsetEdit.setText('0')
+        self.nrDsrRes1OffsetEdit.setValidator(QIntValidator(0, 0))
+
 
     def onCarrierBwCombCurIndChanged(self, index):
         if index < 0:
@@ -4636,7 +4684,7 @@ class NgNrGridUi(QDialog):
         self.nrUssSlotOffsetEdit.clear()
         self.nrUssDurationEdit.clear()
         if period > 1:
-            self.nrUssSlotOffsetLabel.setText('monitoringSlotOffset[0-%s]:' % str(period-1))
+            self.nrUssSlotOffsetLabel.setText('monitoringSlotOffset[0-%d]:' % (period-1))
             self.nrUssSlotOffsetEdit.setValidator(QIntValidator(0, period-1))
         else:
             self.nrUssSlotOffsetLabel.setText('monitoringSlotOffset[0]:')
@@ -4649,7 +4697,7 @@ class NgNrGridUi(QDialog):
             self.nrUssDurationEdit.setText('1')
             self.nrUssDurationEdit.setValidator(QIntValidator(1, 1))
         else:
-            self.nrUssDurationLabel.setText('duration[1-%s]:' % str(period-1))
+            self.nrUssDurationLabel.setText('duration[1-%d]:' % (period-1))
             self.nrUssDurationEdit.setText(str(period-1))
             self.nrUssDurationEdit.setValidator(QIntValidator(1, period-1))
             
@@ -4835,6 +4883,36 @@ class NgNrGridUi(QDialog):
         
         self.ngwin.logEdit.append('-->inside onPrachConfIndEditTextChanged')
         self.updateRachConfig()
+    
+    def onDsrRes0PeriodicityCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onDsrRes0PeriodicityCombCurIndChanged, index=%d' % index)
+        if self.nrDsrRes0PeriodicityComb.currentText() in ('sym2', 'sym6or7', 'sl1'):
+            self.nrDsrRes0OffsetLabel.setText('Offset(in slots)[0]:')
+            self.nrDsrRes0OffsetEdit.setText('0')
+            self.nrDsrRes0OffsetEdit.setValidator(QIntValidator(0, 0))
+        else:
+            period = int(self.nrDsrRes0PeriodicityComb.currentText()[2:])
+            self.nrDsrRes0OffsetLabel.setText('Offset(in slots)[0-%d]:' % (period-1))
+            self.nrDsrRes0OffsetEdit.setText('0')
+            self.nrDsrRes0OffsetEdit.setValidator(QIntValidator(0, period-1))
+            
+    def onDsrRes1PeriodicityCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onDsrRes1PeriodicityCombCurIndChanged, index=%d' % index)
+        if self.nrDsrRes1PeriodicityComb.currentText() in ('sym2', 'sym6or7', 'sl1'):
+            self.nrDsrRes1OffsetLabel.setText('Offset(in slots)[0]:')
+            self.nrDsrRes1OffsetEdit.setText('0')
+            self.nrDsrRes1OffsetEdit.setValidator(QIntValidator(0, 0))
+        else:
+            period = int(self.nrDsrRes1PeriodicityComb.currentText()[2:])
+            self.nrDsrRes1OffsetLabel.setText('Offset(in slots)[0-%d]:' % (period-1))
+            self.nrDsrRes1OffsetEdit.setText('0')
+            self.nrDsrRes1OffsetEdit.setValidator(QIntValidator(0, period-1))
             
 
     def onOkBtnClicked(self):
