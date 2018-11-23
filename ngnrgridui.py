@@ -11,6 +11,7 @@ Change History:
 '''
 
 import time
+import math
 from collections import OrderedDict
 from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QComboBox, QPushButton, QGroupBox, QTabWidget, QWidget, QScrollArea
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QGridLayout
@@ -1412,15 +1413,13 @@ class NgNrGridUi(QDialog):
         self.nrIniDlBwpGenericCpComb.setCurrentIndex(0)
         
         self.nrIniDlBwpGenericLocAndBwLabel = QLabel('locationAndBandwidth[0-37949]:')
-        self.nrIniDlBwpGenericLocAndBwEdit = QLineEdit()
+        self.nrIniDlBwpGenericLocAndBwEdit = QLineEdit('0')
         
         self.nrIniDlBwpGenericRbStartLabel = QLabel('RB_start:')
-        self.nrIniDlBwpGenericRbStartEdit = QLineEdit()
-        self.nrIniDlBwpGenericRbStartEdit.setEnabled(False)
+        self.nrIniDlBwpGenericRbStartEdit = QLineEdit('0')
         
         self.nrIniDlBwpGenericLRbsLabel = QLabel('L_RBs:')
-        self.nrIniDlBwpGenericLRbsEdit = QLineEdit()
-        self.nrIniDlBwpGenericLRbsEdit.setEnabled(False)
+        self.nrIniDlBwpGenericLRbsEdit = QLineEdit('1')
         
         iniDlBwpSib1GrpBox = QGroupBox()
         iniDlBwpSib1GrpBox.setTitle('Initial active DL BWP(SIB1)')
@@ -3137,6 +3136,9 @@ class NgNrGridUi(QDialog):
         self.nrRachGenericPrachConfIdEdit.textChanged.connect(self.onPrachConfIndEditTextChanged)
         self.nrDsrRes0PeriodicityComb.currentIndexChanged[int].connect(self.onDsrRes0PeriodicityCombCurIndChanged)
         self.nrDsrRes1PeriodicityComb.currentIndexChanged[int].connect(self.onDsrRes1PeriodicityCombCurIndChanged)
+        self.nrIniDlBwpGenericLocAndBwEdit.textChanged.connect(self.onIniDlBwpLocAndBwEditTextChanged)
+        self.nrIniDlBwpGenericLRbsEdit.textChanged.connect(self.onIniDlBwpLRBsEditTextChanged)
+        self.nrIniDlBwpGenericRbStartEdit.textChanged.connect(self.onIniDlBwpRbStartEditTextChanged)
         self.nrCarrierBandComb.setCurrentText('n77')
 
         #-->Tab Widgets
@@ -4913,9 +4915,83 @@ class NgNrGridUi(QDialog):
             self.nrDsrRes1OffsetLabel.setText('Offset(in slots)[0-%d]:' % (period-1))
             self.nrDsrRes1OffsetEdit.setText('0')
             self.nrDsrRes1OffsetEdit.setValidator(QIntValidator(0, period-1))
+    
+    def onIniDlBwpLocAndBwEditTextChanged(self, text):
+        if not text:
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onIniDlBwpLocAndBwEditTextChanged')
+        riv = int(self.nrIniDlBwpGenericLocAndBwEdit.text())
+        L_RBs, RB_start= self.parseRiv(riv, 275)
+        if L_RBs is not None and RB_start is not None: 
+            self.nrIniDlBwpGenericLRbsEdit.setText(str(L_RBs))
+            self.nrIniDlBwpGenericRbStartEdit.setText(str(RB_start))
+        else:
+            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid RIV = %d!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv)) 
+            self.nrIniDlBwpGenericLRbsEdit.clear()
+            self.nrIniDlBwpGenericRbStartEdit.clear()
             
+    
+    def onIniDlBwpLRBsEditTextChanged(self, text):
+        if not self.nrIniDlBwpGenericLRbsEdit.text() or not self.nrIniDlBwpGenericRbStartEdit.text():
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onIniDlBwpLRBsEditTextChanged')
+        L_RBs = int(self.nrIniDlBwpGenericLRbsEdit.text())
+        RB_start = int(self.nrIniDlBwpGenericRbStartEdit.text())
+        riv = self.makeRiv(L_RBs, RB_start, 275)
+        if riv is not None and riv in range(37950):
+            self.nrIniDlBwpGenericLocAndBwEdit.setText(str(riv))
+        else:
+            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid RIV = %s(with L_RBs = %s, RB_start=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
+            self.nrIniDlBwpGenericLocAndBwEdit.clear()
+    
+    def onIniDlBwpRbStartEditTextChanged(self, text):
+        if not self.nrIniDlBwpGenericLRbsEdit.text() or not self.nrIniDlBwpGenericRbStartEdit.text():
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onIniDlBwpRbStartEditTextChanged')
+        L_RBs = int(self.nrIniDlBwpGenericLRbsEdit.text())
+        RB_start = int(self.nrIniDlBwpGenericRbStartEdit.text())
+        riv = self.makeRiv(L_RBs, RB_start, 275)
+        if riv is not None and riv in range(37950):
+            self.nrIniDlBwpGenericLocAndBwEdit.setText(str(riv))
+        else:
+            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid RIV = %s(with L_RBs = %s, RB_start=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
+            self.nrIniDlBwpGenericLocAndBwEdit.clear()
 
     def onOkBtnClicked(self):
         self.ngwin.logEdit.append('-->inside onOkBtnClicked')
         #TODO
         self.accept()
+    
+    def parseRiv(self, riv, N_BWP_Size):
+        div = riv // N_BWP_Size
+        rem = riv % N_BWP_Size
+        
+        L_RBs = [div + 1, N_BWP_Size + 1 - div]
+        RB_start = [rem, N_BWP_Size - 1 - rem]
+        #self.ngwin.logEdit.append('Info: RIV = %d, L_RBs = [%d,%d], RB_start = [%d,%d], N_BWP_Size = %d.' % (riv, L_RBs[0], L_RBs[1], RB_start[0], RB_start[1], N_BWP_Size))
+        if L_RBs[0] >= 1 and L_RBs[0] <= (N_BWP_Size - RB_start[0]) and L_RBs[0] <= math.floor(N_BWP_Size / 2):
+            return (L_RBs[0], RB_start[0])
+        elif L_RBs[1] >= 1 and L_RBs[1] <= (N_BWP_Size - RB_start[1]) and L_RBs[1] > math.floor(N_BWP_Size / 2):
+            return (L_RBs[1], RB_start[1])
+        else:
+            #invalid RIV
+            return (None, None)
+    
+    def makeRiv(self, L_RBs, RB_start, N_BWP_Size):
+        if L_RBs < 1 or L_RBs > (N_BWP_Size - RB_start):
+            #self.ngwin.logEdit.append('ERROR: L_RBs = %d, RB_start = %d, N_BWP_Size = %d.' % (L_RBs, RB_start, N_BWP_Size))
+            return None 
+        
+        if (L_RBs - 1) <= math.floor(N_BWP_Size / 2):
+            riv = N_BWP_Size * (L_RBs - 1) + RB_start
+        else:
+            riv = N_BWP_Size * (N_BWP_Size - L_RBs + 1) + (N_BWP_Size - 1 - RB_start)
+        
+        return riv
+            
+            
+        
+        
