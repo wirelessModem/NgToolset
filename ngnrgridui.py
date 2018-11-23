@@ -1414,6 +1414,7 @@ class NgNrGridUi(QDialog):
         
         self.nrIniDlBwpGenericLocAndBwLabel = QLabel('locationAndBandwidth[0-37949]:')
         self.nrIniDlBwpGenericLocAndBwEdit = QLineEdit('0')
+        self.nrIniDlBwpGenericLocAndBwEdit.setValidator(QIntValidator(0, 37949))
         
         self.nrIniDlBwpGenericRbStartLabel = QLabel('RB_start:')
         self.nrIniDlBwpGenericRbStartEdit = QLineEdit('0')
@@ -1462,15 +1463,14 @@ class NgNrGridUi(QDialog):
         self.nrIniUlBwpGenericCpComb.setCurrentIndex(0)
         
         self.nrIniUlBwpGenericLocAndBwLabel = QLabel('locationAndBandwidth[0-37949]:')
-        self.nrIniUlBwpGenericLocAndBwEdit = QLineEdit()
+        self.nrIniUlBwpGenericLocAndBwEdit = QLineEdit('0')
+        self.nrIniUlBwpGenericLocAndBwEdit.setValidator(QIntValidator(0, 37949))
         
         self.nrIniUlBwpGenericRbStartLabel = QLabel('RB_start:')
-        self.nrIniUlBwpGenericRbStartEdit = QLineEdit()
-        self.nrIniUlBwpGenericRbStartEdit.setEnabled(False)
+        self.nrIniUlBwpGenericRbStartEdit = QLineEdit('0')
         
         self.nrIniUlBwpGenericLRbsLabel = QLabel('L_RBs:')
-        self.nrIniUlBwpGenericLRbsEdit = QLineEdit()
-        self.nrIniUlBwpGenericLRbsEdit.setEnabled(False)
+        self.nrIniUlBwpGenericLRbsEdit = QLineEdit('1')
         
         iniUlBwpSib1GrpBox = QGroupBox()
         iniUlBwpSib1GrpBox.setTitle('Initial active UL BWP(SIB1)')
@@ -1675,15 +1675,14 @@ class NgNrGridUi(QDialog):
         self.nrDedDlBwpGenericCpComb.setCurrentIndex(0)
         
         self.nrDedDlBwpGenericLocAndBwLabel = QLabel('locationAndBandwidth[0-37949]:')
-        self.nrDedDlBwpGenericLocAndBwEdit = QLineEdit()
+        self.nrDedDlBwpGenericLocAndBwEdit = QLineEdit('0')
+        self.nrDedDlBwpGenericLocAndBwEdit.setValidator(QIntValidator(0, 37949))
         
         self.nrDedDlBwpGenericRbStartLabel = QLabel('RB_start:')
-        self.nrDedDlBwpGenericRbStartEdit = QLineEdit()
-        self.nrDedDlBwpGenericRbStartEdit.setEnabled(False)
+        self.nrDedDlBwpGenericRbStartEdit = QLineEdit('0')
         
         self.nrDedDlBwpGenericLRbsLabel = QLabel('L_RBs:')
-        self.nrDedDlBwpGenericLRbsEdit = QLineEdit()
-        self.nrDedDlBwpGenericLRbsEdit.setEnabled(False)
+        self.nrDedDlBwpGenericLRbsEdit = QLineEdit('1')
         
         dedDlBwpGrpBox = QGroupBox()
         dedDlBwpGrpBox.setTitle('Dedicated active DL BWP')
@@ -1854,16 +1853,14 @@ class NgNrGridUi(QDialog):
         self.nrDedUlBwpGenericCpComb.setCurrentIndex(0)
         
         self.nrDedUlBwpGenericLocAndBwLabel = QLabel('locationAndBandwidth[0-37949]:')
-        self.nrDedUlBwpGenericLocAndBwEdit = QLineEdit()
+        self.nrDedUlBwpGenericLocAndBwEdit = QLineEdit('0')
         self.nrDedUlBwpGenericLocAndBwEdit.setValidator(QIntValidator(0, 37949))
         
         self.nrDedUlBwpGenericRbStartLabel = QLabel('RB_start:')
-        self.nrDedUlBwpGenericRbStartEdit = QLineEdit()
-        self.nrDedUlBwpGenericRbStartEdit.setEnabled(False)
+        self.nrDedUlBwpGenericRbStartEdit = QLineEdit('0')
         
         self.nrDedUlBwpGenericLRbsLabel = QLabel('L_RBs:')
-        self.nrDedUlBwpGenericLRbsEdit = QLineEdit()
-        self.nrDedUlBwpGenericLRbsEdit.setEnabled(False)
+        self.nrDedUlBwpGenericLRbsEdit = QLineEdit('1')
         
         dedUlBwpGrpBox = QGroupBox()
         dedUlBwpGrpBox.setTitle('Dedicated active UL BWP')
@@ -3136,9 +3133,23 @@ class NgNrGridUi(QDialog):
         self.nrRachGenericPrachConfIdEdit.textChanged.connect(self.onPrachConfIndEditTextChanged)
         self.nrDsrRes0PeriodicityComb.currentIndexChanged[int].connect(self.onDsrRes0PeriodicityCombCurIndChanged)
         self.nrDsrRes1PeriodicityComb.currentIndexChanged[int].connect(self.onDsrRes1PeriodicityCombCurIndChanged)
+        #---->signal-slot for initial dl bwp
         self.nrIniDlBwpGenericLocAndBwEdit.textChanged.connect(self.onIniDlBwpLocAndBwEditTextChanged)
-        self.nrIniDlBwpGenericLRbsEdit.textChanged.connect(self.onIniDlBwpLRBsEditTextChanged)
-        self.nrIniDlBwpGenericRbStartEdit.textChanged.connect(self.onIniDlBwpRbStartEditTextChanged)
+        self.nrIniDlBwpGenericLRbsEdit.textChanged.connect(self.onIniDlBwpLRBsOrRBStartEditTextChanged)
+        self.nrIniDlBwpGenericRbStartEdit.textChanged.connect(self.onIniDlBwpLRBsOrRBStartEditTextChanged)
+        #---->signal-slot for initial ul bwp
+        self.nrIniUlBwpGenericLocAndBwEdit.textChanged.connect(self.onIniUlBwpLocAndBwEditTextChanged)
+        self.nrIniUlBwpGenericLRbsEdit.textChanged.connect(self.onIniUlBwpLRBsOrRBStartEditTextChanged)
+        self.nrIniUlBwpGenericRbStartEdit.textChanged.connect(self.onIniUlBwpLRBsOrRBStartEditTextChanged)
+        #---->signal-slot for dedicated dl bwp
+        self.nrDedDlBwpGenericLocAndBwEdit.textChanged.connect(self.onDedDlBwpLocAndBwEditTextChanged)
+        self.nrDedDlBwpGenericLRbsEdit.textChanged.connect(self.onDedDlBwpLRBsOrRBStartEditTextChanged)
+        self.nrDedDlBwpGenericRbStartEdit.textChanged.connect(self.onDedDlBwpLRBsOrRBStartEditTextChanged)
+        #---->signal-slot for dedicated ul bwp
+        self.nrDedUlBwpGenericLocAndBwEdit.textChanged.connect(self.onDedUlBwpLocAndBwEditTextChanged)
+        self.nrDedUlBwpGenericLRbsEdit.textChanged.connect(self.onDedUlBwpLRBsOrRBStartEditTextChanged)
+        self.nrDedUlBwpGenericRbStartEdit.textChanged.connect(self.onDedUlBwpLRBsOrRBStartEditTextChanged)
+        #---->I am THE driver!
         self.nrCarrierBandComb.setCurrentText('n77')
 
         #-->Tab Widgets
@@ -4646,6 +4657,32 @@ class NgNrGridUi(QDialog):
         if self.flagCoreset0:
             self.updateKSsbAndNCrbSsb(offset=0 if self.coreset0Offset <= 0 else self.coreset0Offset)
             self.flagCss0 = self.validateCss0()
+        
+        #(5) update 'L_RBs' and 'RB_start' labels for initial/dedicated ul/dl bwp tab
+        self.nrIniDlBwpGenericRbStartLabel.setText('RB_start[0-%d]:' % (numRb -1))
+        self.nrIniDlBwpGenericLRbsLabel.setText('L_RBs[1-%d]:' % numRb)
+        self.nrIniDlBwpGenericRbStartEdit.setText('0')
+        self.nrIniDlBwpGenericLRbsEdit.setText(str(numRb))
+        self.nrIniDlBwpGenericRbStartEdit.setValidator(QIntValidator(0, numRb-1))
+        self.nrIniDlBwpGenericLRbsEdit.setValidator(QIntValidator(1, numRb))
+        self.nrIniUlBwpGenericRbStartLabel.setText('RB_start[0-%d]:' % (numRb -1))
+        self.nrIniUlBwpGenericLRbsLabel.setText('L_RBs[1-%d]:' % numRb)
+        self.nrIniUlBwpGenericRbStartEdit.setText('0')
+        self.nrIniUlBwpGenericLRbsEdit.setText(str(numRb))
+        self.nrIniUlBwpGenericRbStartEdit.setValidator(QIntValidator(0, numRb-1))
+        self.nrIniUlBwpGenericLRbsEdit.setValidator(QIntValidator(1, numRb))
+        self.nrDedDlBwpGenericRbStartLabel.setText('RB_start[0-%d]:' % (numRb -1))
+        self.nrDedDlBwpGenericLRbsLabel.setText('L_RBs[1-%d]:' % numRb)
+        self.nrDedDlBwpGenericRbStartEdit.setText('0')
+        self.nrDedDlBwpGenericLRbsEdit.setText(str(numRb))
+        self.nrDedDlBwpGenericRbStartEdit.setValidator(QIntValidator(0, numRb-1))
+        self.nrDedDlBwpGenericLRbsEdit.setValidator(QIntValidator(1, numRb))
+        self.nrDedUlBwpGenericRbStartLabel.setText('RB_start[0-%d]:' % (numRb -1))
+        self.nrDedUlBwpGenericLRbsLabel.setText('L_RBs[1-%d]:' % numRb)
+        self.nrDedUlBwpGenericRbStartEdit.setText('0')
+        self.nrDedUlBwpGenericLRbsEdit.setText(str(numRb))
+        self.nrDedUlBwpGenericRbStartEdit.setValidator(QIntValidator(0, numRb-1))
+        self.nrDedUlBwpGenericLRbsEdit.setValidator(QIntValidator(1, numRb))
 
     def onSsbScsCombCurIndChanged(self, index):
         if index < 0:
@@ -4753,7 +4790,7 @@ class NgNrGridUi(QDialog):
         else:
             return False
             
-        #(2) validate CORESET0 bw against carrier bw
+        #(2) validate CORESET0 bw against carrier bandwidth
         self.coreset0MultiplexingPat, self.coreset0NumRbs, self.coreset0NumSymbs, self.coreset0OffsetList = val
         if int(self.nrCarrierNumRbEdit.text()) < self.coreset0NumRbs:
             self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid CORESET0 setting: CORESET0 numRBs=%d, while carrier numRBs=%s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0NumRbs, self.nrCarrierNumRbEdit.text()))
@@ -4924,6 +4961,13 @@ class NgNrGridUi(QDialog):
         riv = int(self.nrIniDlBwpGenericLocAndBwEdit.text())
         L_RBs, RB_start= self.parseRiv(riv, 275)
         if L_RBs is not None and RB_start is not None: 
+            numRb = int(self.nrCarrierNumRbEdit.text())
+            if L_RBs < 1 or L_RBs > (numRb - RB_start):
+                self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRb))
+                self.nrIniDlBwpGenericLRbsEdit.clear()
+                self.nrIniDlBwpGenericRbStartEdit.clear()
+                return
+            
             self.nrIniDlBwpGenericLRbsEdit.setText(str(L_RBs))
             self.nrIniDlBwpGenericRbStartEdit.setText(str(RB_start))
         else:
@@ -4932,33 +4976,150 @@ class NgNrGridUi(QDialog):
             self.nrIniDlBwpGenericRbStartEdit.clear()
             
     
-    def onIniDlBwpLRBsEditTextChanged(self, text):
+    def onIniDlBwpLRBsOrRBStartEditTextChanged(self, text):
         if not self.nrIniDlBwpGenericLRbsEdit.text() or not self.nrIniDlBwpGenericRbStartEdit.text():
             return
         
-        #self.ngwin.logEdit.append('-->inside onIniDlBwpLRBsEditTextChanged')
+        #self.ngwin.logEdit.append('-->inside onIniDlBwpLRBsOrRBStartEditTextChanged')
         L_RBs = int(self.nrIniDlBwpGenericLRbsEdit.text())
         RB_start = int(self.nrIniDlBwpGenericRbStartEdit.text())
+        numRb = int(self.nrCarrierNumRbEdit.text())
+        if L_RBs < 1 or L_RBs > (numRb - RB_start):
+            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRb))
+            return
+        
         riv = self.makeRiv(L_RBs, RB_start, 275)
         if riv is not None and riv in range(37950):
             self.nrIniDlBwpGenericLocAndBwEdit.setText(str(riv))
         else:
-            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid RIV = %s(with L_RBs = %s, RB_start=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
+            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
             self.nrIniDlBwpGenericLocAndBwEdit.clear()
     
-    def onIniDlBwpRbStartEditTextChanged(self, text):
-        if not self.nrIniDlBwpGenericLRbsEdit.text() or not self.nrIniDlBwpGenericRbStartEdit.text():
+    def onIniUlBwpLocAndBwEditTextChanged(self, text):
+        if not text:
             return
         
-        #self.ngwin.logEdit.append('-->inside onIniDlBwpRbStartEditTextChanged')
-        L_RBs = int(self.nrIniDlBwpGenericLRbsEdit.text())
-        RB_start = int(self.nrIniDlBwpGenericRbStartEdit.text())
+        #self.ngwin.logEdit.append('-->inside onIniUlBwpLocAndBwEditTextChanged')
+        riv = int(self.nrIniUlBwpGenericLocAndBwEdit.text())
+        L_RBs, RB_start= self.parseRiv(riv, 275)
+        if L_RBs is not None and RB_start is not None: 
+            numRb = int(self.nrCarrierNumRbEdit.text())
+            if L_RBs < 1 or L_RBs > (numRb - RB_start):
+                self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRb))
+                self.nrIniUlBwpGenericLRbsEdit.clear()
+                self.nrIniUlBwpGenericRbStartEdit.clear()
+                return
+            
+            self.nrIniUlBwpGenericLRbsEdit.setText(str(L_RBs))
+            self.nrIniUlBwpGenericRbStartEdit.setText(str(RB_start))
+        else:
+            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid RIV = %d!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv)) 
+            self.nrIniUlBwpGenericLRbsEdit.clear()
+            self.nrIniUlBwpGenericRbStartEdit.clear()
+            
+    
+    def onIniUlBwpLRBsOrRBStartEditTextChanged(self, text):
+        if not self.nrIniUlBwpGenericLRbsEdit.text() or not self.nrIniUlBwpGenericRbStartEdit.text():
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onIniUlBwpLRBsOrRBStartEditTextChanged')
+        L_RBs = int(self.nrIniUlBwpGenericLRbsEdit.text())
+        RB_start = int(self.nrIniUlBwpGenericRbStartEdit.text())
+        numRb = int(self.nrCarrierNumRbEdit.text())
+        if L_RBs < 1 or L_RBs > (numRb - RB_start):
+            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRb))
+            return
+        
         riv = self.makeRiv(L_RBs, RB_start, 275)
         if riv is not None and riv in range(37950):
-            self.nrIniDlBwpGenericLocAndBwEdit.setText(str(riv))
+            self.nrIniUlBwpGenericLocAndBwEdit.setText(str(riv))
         else:
-            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid RIV = %s(with L_RBs = %s, RB_start=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
-            self.nrIniDlBwpGenericLocAndBwEdit.clear()
+            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
+            self.nrIniUlBwpGenericLocAndBwEdit.clear()
+    
+    def onDedDlBwpLocAndBwEditTextChanged(self, text):
+        if not text:
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDedDlBwpLocAndBwEditTextChanged')
+        riv = int(self.nrDedDlBwpGenericLocAndBwEdit.text())
+        L_RBs, RB_start= self.parseRiv(riv, 275)
+        if L_RBs is not None and RB_start is not None: 
+            numRb = int(self.nrCarrierNumRbEdit.text())
+            if L_RBs < 1 or L_RBs > (numRb - RB_start):
+                self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRb))
+                self.nrDedDlBwpGenericLRbsEdit.clear()
+                self.nrDedDlBwpGenericRbStartEdit.clear()
+                return
+            
+            self.nrDedDlBwpGenericLRbsEdit.setText(str(L_RBs))
+            self.nrDedDlBwpGenericRbStartEdit.setText(str(RB_start))
+        else:
+            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid RIV = %d!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv)) 
+            self.nrDedDlBwpGenericLRbsEdit.clear()
+            self.nrDedDlBwpGenericRbStartEdit.clear()
+            
+    
+    def onDedDlBwpLRBsOrRBStartEditTextChanged(self, text):
+        if not self.nrDedDlBwpGenericLRbsEdit.text() or not self.nrDedDlBwpGenericRbStartEdit.text():
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDedDlBwpLRBsOrRBStartEditTextChanged')
+        L_RBs = int(self.nrDedDlBwpGenericLRbsEdit.text())
+        RB_start = int(self.nrDedDlBwpGenericRbStartEdit.text())
+        numRb = int(self.nrCarrierNumRbEdit.text())
+        if L_RBs < 1 or L_RBs > (numRb - RB_start):
+            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRb))
+            return
+        
+        riv = self.makeRiv(L_RBs, RB_start, 275)
+        if riv is not None and riv in range(37950):
+            self.nrDedDlBwpGenericLocAndBwEdit.setText(str(riv))
+        else:
+            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
+            self.nrDedDlBwpGenericLocAndBwEdit.clear()
+    
+    def onDedUlBwpLocAndBwEditTextChanged(self, text):
+        if not text:
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDedUlBwpLocAndBwEditTextChanged')
+        riv = int(self.nrDedUlBwpGenericLocAndBwEdit.text())
+        L_RBs, RB_start= self.parseRiv(riv, 275)
+        if L_RBs is not None and RB_start is not None: 
+            numRb = int(self.nrCarrierNumRbEdit.text())
+            if L_RBs < 1 or L_RBs > (numRb - RB_start):
+                self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRb))
+                self.nrDedUlBwpGenericLRbsEdit.clear()
+                self.nrIniUlBwpGenericRbStartEdit.clear()
+                return
+            
+            self.nrDedUlBwpGenericLRbsEdit.setText(str(L_RBs))
+            self.nrDedUlBwpGenericRbStartEdit.setText(str(RB_start))
+        else:
+            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid RIV = %d!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv)) 
+            self.nrDedUlBwpGenericLRbsEdit.clear()
+            self.nrDedUlBwpGenericRbStartEdit.clear()
+            
+    
+    def onDedUlBwpLRBsOrRBStartEditTextChanged(self, text):
+        if not self.nrDedUlBwpGenericLRbsEdit.text() or not self.nrDedUlBwpGenericRbStartEdit.text():
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDedUlBwpLRBsOrRBStartEditTextChanged')
+        L_RBs = int(self.nrDedUlBwpGenericLRbsEdit.text())
+        RB_start = int(self.nrDedUlBwpGenericRbStartEdit.text())
+        numRb = int(self.nrCarrierNumRbEdit.text())
+        if L_RBs < 1 or L_RBs > (numRb - RB_start):
+            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRb))
+            return
+        
+        riv = self.makeRiv(L_RBs, RB_start, 275)
+        if riv is not None and riv in range(37950):
+            self.nrDedUlBwpGenericLocAndBwEdit.setText(str(riv))
+        else:
+            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
+            self.nrDedUlBwpGenericLocAndBwEdit.clear()
 
     def onOkBtnClicked(self):
         self.ngwin.logEdit.append('-->inside onOkBtnClicked')
