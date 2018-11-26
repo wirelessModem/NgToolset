@@ -5229,8 +5229,9 @@ class NgNrGridUi(QDialog):
             self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Length of monitoringSymbolsWithinSlot for USS with CORESET1 must be 14.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
             return
         
-        text = self.nrUssFirstSymbsEdit.text()[:7] + self.nrUssFirstSymbsEdit.text()[-7:]
+        self.ngwin.logEdit.append('-->inside validateUssFirstSymbs')
         
+        text = self.nrUssFirstSymbsEdit.text()[:7] + self.nrUssFirstSymbsEdit.text()[-7:]
         #refer to 3GPP 38.213 10.1
         #If the higher layer parameter monitoringSymbolsWithinSlot indicates to a UE to monitor PDCCH in a subset of up to three consecutive symbols that are same in every slot where the UE monitors PDCCH for all search space sets, the UE does not expect to be configured with a PDCCH subcarrier spacing other than 15 kHz if the subset includes at least one symbol after the third symbol.
         subText = text[2:]
@@ -5265,29 +5266,29 @@ class NgNrGridUi(QDialog):
         #TODO
         self.accept()
     
-    def parseRiv(self, riv, N_BWP_Size):
-        div = riv // N_BWP_Size
-        rem = riv % N_BWP_Size
+    def parseRiv(self, riv, N_BWP_size):
+        div = riv // N_BWP_size
+        rem = riv % N_BWP_size
         
-        L_RBs = [div + 1, N_BWP_Size + 1 - div]
-        RB_start = [rem, N_BWP_Size - 1 - rem]
-        #self.ngwin.logEdit.append('Info: RIV = %d, L_RBs = [%d,%d], RB_start = [%d,%d], N_BWP_Size = %d.' % (riv, L_RBs[0], L_RBs[1], RB_start[0], RB_start[1], N_BWP_Size))
-        if L_RBs[0] >= 1 and L_RBs[0] <= (N_BWP_Size - RB_start[0]) and L_RBs[0] <= math.floor(N_BWP_Size / 2):
+        L_RBs = [div + 1, N_BWP_size + 1 - div]
+        RB_start = [rem, N_BWP_size - 1 - rem]
+        #self.ngwin.logEdit.append('Info: RIV = %d, L_RBs = [%d,%d], RB_start = [%d,%d], N_BWP_size = %d.' % (riv, L_RBs[0], L_RBs[1], RB_start[0], RB_start[1], N_BWP_size))
+        if L_RBs[0] >= 1 and L_RBs[0] <= (N_BWP_size - RB_start[0]) and L_RBs[0] <= math.floor(N_BWP_size / 2):
             return (L_RBs[0], RB_start[0])
-        elif L_RBs[1] >= 1 and L_RBs[1] <= (N_BWP_Size - RB_start[1]) and L_RBs[1] > math.floor(N_BWP_Size / 2):
+        elif L_RBs[1] >= 1 and L_RBs[1] <= (N_BWP_size - RB_start[1]) and L_RBs[1] > math.floor(N_BWP_size / 2):
             return (L_RBs[1], RB_start[1])
         else:
             #invalid RIV
             return (None, None)
     
-    def makeRiv(self, L_RBs, RB_start, N_BWP_Size):
-        if L_RBs < 1 or L_RBs > (N_BWP_Size - RB_start):
-            #self.ngwin.logEdit.append('ERROR: L_RBs = %d, RB_start = %d, N_BWP_Size = %d.' % (L_RBs, RB_start, N_BWP_Size))
+    def makeRiv(self, L_RBs, RB_start, N_BWP_size):
+        if L_RBs < 1 or L_RBs > (N_BWP_size - RB_start):
+            #self.ngwin.logEdit.append('ERROR: L_RBs = %d, RB_start = %d, N_BWP_size = %d.' % (L_RBs, RB_start, N_BWP_size))
             return None 
         
-        if (L_RBs - 1) <= math.floor(N_BWP_Size / 2):
-            riv = N_BWP_Size * (L_RBs - 1) + RB_start
+        if (L_RBs - 1) <= math.floor(N_BWP_size / 2):
+            riv = N_BWP_size * (L_RBs - 1) + RB_start
         else:
-            riv = N_BWP_Size * (N_BWP_Size - L_RBs + 1) + (N_BWP_Size - 1 - RB_start)
+            riv = N_BWP_size * (N_BWP_size - L_RBs + 1) + (N_BWP_size - 1 - RB_start)
         
         return riv
