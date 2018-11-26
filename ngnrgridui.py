@@ -15,8 +15,8 @@ import math
 from collections import OrderedDict
 from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QComboBox, QPushButton, QGroupBox, QTabWidget, QWidget, QScrollArea
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QGridLayout
-from PyQt5.QtGui import QColor, QIntValidator
-from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor, QIntValidator, QRegExpValidator
+from PyQt5.QtCore import Qt, QRegExp
 
 class NgNrGridUi(QDialog):
     def __init__(self, ngwin):
@@ -116,10 +116,12 @@ class NgNrGridUi(QDialog):
         #---->(2.1) SSB configurations
         self.nrSsbInOneGrpLabel = QLabel('inOneGroup(ssb-PositionsInBurst):')
         self.nrSsbInOneGrpEdit = QLineEdit()
+        self.nrSsbInOneGrpEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{8}')))
         self.nrSsbInOneGrpEdit.setPlaceholderText('11111111')
         
         self.nrSsbGrpPresenceLabel = QLabel('groupPresence(ssb-PositionsInBurst):')
         self.nrSsbGrpPresenceEdit = QLineEdit()
+        self.nrSsbGrpPresenceEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{8}')))
         self.nrSsbGrpPresenceEdit.setPlaceholderText('11111111')
         
         self.nrSsbPeriodicityLabel = QLabel('ssb-PeriodicityServingCell:')
@@ -316,6 +318,7 @@ class NgNrGridUi(QDialog):
         self.nrCoreset1FreqResourcesLabel = QLabel('frequencyDomainResources:')
         self.nrCoreset1FreqResourcesEdit = QLineEdit()
         self.nrCoreset1FreqResourcesEdit.setFixedWidth(52 * self.fontMetrics().width('0'))
+        self.nrCoreset1FreqResourcesEdit.setValidator(QRegExpValidator(QRegExp('([0-1]{8},){5}[0-1]{5}')))
         self.nrCoreset1FreqResourcesEdit.setPlaceholderText('00000000,00000000,00000000,00000000,00000000,00000')
         
         self.nrCoreset1DurationLabel = QLabel('duration:')
@@ -330,7 +333,7 @@ class NgNrGridUi(QDialog):
         
         self.nrCoreset1RegBundleSizeLabel = QLabel('reg-BundleSize(L):')
         self.nrCoreset1RegBundleSizeComb = QComboBox()
-        self.nrCoreset1RegBundleSizeComb.addItems(['n2', 'n3', 'n6'])
+        self.nrCoreset1RegBundleSizeComb.addItems(['n2', 'n6'])
         self.nrCoreset1RegBundleSizeComb.setCurrentIndex(0)
         
         self.nrCoreset1InterleaverSizeLabel = QLabel('interleaverSize(R):')
@@ -383,8 +386,8 @@ class NgNrGridUi(QDialog):
         self.nrUssDurationEdit = QLineEdit('1')
         
         self.nrUssFirstSymbsLabel = QLabel('monitoringSymbolsWithinSlot:')
-        self.nrUssFirstSymbsEdit = QLineEdit()
-        self.nrUssFirstSymbsEdit.setPlaceholderText('1111111,1111111')
+        self.nrUssFirstSymbsEdit = QLineEdit('1010101,0101010')
+        self.nrUssFirstSymbsEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{7},[0-1]{7}')))
         
         self.nrUssAggLevelLabel = QLabel('aggregationLevel:')
         self.nrUssAggLevelComb = QComboBox()
@@ -3149,6 +3152,11 @@ class NgNrGridUi(QDialog):
         self.nrDedUlBwpGenericLocAndBwEdit.textChanged.connect(self.onDedUlBwpLocAndBwEditTextChanged)
         self.nrDedUlBwpGenericLRbsEdit.textChanged.connect(self.onDedUlBwpLRBsOrRBStartEditTextChanged)
         self.nrDedUlBwpGenericRbStartEdit.textChanged.connect(self.onDedUlBwpLRBsOrRBStartEditTextChanged)
+        
+        self.nrCoreset1DurationComb.currentIndexChanged[int].connect(self.onCoreset1DurationCombCurIndChanged)
+        self.nrCoreset1CceRegMapComb.currentIndexChanged[int].connect(self.onCoreset1CceRegMapCombCurIndChanged)
+        self.nrUssFirstSymbsEdit.textChanged.connect(self.onUssFirstSymbsEditTextChanged)
+        
         #---->I am THE driver!
         self.nrCarrierBandComb.setCurrentText('n77')
 
@@ -4501,6 +4509,31 @@ class NgNrGridUi(QDialog):
         self.nrRachGenericScsComb.addItems(raScsSubset)
         self.nrRachGenericScsComb.setCurrentIndex(0)
     
+    def updateCoreset1FreqRes(self):
+        if not self.nrDedDlBwpGenericRbStartEdit.text() or not self.nrDedDlBwpGenericLRbsEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside updateCoreset1FreqRes')
+        bwpStart = int(self.nrDedDlBwpGenericRbStartEdit.text())
+        bwpSize = int(self.nrDedDlBwpGenericLRbsEdit.text())
+        #refer to 3GPP 38.213 10.1
+        #...the first common RB of the first group of 6 PRBs has index 6*ceil(N_BWP_start/6). 
+        firstPrbFirstGrp = 6 * math.ceil(bwpStart / 6)
+        numNonOverlapGrps = math.floor((bwpSize - (firstPrbFirstGrp - bwpStart)) / 6)
+        text = ''
+        for i in range(45):
+            if i < numNonOverlapGrps:
+                text = text + '1'
+            else:
+                text = text + '0'
+                
+            if i > 0 and (i+1) % 8 == 0:
+                text = text + ','
+        
+        self.nrCoreset1FreqResourcesLabel.setText('frequencyDomainResources[%d]:' % numNonOverlapGrps)
+        self.nrCoreset1FreqResourcesEdit.setText(text)
+        
+    
     def onCarrierBandCombCurIndChanged(self, index):
         if index < 0:
             return
@@ -4516,7 +4549,7 @@ class NgNrGridUi(QDialog):
             self.nrCarrierBandInfoLabel.setText('<font color=green>UL: %s, DL: %s, %s, %s</font>' % (ulBand, dlBand, self.duplexMode, self.freqRange))
 
         if self.duplexMode in ('SUL', 'SDL'):
-            self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: SUL/SDL bands (3GPP 38.104 vf30, SDL: n75/n76, SUL: n80/n81/n82/n83/n84/n86)'
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: SUL/SDL bands (3GPP 38.104 vf30, SDL: n75/n76, SUL: n80/n81/n82/n83/n84/n86)'
                                       ' are not supported!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
             return
 
@@ -4616,6 +4649,9 @@ class NgNrGridUi(QDialog):
         self.nrDsrRes1OffsetLabel.setText('offset(in slots)[0]:')
         self.nrDsrRes1OffsetEdit.setText('0')
         self.nrDsrRes1OffsetEdit.setValidator(QIntValidator(0, 0))
+        
+        #(5) validate 'uss first symbols' edit
+        self.validateUssFirstSymbs()
 
 
     def onCarrierBwCombCurIndChanged(self, index):
@@ -4646,7 +4682,7 @@ class NgNrGridUi(QDialog):
         if self.freqRange == 'FR2' and self.nrSsbScsComb.currentText() == '240KHz':
             carrierBw = int(self.nrCarrierBwComb.currentText()[:-3])
             if carrierBw < 100:
-                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Minimum transmission bandwidth is 100MHz when SSB'
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Minimum transmission bandwidth is 100MHz when SSB'
                                           ' subcarrier spacing is 240KHz!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
                 self.nrSsbMinGuardBandScs240kEdit.setText('NA')
             else:
@@ -4698,7 +4734,7 @@ class NgNrGridUi(QDialog):
         if ssbScs == '240KHz':
             carrierBw = int(self.nrCarrierBwComb.currentText()[:-3])
             if carrierBw < 100:
-                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Minimum transmission bandwidth is 100MHz when SSB'
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Minimum transmission bandwidth is 100MHz when SSB'
                                           'subcarrier spacing is 240KHz!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
                 self.nrSsbMinGuardBandScs240kEdit.setText('NA')
                 return
@@ -4759,31 +4795,31 @@ class NgNrGridUi(QDialog):
         key = self.nrSsbScsComb.currentText()[:-3] + '_' + self.nrMibScsCommonComb.currentText()[:-3] + '_' + self.nrMibCoreset0Edit.text()
         if self.freqRange == 'FR1' and self.minChBw in (5, 10):
             if not key in self.nrCoreset0Fr1MinChBw5m10m.keys():
-                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid key(=%s) when referring nrCoreset0Fr1MinChBw5m10m!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrCoreset0Fr1MinChBw5m10m!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
                 return False 
             
             if self.nrCoreset0Fr1MinChBw5m10m[key] is None:
-                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of coresetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibCoreset0Edit.text()))
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid value of coresetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibCoreset0Edit.text()))
                 return False
             
             val = self.nrCoreset0Fr1MinChBw5m10m[key]
         elif self.freqRange == 'FR1' and self.minChBw == 40:
             if not key in self.nrCoreset0Fr1MinChBw40m.keys():
-                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid key(=%s) when referring nrCoreset0Fr1MinChBw40m!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrCoreset0Fr1MinChBw40m!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
                 return False
             
             if self.nrCoreset0Fr1MinChBw40m[key] is None:
-                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of coresetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibCoreset0Edit.text()))
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid value of coresetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibCoreset0Edit.text()))
                 return False
             
             val = self.nrCoreset0Fr1MinChBw40m[key]
         elif self.freqRange == 'FR2':
             if not key in self.nrCoreset0Fr2.keys():
-                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid key(=%s) when referring nrCoreset0Fr2!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrCoreset0Fr2!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
                 return False
             
             if self.nrCoreset0Fr2[key] is None:
-                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid value of coresetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibCoreset0Edit.text()))
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid value of coresetZero(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrMibCoreset0Edit.text()))
                 return False
             
             val = self.nrCoreset0Fr2[key]
@@ -4793,7 +4829,7 @@ class NgNrGridUi(QDialog):
         #(2) validate CORESET0 bw against carrier bandwidth
         self.coreset0MultiplexingPat, self.coreset0NumRbs, self.coreset0NumSymbs, self.coreset0OffsetList = val
         if int(self.nrCarrierNumRbEdit.text()) < self.coreset0NumRbs:
-            self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid CORESET0 setting: CORESET0 numRBs=%d, while carrier numRBs=%s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0NumRbs, self.nrCarrierNumRbEdit.text()))
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid CORESET0 setting: CORESET0 numRBs=%d, while carrier numRBs=%s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0NumRbs, self.nrCarrierNumRbEdit.text()))
             return False
         
         #(3) if k_ssb is configured, further validate CORESET0
@@ -4814,15 +4850,15 @@ class NgNrGridUi(QDialog):
                 minBw = self.coreset0NumRbs - self.coreset0Offset
             
             if int(self.nrCarrierNumRbEdit.text()) < minBw:
-                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid CORESET0 setting: CORESET0 numRBs=%d, offset=%d, minBw = %d, while carrier numRBs=%s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0NumRbs, self.coreset0Offset, minBw, self.nrCarrierNumRbEdit.text()))
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid CORESET0 setting: CORESET0 numRBs=%d, offset=%d, minBw = %d, while carrier numRBs=%s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0NumRbs, self.coreset0Offset, minBw, self.nrCarrierNumRbEdit.text()))
                 return False
         
         #print CORESET0 info
-        self.ngwin.logEdit.append('[%s]<font color=green>INFO</font>: CORESET0 setting: multiplexingPattern = %d, numRBs=%d, numSymbs=%d, offset=%d.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0MultiplexingPat, self.coreset0NumRbs, self.coreset0NumSymbs, self.coreset0Offset))
+        self.ngwin.logEdit.append('<font color=green><b>[%s]Info</font>: CORESET0 setting: multiplexingPattern = %d, numRBs=%d, numSymbs=%d, offset=%d.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0MultiplexingPat, self.coreset0NumRbs, self.coreset0NumSymbs, self.coreset0Offset))
         
         #(4) validate self.coreset0NumSymbs against 'dmrs-pointA-Position'
         if self.coreset0NumSymbs == 3 and int(self.nrMibDmRsTypeAPosComb.currentText()[3:]) != 3:
-            self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: CORESET numSymbs = 3 is only supported when dmrs-TypeA-Position = 3!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: CORESET numSymbs = 3 is only supported when dmrs-TypeA-Position = 3!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
             return False
             
         #when validation passed
@@ -4841,13 +4877,13 @@ class NgNrGridUi(QDialog):
             if self.freqRange == 'FR2' and int(self.nrMibCss0Edit.text()) in range(14):
                 return True
             else:
-                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid CSS0 setting: searchSpaceZero can be [0, 13] for CORESET0/CSS0 with multiplexing pattern 1 and FR2!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid CSS0 setting: searchSpaceZero can be [0, 13] for CORESET0/CSS0 with multiplexing pattern 1 and FR2!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
                 return False
         else:   #self.coreset0MultiplexingPat = 2/3
             if int(self.nrMibCss0Edit.text()) == 0:
                 return True
             else:
-                self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Invalid CSS0 setting: searchSpaceZero can be [0] for CORESET0/CSS0 with multiplexing pattern %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0MultiplexingPat))
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid CSS0 setting: searchSpaceZero can be [0] for CORESET0/CSS0 with multiplexing pattern %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0MultiplexingPat))
                 return False
     
     def onMibCoreset0EditTextChanged(self, text):
@@ -4913,7 +4949,7 @@ class NgNrGridUi(QDialog):
         self.ngwin.logEdit.append('-->inside onCss0NumCandidatesCombCurIndChanged, index=%d' % index)
         maxNumCandidates = 16 // int(self.nrCss0AggLevelComb.currentText())
         if int(self.nrCss0NumCandidatesComb.currentText()[1:]) > maxNumCandidates:
-            self.ngwin.logEdit.append('[%s]<font color=red>ERROR</font>: Max number of PDCCH candidates of AL=%s for CSS0 is %d!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrCss0AggLevelComb.currentText(), maxNumCandidates))
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Max number of PDCCH candidates of AL=%s for CSS0 is %d!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrCss0AggLevelComb.currentText(), maxNumCandidates))
             self.nrCss0AggLevelComb.setCurrentText('n%d' % maxNumCandidates)
     
     def onPrachConfIndEditTextChanged(self, text):
@@ -4963,7 +4999,7 @@ class NgNrGridUi(QDialog):
         if L_RBs is not None and RB_start is not None: 
             numRb = int(self.nrCarrierNumRbEdit.text())
             if L_RBs < 1 or L_RBs > (numRb - RB_start):
-                self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRb))
+                self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRb))
                 self.nrIniDlBwpGenericLRbsEdit.clear()
                 self.nrIniDlBwpGenericRbStartEdit.clear()
                 return
@@ -4971,7 +5007,7 @@ class NgNrGridUi(QDialog):
             self.nrIniDlBwpGenericLRbsEdit.setText(str(L_RBs))
             self.nrIniDlBwpGenericRbStartEdit.setText(str(RB_start))
         else:
-            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid RIV = %d!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv)) 
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid RIV = %d!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv)) 
             self.nrIniDlBwpGenericLRbsEdit.clear()
             self.nrIniDlBwpGenericRbStartEdit.clear()
             
@@ -4985,14 +5021,14 @@ class NgNrGridUi(QDialog):
         RB_start = int(self.nrIniDlBwpGenericRbStartEdit.text())
         numRb = int(self.nrCarrierNumRbEdit.text())
         if L_RBs < 1 or L_RBs > (numRb - RB_start):
-            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRb))
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRb))
             return
         
         riv = self.makeRiv(L_RBs, RB_start, 275)
         if riv is not None and riv in range(37950):
             self.nrIniDlBwpGenericLocAndBwEdit.setText(str(riv))
         else:
-            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
             self.nrIniDlBwpGenericLocAndBwEdit.clear()
     
     def onIniUlBwpLocAndBwEditTextChanged(self, text):
@@ -5005,7 +5041,7 @@ class NgNrGridUi(QDialog):
         if L_RBs is not None and RB_start is not None: 
             numRb = int(self.nrCarrierNumRbEdit.text())
             if L_RBs < 1 or L_RBs > (numRb - RB_start):
-                self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRb))
+                self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRb))
                 self.nrIniUlBwpGenericLRbsEdit.clear()
                 self.nrIniUlBwpGenericRbStartEdit.clear()
                 return
@@ -5013,7 +5049,7 @@ class NgNrGridUi(QDialog):
             self.nrIniUlBwpGenericLRbsEdit.setText(str(L_RBs))
             self.nrIniUlBwpGenericRbStartEdit.setText(str(RB_start))
         else:
-            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid RIV = %d!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv)) 
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid RIV = %d!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv)) 
             self.nrIniUlBwpGenericLRbsEdit.clear()
             self.nrIniUlBwpGenericRbStartEdit.clear()
             
@@ -5027,14 +5063,14 @@ class NgNrGridUi(QDialog):
         RB_start = int(self.nrIniUlBwpGenericRbStartEdit.text())
         numRb = int(self.nrCarrierNumRbEdit.text())
         if L_RBs < 1 or L_RBs > (numRb - RB_start):
-            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRb))
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRb))
             return
         
         riv = self.makeRiv(L_RBs, RB_start, 275)
         if riv is not None and riv in range(37950):
             self.nrIniUlBwpGenericLocAndBwEdit.setText(str(riv))
         else:
-            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
             self.nrIniUlBwpGenericLocAndBwEdit.clear()
     
     def onDedDlBwpLocAndBwEditTextChanged(self, text):
@@ -5047,15 +5083,16 @@ class NgNrGridUi(QDialog):
         if L_RBs is not None and RB_start is not None: 
             numRb = int(self.nrCarrierNumRbEdit.text())
             if L_RBs < 1 or L_RBs > (numRb - RB_start):
-                self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRb))
+                self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRb))
                 self.nrDedDlBwpGenericLRbsEdit.clear()
                 self.nrDedDlBwpGenericRbStartEdit.clear()
                 return
             
             self.nrDedDlBwpGenericLRbsEdit.setText(str(L_RBs))
             self.nrDedDlBwpGenericRbStartEdit.setText(str(RB_start))
+            self.updateCoreset1FreqRes()
         else:
-            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid RIV = %d!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv)) 
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid RIV = %d!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv)) 
             self.nrDedDlBwpGenericLRbsEdit.clear()
             self.nrDedDlBwpGenericRbStartEdit.clear()
             
@@ -5069,14 +5106,15 @@ class NgNrGridUi(QDialog):
         RB_start = int(self.nrDedDlBwpGenericRbStartEdit.text())
         numRb = int(self.nrCarrierNumRbEdit.text())
         if L_RBs < 1 or L_RBs > (numRb - RB_start):
-            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRb))
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRb))
             return
         
         riv = self.makeRiv(L_RBs, RB_start, 275)
         if riv is not None and riv in range(37950):
             self.nrDedDlBwpGenericLocAndBwEdit.setText(str(riv))
+            self.updateCoreset1FreqRes()
         else:
-            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
             self.nrDedDlBwpGenericLocAndBwEdit.clear()
     
     def onDedUlBwpLocAndBwEditTextChanged(self, text):
@@ -5089,7 +5127,7 @@ class NgNrGridUi(QDialog):
         if L_RBs is not None and RB_start is not None: 
             numRb = int(self.nrCarrierNumRbEdit.text())
             if L_RBs < 1 or L_RBs > (numRb - RB_start):
-                self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRb))
+                self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRb))
                 self.nrDedUlBwpGenericLRbsEdit.clear()
                 self.nrIniUlBwpGenericRbStartEdit.clear()
                 return
@@ -5097,7 +5135,7 @@ class NgNrGridUi(QDialog):
             self.nrDedUlBwpGenericLRbsEdit.setText(str(L_RBs))
             self.nrDedUlBwpGenericRbStartEdit.setText(str(RB_start))
         else:
-            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid RIV = %d!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv)) 
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid RIV = %d!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv)) 
             self.nrDedUlBwpGenericLRbsEdit.clear()
             self.nrDedUlBwpGenericRbStartEdit.clear()
             
@@ -5111,15 +5149,116 @@ class NgNrGridUi(QDialog):
         RB_start = int(self.nrDedUlBwpGenericRbStartEdit.text())
         numRb = int(self.nrCarrierNumRbEdit.text())
         if L_RBs < 1 or L_RBs > (numRb - RB_start):
-            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRb))
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRb))
             return
         
         riv = self.makeRiv(L_RBs, RB_start, 275)
         if riv is not None and riv in range(37950):
             self.nrDedUlBwpGenericLocAndBwEdit.setText(str(riv))
         else:
-            self.ngwin.logEdit.append('[%s]<font color=yellow>WARNING</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
             self.nrDedUlBwpGenericLocAndBwEdit.clear()
+            
+    def onCoreset1DurationCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onCoreset1DurationCombCurIndChanged, index=%d' % index)
+        coreset1Duration = int(self.nrCoreset1DurationComb.currentText())
+        
+        #validate coreset1 duration against dmrs-TypeA-Position in MIB
+        if coreset1Duration == 3 and int(self.nrMibDmRsTypeAPosComb.currentText()[3:]) != 3:
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid setting: coreset1Duration = %s but dmrs-TypeA-Position = "%s"! Reset coreset1Duration to 1.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrCoreset1DurationComb.currentText(), self.nrMibDmRsTypeAPosComb.currentText()))
+            self.nrCoreset1DurationComb.setCurrentIndex(0)
+            return
+        
+        #set values of reg-BundleSize for interleaved CCE-to-REG mapping
+        if self.nrCoreset1CceRegMapComb.currentText() == 'interleaved':
+            if coreset1Duration == 1:
+                self.nrCoreset1RegBundleSizeComb.clear()
+                self.nrCoreset1RegBundleSizeComb.addItems(['n2', 'n6'])
+                self.nrCoreset1RegBundleSizeComb.setCurrentIndex(0)
+            else:
+                self.nrCoreset1RegBundleSizeComb.clear()
+                self.nrCoreset1RegBundleSizeComb.addItems(['n%d' % coreset1Duration, 'n6'])
+                self.nrCoreset1RegBundleSizeComb.setCurrentIndex(0)
+        
+        #set 'uss first symbols' edit
+        tmpList = ['0']*14
+        defSymbOff = 2 if coreset1Duration in (1, 2) else coreset1Duration
+        for i in range(0, 14, defSymbOff):
+            if i + coreset1Duration <= 14:
+                tmpList[i] = '1'
+                
+        tmpList.insert(7, ',')
+        self.nrUssFirstSymbsEdit.setText(''.join(tmpList))
+        
+                
+    def onCoreset1CceRegMapCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onCoreset1CceRegMapCombCurIndChanged, index=%d' % index)
+        if self.nrCoreset1CceRegMapComb.currentText() == 'nonInterleaved':
+            self.nrCoreset1RegBundleSizeComb.setEnabled(False)
+            self.nrCoreset1InterleaverSizeComb.setEnabled(False)
+            self.nrCoreset1ShiftIndexEdit.setEnabled(False)
+        else:
+            self.nrCoreset1RegBundleSizeComb.setEnabled(True)
+            self.nrCoreset1InterleaverSizeComb.setEnabled(True)
+            self.nrCoreset1ShiftIndexEdit.setEnabled(True)
+            coreset1Duration = int(self.nrCoreset1DurationComb.currentText())
+            if coreset1Duration == 1:
+                self.nrCoreset1RegBundleSizeComb.clear()
+                self.nrCoreset1RegBundleSizeComb.addItems(['n2', 'n6'])
+                self.nrCoreset1RegBundleSizeComb.setCurrentIndex(0)
+            else:
+                self.nrCoreset1RegBundleSizeComb.clear()
+                self.nrCoreset1RegBundleSizeComb.addItems(['n%d' % coreset1Duration, 'n6'])
+                self.nrCoreset1RegBundleSizeComb.setCurrentIndex(0)
+                
+    def onUssFirstSymbsEditTextChanged(self, text):
+        if not text:
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onUssFirstSymbsEditTextChanged')
+        self.validateUssFirstSymbs()
+    
+    def validateUssFirstSymbs(self):
+        if len(self.nrUssFirstSymbsEdit.text()) != 15:
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Length of monitoringSymbolsWithinSlot for USS with CORESET1 must be 14.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+            return
+        
+        text = self.nrUssFirstSymbsEdit.text()[:7] + self.nrUssFirstSymbsEdit.text()[-7:]
+        
+        #refer to 3GPP 38.213 10.1
+        #If the higher layer parameter monitoringSymbolsWithinSlot indicates to a UE to monitor PDCCH in a subset of up to three consecutive symbols that are same in every slot where the UE monitors PDCCH for all search space sets, the UE does not expect to be configured with a PDCCH subcarrier spacing other than 15 kHz if the subset includes at least one symbol after the third symbol.
+        subText = text[2:]
+        if subText.find('111') >= 0 or subText.find('11') >= 0:
+            if int(self.nrDedDlBwpGenericScsComb.currentText()[:-3]) != 15:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid setting of monitoringSymbolsWithinSlot for USS with CORESET1.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+                self.ngwin.logEdit.append('If the higher layer parameter monitoringSymbolsWithinSlot indicates to a UE to monitor PDCCH in a subset of up to three' 
+                    'consecutive symbols that are same in every slot where the UE monitors PDCCH for all search space sets, the UE does not expect to be configured with a'
+                    'PDCCH subcarrier spacing other than 15 kHz if the subset includes at least one symbol after the third symbol.')
+                return
+        
+        #A UE does not expect to be provided a first symbol and a number of consecutive symbols for a control resource set that results to a PDCCH candidate mapping to symbols of different slots.
+        coreset1Duration = int(self.nrCoreset1DurationComb.currentText())
+        oneList = [i for i in range(len(text)) if text[i] == '1']
+        for i in oneList:
+            if i + coreset1Duration > 14:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid setting of monitoringSymbolsWithinSlot for USS with CORESET1.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+                self.ngwin.logEdit.append('A UE does not expect to be provided a first symbol and a number of consecutive symbols for a control resource set that results'
+                    'to a PDCCH candidate mapping to symbols of different slots.')
+                return
+                    
+        #A UE does not expect any two PDCCH monitoring occasions, for a same search space set or for different search space sets, in a same control resource set to be separated by a non-zero number of symbols that is smaller than the control resource set duration.
+        for i in range(len(oneList)-1):
+            if oneList[i+1] - oneList[i] < coreset1Duration:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid setting of monitoringSymbolsWithinSlot for USS with CORESET1.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+                self.ngwin.logEdit.append('A UE does not expect any two PDCCH monitoring occasions, for a same search space set or for different search space sets, in a'
+                    'same control resource set to be separated by a non-zero number of symbols that is smaller than the control resource set duration.')
+                return
 
     def onOkBtnClicked(self):
         self.ngwin.logEdit.append('-->inside onOkBtnClicked')
@@ -5152,7 +5291,3 @@ class NgNrGridUi(QDialog):
             riv = N_BWP_Size * (N_BWP_Size - L_RBs + 1) + (N_BWP_Size - 1 - RB_start)
         
         return riv
-            
-            
-        
-        
