@@ -98,55 +98,8 @@ class NgNrGridUi(QDialog):
         ssbGridGrpBoxLayout.addWidget(self.nrSsbNCrbSsbLabel, 4, 0)
         ssbGridGrpBoxLayout.addWidget(self.nrSsbNCrbSsbEdit, 4, 1)
         ssbGridGrpBox.setLayout(ssbGridGrpBoxLayout)
-
-        gridLayoutResGridCfg = QGridLayout()
-        gridLayoutResGridCfg.addWidget(self.nrCarrierBandLabel, 0, 0)
-        gridLayoutResGridCfg.addWidget(self.nrCarrierBandComb, 0, 1)
-        gridLayoutResGridCfg.addWidget(self.nrCarrierBandInfoLabel, 1, 0, 1, 2)
-        gridLayoutResGridCfg.addWidget(carrierGridGrpBox, 2, 0, 1, 2)
-        gridLayoutResGridCfg.addWidget(ssbGridGrpBox, 3, 0, 1, 2)
-
-        gridCfgWidget = QWidget()
-        gridCfgLayout = QVBoxLayout()
-        gridCfgLayout.addLayout(gridLayoutResGridCfg)
-        gridCfgLayout.addStretch()
-        gridCfgWidget.setLayout(gridCfgLayout)
         
-        #-->(2) SSB settings tab
-        #---->(2.1) SSB configurations
-        self.nrSsbInOneGrpLabel = QLabel('inOneGroup(ssb-PositionsInBurst):')
-        self.nrSsbInOneGrpEdit = QLineEdit()
-        self.nrSsbInOneGrpEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{8}')))
-        self.nrSsbInOneGrpEdit.setPlaceholderText('11111111')
-        
-        self.nrSsbGrpPresenceLabel = QLabel('groupPresence(ssb-PositionsInBurst):')
-        self.nrSsbGrpPresenceEdit = QLineEdit()
-        self.nrSsbGrpPresenceEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{8}')))
-        self.nrSsbGrpPresenceEdit.setPlaceholderText('11111111')
-        
-        self.nrSsbPeriodicityLabel = QLabel('ssb-PeriodicityServingCell:')
-        self.nrSsbPeriodicityComb = QComboBox()
-        self.nrSsbPeriodicityComb.addItems(['5ms', '10ms', '20ms', '40ms', '80ms', '160ms'])
-        #refer to 3GPP 38.213 4.1
-        #For initial cell selection, a UE may assume that half frames with SS/PBCH blocks occur with a periodicity of 2 frames.
-        self.nrSsbPeriodicityComb.setCurrentIndex(2)    #default to 20ms
-        
-        ssbGrpBox = QGroupBox()
-        ssbGrpBox.setTitle('SSB(ServingCellConfigCommonSIB)')
-        ssbGrpBoxLayout = QGridLayout()
-        ssbGrpBoxLayout.addWidget(self.nrSsbInOneGrpLabel, 0, 0)
-        ssbGrpBoxLayout.addWidget(self.nrSsbInOneGrpEdit, 0, 1)
-        ssbGrpBoxLayout.addWidget(self.nrSsbGrpPresenceLabel, 1, 0)
-        ssbGrpBoxLayout.addWidget(self.nrSsbGrpPresenceEdit, 1, 1)
-        ssbGrpBoxLayout.addWidget(self.nrSsbPeriodicityLabel, 2, 0)
-        ssbGrpBoxLayout.addWidget(self.nrSsbPeriodicityComb, 2, 1)
-        ssbGrpBox.setLayout(ssbGrpBoxLayout)
-        
-        self.nrSsbPciLabel = QLabel('PCI[0-1007]:')
-        self.nrSsbPciEdit = QLineEdit('0')
-        self.nrSsbPciEdit.setValidator(QIntValidator(0, 1007))
-        
-        #---->(2.2) MIB configurations
+        #---->(1.3) MIB configurations
         self.nrMibSfnLabel = QLabel('SFN[0-1023]:')
         self.nrMibSfnEdit = QLineEdit('0')
         self.nrMibSfnEdit.setValidator(QIntValidator(0, 1023))
@@ -182,7 +135,57 @@ class NgNrGridUi(QDialog):
         mibGrpBoxLayout.addWidget(self.nrMibCss0Edit, 4, 1)
         mibGrpBox.setLayout(mibGrpBoxLayout)
         
-        #---->(2.3) TDD UL/DL Configurations
+        #---->(1.4) SSB burst configurations
+        self.nrSsbInOneGrpLabel = QLabel('inOneGroup(ssb-PositionsInBurst):')
+        self.nrSsbInOneGrpEdit = QLineEdit()
+        self.nrSsbInOneGrpEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{8}')))
+        self.nrSsbInOneGrpEdit.setPlaceholderText('11111111')
+        
+        self.nrSsbGrpPresenceLabel = QLabel('groupPresence(ssb-PositionsInBurst):')
+        self.nrSsbGrpPresenceEdit = QLineEdit()
+        self.nrSsbGrpPresenceEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{8}')))
+        self.nrSsbGrpPresenceEdit.setPlaceholderText('11111111')
+        
+        self.nrSsbPeriodicityLabel = QLabel('ssb-PeriodicityServingCell:')
+        self.nrSsbPeriodicityComb = QComboBox()
+        self.nrSsbPeriodicityComb.addItems(['5ms', '10ms', '20ms', '40ms', '80ms', '160ms'])
+        #refer to 3GPP 38.213 4.1
+        #For initial cell selection, a UE may assume that half frames with SS/PBCH blocks occur with a periodicity of 2 frames.
+        self.nrSsbPeriodicityComb.setCurrentIndex(2)    #default to 20ms
+        
+        ssbBurstGrpBox = QGroupBox()
+        ssbBurstGrpBox.setTitle('SSB Burst(ServingCellConfigCommonSIB)')
+        ssbBurstGrpBoxLayout = QGridLayout()
+        ssbBurstGrpBoxLayout.addWidget(self.nrSsbInOneGrpLabel, 0, 0)
+        ssbBurstGrpBoxLayout.addWidget(self.nrSsbInOneGrpEdit, 0, 1)
+        ssbBurstGrpBoxLayout.addWidget(self.nrSsbGrpPresenceLabel, 1, 0)
+        ssbBurstGrpBoxLayout.addWidget(self.nrSsbGrpPresenceEdit, 1, 1)
+        ssbBurstGrpBoxLayout.addWidget(self.nrSsbPeriodicityLabel, 2, 0)
+        ssbBurstGrpBoxLayout.addWidget(self.nrSsbPeriodicityComb, 2, 1)
+        ssbBurstGrpBox.setLayout(ssbBurstGrpBoxLayout)
+
+        gridLayoutResGridCfg = QGridLayout()
+        gridLayoutResGridCfg.addWidget(self.nrCarrierBandLabel, 0, 0)
+        gridLayoutResGridCfg.addWidget(self.nrCarrierBandComb, 0, 1)
+        gridLayoutResGridCfg.addWidget(self.nrCarrierBandInfoLabel, 1, 0, 1, 2)
+        gridLayoutResGridCfg.addWidget(ssbGridGrpBox, 2, 0, 1, 2)
+        gridLayoutResGridCfg.addWidget(ssbBurstGrpBox, 3, 0, 1, 2)
+        gridLayoutResGridCfg.addWidget(mibGrpBox, 4, 0, 1, 2)
+        gridLayoutResGridCfg.addWidget(carrierGridGrpBox, 5, 0, 1, 2)
+
+        gridCfgWidget = QWidget()
+        gridCfgLayout = QVBoxLayout()
+        gridCfgLayout.addLayout(gridLayoutResGridCfg)
+        gridCfgLayout.addStretch()
+        gridCfgWidget.setLayout(gridCfgLayout)
+        
+        #-->(2) Common settings tab
+        #---->(2.1) PCI
+        self.nrSsbPciLabel = QLabel('PCI[0-1007]:')
+        self.nrSsbPciEdit = QLineEdit('0')
+        self.nrSsbPciEdit.setValidator(QIntValidator(0, 1007))
+        
+        #---->(2.2) TDD UL/DL Configurations
         self.nrTddCfgRefScsLabel = QLabel('referenceSubcarrierSpacing:')
         self.nrTddCfgRefScsComb = QComboBox()
         self.nrTddCfgRefScsComb.addItems(['15KHz', '30KHz', '60KHz', '120KHz'])
@@ -272,6 +275,7 @@ class NgNrGridUi(QDialog):
         tddCfgRefScsLayout.addStretch()
         tddCfgGrpBoxLayout.addLayout(tddCfgRefScsLayout)
         tddCfgGrpBoxLayout.addWidget(tddCfgTabWidget)
+        tddCfgGrpBoxLayout.addStretch()
         tddCfgGrpBox.setLayout(tddCfgGrpBoxLayout)
         
         pciLayout = QHBoxLayout()
@@ -279,17 +283,12 @@ class NgNrGridUi(QDialog):
         pciLayout.addWidget(self.nrSsbPciEdit)
         pciLayout.addStretch()
         
-        gridLayoutSsbCfg = QGridLayout()
-        gridLayoutSsbCfg.addWidget(ssbGrpBox, 0, 0, 1, 2)
-        gridLayoutSsbCfg.addWidget(mibGrpBox, 1, 0, 1, 2)
-        gridLayoutSsbCfg.addWidget(tddCfgGrpBox, 2, 0, 1, 2)
-        
-        ssbCfgWidget = QWidget()
+        commonCfgWidget = QWidget()
         ssbCfgLayout = QVBoxLayout()
         ssbCfgLayout.addLayout(pciLayout)
-        ssbCfgLayout.addLayout(gridLayoutSsbCfg)
+        ssbCfgLayout.addWidget(tddCfgGrpBox)
         ssbCfgLayout.addStretch()
-        ssbCfgWidget.setLayout(ssbCfgLayout)
+        commonCfgWidget.setLayout(ssbCfgLayout)
         
         #-->(3) PDCCH settings tab
         #---->(3.1) CSS0 configurations
@@ -3162,7 +3161,7 @@ class NgNrGridUi(QDialog):
         #-->Tab Widgets
         tabWidget = QTabWidget()
         tabWidget.addTab(gridCfgWidget, 'Grid Settings')
-        tabWidget.addTab(ssbCfgWidget, 'SSB Settings')
+        tabWidget.addTab(commonCfgWidget, 'Common Settings')
         tabWidget.addTab(pdcchCfgWidget, 'PDCCH Settings')
         tabWidget.addTab(bwpCfgTabWidget, 'BWP Settings')
 
@@ -4560,12 +4559,11 @@ class NgNrGridUi(QDialog):
             if val.count(1) == 0:
                 continue
             band, scs = key.split('_')
-            #FIXME
             #refer to 38.331 vf30
             #MIB - subCarrierSpacingCommon: Subcarrier spacing for SIB1, Msg.2/4 for initial access and broadcast SI-messages. If the UE acquires this MIB on a carrier frequency <6GHz, the value scs15or60 corresponds to 15 Khz and the value scs30or120 corresponds to 30 kHz. If the UE acquires this MIB on a carrier frequency >6GHz, the value scs15or60 corresponds to 60 Khz and the value scs30or120 corresponds to 120 kHz.
             #BWP - subcarrierSpacing: For the initial DL BWP this field has the same value as the field subCarrierSpacingCommon in MIB of the same serving cell.
-            if scs == '60':
-                continue
+            #if scs == '60':
+            #    continue
             if not band in self.nrScsPerBandFr1:
                 self.nrScsPerBandFr1[band] = [scs+'KHz']
             else:
@@ -4706,17 +4704,8 @@ class NgNrGridUi(QDialog):
         self.nrSsbScsComb.clear()
         self.nrSsbScsComb.addItems(ssbScsSubset)
         self.nrSsbScsComb.setCurrentIndex(0)
-
-        #(3) update carrier scs
-        if self.freqRange == 'FR1':
-            scsSubset = self.nrScsPerBandFr1[self.nrCarrierBandComb.currentText()]
-        else:
-            scsSubset = ('60KHz', '120KHz')
-        self.nrCarrierScsComb.clear()
-        self.nrCarrierScsComb.addItems(scsSubset)
-        self.nrCarrierScsComb.setCurrentIndex(0)
         
-        #(3.1) update common scs
+        #(3) update common scs
         if self.freqRange == 'FR1':
             commonScsSubset = ('15KHz', '30KHz')
         else:
@@ -4724,8 +4713,17 @@ class NgNrGridUi(QDialog):
         self.nrMibScsCommonComb.clear()
         self.nrMibScsCommonComb.addItems(commonScsSubset)
         self.nrMibScsCommonComb.setCurrentIndex(0)
+
+        #(4) update carrier scs
+        if self.freqRange == 'FR1':
+            carrierScsSubset = self.nrScsPerBandFr1[self.nrCarrierBandComb.currentText()]
+        else:
+            carrierScsSubset = ('60KHz', '120KHz')
+        self.nrCarrierScsComb.clear()
+        self.nrCarrierScsComb.addItems(carrierScsSubset)
+        self.nrCarrierScsComb.setCurrentIndex(0)
         
-        #(4) update ssb-positions-in-burst
+        #(5) update ssb-positions-in-burst
         if self.maxL in (4, 8):
             self.nrSsbInOneGrpEdit.setText('11110000' if self.maxL == 4 else '11111111')
             self.nrSsbGrpPresenceEdit.setText('NA')
@@ -4735,7 +4733,7 @@ class NgNrGridUi(QDialog):
             self.nrSsbGrpPresenceEdit.setText('11111111')
             self.nrSsbGrpPresenceEdit.setEnabled(True)
         
-        #(5) update rach config 
+        #(6) update rach config 
         self.updateRachConfig()
 
     def onCarrierScsCombCurIndChanged(self, index):
@@ -4765,7 +4763,12 @@ class NgNrGridUi(QDialog):
         self.nrDci01PuschMuPuschEdit.setText(str(u))
 
         #(2) update transmission bandwidth
-        key = self.nrCarrierBandComb.currentText() + '_' + self.nrCarrierScsComb.currentText()[:-3]
+        carrierScs = int(self.nrCarrierScsComb.currentText()[:-3])
+        commonScs = int(self.nrMibScsCommonComb.currentText()[:-3])
+        if commonScs < carrierScs: 
+            key = self.nrCarrierBandComb.currentText() + '_' + self.nrMibScsCommonComb.currentText()[:-3]
+        else:
+            key = self.nrCarrierBandComb.currentText() + '_' + self.nrCarrierScsComb.currentText()[:-3]
         if not key in self.nrBandScs2BwFr1 and not key in self.nrBandScs2BwFr2:
             return
         if self.freqRange == 'FR1':
@@ -4817,6 +4820,7 @@ class NgNrGridUi(QDialog):
             return
         
         self.ngwin.logEdit.append('-->inside onMibScsCommonCombCurIndChanged, index=%d' % index)
+        
         #(1) update scs for initial dl bwp; update u_pdcch/u_pdsch for sib1/msg2/msg4 
         self.nrIniDlBwpGenericScsComb.setCurrentText(self.nrMibScsCommonComb.currentText())
         u = {'15KHz':0, '30KHz':1, '60KHz':2, '120KHz':3, '240KHz':4}[self.nrMibScsCommonComb.currentText()]
@@ -4827,11 +4831,32 @@ class NgNrGridUi(QDialog):
         self.nrDci10Msg4MuPdcchEdit.setText(str(u))
         self.nrDci10Msg4MuPdschEdit.setText(str(u))
         
-        #(2) validate coreset0 and update k_ssb and n_crb_ssb if necessary
-        self.flagCoreset0 = self.validateCoreset0()
-        if self.flagCoreset0:
-            self.updateKSsbAndNCrbSsb(offset=0 if self.coreset0Offset <= 0 else self.coreset0Offset)
-            self.flagCss0 = self.validateCss0()
+        #(2) either update 'carrier bandwidth' or validate coreset0 and update k_ssb and n_crb_ssb
+        if self.nrCarrierScsComb.currentText():
+            carrierScs = int(self.nrCarrierScsComb.currentText()[:-3])
+            commonScs = int(self.nrMibScsCommonComb.currentText()[:-3])
+            if commonScs < carrierScs: 
+                key = self.nrCarrierBandComb.currentText() + '_' + self.nrMibScsCommonComb.currentText()[:-3]
+            else:
+                key = self.nrCarrierBandComb.currentText() + '_' + self.nrCarrierScsComb.currentText()[:-3]
+            if not key in self.nrBandScs2BwFr1 and not key in self.nrBandScs2BwFr2:
+                return
+            if self.freqRange == 'FR1':
+                bwSubset = [self.nrBwSetFr1[i] for i in range(len(self.nrBwSetFr1)) if self.nrBandScs2BwFr1[key][i]]
+            else:
+                bwSubset = [self.nrBwSetFr2[i] for i in range(len(self.nrBwSetFr2)) if self.nrBandScs2BwFr2[key][i]]
+            
+            #min channel bw used in Type-0 CSS determination
+            self.minChBw = int(bwSubset[0][:-3]) if len(bwSubset) > 0 else 0 
+
+            self.nrCarrierBwComb.clear()
+            self.nrCarrierBwComb.addItems(bwSubset)
+            self.nrCarrierBwComb.setCurrentIndex(0)
+        else:
+            self.flagCoreset0 = self.validateCoreset0()
+            if self.flagCoreset0:
+                self.updateKSsbAndNCrbSsb(offset=0 if self.coreset0Offset <= 0 else self.coreset0Offset)
+                self.flagCss0 = self.validateCss0()
 
     def onCarrierBwCombCurIndChanged(self, index):
         if index < 0:
@@ -4839,22 +4864,30 @@ class NgNrGridUi(QDialog):
         
         self.ngwin.logEdit.append('-->inside onCarrierBwCombCurIndChanged, index=%d' % index)
 
-        #(1) update N_RB w.r.t carrierScs and carrierBw
-        key = int(self.nrCarrierScsComb.currentText()[:-3])
-        if not key in self.nrNrbFr1 and not key in self.nrNrbFr2:
+        #(1) update N_RB w.r.t carrierScs and carrierBw; update N_RB for initial dl bwp w.r.t. commonScs and carrierBw
+        carrierScs = int(self.nrCarrierScsComb.currentText()[:-3])
+        commonScs = int(self.nrMibScsCommonComb.currentText()[:-3])
+        #FIXME two IFs as below is not necessary?
+        '''
+        if not carrierScs in self.nrNrbFr1 and not carrierScs in self.nrNrbFr2:
             return
+        if not commonScs in self.nrNrbFr1 and not commonScs in self.nrNrbFr2:
+            return
+        '''
 
         if self.freqRange == 'FR1':
-            numRb = self.nrNrbFr1[key][self.nrBwSetFr1.index(self.nrCarrierBwComb.currentText())]
+            numRbCarrierScs = self.nrNrbFr1[carrierScs][self.nrBwSetFr1.index(self.nrCarrierBwComb.currentText())]
+            numRbCommonScs = self.nrNrbFr1[commonScs][self.nrBwSetFr1.index(self.nrCarrierBwComb.currentText())]
         else:
-            numRb = self.nrNrbFr2[key][self.nrBwSetFr2.index(self.nrCarrierBwComb.currentText())]
-        self.nrCarrierNumRbEdit.setText(str(numRb))
+            numRbCarrierScs = self.nrNrbFr2[carrierScs][self.nrBwSetFr2.index(self.nrCarrierBwComb.currentText())]
+            numRbCommonScs = self.nrNrbFr2[commonScs][self.nrBwSetFr2.index(self.nrCarrierBwComb.currentText())]
+        self.nrCarrierNumRbEdit.setText(str(numRbCarrierScs))
 
         #(2) update minGuardBand w.r.t carrierScs and carrierBw
         if self.freqRange == 'FR1':
-            minGuardBand = self.nrMinGuardBandFr1[key][self.nrBwSetFr1.index(self.nrCarrierBwComb.currentText())]
+            minGuardBand = self.nrMinGuardBandFr1[carrierScs][self.nrBwSetFr1.index(self.nrCarrierBwComb.currentText())]
         else:
-            minGuardBand = self.nrMinGuardBandFr2[key][self.nrBwSetFr2.index(self.nrCarrierBwComb.currentText())]
+            minGuardBand = self.nrMinGuardBandFr2[carrierScs][self.nrBwSetFr2.index(self.nrCarrierBwComb.currentText())]
         self.nrMinGuardBandEdit.setText(str(minGuardBand))
 
         #(3) update minGuardBandScs240k w.r.t. ssbScs and carrierBw
@@ -4873,31 +4906,33 @@ class NgNrGridUi(QDialog):
             self.updateKSsbAndNCrbSsb(offset=0 if self.coreset0Offset <= 0 else self.coreset0Offset)
             self.flagCss0 = self.validateCss0()
         
-        #(5) update 'L_RBs' and 'RB_start' labels for initial/dedicated ul/dl bwp tab
-        self.nrIniDlBwpGenericRbStartLabel.setText('RB_start[0-%d]:' % (numRb -1))
-        self.nrIniDlBwpGenericLRbsLabel.setText('L_RBs[1-%d]:' % numRb)
+        #(5) update 'L_RBs' and 'RB_start' labels for initial dl bwp tab
+        self.nrIniDlBwpGenericRbStartLabel.setText('RB_start[0-%d]:' % (numRbCommonScs -1))
+        self.nrIniDlBwpGenericLRbsLabel.setText('L_RBs[1-%d]:' % numRbCommonScs)
         self.nrIniDlBwpGenericRbStartEdit.setText('0')
-        self.nrIniDlBwpGenericLRbsEdit.setText(str(numRb))
-        self.nrIniDlBwpGenericRbStartEdit.setValidator(QIntValidator(0, numRb-1))
-        self.nrIniDlBwpGenericLRbsEdit.setValidator(QIntValidator(1, numRb))
-        self.nrIniUlBwpGenericRbStartLabel.setText('RB_start[0-%d]:' % (numRb -1))
-        self.nrIniUlBwpGenericLRbsLabel.setText('L_RBs[1-%d]:' % numRb)
+        self.nrIniDlBwpGenericLRbsEdit.setText(str(numRbCommonScs))
+        self.nrIniDlBwpGenericRbStartEdit.setValidator(QIntValidator(0, numRbCommonScs-1))
+        self.nrIniDlBwpGenericLRbsEdit.setValidator(QIntValidator(1, numRbCommonScs))
+        
+        #(6) update 'L_RBs' and 'RB_start' labels for initial ul bwp and dedicated ul/dl bwp tab
+        self.nrIniUlBwpGenericRbStartLabel.setText('RB_start[0-%d]:' % (numRbCarrierScs -1))
+        self.nrIniUlBwpGenericLRbsLabel.setText('L_RBs[1-%d]:' % numRbCarrierScs)
         self.nrIniUlBwpGenericRbStartEdit.setText('0')
-        self.nrIniUlBwpGenericLRbsEdit.setText(str(numRb))
-        self.nrIniUlBwpGenericRbStartEdit.setValidator(QIntValidator(0, numRb-1))
-        self.nrIniUlBwpGenericLRbsEdit.setValidator(QIntValidator(1, numRb))
-        self.nrDedDlBwpGenericRbStartLabel.setText('RB_start[0-%d]:' % (numRb -1))
-        self.nrDedDlBwpGenericLRbsLabel.setText('L_RBs[1-%d]:' % numRb)
+        self.nrIniUlBwpGenericLRbsEdit.setText(str(numRbCarrierScs))
+        self.nrIniUlBwpGenericRbStartEdit.setValidator(QIntValidator(0, numRbCarrierScs-1))
+        self.nrIniUlBwpGenericLRbsEdit.setValidator(QIntValidator(1, numRbCarrierScs))
+        self.nrDedDlBwpGenericRbStartLabel.setText('RB_start[0-%d]:' % (numRbCarrierScs -1))
+        self.nrDedDlBwpGenericLRbsLabel.setText('L_RBs[1-%d]:' % numRbCarrierScs)
         self.nrDedDlBwpGenericRbStartEdit.setText('0')
-        self.nrDedDlBwpGenericLRbsEdit.setText(str(numRb))
-        self.nrDedDlBwpGenericRbStartEdit.setValidator(QIntValidator(0, numRb-1))
-        self.nrDedDlBwpGenericLRbsEdit.setValidator(QIntValidator(1, numRb))
-        self.nrDedUlBwpGenericRbStartLabel.setText('RB_start[0-%d]:' % (numRb -1))
-        self.nrDedUlBwpGenericLRbsLabel.setText('L_RBs[1-%d]:' % numRb)
+        self.nrDedDlBwpGenericLRbsEdit.setText(str(numRbCarrierScs))
+        self.nrDedDlBwpGenericRbStartEdit.setValidator(QIntValidator(0, numRbCarrierScs-1))
+        self.nrDedDlBwpGenericLRbsEdit.setValidator(QIntValidator(1, numRbCarrierScs))
+        self.nrDedUlBwpGenericRbStartLabel.setText('RB_start[0-%d]:' % (numRbCarrierScs -1))
+        self.nrDedUlBwpGenericLRbsLabel.setText('L_RBs[1-%d]:' % numRbCarrierScs)
         self.nrDedUlBwpGenericRbStartEdit.setText('0')
-        self.nrDedUlBwpGenericLRbsEdit.setText(str(numRb))
-        self.nrDedUlBwpGenericRbStartEdit.setValidator(QIntValidator(0, numRb-1))
-        self.nrDedUlBwpGenericLRbsEdit.setValidator(QIntValidator(1, numRb))
+        self.nrDedUlBwpGenericLRbsEdit.setText(str(numRbCarrierScs))
+        self.nrDedUlBwpGenericRbStartEdit.setValidator(QIntValidator(0, numRbCarrierScs-1))
+        self.nrDedUlBwpGenericLRbsEdit.setValidator(QIntValidator(1, numRbCarrierScs))
 
     def onSsbScsCombCurIndChanged(self, index):
         if index < 0:
@@ -4961,11 +4996,11 @@ class NgNrGridUi(QDialog):
         
         ssbScsSubset = [v[0] for v in self.nrSsbRasters[self.nrCarrierBandComb.currentText()]]
         if self.freqRange == 'FR1':
-            scsSubset = ('15KHz', '30KHz')
+            commonScsSubset = ('15KHz', '30KHz')
         else:
-            scsSubset = ('60KHz', '120KHz')
+            commonScsSubset = ('60KHz', '120KHz')
         #avoid error when changing 'operating band' from FR1 to FR2
-        if not (self.nrSsbScsComb.currentText() in ssbScsSubset and self.nrMibScsCommonComb.currentText() in scsSubset):
+        if not (self.nrSsbScsComb.currentText() in ssbScsSubset and self.nrMibScsCommonComb.currentText() in commonScsSubset):
             return False
         
         self.ngwin.logEdit.append('-->inside validateCoreset0')
@@ -5006,9 +5041,16 @@ class NgNrGridUi(QDialog):
             return False
             
         #(2) validate CORESET0 bw against carrier bandwidth
+        commonScs = int(self.nrMibScsCommonComb.currentText()[:-3])
+        if self.freqRange == 'FR1':
+            numRbCommonScs = self.nrNrbFr1[commonScs][self.nrBwSetFr1.index(self.nrCarrierBwComb.currentText())]
+        else:
+            numRbCommonScs = self.nrNrbFr2[commonScs][self.nrBwSetFr2.index(self.nrCarrierBwComb.currentText())]
+            
         self.coreset0MultiplexingPat, self.coreset0NumRbs, self.coreset0NumSymbs, self.coreset0OffsetList = val
-        if int(self.nrCarrierNumRbEdit.text()) < self.coreset0NumRbs:
-            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid CORESET0 setting: CORESET0 numRBs=%d, while carrier numRBs=%s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0NumRbs, self.nrCarrierNumRbEdit.text()))
+        #if int(self.nrCarrierNumRbEdit.text()) < self.coreset0NumRbs:
+        if numRbCommonScs < self.coreset0NumRbs:
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid CORESET0 setting: CORESET0 numRBs=%d, while numRBs(common scs)=%s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0NumRbs, numRbCommonScs))
             return False
         
         #(3) if k_ssb is configured, further validate CORESET0
@@ -5024,12 +5066,14 @@ class NgNrGridUi(QDialog):
             if offset <= 0, min bw = self.coreset0NumRbs - offset, and don't have to update n_CRB_SSB
             '''
             if self.coreset0Offset > 0:
-                minBw = max(self.coreset0NumRbs, self.coreset0Offset + 20 * int(self.nrSsbScsComb.currentText()[:-3]) / int(self.nrCarrierScsComb.currentText()[:-3]))
+                #minBw = max(self.coreset0NumRbs, self.coreset0Offset + 20 * int(self.nrSsbScsComb.currentText()[:-3]) / int(self.nrCarrierScsComb.currentText()[:-3]))
+                minBw = max(self.coreset0NumRbs, self.coreset0Offset + 20 * int(self.nrSsbScsComb.currentText()[:-3]) / commonScs)
             else:
                 minBw = self.coreset0NumRbs - self.coreset0Offset
             
-            if int(self.nrCarrierNumRbEdit.text()) < minBw:
-                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid CORESET0 setting: CORESET0 numRBs=%d, offset=%d, minBw = %d, while carrier numRBs=%s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0NumRbs, self.coreset0Offset, minBw, self.nrCarrierNumRbEdit.text()))
+            #if int(self.nrCarrierNumRbEdit.text()) < minBw:
+            if numRbCommonScs < minBw:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid CORESET0 setting: CORESET0 numRBs=%d, offset=%d, minBw = %d, while numRBs(common scs)=%s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0NumRbs, self.coreset0Offset, minBw, numRbCommonScs))
                 return False
         
         #print CORESET0 info
@@ -5176,9 +5220,14 @@ class NgNrGridUi(QDialog):
         riv = int(self.nrIniDlBwpGenericLocAndBwEdit.text())
         L_RBs, RB_start= self.parseRiv(riv, 275)
         if L_RBs is not None and RB_start is not None: 
-            numRb = int(self.nrCarrierNumRbEdit.text())
-            if L_RBs < 1 or L_RBs > (numRb - RB_start):
-                self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRb))
+            commonScs = int(self.nrMibScsCommonComb.currentText()[:-3])
+            if self.freqRange == 'FR1':
+                numRbCommonScs = self.nrNrbFr1[commonScs][self.nrBwSetFr1.index(self.nrCarrierBwComb.currentText())]
+            else:
+                numRbCommonScs = self.nrNrbFr2[commonScs][self.nrBwSetFr2.index(self.nrCarrierBwComb.currentText())]
+            #numRbCarrierScs = int(self.nrCarrierNumRbEdit.text())
+            if L_RBs < 1 or L_RBs > (numRbCommonScs - RB_start):
+                self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRbCommonScs))
                 self.nrIniDlBwpGenericLRbsEdit.clear()
                 self.nrIniDlBwpGenericRbStartEdit.clear()
                 return
@@ -5198,9 +5247,14 @@ class NgNrGridUi(QDialog):
         #self.ngwin.logEdit.append('-->inside onIniDlBwpLRBsOrRBStartEditTextChanged')
         L_RBs = int(self.nrIniDlBwpGenericLRbsEdit.text())
         RB_start = int(self.nrIniDlBwpGenericRbStartEdit.text())
-        numRb = int(self.nrCarrierNumRbEdit.text())
-        if L_RBs < 1 or L_RBs > (numRb - RB_start):
-            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRb))
+        commonScs = int(self.nrMibScsCommonComb.currentText()[:-3])
+        if self.freqRange == 'FR1':
+            numRbCommonScs = self.nrNrbFr1[commonScs][self.nrBwSetFr1.index(self.nrCarrierBwComb.currentText())]
+        else:
+            numRbCommonScs = self.nrNrbFr2[commonScs][self.nrBwSetFr2.index(self.nrCarrierBwComb.currentText())]
+        #numRbCarrierScs = int(self.nrCarrierNumRbEdit.text())
+        if L_RBs < 1 or L_RBs > (numRbCommonScs - RB_start):
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRbCommonScs))
             return
         
         riv = self.makeRiv(L_RBs, RB_start, 275)
@@ -5218,9 +5272,9 @@ class NgNrGridUi(QDialog):
         riv = int(self.nrIniUlBwpGenericLocAndBwEdit.text())
         L_RBs, RB_start= self.parseRiv(riv, 275)
         if L_RBs is not None and RB_start is not None: 
-            numRb = int(self.nrCarrierNumRbEdit.text())
-            if L_RBs < 1 or L_RBs > (numRb - RB_start):
-                self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRb))
+            numRbCarrierScs = int(self.nrCarrierNumRbEdit.text())
+            if L_RBs < 1 or L_RBs > (numRbCarrierScs - RB_start):
+                self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRbCarrierScs))
                 self.nrIniUlBwpGenericLRbsEdit.clear()
                 self.nrIniUlBwpGenericRbStartEdit.clear()
                 return
@@ -5240,9 +5294,9 @@ class NgNrGridUi(QDialog):
         #self.ngwin.logEdit.append('-->inside onIniUlBwpLRBsOrRBStartEditTextChanged')
         L_RBs = int(self.nrIniUlBwpGenericLRbsEdit.text())
         RB_start = int(self.nrIniUlBwpGenericRbStartEdit.text())
-        numRb = int(self.nrCarrierNumRbEdit.text())
-        if L_RBs < 1 or L_RBs > (numRb - RB_start):
-            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRb))
+        numRbCarrierScs = int(self.nrCarrierNumRbEdit.text())
+        if L_RBs < 1 or L_RBs > (numRbCarrierScs - RB_start):
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRbCarrierScs))
             return
         
         riv = self.makeRiv(L_RBs, RB_start, 275)
@@ -5260,9 +5314,9 @@ class NgNrGridUi(QDialog):
         riv = int(self.nrDedDlBwpGenericLocAndBwEdit.text())
         L_RBs, RB_start= self.parseRiv(riv, 275)
         if L_RBs is not None and RB_start is not None: 
-            numRb = int(self.nrCarrierNumRbEdit.text())
-            if L_RBs < 1 or L_RBs > (numRb - RB_start):
-                self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRb))
+            numRbCarrierScs = int(self.nrCarrierNumRbEdit.text())
+            if L_RBs < 1 or L_RBs > (numRbCarrierScs - RB_start):
+                self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRbCarrierScs))
                 self.nrDedDlBwpGenericLRbsEdit.clear()
                 self.nrDedDlBwpGenericRbStartEdit.clear()
                 return
@@ -5283,9 +5337,9 @@ class NgNrGridUi(QDialog):
         #self.ngwin.logEdit.append('-->inside onDedDlBwpLRBsOrRBStartEditTextChanged')
         L_RBs = int(self.nrDedDlBwpGenericLRbsEdit.text())
         RB_start = int(self.nrDedDlBwpGenericRbStartEdit.text())
-        numRb = int(self.nrCarrierNumRbEdit.text())
-        if L_RBs < 1 or L_RBs > (numRb - RB_start):
-            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRb))
+        numRbCarrierScs = int(self.nrCarrierNumRbEdit.text())
+        if L_RBs < 1 or L_RBs > (numRbCarrierScs - RB_start):
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRbCarrierScs))
             return
         
         riv = self.makeRiv(L_RBs, RB_start, 275)
@@ -5304,9 +5358,9 @@ class NgNrGridUi(QDialog):
         riv = int(self.nrDedUlBwpGenericLocAndBwEdit.text())
         L_RBs, RB_start= self.parseRiv(riv, 275)
         if L_RBs is not None and RB_start is not None: 
-            numRb = int(self.nrCarrierNumRbEdit.text())
-            if L_RBs < 1 or L_RBs > (numRb - RB_start):
-                self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRb))
+            numRbCarrierScs = int(self.nrCarrierNumRbEdit.text())
+            if L_RBs < 1 or L_RBs > (numRbCarrierScs - RB_start):
+                self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRbCarrierScs))
                 self.nrDedUlBwpGenericLRbsEdit.clear()
                 self.nrIniUlBwpGenericRbStartEdit.clear()
                 return
@@ -5326,9 +5380,9 @@ class NgNrGridUi(QDialog):
         #self.ngwin.logEdit.append('-->inside onDedUlBwpLRBsOrRBStartEditTextChanged')
         L_RBs = int(self.nrDedUlBwpGenericLRbsEdit.text())
         RB_start = int(self.nrDedUlBwpGenericRbStartEdit.text())
-        numRb = int(self.nrCarrierNumRbEdit.text())
-        if L_RBs < 1 or L_RBs > (numRb - RB_start):
-            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRb))
+        numRbCarrierScs = int(self.nrCarrierNumRbEdit.text())
+        if L_RBs < 1 or L_RBs > (numRbCarrierScs - RB_start):
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRbCarrierScs))
             return
         
         riv = self.makeRiv(L_RBs, RB_start, 275)
