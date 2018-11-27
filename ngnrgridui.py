@@ -4598,14 +4598,16 @@ class NgNrGridUi(QDialog):
         #initialize SLIV look-up tables 
         self.initPdschSliv()
         self.initPuschSliv()
+        '''
         self.ngwin.logEdit.append('contents of self.nrPdschToSliv:')
         for key,val in self.nrPdschToSliv.items():
             prefix, S, L = key.split('_')
             self.ngwin.logEdit.append('%s,%s,%s,%s'%(prefix,S,L,val))
-            self.ngwin.logEdit.append('contents of self.nrPuschToSliv:')
+        self.ngwin.logEdit.append('contents of self.nrPuschToSliv:')
         for key,val in self.nrPuschToSliv.items():
             prefix, S, L = key.split('_')
             self.ngwin.logEdit.append('%s,%s,%s,%s'%(prefix,S,L,val))
+        '''
             
         
     def validateScsPerBandFr1(self):
