@@ -158,8 +158,6 @@ class NgNrGridUi(QDialog):
         
         self.nrMibScsCommonLabel = QLabel('subCarrierSpacingCommon:')
         self.nrMibScsCommonComb = QComboBox()
-        self.nrMibScsCommonComb.addItems(['15KHz', '30KHz', '60KHz', '120KHz'])
-        self.nrMibScsCommonComb.setEnabled(False)
         
         self.nrMibCoreset0Label = QLabel('coresetZero(PDCCH-ConfigSIB1)[0-15]:')
         self.nrMibCoreset0Edit = QLineEdit('0')
@@ -3126,6 +3124,7 @@ class NgNrGridUi(QDialog):
         self.nrCarrierScsComb.currentIndexChanged[int].connect(self.onCarrierScsCombCurIndChanged)
         self.nrCarrierBandComb.currentIndexChanged[int].connect(self.onCarrierBandCombCurIndChanged)
         self.nrSsbScsComb.currentIndexChanged[int].connect(self.onSsbScsCombCurIndChanged)
+        self.nrMibScsCommonComb.currentIndexChanged[int].connect(self.onMibScsCommonCombCurIndChanged)
         self.nrMibDmRsTypeAPosComb.currentIndexChanged[int].connect(self.onMibDmrsTypeAPosCombCurIndChanged)
         self.nrMibCoreset0Edit.textChanged.connect(self.onMibCoreset0EditTextChanged)
         self.nrMibCss0Edit.textChanged.connect(self.onMibCss0EditTextChanged)
@@ -4548,13 +4547,6 @@ class NgNrGridUi(QDialog):
 
         
         
-        
-        
-        
-        
-        
-        
-        
         #offset of CORESET0 w.r.t. SSB
         self.coreset0Offset = 0
         #minimum channel bandwidth
@@ -4568,7 +4560,10 @@ class NgNrGridUi(QDialog):
             if val.count(1) == 0:
                 continue
             band, scs = key.split('_')
-            #FIXME 60KHz scs is not supported, although 60KHz is specified in transmission bandwidth table of FR1 in 38.104 vf3  
+            #FIXME
+            #refer to 38.331 vf30
+            #MIB - subCarrierSpacingCommon: Subcarrier spacing for SIB1, Msg.2/4 for initial access and broadcast SI-messages. If the UE acquires this MIB on a carrier frequency <6GHz, the value scs15or60 corresponds to 15 Khz and the value scs30or120 corresponds to 30 kHz. If the UE acquires this MIB on a carrier frequency >6GHz, the value scs15or60 corresponds to 60 Khz and the value scs30or120 corresponds to 120 kHz.
+            #BWP - subcarrierSpacing: For the initial DL BWP this field has the same value as the field subCarrierSpacingCommon in MIB of the same serving cell.
             if scs == '60':
                 continue
             if not band in self.nrScsPerBandFr1:
@@ -4583,8 +4578,8 @@ class NgNrGridUi(QDialog):
 
     def updateKSsbAndNCrbSsb(self, offset):
         #NOTE:
-        #(a) offset in scsCommon, which equals to scsCarrier;
-        #(b) and offset > 0;
+        #(a) offset in scsCommon
+        #(b) and offset >= 0;
         if not self.nrMinGuardBandEdit.text():
             return
         
@@ -4592,46 +4587,54 @@ class NgNrGridUi(QDialog):
         #7.4.3.1	Time-frequency structure of an SS/PBCH block
         '''
         For FR1, k_ssb and n_crb_ssb based on 15k
-        For FR2, k_ssb based on carrier_scs, n_crb_ssb based on 60k
+        For FR2, k_ssb based on common scs, n_crb_ssb based on 60k
 
-        FR1/FR2   carrier_scs   ssb_scs     k_ssb	n_crb_ssb
+        FR1/FR2   common_scs   ssb_scs     k_ssb	n_crb_ssb
         -----------------------------------------------------------
-        FR1	        15k         15k         0~11	minGuardBand+offset
-                    15k         30k         0~11	minGuardBand+offset
-                    30k         15k         0~23	2*(minGuardBand+offset)
-                    30k         30k         0~23	2*(minGuardBand+offset)
-        FR2         60k         120k        0~11	minGuardBand+offset
-                    60k         240k        0~11	max(minGuardBand+offset,4*minGuardBand240k)
-                    120k        120k        0~11	2*(minGuardBand+offset)
-                    120k        240k        0~11	max(2*(minGuardBand+offset),4*minGuardBand240k)
+        FR1	        15k         15k         0~11	minGuardBand*scsCarrier/15+offset
+                    15k         30k         0~11	minGuardBand*scsCarrier/15+offset
+                    30k         15k         0~23	minGuardBand*scsCarrier/15+2*offset
+                    30k         30k         0~23	minGuardBand*scsCarrier/15+2*offset
+        FR2         60k         120k        0~11	minGuardBand*scsCarrier/60+offset
+                    60k         240k        0~11	max(minGuardBand*scsCarrier/60+offset,4*minGuardBand240k)
+                    120k        120k        0~11	minGuardBand*scsCarrier/60+2*offset
+                    120k        240k        0~11	max(minGuardBand*scsCarrier/60+2*offset,4*minGuardBand240k)
         -----------------------------------------------------------
         '''
         self.ngwin.logEdit.append('-->inside updateKSsbAndNCrbSsb')
         
-        key = self.nrCarrierScsComb.currentText()[:-3] + '_' + self.nrSsbScsComb.currentText()[:-3]
+        #minGuardBand in carrier scs
         minGuardBand = int(self.nrMinGuardBandEdit.text())
-        if key in ('15_15', '15_30', '60_120'):
+        scsCarrier = int(self.nrCarrierScsComb.currentText()[:-3])
+        
+        #key = self.nrCarrierScsComb.currentText()[:-3] + '_' + self.nrSsbScsComb.currentText()[:-3]
+        key = self.nrMibScsCommonComb.currentText()[:-3] + '_' + self.nrSsbScsComb.currentText()[:-3]
+        if key in ('15_15', '15_30'):
             self.nrSsbKssbLabel.setText('k_SSB[0-11]:')
             self.nrSsbKssbEdit.setValidator(QIntValidator(0, 11))
-            self.nrSsbNCrbSsbEdit.setText(str(minGuardBand+offset))
+            self.nrSsbNCrbSsbEdit.setText(str(minGuardBand*scsCarrier//15+offset))
         elif key in ('30_15', '30_30'):
             self.nrSsbKssbLabel.setText('k_SSB[0-23]:')
             self.nrSsbKssbEdit.setValidator(QIntValidator(0, 23))
-            self.nrSsbNCrbSsbEdit.setText(str(2*(minGuardBand+offset)))
+            self.nrSsbNCrbSsbEdit.setText(str(minGuardBand*scsCarrier//15+2*offset))
+        elif key == '60_120':
+            self.nrSsbKssbLabel.setText('k_SSB[0-11]:')
+            self.nrSsbKssbEdit.setValidator(QIntValidator(0, 11))
+            self.nrSsbNCrbSsbEdit.setText(str(minGuardBand*scsCarrier//60+offset))
         elif key == '60_240':
             self.nrSsbKssbLabel.setText('k_SSB[0-11]:')
             self.nrSsbKssbEdit.setValidator(QIntValidator(0, 11))
             minGuardBand240k = int(self.nrSsbMinGuardBandScs240kEdit.text())
-            self.nrSsbNCrbSsbEdit.setText(str(max(minGuardBand+offset, 4*minGuardBand240k)))
+            self.nrSsbNCrbSsbEdit.setText(str(max(minGuardBand*scsCarrier//60+offset, 4*minGuardBand240k)))
         elif key == '120_120':
             self.nrSsbKssbLabel.setText('k_SSB[0-11]:')
             self.nrSsbKssbEdit.setValidator(QIntValidator(0, 11))
-            self.nrSsbNCrbSsbEdit.setText(str(2*(minGuardBand+offset)))
+            self.nrSsbNCrbSsbEdit.setText(str(minGuardBand*scsCarrier//60+2*offset))
         elif key == '120_240':
             self.nrSsbKssbLabel.setText('k_SSB[0-11]:')
             self.nrSsbKssbEdit.setValidator(QIntValidator(0, 11))
             minGuardBand240k = int(self.nrSsbMinGuardBandScs240kEdit.text())
-            self.nrSsbNCrbSsbEdit.setText(str(max(2*(minGuardBand+offset), 4*minGuardBand240k)))
+            self.nrSsbNCrbSsbEdit.setText(str(max(minGuardBand*scsCarrier//60+2*offset, 4*minGuardBand240k)))
         else:
             pass
     
@@ -4713,6 +4716,15 @@ class NgNrGridUi(QDialog):
         self.nrCarrierScsComb.addItems(scsSubset)
         self.nrCarrierScsComb.setCurrentIndex(0)
         
+        #(3.1) update common scs
+        if self.freqRange == 'FR1':
+            commonScsSubset = ('15KHz', '30KHz')
+        else:
+            commonScsSubset = ('60KHz', '120KHz')
+        self.nrMibScsCommonComb.clear()
+        self.nrMibScsCommonComb.addItems(commonScsSubset)
+        self.nrMibScsCommonComb.setCurrentIndex(0)
+        
         #(4) update ssb-positions-in-burst
         if self.maxL in (4, 8):
             self.nrSsbInOneGrpEdit.setText('11110000' if self.maxL == 4 else '11111111')
@@ -4732,20 +4744,20 @@ class NgNrGridUi(QDialog):
         
         self.ngwin.logEdit.append('-->inside onCarrierScsCombCurIndChanged, index=%d' % index)
         
-        #(1) update scsCommon and refScs, u_PDCCH/u_PDSCH/u_PUSCH in DCIs and scs of initial/dedicated ul/dl bwp
-        self.nrMibScsCommonComb.setCurrentText(self.nrCarrierScsComb.currentText())
+        #(1) update refScs; update u_PDCCH/u_PDSCH/u_PUSCH in DCI 1_1/0_1 and msg3 PUSCH; update scs of initial ul bwp, dedicated ul/dl bwp
+        #self.nrMibScsCommonComb.setCurrentText(self.nrCarrierScsComb.currentText())
         self.nrTddCfgRefScsComb.setCurrentText(self.nrCarrierScsComb.currentText())
-        self.nrIniDlBwpGenericScsComb.setCurrentText(self.nrCarrierScsComb.currentText())
+        #self.nrIniDlBwpGenericScsComb.setCurrentText(self.nrCarrierScsComb.currentText())
         self.nrIniUlBwpGenericScsComb.setCurrentText(self.nrCarrierScsComb.currentText())
         self.nrDedDlBwpGenericScsComb.setCurrentText(self.nrCarrierScsComb.currentText())
         self.nrDedUlBwpGenericScsComb.setCurrentText(self.nrCarrierScsComb.currentText())
         u = {'15KHz':0, '30KHz':1, '60KHz':2, '120KHz':3, '240KHz':4}[self.nrCarrierScsComb.currentText()]
-        self.nrDci10Sib1MuPdcchEdit.setText(str(u))
-        self.nrDci10Sib1MuPdschEdit.setText(str(u))
-        self.nrDci10Msg2MuPdcchEdit.setText(str(u))
-        self.nrDci10Msg2MuPdschEdit.setText(str(u))
-        self.nrDci10Msg4MuPdcchEdit.setText(str(u))
-        self.nrDci10Msg4MuPdschEdit.setText(str(u))
+        #self.nrDci10Sib1MuPdcchEdit.setText(str(u))
+        #self.nrDci10Sib1MuPdschEdit.setText(str(u))
+        #self.nrDci10Msg2MuPdcchEdit.setText(str(u))
+        #self.nrDci10Msg2MuPdschEdit.setText(str(u))
+        #self.nrDci10Msg4MuPdcchEdit.setText(str(u))
+        #self.nrDci10Msg4MuPdschEdit.setText(str(u))
         self.nrDci11PdschMuPdcchEdit.setText(str(u))
         self.nrDci11PdschMuPdschEdit.setText(str(u))
         self.nrMsg3PuschMuPuschEdit.setText(str(u))
@@ -4769,10 +4781,12 @@ class NgNrGridUi(QDialog):
         self.nrCarrierBwComb.setCurrentIndex(0)
         
         #(3) validate CORESET0 and update n_CRB_SSB when necessary
+        '''
         self.flagCoreset0 = self.validateCoreset0()
         if self.flagCoreset0:
             self.updateKSsbAndNCrbSsb(offset=0 if self.coreset0Offset <= 0 else self.coreset0Offset)
             self.flagCss0 = self.validateCss0()
+        '''
         
         #(4) update SR periodicity and offset
         srPeriodSet = {
@@ -4797,7 +4811,27 @@ class NgNrGridUi(QDialog):
         
         #(5) validate 'uss first symbols' edit
         self.validateUssFirstSymbs()
-
+    
+    def onMibScsCommonCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onMibScsCommonCombCurIndChanged, index=%d' % index)
+        #(1) update scs for initial dl bwp; update u_pdcch/u_pdsch for sib1/msg2/msg4 
+        self.nrIniDlBwpGenericScsComb.setCurrentText(self.nrMibScsCommonComb.currentText())
+        u = {'15KHz':0, '30KHz':1, '60KHz':2, '120KHz':3, '240KHz':4}[self.nrMibScsCommonComb.currentText()]
+        self.nrDci10Sib1MuPdcchEdit.setText(str(u))
+        self.nrDci10Sib1MuPdschEdit.setText(str(u))
+        self.nrDci10Msg2MuPdcchEdit.setText(str(u))
+        self.nrDci10Msg2MuPdschEdit.setText(str(u))
+        self.nrDci10Msg4MuPdcchEdit.setText(str(u))
+        self.nrDci10Msg4MuPdschEdit.setText(str(u))
+        
+        #(2) validate coreset0 and update k_ssb and n_crb_ssb if necessary
+        self.flagCoreset0 = self.validateCoreset0()
+        if self.flagCoreset0:
+            self.updateKSsbAndNCrbSsb(offset=0 if self.coreset0Offset <= 0 else self.coreset0Offset)
+            self.flagCss0 = self.validateCss0()
 
     def onCarrierBwCombCurIndChanged(self, index):
         if index < 0:
@@ -4927,7 +4961,7 @@ class NgNrGridUi(QDialog):
         
         ssbScsSubset = [v[0] for v in self.nrSsbRasters[self.nrCarrierBandComb.currentText()]]
         if self.freqRange == 'FR1':
-            scsSubset = self.nrScsPerBandFr1[self.nrCarrierBandComb.currentText()]
+            scsSubset = ('15KHz', '30KHz')
         else:
             scsSubset = ('60KHz', '120KHz')
         #avoid error when changing 'operating band' from FR1 to FR2
