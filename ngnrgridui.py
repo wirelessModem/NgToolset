@@ -4598,6 +4598,15 @@ class NgNrGridUi(QDialog):
         #initialize SLIV look-up tables 
         self.initPdschSliv()
         self.initPuschSliv()
+        self.ngwin.logEdit.append('contents of self.nrPdschToSliv:')
+        for key,val in self.nrPdschToSliv.items():
+            prefix, S, L = key.split('_')
+            self.ngwin.logEdit.append('%s,%s,%s,%s'%(prefix,S,L,val))
+            self.ngwin.logEdit.append('contents of self.nrPuschToSliv:')
+        for key,val in self.nrPuschToSliv.items():
+            prefix, S, L = key.split('_')
+            self.ngwin.logEdit.append('%s,%s,%s,%s'%(prefix,S,L,val))
+            
         
     def validateScsPerBandFr1(self):
         self.ngwin.logEdit.append('-->inside validateScsPerBandFr1')
@@ -5775,6 +5784,8 @@ class NgNrGridUi(QDialog):
         if index < 0:
             return
         
+        self.ngwin.logEdit.append('-->inside onDci11MappingTypeOrDedDlBwpCpCombCurIndChanged, index=%d' % index)
+        
         mappingType = self.nrDci11PdschTimeAllocMappingTypeComb.currentText()
         cp = self.nrDedDlBwpGenericCpComb.currentText()
         
@@ -5845,7 +5856,6 @@ class NgNrGridUi(QDialog):
     
     def makeSliv(self, S, L):
         if L <= 0 or L > 14 - S:
-            #self.ngwin.logEdit.append('Error: S = %d, L = %d.' % (S, L))
             return None
         
         if (L - 1) <= 7:
