@@ -3594,6 +3594,7 @@ class NgNrGridUi(QDialog):
             '240_120_15' : None,
             }
         
+        #refer to 3GPP 38.211 vf30
         #Table 6.3.3.1-1: PRACH preamble formats for L_RA=839 and scsRA={1.25k, 5k}
         self.nrScsRaLongPrach = {
             '839_0' : '1.25KHz',
@@ -4401,6 +4402,150 @@ class NgNrGridUi(QDialog):
             254 : ('A3/B3', 1, (0,), (3,7,11,15,19,23,27,31,35,39,), 2, 1, 2, 6),
             255 : ('A3/B3', 1, (0,), tuple(range(1,40,2)), 2, 1, 2, 6),
             }
+        
+        #refer to 3GPP 38.214 vf30
+        #Table 5.1.2.1.1-2: Default PDSCH time domain resource allocation A for normal CP
+        self.nrPdschTimeAllocDefANormCp = {
+            '1_2' : ('Type A', 0, 2, 12),
+            '1_3' : ('Type A', 0, 3, 11),
+            '2_2' : ('Type A', 0, 2, 10),
+            '2_3' : ('Type A', 0, 3, 9),
+            '3_2' : ('Type A', 0, 2, 9),
+            '3_3' : ('Type A', 0, 3, 8),
+            '4_2' : ('Type A', 0, 2, 7),
+            '4_3' : ('Type A', 0, 3, 6),
+            '5_2' : ('Type A', 0, 2, 5),
+            '5_3' : ('Type A', 0, 3, 4),
+            '6_2' : ('Type B', 0, 9, 4),
+            '6_3' : ('Type B', 0, 10, 4),
+            '7_2' : ('Type B', 0, 4, 4),
+            '7_3' : ('Type B', 0, 6, 4),
+            '8_2' : ('Type B', 0, 5, 7),
+            '9_2' : ('Type B', 0, 5, 2),
+            '10_2' : ('Type B', 0, 9, 2),
+            '11_2' : ('Type B', 0, 12, 2),
+            '12_2' : ('Type A', 0, 1, 13),
+            '13_2' : ('Type A', 0, 1, 6),
+            '14_2' : ('Type A', 0, 2, 4),
+            '15_2' : ('Type B', 0, 4, 7),
+            '16_2' : ('Type B', 0, 8, 4),
+            '8_3' : ('Type B', 0, 5, 7),
+            '9_3' : ('Type B', 0, 5, 2),
+            '10_3' : ('Type B', 0, 9, 2),
+            '11_3' : ('Type B', 0, 12, 2),
+            '12_3' : ('Type A', 0, 1, 13),
+            '13_3' : ('Type A', 0, 1, 6),
+            '14_3' : ('Type A', 0, 2, 4),
+            '15_3' : ('Type B', 0, 4, 7),
+            '16_3' : ('Type B', 0, 8, 4),
+            }
+        
+        #Table 5.1.2.1.1-3: Default PDSCH time domain resource allocation A for extended CP
+        self.nrPdschTimeAllocDefAExtCp = {
+            '1_2' : ('Type A', 0, 2, 6),
+            '1_3' : ('Type A', 0, 3, 5),
+            '2_2' : ('Type A', 0, 2, 10),
+            '1_3' : ('Type A', 0, 3, 9),
+            '3_2' : ('Type A', 0, 2, 9),
+            '3_3' : ('Type A', 0, 3, 8),
+            '4_2' : ('Type A', 0, 2, 7),
+            '4_3' : ('Type A', 0, 3, 6),
+            '5_2' : ('Type A', 0, 2, 5),
+            '5_3' : ('Type A', 0, 3, 4),
+            '6_2' : ('Type B', 0, 6, 4),
+            '6_3' : ('Type B', 0, 8, 2),
+            '7_2' : ('Type B', 0, 4, 4),
+            '7_3' : ('Type B', 0, 6, 4),
+            '8_2' : ('Type B', 0, 5, 6),
+            '9_2' : ('Type B', 0, 5, 2),
+            '10_2' : ('Type B', 0, 9, 2),
+            '11_2' : ('Type B', 0, 10, 2),
+            '12_2' : ('Type A', 0, 1, 11),
+            '13_2' : ('Type A', 0, 1, 6),
+            '14_2' : ('Type A', 0, 2, 4),
+            '15_2' : ('Type B', 0, 4, 6),
+            '16_2' : ('Type B', 0, 8, 4),
+            '8_3' : ('Type B', 0, 5, 6),
+            '9_3' : ('Type B', 0, 5, 2),
+            '10_3' : ('Type B', 0, 9, 2),
+            '11_3' : ('Type B', 0, 10, 2),
+            '12_3' : ('Type A', 0, 1, 11),
+            '13_3' : ('Type A', 0, 1, 6),
+            '14_3' : ('Type A', 0, 2, 4),
+            '15_3' : ('Type B', 0, 4, 6),
+            '16_3' : ('Type B', 0, 8, 4),
+            }
+        
+        #Table 5.1.2.1.1-4: Default PDSCH time domain resource allocation B
+        self.nrPdschTimeAllocDefB = {
+            '1_2' : ('Type B', 0, 2, 2),
+            '2_2' : ('Type B', 0, 4, 2),
+            '3_2' : ('Type B', 0, 6, 2),
+            '4_2' : ('Type B', 0, 8, 2),
+            '5_2' : ('Type B', 0, 10, 2),
+            '6_2' : ('Type B', 1, 2, 2),
+            '7_2' : ('Type B', 1, 4, 2),
+            '8_2' : ('Type B', 0, 2, 4),
+            '9_2' : ('Type B', 0, 4, 4),
+            '10_2' : ('Type B', 0, 6, 4),
+            '11_2' : ('Type B', 0, 8, 4),
+            '12_2' : ('Type B', 0, 10, 4),
+            '13_2' : ('Type B', 0, 2, 7),
+            '14_2' : ('Type A', 0, 2, 12),
+            '14_3' : ('Type A', 0, 3, 11),
+            '15_2' : ('Type B', 1, 2, 4),
+            '1_3' : ('Type B', 0, 2, 2),
+            '2_3' : ('Type B', 0, 4, 2),
+            '3_3' : ('Type B', 0, 6, 2),
+            '4_3' : ('Type B', 0, 8, 2),
+            '5_3' : ('Type B', 0, 10, 2),
+            '6_3' : ('Type B', 1, 2, 2),
+            '7_3' : ('Type B', 1, 4, 2),
+            '8_3' : ('Type B', 0, 2, 4),
+            '9_3' : ('Type B', 0, 4, 4),
+            '10_3' : ('Type B', 0, 6, 4),
+            '11_3' : ('Type B', 0, 8, 4),
+            '12_3' : ('Type B', 0, 10, 4),
+            '13_3' : ('Type B', 0, 2, 7),
+            '15_3' : ('Type B', 1, 2, 4),
+            }
+        #Note 1: If the PDSCH was scheduled with SI-RNTI in PDCCH Type0 common search space, the UE may assume that this PDSCH resource allocation is not applied
+        self.nrPdschTimeAllocDefBNote1Set = [12, 13, 14]
+        
+        #Table 5.1.2.1.1-5: Default PDSCH time domain resource allocation C
+        self.nrPdschTimeAllocDefC = {
+            '1_2' : ('Type B', 0, 2, 2),
+            '2_2' : ('Type B', 0, 4, 2),
+            '3_2' : ('Type B', 0, 6, 2),
+            '4_2' : ('Type B', 0, 8, 2),
+            '5_2' : ('Type B', 0, 10, 2),
+            '8_2' : ('Type B', 0, 2, 4),
+            '9_2' : ('Type B', 0, 4, 4),
+            '10_2' : ('Type B', 0, 6, 4),
+            '11_2' : ('Type B', 0, 8, 4),
+            '12_2' : ('Type B', 0, 10, 4),
+            '13_2' : ('Type B', 0, 2, 7),
+            '14_2' : ('Type A', 0, 2, 12),
+            '14_3' : ('Type A', 0, 3, 11),
+            '15_2' : ('Type A', 0, 0, 6),
+            '16_2' : ('Type A', 0, 2, 6),
+            '1_3' : ('Type B', 0, 2, 2),
+            '2_3' : ('Type B', 0, 4, 2),
+            '3_3' : ('Type B', 0, 6, 2),
+            '4_3' : ('Type B', 0, 8, 2),
+            '5_3' : ('Type B', 0, 10, 2),
+            '8_3' : ('Type B', 0, 2, 4),
+            '9_3' : ('Type B', 0, 4, 4),
+            '10_3' : ('Type B', 0, 6, 4),
+            '11_3' : ('Type B', 0, 8, 4),
+            '12_3' : ('Type B', 0, 10, 4),
+            '13_3' : ('Type B', 0, 2, 7),
+            '15_3' : ('Type A', 0, 0, 6),
+            '16_3' : ('Type A', 0, 2, 6),
+            }
+        #Note 1: The UE may assume that this PDSCH resource allocation is not used, if the PDSCH was scheduled with SI-RNTI in PDCCH Type0 common search space
+        self.nrPdschTimeAllocDefCNote1Set = [1, 13, 14, 15, 16]
+
         
         
         
