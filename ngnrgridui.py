@@ -37,7 +37,7 @@ class NgNrGridUi(QDialog):
 
         self.nrCarrierBandInfoLabel = QLabel()
 
-        self.nrCarrierScsLabel = QLabel('Subcarrier spacing:')
+        self.nrCarrierScsLabel = QLabel('subcarrierSpacingg:')
         self.nrCarrierScsComb = QComboBox()
 
         self.nrCarrierBwLabel = QLabel('Transmission bandwidth:')
@@ -444,22 +444,28 @@ class NgNrGridUi(QDialog):
         
         self.nrDci10Sib1TimeAllocFieldLabel = QLabel('Time domain resource assignment[0-15]:')
         self.nrDci10Sib1TimeAllocFieldEdit = QLineEdit()
+        self.nrDci10Sib1TimeAllocFieldEdit.setValidator(QIntValidator(0, 15))
         
         self.nrDci10Sib1TimeAllocMappingTypeLabel = QLabel('Mapping type:')
         self.nrDci10Sib1TimeAllocMappingTypeComb = QComboBox()
         self.nrDci10Sib1TimeAllocMappingTypeComb.addItems(['Type A', 'Type B'])
+        self.nrDci10Sib1TimeAllocMappingTypeComb.setEnabled(False)
         
         self.nrDci10Sib1TimeAllocK0Label = QLabel('K0:')
         self.nrDci10Sib1TimeAllocK0Edit = QLineEdit()
+        self.nrDci10Sib1TimeAllocK0Edit.setEnabled(False)
         
         self.nrDci10Sib1TimeAllocSlivLabel = QLabel('SLIV:')
         self.nrDci10Sib1TimeAllocSlivEdit = QLineEdit()
+        self.nrDci10Sib1TimeAllocSlivEdit.setEnabled(False)
         
         self.nrDci10Sib1TimeAllocSLabel = QLabel('S(of SLIV):')
         self.nrDci10Sib1TimeAllocSEdit = QLineEdit()
+        self.nrDci10Sib1TimeAllocSEdit.setEnabled(False)
         
         self.nrDci10Sib1TimeAllocLLabel = QLabel('L(of SLIV):')
         self.nrDci10Sib1TimeAllocLEdit = QLineEdit()
+        self.nrDci10Sib1TimeAllocLEdit.setEnabled(False)
         
         self.nrDci10Sib1FreqAllocTypeLabel = QLabel('resourceAllocation:')
         self.nrDci10Sib1FreqAllocTypeComb = QComboBox()
@@ -567,22 +573,28 @@ class NgNrGridUi(QDialog):
         
         self.nrDci10Msg2TimeAllocFieldLabel = QLabel('Time domain resource assignment[0-15]:')
         self.nrDci10Msg2TimeAllocFieldEdit = QLineEdit()
+        self.nrDci10Msg2TimeAllocFieldEdit.setValidator(QIntValidator(0, 15))
         
         self.nrDci10Msg2TimeAllocMappingTypeLabel = QLabel('Mapping type:')
         self.nrDci10Msg2TimeAllocMappingTypeComb = QComboBox()
         self.nrDci10Msg2TimeAllocMappingTypeComb.addItems(['Type A', 'Type B'])
+        self.nrDci10Msg2TimeAllocMappingTypeComb.setEnabled(False)
         
         self.nrDci10Msg2TimeAllocK0Label = QLabel('K0:')
         self.nrDci10Msg2TimeAllocK0Edit = QLineEdit()
+        self.nrDci10Msg2TimeAllocK0Edit.setEnabled(False)
         
         self.nrDci10Msg2TimeAllocSlivLabel = QLabel('SLIV:')
         self.nrDci10Msg2TimeAllocSlivEdit = QLineEdit()
+        self.nrDci10Msg2TimeAllocSlivEdit.setEnabled(False)
         
         self.nrDci10Msg2TimeAllocSLabel = QLabel('S(of SLIV):')
         self.nrDci10Msg2TimeAllocSEdit = QLineEdit()
+        self.nrDci10Msg2TimeAllocSEdit.setEnabled(False)
         
         self.nrDci10Msg2TimeAllocLLabel = QLabel('L(of SLIV):')
         self.nrDci10Msg2TimeAllocLEdit = QLineEdit()
+        self.nrDci10Msg2TimeAllocLEdit.setEnabled(False)
         
         self.nrDci10Msg2FreqAllocTypeLabel = QLabel('resourceAllocation:')
         self.nrDci10Msg2FreqAllocTypeComb = QComboBox()
@@ -696,22 +708,28 @@ class NgNrGridUi(QDialog):
         
         self.nrDci10Msg4TimeAllocFieldLabel = QLabel('Time domain resource assignment[0-15]:')
         self.nrDci10Msg4TimeAllocFieldEdit = QLineEdit()
+        self.nrDci10Msg4TimeAllocFieldEdit.setValidator(QIntValidator(0, 15))
         
         self.nrDci10Msg4TimeAllocMappingTypeLabel = QLabel('Mapping type:')
         self.nrDci10Msg4TimeAllocMappingTypeComb = QComboBox()
         self.nrDci10Msg4TimeAllocMappingTypeComb.addItems(['Type A', 'Type B'])
+        self.nrDci10Msg4TimeAllocMappingTypeComb.setEnabled(False)
         
         self.nrDci10Msg4TimeAllocK0Label = QLabel('K0:')
         self.nrDci10Msg4TimeAllocK0Edit = QLineEdit()
+        self.nrDci10Msg4TimeAllocK0Edit.setEnabled(False)
         
         self.nrDci10Msg4TimeAllocSlivLabel = QLabel('SLIV:')
         self.nrDci10Msg4TimeAllocSlivEdit = QLineEdit()
+        self.nrDci10Msg4TimeAllocSlivEdit.setEnabled(False)
         
         self.nrDci10Msg4TimeAllocSLabel = QLabel('S(of SLIV):')
         self.nrDci10Msg4TimeAllocSEdit = QLineEdit()
+        self.nrDci10Msg4TimeAllocSEdit.setEnabled(False)
         
         self.nrDci10Msg4TimeAllocLLabel = QLabel('L(of SLIV):')
         self.nrDci10Msg4TimeAllocLEdit = QLineEdit()
+        self.nrDci10Msg4TimeAllocLEdit.setEnabled(False)
         
         self.nrDci10Msg4FreqAllocTypeLabel = QLabel('resourceAllocation:')
         self.nrDci10Msg4FreqAllocTypeComb = QComboBox()
@@ -837,8 +855,9 @@ class NgNrGridUi(QDialog):
         self.nrDci11PdschIndicatedBwpEdit = QLineEdit('1')
         self.nrDci11PdschIndicatedBwpEdit.setEnabled(False)
         
-        self.nrDci11PdschTimeAllocFieldLabel = QLabel('Time domain resource assignment[0-15]:')
+        self.nrDci11PdschTimeAllocFieldLabel = QLabel('Time domain resource assignment[0-15,16]:')
         self.nrDci11PdschTimeAllocFieldEdit = QLineEdit()
+        self.nrDci11PdschTimeAllocFieldEdit.setValidator(QIntValidator(0, 16))
         
         self.nrDci11PdschTimeAllocMappingTypeLabel = QLabel('Mapping type:')
         self.nrDci11PdschTimeAllocMappingTypeComb = QComboBox()
@@ -995,8 +1014,9 @@ class NgNrGridUi(QDialog):
         self.nrDci01PuschIndicatedBwpEdit = QLineEdit('1')
         self.nrDci01PuschIndicatedBwpEdit.setEnabled(False)
         
-        self.nrDci01PuschTimeAllocFieldLabel = QLabel('Time domain resource assignment[0-15]:')
+        self.nrDci01PuschTimeAllocFieldLabel = QLabel('Time domain resource assignment[0-15,16]:')
         self.nrDci01PuschTimeAllocFieldEdit = QLineEdit()
+        self.nrDci01PuschTimeAllocFieldEdit.setValidator(QIntValidator(0, 16))
         
         self.nrDci01PuschTimeAllocMappingTypeLabel = QLabel('Mapping type:')
         self.nrDci01PuschTimeAllocMappingTypeComb = QComboBox()
@@ -1126,25 +1146,32 @@ class NgNrGridUi(QDialog):
         
         self.nrMsg3PuschTimeAllocFieldLabel = QLabel('Time domain resource assignment[0-15]:')
         self.nrMsg3PuschTimeAllocFieldEdit = QLineEdit()
+        self.nrMsg3PuschTimeAllocFieldEdit.setValidator(QIntValidator(0, 15))
         
         self.nrMsg3PuschTimeAllocMappingTypeLabel = QLabel('Mapping type:')
         self.nrMsg3PuschTimeAllocMappingTypeComb = QComboBox()
         self.nrMsg3PuschTimeAllocMappingTypeComb.addItems(['Type A', 'Type B'])
+        self.nrMsg3PuschTimeAllocMappingTypeComb.setEnabled(False)
         
         self.nrMsg3PuschTimeAllocK2Label = QLabel('K2:')
         self.nrMsg3PuschTimeAllocK2Edit = QLineEdit()
+        self.nrMsg3PuschTimeAllocK2Edit.setEnabled(False)
         
         self.nrMsg3PuschTimeAllocDeltaLabel= QLabel('Delta:')
         self.nrMsg3PuschTimeAllocDeltaEdit = QLineEdit()
+        self.nrMsg3PuschTimeAllocDeltaEdit.setEnabled(False)
         
         self.nrMsg3PuschTimeAllocSlivLabel = QLabel('SLIV:')
         self.nrMsg3PuschTimeAllocSlivEdit = QLineEdit()
+        self.nrMsg3PuschTimeAllocSlivEdit.setEnabled(False)
         
         self.nrMsg3PuschTimeAllocSLabel = QLabel('S(of SLIV):')
         self.nrMsg3PuschTimeAllocSEdit = QLineEdit()
+        self.nrMsg3PuschTimeAllocSEdit.setEnabled(False)
         
         self.nrMsg3PuschTimeAllocLLabel = QLabel('L(of SLIV):')
         self.nrMsg3PuschTimeAllocLEdit = QLineEdit()
+        self.nrMsg3PuschTimeAllocLEdit.setEnabled(False)
         
         self.nrMsg3PuschFreqAllocTypeLabel = QLabel('resourceAllocation:')
         self.nrMsg3PuschFreqAllocTypeComb = QComboBox()
@@ -3155,6 +3182,11 @@ class NgNrGridUi(QDialog):
         self.nrCoreset1CceRegMapComb.currentIndexChanged[int].connect(self.onCoreset1CceRegMapCombCurIndChanged)
         self.nrUssFirstSymbsEdit.textChanged.connect(self.onUssFirstSymbsEditTextChanged)
         
+        #---->signal-slot for dci
+        self.nrDci10Sib1TimeAllocFieldEdit.textChanged.connect(self.onDci10Sib1TimeAllocFieldEditTextChanged)
+        self.nrDci10Msg2TimeAllocFieldEdit.textChanged.connect(self.onDci10Msg2TimeAllocFieldEditTextChanged)
+        self.nrDci10Msg4TimeAllocFieldEdit.textChanged.connect(self.onDci10Msg4TimeAllocFieldEditTextChanged)
+        
         #---->I am THE driver!
         self.nrCarrierBandComb.setCurrentText('n77')
 
@@ -5140,7 +5172,20 @@ class NgNrGridUi(QDialog):
             return
         
         self.ngwin.logEdit.append('-->inside onMibDmrsTypeAPosCombCurIndChanged, index=%d' % index)
+        #validate coreset0 duration
         self.flagCoreset0 = self.validateCoreset0()
+        
+        #validate coreset1 duration
+        coreset1Duration = int(self.nrCoreset1DurationComb.currentText())
+        if coreset1Duration == 3 and int(self.nrMibDmRsTypeAPosComb.currentText()[3:]) != 3:
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid setting: coreset1Duration = %s but dmrs-TypeA-Position = "%s"! Reset dmrs-TypeA-Position to "pos3".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrCoreset1DurationComb.currentText(), self.nrMibDmRsTypeAPosComb.currentText()))
+            self.nrMibDmRsTypeAPosComb.setCurrentText('pos3')
+            return
+        
+        #validate 'time domain resource assignment' of dci
+        self.validateDci10Sib1TimeAllocField()
+        self.validateDci10Msg2TimeAllocField()
+        self.validateDci10Msg4TimeAllocField()
         
     def onTddCfgPat2PeriodCombCurIndChanged(self, index):
         if index < 0:
@@ -5493,6 +5538,145 @@ class NgNrGridUi(QDialog):
                 self.ngwin.logEdit.append('A UE does not expect any two PDCCH monitoring occasions, for a same search space set or for different search space sets, in a'
                     'same control resource set to be separated by a non-zero number of symbols that is smaller than the control resource set duration.')
                 return
+    
+    def onDci10Sib1TimeAllocFieldEditTextChanged(self, text):
+        if not text:
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDci10Sib1TimeAllocFieldEditTextChanged')
+        self.validateDci10Sib1TimeAllocField()
+        
+    def onDci10Msg2TimeAllocFieldEditTextChanged(self, text):
+        if not text:
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDci10Msg2TimeAllocFieldEditTextChanged')
+        self.validateDci10Msg2TimeAllocField()
+        
+    def onDci10Msg4TimeAllocFieldEditTextChanged(self, text):
+        if not text:
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDci10Msg4TimeAllocFieldEditTextChanged')
+        self.validateDci10Msg4TimeAllocField()
+    
+    def validateDci10Sib1TimeAllocField(self):
+        if not self.nrDci10Sib1TimeAllocFieldEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside validateDci10Sib1TimeAllocField')
+        
+        row = int(self.nrDci10Sib1TimeAllocFieldEdit.text()) + 1
+        key = '%s_%s' % (row, self.nrMibDmRsTypeAPosComb.currentText()[3:])
+        if self.coreset0MultiplexingPat == 1:
+            if not key in self.nrPdschTimeAllocDefANormCp.keys():
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefANormCp.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                self.nrDci10Sib1TimeAllocFieldEdit.clear()
+                return
+            
+            val = self.nrPdschTimeAllocDefANormCp[key]
+        elif self.coreset0MultiplexingPat == 2:
+            if row in self.nrPdschTimeAllocDefBNote1Set:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Row %s is not used for SIB1(SI-RNTI with CSS Type0).' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), row))
+                self.nrDci10Sib1TimeAllocFieldEdit.clear()
+                return
+            
+            if not key in self.nrPdschTimeAllocDefB.keys():
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefB.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                self.nrDci10Sib1TimeAllocFieldEdit.clear()
+                return
+            
+            val = self.nrPdschTimeAllocDefB[key]
+        else: #self.coreset0MultiplexingPat == 3
+            if row in self.nrPdschTimeAllocDefCNote1Set:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Row %s is not used for SIB1(SI-RNTI with CSS Type0).' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), row))
+                self.nrDci10Sib1TimeAllocFieldEdit.clear()
+                return
+            
+            if not key in self.nrPdschTimeAllocDefC.keys():
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefC.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                self.nrDci10Sib1TimeAllocFieldEdit.clear()
+                return
+            
+            val = self.nrPdschTimeAllocDefC[key]
+        
+        mappingType, k0, s, l = val
+        self.nrDci10Sib1TimeAllocMappingTypeComb.setCurrentText(mappingType)
+        self.nrDci10Sib1TimeAllocK0Edit.setText(str(k0))
+        self.nrDci10Sib1TimeAllocSEdit.setText(str(s))
+        self.nrDci10Sib1TimeAllocLEdit.setText(str(l))
+        
+    def validateDci10Msg2TimeAllocField(self):
+        if not self.nrDci10Msg2TimeAllocFieldEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside validateDci10Msg2TimeAllocField')
+        
+        row = int(self.nrDci10Msg2TimeAllocFieldEdit.text()) + 1
+        key = '%s_%s' % (row, self.nrMibDmRsTypeAPosComb.currentText()[3:])
+        if self.coreset0MultiplexingPat == 1:
+            if not key in self.nrPdschTimeAllocDefANormCp.keys():
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefANormCp.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                self.nrDci10Msg2TimeAllocFieldEdit.clear()
+                return
+            
+            val = self.nrPdschTimeAllocDefANormCp[key]
+        elif self.coreset0MultiplexingPat == 2:
+            if not key in self.nrPdschTimeAllocDefB.keys():
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefB.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                self.nrDci10Msg2TimeAllocFieldEdit.clear()
+                return
+            
+            val = self.nrPdschTimeAllocDefB[key]
+        else: #self.coreset0MultiplexingPat == 3
+            if not key in self.nrPdschTimeAllocDefC.keys():
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefC.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                self.nrDci10Msg2TimeAllocFieldEdit.clear()
+                return
+            
+            val = self.nrPdschTimeAllocDefC[key]
+        
+        mappingType, k0, s, l = val
+        self.nrDci10Msg2TimeAllocMappingTypeComb.setCurrentText(mappingType)
+        self.nrDci10Msg2TimeAllocK0Edit.setText(str(k0))
+        self.nrDci10Msg2TimeAllocSEdit.setText(str(s))
+        self.nrDci10Msg2TimeAllocLEdit.setText(str(l))
+        
+    def validateDci10Msg4TimeAllocField(self):
+        if not self.nrDci10Msg4TimeAllocFieldEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside validateDci10Msg4TimeAllocField')
+        
+        row = int(self.nrDci10Msg4TimeAllocFieldEdit.text()) + 1
+        key = '%s_%s' % (row, self.nrMibDmRsTypeAPosComb.currentText()[3:])
+        if self.coreset0MultiplexingPat == 1:
+            if not key in self.nrPdschTimeAllocDefANormCp.keys():
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefANormCp.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                self.nrDci10Msg4TimeAllocFieldEdit.clear()
+                return
+            
+            val = self.nrPdschTimeAllocDefANormCp[key]
+        elif self.coreset0MultiplexingPat == 2:
+            if not key in self.nrPdschTimeAllocDefB.keys():
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefB.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                self.nrDci10Msg4TimeAllocFieldEdit.clear()
+                return
+            
+            val = self.nrPdschTimeAllocDefB[key]
+        else: #self.coreset0MultiplexingPat == 3
+            if not key in self.nrPdschTimeAllocDefC.keys():
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefC.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                self.nrDci10Msg4TimeAllocFieldEdit.clear()
+                return
+            
+            val = self.nrPdschTimeAllocDefC[key]
+        
+        mappingType, k0, s, l = val
+        self.nrDci10Msg4TimeAllocMappingTypeComb.setCurrentText(mappingType)
+        self.nrDci10Msg4TimeAllocK0Edit.setText(str(k0))
+        self.nrDci10Msg4TimeAllocSEdit.setText(str(s))
+        self.nrDci10Msg4TimeAllocLEdit.setText(str(l))
 
     def onOkBtnClicked(self):
         self.ngwin.logEdit.append('-->inside onOkBtnClicked')
