@@ -856,24 +856,28 @@ class NgNrGridUi(QDialog):
         self.nrDci11PdschIndicatedBwpEdit.setEnabled(False)
         
         self.nrDci11PdschTimeAllocFieldLabel = QLabel('Time domain resource assignment[0-15,16]:')
-        self.nrDci11PdschTimeAllocFieldEdit = QLineEdit()
+        self.nrDci11PdschTimeAllocFieldEdit = QLineEdit('16')
         self.nrDci11PdschTimeAllocFieldEdit.setValidator(QIntValidator(0, 16))
         
         self.nrDci11PdschTimeAllocMappingTypeLabel = QLabel('Mapping type:')
         self.nrDci11PdschTimeAllocMappingTypeComb = QComboBox()
         self.nrDci11PdschTimeAllocMappingTypeComb.addItems(['Type A', 'Type B'])
         
-        self.nrDci11PdschTimeAllocK0Label = QLabel('K0:')
-        self.nrDci11PdschTimeAllocK0Edit = QLineEdit()
+        self.nrDci11PdschTimeAllocK0Label = QLabel('K0[0-32]:')
+        self.nrDci11PdschTimeAllocK0Edit = QLineEdit('0')
+        self.nrDci11PdschTimeAllocK0Edit.setValidator(QIntValidator(0, 32))
         
-        self.nrDci11PdschTimeAllocSlivLabel = QLabel('SLIV:')
-        self.nrDci11PdschTimeAllocSlivEdit = QLineEdit()
+        self.nrDci11PdschTimeAllocSlivLabel = QLabel('SLIV[0-127]:')
+        self.nrDci11PdschTimeAllocSlivEdit = QLineEdit('28')
+        self.nrDci11PdschTimeAllocSlivEdit.setValidator(QIntValidator(0, 127))
         
-        self.nrDci11PdschTimeAllocSLabel = QLabel('S(of SLIV):')
-        self.nrDci11PdschTimeAllocSEdit = QLineEdit()
+        self.nrDci11PdschTimeAllocSLabel = QLabel('S(of SLIV)[0-3]:')
+        self.nrDci11PdschTimeAllocSEdit = QLineEdit('0')
+        self.nrDci11PdschTimeAllocSEdit.setValidator(QIntValidator(0, 3))
         
-        self.nrDci11PdschTimeAllocLLabel = QLabel('L(of SLIV):')
-        self.nrDci11PdschTimeAllocLEdit = QLineEdit()
+        self.nrDci11PdschTimeAllocLLabel = QLabel('L(of SLIV)[3-14]:')
+        self.nrDci11PdschTimeAllocLEdit = QLineEdit('3')
+        self.nrDci11PdschTimeAllocLEdit.setValidator(QIntValidator(3, 14))
         
         self.nrDci11PdschFreqAllocTypeLabel = QLabel('resourceAllocation:')
         self.nrDci11PdschFreqAllocTypeComb = QComboBox()
@@ -3186,6 +3190,14 @@ class NgNrGridUi(QDialog):
         self.nrDci10Sib1TimeAllocFieldEdit.textChanged.connect(self.onDci10Sib1TimeAllocFieldEditTextChanged)
         self.nrDci10Msg2TimeAllocFieldEdit.textChanged.connect(self.onDci10Msg2TimeAllocFieldEditTextChanged)
         self.nrDci10Msg4TimeAllocFieldEdit.textChanged.connect(self.onDci10Msg4TimeAllocFieldEditTextChanged)
+        self.nrDci11PdschTimeAllocFieldEdit.textChanged.connect(self.onDci11PdschTimeAllocFieldEditTextChanged)
+        self.nrDci11PdschTimeAllocSlivEdit.textChanged.connect(self.onDci11PdschTimeAllocSlivEditTextChanged)
+        self.nrDci11PdschTimeAllocSEdit.textChanged.connect(self.onDci11PdschTimeAllocSOrLEditTextChanged)
+        self.nrDci11PdschTimeAllocLEdit.textChanged.connect(self.onDci11PdschTimeAllocSOrLEditTextChanged)
+        self.nrDci11PdschTimeAllocMappingTypeComb.currentIndexChanged.connect(self.onDci11MappingTypeOrDedDlBwpCpCombCurIndChanged)
+        
+        #---->dedicated dl bwp
+        self.nrDedDlBwpGenericCpComb.currentIndexChanged.connect(self.onDci11MappingTypeOrDedDlBwpCpCombCurIndChanged)
         
         #---->I am THE driver!
         self.nrCarrierBandComb.setCurrentText('n77')
@@ -4583,6 +4595,10 @@ class NgNrGridUi(QDialog):
         #minimum channel bandwidth
         self.minChBw = 0
         
+        #initialize SLIV look-up tables 
+        self.initPdschSliv()
+        self.initPuschSliv()
+        
     def validateScsPerBandFr1(self):
         self.ngwin.logEdit.append('-->inside validateScsPerBandFr1')
         
@@ -5186,6 +5202,13 @@ class NgNrGridUi(QDialog):
         self.validateDci10Sib1TimeAllocField()
         self.validateDci10Msg2TimeAllocField()
         self.validateDci10Msg4TimeAllocField()
+        if self.nrDci11PdschTimeAllocFieldEdit.text():
+            timeAllocFieldDci11 = int(self.nrDci11PdschTimeAllocFieldEdit.text())
+            if timeAllocFieldDci11 in range(16):
+                self.validateDci11PdschTimeAllocField()
+            else:
+                #FIXME
+                pass
         
     def onTddCfgPat2PeriodCombCurIndChanged(self, index):
         if index < 0:
@@ -5272,7 +5295,7 @@ class NgNrGridUi(QDialog):
                 numRbCommonScs = self.nrNrbFr2[commonScs][self.nrBwSetFr2.index(self.nrCarrierBwComb.currentText())]
             #numRbCarrierScs = int(self.nrCarrierNumRbEdit.text())
             if L_RBs < 1 or L_RBs > (numRbCommonScs - RB_start):
-                self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRbCommonScs))
+                self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRbCommonScs))
                 self.nrIniDlBwpGenericLRbsEdit.clear()
                 self.nrIniDlBwpGenericRbStartEdit.clear()
                 return
@@ -5299,7 +5322,7 @@ class NgNrGridUi(QDialog):
             numRbCommonScs = self.nrNrbFr2[commonScs][self.nrBwSetFr2.index(self.nrCarrierBwComb.currentText())]
         #numRbCarrierScs = int(self.nrCarrierNumRbEdit.text())
         if L_RBs < 1 or L_RBs > (numRbCommonScs - RB_start):
-            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRbCommonScs))
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRbCommonScs))
             return
         
         riv = self.makeRiv(L_RBs, RB_start, 275)
@@ -5560,6 +5583,13 @@ class NgNrGridUi(QDialog):
         #self.ngwin.logEdit.append('-->inside onDci10Msg4TimeAllocFieldEditTextChanged')
         self.validateDci10Msg4TimeAllocField()
     
+    def onDci11PdschTimeAllocFieldEditTextChanged(self, text):
+        if not text:
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDci11PdschTimeAllocFieldEditTextChanged')
+        self.validateDci11PdschTimeAllocField()
+    
     def validateDci10Sib1TimeAllocField(self):
         if not self.nrDci10Sib1TimeAllocFieldEdit.text():
             return
@@ -5603,6 +5633,7 @@ class NgNrGridUi(QDialog):
         mappingType, k0, s, l = val
         self.nrDci10Sib1TimeAllocMappingTypeComb.setCurrentText(mappingType)
         self.nrDci10Sib1TimeAllocK0Edit.setText(str(k0))
+        self.nrDci10Sib1TimeAllocSlivEdit.setText(str(self.toSliv(s, l, sch='pdsch', type=mappingType, cp='normal')))
         self.nrDci10Sib1TimeAllocSEdit.setText(str(s))
         self.nrDci10Sib1TimeAllocLEdit.setText(str(l))
         
@@ -5614,31 +5645,25 @@ class NgNrGridUi(QDialog):
         
         row = int(self.nrDci10Msg2TimeAllocFieldEdit.text()) + 1
         key = '%s_%s' % (row, self.nrMibDmRsTypeAPosComb.currentText()[3:])
-        if self.coreset0MultiplexingPat == 1:
+        if self.nrIniDlBwpGenericCpComb.currentText() == 'normal':
             if not key in self.nrPdschTimeAllocDefANormCp.keys():
                 self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefANormCp.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
                 self.nrDci10Msg2TimeAllocFieldEdit.clear()
                 return
             
             val = self.nrPdschTimeAllocDefANormCp[key]
-        elif self.coreset0MultiplexingPat == 2:
-            if not key in self.nrPdschTimeAllocDefB.keys():
-                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefB.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+        else: #self.nrIniDlBwpGenericCpComb.currentText() == 'extended':
+            if not key in self.nrPdschTimeAllocDefAExtCp.keys():
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefAExtCp.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
                 self.nrDci10Msg2TimeAllocFieldEdit.clear()
                 return
             
-            val = self.nrPdschTimeAllocDefB[key]
-        else: #self.coreset0MultiplexingPat == 3
-            if not key in self.nrPdschTimeAllocDefC.keys():
-                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefC.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
-                self.nrDci10Msg2TimeAllocFieldEdit.clear()
-                return
+            val = self.nrPdschTimeAllocDefAExtCp[key]
             
-            val = self.nrPdschTimeAllocDefC[key]
-        
         mappingType, k0, s, l = val
         self.nrDci10Msg2TimeAllocMappingTypeComb.setCurrentText(mappingType)
         self.nrDci10Msg2TimeAllocK0Edit.setText(str(k0))
+        self.nrDci10Msg2TimeAllocSlivEdit.setText(str(self.toSliv(s, l, sch='pdsch', type=mappingType, cp=self.nrIniDlBwpGenericCpComb.currentText())))
         self.nrDci10Msg2TimeAllocSEdit.setText(str(s))
         self.nrDci10Msg2TimeAllocLEdit.setText(str(l))
         
@@ -5650,33 +5675,141 @@ class NgNrGridUi(QDialog):
         
         row = int(self.nrDci10Msg4TimeAllocFieldEdit.text()) + 1
         key = '%s_%s' % (row, self.nrMibDmRsTypeAPosComb.currentText()[3:])
-        if self.coreset0MultiplexingPat == 1:
+        if self.nrIniDlBwpGenericCpComb.currentText() == 'normal':
             if not key in self.nrPdschTimeAllocDefANormCp.keys():
                 self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefANormCp.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
                 self.nrDci10Msg4TimeAllocFieldEdit.clear()
                 return
             
             val = self.nrPdschTimeAllocDefANormCp[key]
-        elif self.coreset0MultiplexingPat == 2:
-            if not key in self.nrPdschTimeAllocDefB.keys():
-                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefB.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+        else: #self.nrIniDlBwpGenericCpComb.currentText() == 'extended':
+            if not key in self.nrPdschTimeAllocDefAExtCp.keys():
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefAExtCp.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
                 self.nrDci10Msg4TimeAllocFieldEdit.clear()
                 return
             
-            val = self.nrPdschTimeAllocDefB[key]
-        else: #self.coreset0MultiplexingPat == 3
-            if not key in self.nrPdschTimeAllocDefC.keys():
-                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefC.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
-                self.nrDci10Msg4TimeAllocFieldEdit.clear()
-                return
-            
-            val = self.nrPdschTimeAllocDefC[key]
+            val = self.nrPdschTimeAllocDefAExtCp[key]
         
         mappingType, k0, s, l = val
         self.nrDci10Msg4TimeAllocMappingTypeComb.setCurrentText(mappingType)
         self.nrDci10Msg4TimeAllocK0Edit.setText(str(k0))
+        self.nrDci10Msg4TimeAllocSlivEdit.setText(str(self.toSliv(s, l, sch='pdsch', type=mappingType, cp=self.nrIniDlBwpGenericCpComb.currentText())))
         self.nrDci10Msg4TimeAllocSEdit.setText(str(s))
         self.nrDci10Msg4TimeAllocLEdit.setText(str(l))
+    
+    def validateDci11PdschTimeAllocField(self):
+        if not self.nrDci11PdschTimeAllocFieldEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside validateDci11PdschTimeAllocField')
+        
+        row = int(self.nrDci11PdschTimeAllocFieldEdit.text()) + 1
+        if row in range(1, 17):
+            #use default time-domain allocation schemes
+            key = '%s_%s' % (row, self.nrMibDmRsTypeAPosComb.currentText()[3:])
+            if self.nrIniDlBwpGenericCpComb.currentText() == 'normal':
+                if not key in self.nrPdschTimeAllocDefANormCp.keys():
+                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefANormCp.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                    self.nrDci11PdschTimeAllocFieldEdit.clear()
+                    return
+                
+                val = self.nrPdschTimeAllocDefANormCp[key]
+            else: #self.nrIniDlBwpGenericCpComb.currentText() == 'extended':
+                if not key in self.nrPdschTimeAllocDefAExtCp.keys():
+                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefAExtCp.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                    self.nrDci11PdschTimeAllocFieldEdit.clear()
+                    return
+                
+                val = self.nrPdschTimeAllocDefAExtCp[key]
+            
+            self.nrDci11PdschTimeAllocMappingTypeComb.setEnabled(False)
+            self.nrDci11PdschTimeAllocK0Edit.setEnabled(False)
+            self.nrDci11PdschTimeAllocSlivEdit.setEnabled(False)
+            self.nrDci11PdschTimeAllocSEdit.setEnabled(False)
+            self.nrDci11PdschTimeAllocLEdit.setEnabled(False)
+            
+            mappingType, k0, s, l = val
+            self.nrDci11PdschTimeAllocMappingTypeComb.setCurrentText(mappingType)
+            self.nrDci11PdschTimeAllocK0Edit.setText(str(k0))
+            self.nrDci11PdschTimeAllocSlivEdit.setText(str(self.toSliv(s, l, sch='pdsch', type=mappingType, cp=self.nrIniDlBwpGenericCpComb.currentText())))
+            self.nrDci11PdschTimeAllocSEdit.setText(str(s))
+            self.nrDci11PdschTimeAllocLEdit.setText(str(l))
+        else:
+            #use user-defined time-domain allocation scheme
+            self.nrDci11PdschTimeAllocMappingTypeComb.setEnabled(True)
+            self.nrDci11PdschTimeAllocK0Edit.setEnabled(True)
+            self.nrDci11PdschTimeAllocSlivEdit.setEnabled(True)
+            self.nrDci11PdschTimeAllocSEdit.setEnabled(True)
+            self.nrDci11PdschTimeAllocLEdit.setEnabled(True)
+            
+    def onDci11PdschTimeAllocSlivEditTextChanged(self, text):
+        if not text:
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDci11PdschTimeAllocSlivEditTextChanged')
+        sliv = int(self.nrDci11PdschTimeAllocSlivEdit.text())
+        S,L = self.fromSliv(sliv, sch='pdsch', type=self.nrDci11PdschTimeAllocMappingTypeComb.currentText(), cp=self.nrDedDlBwpGenericCpComb.currentText())
+        if S is not None and L is not None:
+            self.nrDci11PdschTimeAllocSEdit.setText(str(S))
+            self.nrDci11PdschTimeAllocLEdit.setText(str(L))
+        else:
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid SLIV(=%s) and prefix info: type="%s", cp="%s".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), sliv, self.nrDci11PdschTimeAllocMappingTypeComb.currentText(), self.nrDedDlBwpGenericCpComb.currentText()))
+            self.nrDci11PdschTimeAllocSEdit.clear()
+            self.nrDci11PdschTimeAllocLEdit.clear()
+    
+    def onDci11PdschTimeAllocSOrLEditTextChanged(self, text):
+        if not self.nrDci11PdschTimeAllocSEdit.text() or not self.nrDci11PdschTimeAllocLEdit.text():
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDci11PdschTimeAllocSOrLEditTextChanged')
+        S = int(self.nrDci11PdschTimeAllocSEdit.text())
+        L = int(self.nrDci11PdschTimeAllocLEdit.text())
+        sliv = self.toSliv(S, L, sch='pdsch', type=self.nrDci11PdschTimeAllocMappingTypeComb.currentText(), cp=self.nrDedDlBwpGenericCpComb.currentText())
+        if sliv is not None:
+            self.nrDci11PdschTimeAllocSlivEdit.setText(str(sliv))
+        else:
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid S/L combination(S=%s, L=%s) and prefix info: type="%s", cp="%s".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), S, L, self.nrDci11PdschTimeAllocMappingTypeComb.currentText(), self.nrDedDlBwpGenericCpComb.currentText()))
+            self.nrDci11PdschTimeAllocSlivEdit.clear()
+    
+    def onDci11MappingTypeOrDedDlBwpCpCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        mappingType = self.nrDci11PdschTimeAllocMappingTypeComb.currentText()
+        cp = self.nrDedDlBwpGenericCpComb.currentText()
+        
+        if mappingType == 'Type A':
+            if cp == 'normal':
+                self.nrDci11PdschTimeAllocSLabel.setText('S(of SLIV)[0-3]:')
+                self.nrDci11PdschTimeAllocSEdit.setValidator(QIntValidator(0, 3))
+                self.nrDci11PdschTimeAllocLLabel.setText('L(of SLIV)[3-14]:')
+                self.nrDci11PdschTimeAllocLEdit.setValidator(QIntValidator(3, 14))
+            elif cp == 'extended':
+                self.nrDci11PdschTimeAllocSLabel.setText('S(of SLIV)[0-3]:')
+                self.nrDci11PdschTimeAllocSEdit.setValidator(QIntValidator(0, 3))
+                self.nrDci11PdschTimeAllocLLabel.setText('L(of SLIV)[3-12]:')
+                self.nrDci11PdschTimeAllocLEdit.setValidator(QIntValidator(3, 12))
+            else:
+                return
+        elif mappingType == 'Type B':
+            if cp == 'normal':
+                self.nrDci11PdschTimeAllocSLabel.setText('S(of SLIV)[0-12]:')
+                self.nrDci11PdschTimeAllocSEdit.setValidator(QIntValidator(0, 12))
+                self.nrDci11PdschTimeAllocLLabel.setText('L(of SLIV)[2,4,7]:')
+                self.nrDci11PdschTimeAllocLEdit.setValidator(QIntValidator(2, 7))
+            elif cp == 'extended':
+                self.nrDci11PdschTimeAllocSLabel.setText('S(of SLIV)[0-10]:')
+                self.nrDci11PdschTimeAllocSEdit.setValidator(QIntValidator(0, 10))
+                self.nrDci11PdschTimeAllocLLabel.setText('L(of SLIV)[2,4,6]:')
+                self.nrDci11PdschTimeAllocLEdit.setValidator(QIntValidator(2, 6))
+            else:
+                return
+        else:
+            return
+        
+        self.nrDci11PdschTimeAllocSlivEdit.clear()
+        self.nrDci11PdschTimeAllocSEdit.clear()
+        self.nrDci11PdschTimeAllocLEdit.clear()
 
     def onOkBtnClicked(self):
         self.ngwin.logEdit.append('-->inside onOkBtnClicked')
@@ -5700,7 +5833,7 @@ class NgNrGridUi(QDialog):
     
     def makeRiv(self, L_RBs, RB_start, N_BWP_size):
         if L_RBs < 1 or L_RBs > (N_BWP_size - RB_start):
-            #self.ngwin.logEdit.append('ERROR: L_RBs = %d, RB_start = %d, N_BWP_size = %d.' % (L_RBs, RB_start, N_BWP_size))
+            #self.ngwin.logEdit.append('Error: L_RBs = %d, RB_start = %d, N_BWP_size = %d.' % (L_RBs, RB_start, N_BWP_size))
             return None 
         
         if (L_RBs - 1) <= math.floor(N_BWP_size / 2):
@@ -5709,3 +5842,200 @@ class NgNrGridUi(QDialog):
             riv = N_BWP_size * (N_BWP_size - L_RBs + 1) + (N_BWP_size - 1 - RB_start)
         
         return riv
+    
+    def makeSliv(self, S, L):
+        if L <= 0 or L > 14 - S:
+            #self.ngwin.logEdit.append('Error: S = %d, L = %d.' % (S, L))
+            return None
+        
+        if (L - 1) <= 7:
+            sliv = 14 * (L - 1) + S
+        else:
+            sliv = 14 * (14 - L + 1) + (14 - 1 - S)
+        
+        return sliv
+    
+    def initPdschSliv(self):
+        #prefix
+        #'00': mapping type A + normal cp
+        #'01': mapping type A + extended cp
+        #'10': mapping type B + normal cp
+        #'11': mapping type B + extended cp
+        
+        self.nrPdschToSliv = dict()
+        self.nrPdschFromSliv = dict()
+        
+        #case1: prefix='00'
+        prefix = '00'
+        for S in range(4):
+            for L in range(3, 15):
+                if S+L in range(3, 15):
+                    sliv = self.makeSliv(S, L)
+                    if sliv is not None:
+                        keyToSliv = '%s_%s_%s' % (prefix, S, L)
+                        self.nrPdschToSliv[keyToSliv] = sliv
+                        keyFromSliv = '%s_%s' % (prefix, sliv)
+                        self.nrPdschFromSliv[keyFromSliv] = (S, L)
+        
+        #case2: prefix='01'
+        prefix = '01'
+        for S in range(4):
+            for L in range(3, 13):
+                if S+L in range(3, 13):
+                    sliv = self.makeSliv(S, L)
+                    if sliv is not None:
+                        keyToSliv = '%s_%s_%s' % (prefix, S, L)
+                        self.nrPdschToSliv[keyToSliv] = sliv
+                        keyFromSliv = '%s_%s' % (prefix, sliv)
+                        self.nrPdschFromSliv[keyFromSliv] = (S, L)
+        
+        #case2: prefix='10'
+        prefix = '10'
+        for S in range(13):
+            for L in (2,4,7):
+                if S+L in range(2, 15):
+                    sliv = self.makeSliv(S, L)
+                    if sliv is not None:
+                        keyToSliv = '%s_%s_%s' % (prefix, S, L)
+                        self.nrPdschToSliv[keyToSliv] = sliv
+                        keyFromSliv = '%s_%s' % (prefix, sliv)
+                        self.nrPdschFromSliv[keyFromSliv] = (S, L)
+        
+        #case2: prefix='11'
+        prefix = '11'
+        for S in range(11):
+            for L in (2,4,6):
+                if S+L in range(2, 13):
+                    sliv = self.makeSliv(S, L)
+                    if sliv is not None:
+                        keyToSliv = '%s_%s_%s' % (prefix, S, L)
+                        self.nrPdschToSliv[keyToSliv] = sliv
+                        keyFromSliv = '%s_%s' % (prefix, sliv)
+                        self.nrPdschFromSliv[keyFromSliv] = (S, L)
+                    
+    
+    def initPuschSliv(self):
+        #prefix
+        #'00': mapping type A + normal cp
+        #'01': mapping type A + extended cp
+        #'10': mapping type B + normal cp
+        #'11': mapping type B + extended cp
+        
+        self.nrPuschToSliv = dict()
+        self.nrPuschFromSliv = dict()
+        
+        #case1: prefix='00'
+        prefix = '00'
+        for S in (0,):
+            for L in range(4, 15):
+                if S+L in range(4, 15):
+                    sliv = self.makeSliv(S, L)
+                    if sliv is not None:
+                        keyToSliv = '%s_%s_%s' % (prefix, S, L)
+                        self.nrPuschToSliv[keyToSliv] = sliv
+                        keyFromSliv = '%s_%s' % (prefix, sliv)
+                        self.nrPuschFromSliv[keyFromSliv] = (S, L)
+        
+        #case2: prefix='01'
+        prefix = '01'
+        for S in (0,):
+            for L in range(4, 13):
+                if S+L in range(4, 13):
+                    sliv = self.makeSliv(S, L)
+                    if sliv is not None:
+                        keyToSliv = '%s_%s_%s' % (prefix, S, L)
+                        self.nrPuschToSliv[keyToSliv] = sliv
+                        keyFromSliv = '%s_%s' % (prefix, sliv)
+                        self.nrPuschFromSliv[keyFromSliv] = (S, L)
+        
+        #case2: prefix='10'
+        prefix = '10'
+        for S in range(14):
+            for L in range(1, 15):
+                if S+L in range(1, 15):
+                    sliv = self.makeSliv(S, L)
+                    if sliv is not None:
+                        keyToSliv = '%s_%s_%s' % (prefix, S, L)
+                        self.nrPuschToSliv[keyToSliv] = sliv
+                        keyFromSliv = '%s_%s' % (prefix, sliv)
+                        self.nrPuschFromSliv[keyFromSliv] = (S, L)
+        
+        #case2: prefix='11'
+        prefix = '11'
+        for S in range(13):
+            for L in range(1, 13):
+                if S+L in range(1, 13):
+                    sliv = self.makeSliv(S, L)
+                    if sliv is not None:
+                        keyToSliv = '%s_%s_%s' % (prefix, S, L)
+                        self.nrPuschToSliv[keyToSliv] = sliv
+                        keyFromSliv = '%s_%s' % (prefix, sliv)
+                        self.nrPuschFromSliv[keyFromSliv] = (S, L)
+    
+    def toSliv(self, S, L, sch='pdsch', type='Type A', cp='normal'):
+        if type == 'Type A':
+            if cp == 'normal':
+                prefix = '00'
+            elif cp == 'extended':
+                prefix = '01'
+            else:
+                return None
+        elif type == 'Type B':
+            if cp == 'normal':
+                prefix = '10'
+            elif cp == 'extended':
+                prefix = '11'
+            else:
+                return None
+        else:
+            return None
+                
+        key = '%s_%s_%s' % (prefix, S, L)
+        if sch == 'pdsch':
+            if not key in self.nrPdschToSliv.keys():
+                return None
+            else:
+                sliv = self.nrPdschToSliv[key]
+        elif sch == 'pusch':
+            if not key in self.nrPuschToSliv.keys():
+                return None
+            else:
+                sliv = self.nrPuschToSliv[key]
+        else:
+            return None
+        
+        return sliv
+    
+    def fromSliv(self, sliv, sch='pdsch', type='Type A', cp='normal'):
+        if type == 'Type A':
+            if cp == 'normal':
+                prefix = '00'
+            elif cp == 'extended':
+                prefix = '01'
+            else:
+                return (None, None)
+        elif type == 'Type B':
+            if cp == 'normal':
+                prefix = '10'
+            elif cp == 'extended':
+                prefix = '11'
+            else:
+                return (None, None)
+        else:
+            return (None, None)
+                
+        key = '%s_%s' % (prefix, sliv)
+        if sch == 'pdsch':
+            if not key in self.nrPdschFromSliv.keys():
+                return (None, None)
+            else:
+                S, L = self.nrPdschFromSliv[key]
+        elif sch == 'pusch':
+            if not key in self.nrPuschFromSliv.keys():
+                return (None, None)
+            else:
+                S, L = self.nrPuschFromSliv[key]
+        else:
+            return (None, None)
+        
+        return (S, L) 
