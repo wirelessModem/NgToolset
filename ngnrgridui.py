@@ -495,6 +495,7 @@ class NgNrGridUi(QDialog):
         self.nrDci10Sib1FreqAllocType1BundleSizeComb = QComboBox()
         self.nrDci10Sib1FreqAllocType1BundleSizeComb.addItems(['n2', 'n4'])
         self.nrDci10Sib1FreqAllocType1BundleSizeComb.setCurrentIndex(0)
+        self.nrDci10Sib1FreqAllocType1BundleSizeComb.setEnabled(False)
         
         self.nrDci10Sib1McsLabel = QLabel('Modulation and coding scheme(CW0)[0-31]:')
         self.nrDci10Sib1McsEdit = QLineEdit()
@@ -626,6 +627,7 @@ class NgNrGridUi(QDialog):
         self.nrDci10Msg2FreqAllocType1BundleSizeComb = QComboBox()
         self.nrDci10Msg2FreqAllocType1BundleSizeComb.addItems(['n2', 'n4'])
         self.nrDci10Msg2FreqAllocType1BundleSizeComb.setCurrentIndex(0)
+        self.nrDci10Msg2FreqAllocType1BundleSizeComb.setEnabled(False)
         
         self.nrDci10Msg2McsLabel = QLabel('Modulation and coding scheme(CW0)[0-31]:')
         self.nrDci10Msg2McsEdit = QLineEdit()
@@ -763,6 +765,7 @@ class NgNrGridUi(QDialog):
         self.nrDci10Msg4FreqAllocType1BundleSizeComb = QComboBox()
         self.nrDci10Msg4FreqAllocType1BundleSizeComb.addItems(['n2', 'n4'])
         self.nrDci10Msg4FreqAllocType1BundleSizeComb.setCurrentIndex(0)
+        self.nrDci10Msg4FreqAllocType1BundleSizeComb.setEnabled(False)
         
         self.nrDci10Msg4McsLabel = QLabel('Modulation and coding scheme(CW0)[0-31]:')
         self.nrDci10Msg4McsEdit = QLineEdit()
