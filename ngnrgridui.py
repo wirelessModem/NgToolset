@@ -1019,24 +1019,28 @@ class NgNrGridUi(QDialog):
         self.nrDci01PuschIndicatedBwpEdit.setEnabled(False)
         
         self.nrDci01PuschTimeAllocFieldLabel = QLabel('Time domain resource assignment[0-15,16]:')
-        self.nrDci01PuschTimeAllocFieldEdit = QLineEdit()
+        self.nrDci01PuschTimeAllocFieldEdit = QLineEdit('16')
         self.nrDci01PuschTimeAllocFieldEdit.setValidator(QIntValidator(0, 16))
         
         self.nrDci01PuschTimeAllocMappingTypeLabel = QLabel('Mapping type:')
         self.nrDci01PuschTimeAllocMappingTypeComb = QComboBox()
         self.nrDci01PuschTimeAllocMappingTypeComb.addItems(['Type A', 'Type B'])
         
-        self.nrDci01PuschTimeAllocK2Label = QLabel('K2:')
-        self.nrDci01PuschTimeAllocK2Edit = QLineEdit()
+        self.nrDci01PuschTimeAllocK2Label = QLabel('K2[0-32]:')
+        self.nrDci01PuschTimeAllocK2Edit = QLineEdit('1')
+        self.nrDci01PuschTimeAllocK2Edit.setValidator(QIntValidator(0, 32))
         
-        self.nrDci01PuschTimeAllocSlivLabel = QLabel('SLIV:')
-        self.nrDci01PuschTimeAllocSlivEdit = QLineEdit()
+        self.nrDci01PuschTimeAllocSlivLabel = QLabel('SLIV[0-127]:')
+        self.nrDci01PuschTimeAllocSlivEdit = QLineEdit('27')
+        self.nrDci01PuschTimeAllocSlivEdit.setValidator(QIntValidator(0, 127))
         
-        self.nrDci01PuschTimeAllocSLabel = QLabel('S(of SLIV):')
-        self.nrDci01PuschTimeAllocSEdit = QLineEdit()
+        self.nrDci01PuschTimeAllocSLabel = QLabel('S(of SLIV)[0]:')
+        self.nrDci01PuschTimeAllocSEdit = QLineEdit('0')
+        self.nrDci01PuschTimeAllocSEdit.setValidator(QIntValidator(0, 0))
         
-        self.nrDci01PuschTimeAllocLLabel = QLabel('L(of SLIV):')
-        self.nrDci01PuschTimeAllocLEdit = QLineEdit()
+        self.nrDci01PuschTimeAllocLLabel = QLabel('L(of SLIV)[4-14]:')
+        self.nrDci01PuschTimeAllocLEdit = QLineEdit('14')
+        self.nrDci01PuschTimeAllocLEdit.setValidator(QIntValidator(4, 14))
         
         self.nrDci01PuschFreqAllocTypeLabel = QLabel('resourceAllocation:')
         self.nrDci01PuschFreqAllocTypeComb = QComboBox()
@@ -3195,9 +3199,17 @@ class NgNrGridUi(QDialog):
         self.nrDci11PdschTimeAllocSEdit.textChanged.connect(self.onDci11PdschTimeAllocSOrLEditTextChanged)
         self.nrDci11PdschTimeAllocLEdit.textChanged.connect(self.onDci11PdschTimeAllocSOrLEditTextChanged)
         self.nrDci11PdschTimeAllocMappingTypeComb.currentIndexChanged.connect(self.onDci11MappingTypeOrDedDlBwpCpCombCurIndChanged)
+        self.nrMsg3PuschTimeAllocFieldEdit.textChanged.connect(self.onMsg3PuschTimeAllocFieldEditTextChanged)
+        self.nrDci01PuschTimeAllocFieldEdit.textChanged.connect(self.onDci01PuschTimeAllocFieldEditTextChanged)
+        self.nrDci01PuschTimeAllocSlivEdit.textChanged.connect(self.onDci01PuschTimeAllocSlivEditTextChanged)
+        self.nrDci01PuschTimeAllocSEdit.textChanged.connect(self.onDci01PuschTimeAllocSOrLEditTextChanged)
+        self.nrDci01PuschTimeAllocLEdit.textChanged.connect(self.onDci01PuschTimeAllocSOrLEditTextChanged)
+        self.nrDci01PuschTimeAllocMappingTypeComb.currentIndexChanged.connect(self.onDci01MappingTypeOrDedUlBwpCpCombCurIndChanged)
         
         #---->dedicated dl bwp
         self.nrDedDlBwpGenericCpComb.currentIndexChanged.connect(self.onDci11MappingTypeOrDedDlBwpCpCombCurIndChanged)
+        #---->dedicated ul bwp
+        self.nrDedUlBwpGenericCpComb.currentIndexChanged.connect(self.onDci01MappingTypeOrDedUlBwpCpCombCurIndChanged)
         
         #---->I am THE driver!
         self.nrCarrierBandComb.setCurrentText('n77')
@@ -4587,6 +4599,54 @@ class NgNrGridUi(QDialog):
             }
         #Note 1: The UE may assume that this PDSCH resource allocation is not used, if the PDSCH was scheduled with SI-RNTI in PDCCH Type0 common search space
         self.nrPdschTimeAllocDefCNote1Set = [1, 13, 14, 15, 16]
+        
+        #refer to 3GPP 38.214 vf30
+        #Table 6.1.2.1.1-2: Default PUSCH time domain resource allocation A for normal CP
+        self.nrPuschTimeAllocDefANormCp = {
+            1 : ('Type A',0,0,14),
+            2 : ('Type A',0,0,12),
+            3 : ('Type A',0,0,10),
+            4 : ('Type B',0,2,10),
+            5 : ('Type B',0,4,10),
+            6 : ('Type B',0,4,8),
+            7 : ('Type B',0,4,6),
+            8 : ('Type A',1,0,14),
+            9 : ('Type A',1,0,12),
+            10 : ('Type A',1,0,10),
+            11 : ('Type A',2,0,14),
+            12 : ('Type A',2,0,12),
+            13 : ('Type A',2,0,10),
+            14 : ('Type B',0,8,6),
+            15 : ('Type A',3,0,14),
+            16 : ('Type A',3,0,10),
+            }
+        
+        #Table 6.1.2.1.1-3: Default PUSCH time domain resource allocation A for extended CP
+        self.nrPuschTimeAllocDefAExtCp = {
+            1 : ('Type A',0,0,8),
+            2 : ('Type A',0,0,12),
+            3 : ('Type A',0,0,10),
+            4 : ('Type B',0,2,10),
+            5 : ('Type B',0,4,4),
+            6 : ('Type B',0,4,8),
+            7 : ('Type B',0,4,6),
+            8 : ('Type A',1,0,8),
+            9 : ('Type A',1,0,12),
+            10 : ('Type A',1,0,10),
+            11 : ('Type A',2,0,6),
+            12 : ('Type A',2,0,12),
+            13 : ('Type A',2,0,10),
+            14 : ('Type B',0,8,4),
+            15 : ('Type A',3,0,8),
+            16 : ('Type A',3,0,10),
+            }
+        
+        #Table 6.1.2.1.1-4: Definition of value j
+        self.nrPuschTimeAllocK2j = { '15KHz':1, '30KHz':1, '60KHz':2, '120KHz':3 }
+        
+        #Table 6.1.2.1.1-5: Definition of value Δ
+        self.nrPuschTimeAllocMsg3K2Delta = { '15KHz':2, '30KHz':3, '60KHz':4, '120KHz':6 }
+
 
         
         
@@ -4818,6 +4878,7 @@ class NgNrGridUi(QDialog):
         self.nrDci11PdschMuPdcchEdit.setText(str(u))
         self.nrDci11PdschMuPdschEdit.setText(str(u))
         self.nrMsg3PuschMuPuschEdit.setText(str(u))
+        self.nrMsg3PuschTimeAllocDeltaEdit.setText(str(self.nrPuschTimeAllocMsg3K2Delta[self.nrIniUlBwpGenericScsComb.currentText()]))
         self.nrDci01PuschMuPdcchEdit.setText(str(u))
         self.nrDci01PuschMuPuschEdit.setText(str(u))
 
@@ -5601,6 +5662,20 @@ class NgNrGridUi(QDialog):
         #self.ngwin.logEdit.append('-->inside onDci11PdschTimeAllocFieldEditTextChanged')
         self.validateDci11PdschTimeAllocField()
     
+    def onMsg3PuschTimeAllocFieldEditTextChanged(self, text):
+        if not text:
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onMsg3PuschTimeAllocFieldEditTextChanged')
+        self.validateMsg3PuschTimeAllocField()
+    
+    def onDci01PuschTimeAllocFieldEditTextChanged(self, text):
+        if not text:
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDci01PuschTimeAllocFieldEditTextChanged')
+        self.validateDci01PuschTimeAllocField()
+    
     def validateDci10Sib1TimeAllocField(self):
         if not self.nrDci10Sib1TimeAllocFieldEdit.text():
             return
@@ -5718,14 +5793,14 @@ class NgNrGridUi(QDialog):
         if row in range(1, 17):
             #use default time-domain allocation schemes
             key = '%s_%s' % (row, self.nrMibDmRsTypeAPosComb.currentText()[3:])
-            if self.nrIniDlBwpGenericCpComb.currentText() == 'normal':
+            if self.nrDedDlBwpGenericCpComb.currentText() == 'normal':
                 if not key in self.nrPdschTimeAllocDefANormCp.keys():
                     self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefANormCp.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
                     self.nrDci11PdschTimeAllocFieldEdit.clear()
                     return
                 
                 val = self.nrPdschTimeAllocDefANormCp[key]
-            else: #self.nrIniDlBwpGenericCpComb.currentText() == 'extended':
+            else: #self.nrDedDlBwpGenericCpComb.currentText() == 'extended':
                 if not key in self.nrPdschTimeAllocDefAExtCp.keys():
                     self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPdschTimeAllocDefAExtCp.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
                     self.nrDci11PdschTimeAllocFieldEdit.clear()
@@ -5742,7 +5817,7 @@ class NgNrGridUi(QDialog):
             mappingType, k0, s, l = val
             self.nrDci11PdschTimeAllocMappingTypeComb.setCurrentText(mappingType)
             self.nrDci11PdschTimeAllocK0Edit.setText(str(k0))
-            self.nrDci11PdschTimeAllocSlivEdit.setText(str(self.toSliv(s, l, sch='pdsch', type=mappingType, cp=self.nrIniDlBwpGenericCpComb.currentText())))
+            self.nrDci11PdschTimeAllocSlivEdit.setText(str(self.toSliv(s, l, sch='pdsch', type=mappingType, cp=self.nrDedDlBwpGenericCpComb.currentText())))
             self.nrDci11PdschTimeAllocSEdit.setText(str(s))
             self.nrDci11PdschTimeAllocLEdit.setText(str(l))
         else:
@@ -5752,6 +5827,79 @@ class NgNrGridUi(QDialog):
             self.nrDci11PdschTimeAllocSlivEdit.setEnabled(True)
             self.nrDci11PdschTimeAllocSEdit.setEnabled(True)
             self.nrDci11PdschTimeAllocLEdit.setEnabled(True)
+    
+    def validateMsg3PuschTimeAllocField(self):
+        if not self.nrMsg3PuschTimeAllocFieldEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside validateMsg3PuschTimeAllocField')
+        
+        key = int(self.nrMsg3PuschTimeAllocFieldEdit.text()) + 1
+        if self.nrIniUlBwpGenericCpComb.currentText() == 'normal':
+            if not key in self.nrPuschTimeAllocDefANormCp.keys():
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPuschTimeAllocDefANormCp.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                self.nrMsg3PuschTimeAllocFieldEdit.clear()
+                return
+            
+            val = self.nrPuschTimeAllocDefANormCp[key]
+        else: #self.nrIniUlBwpGenericCpComb.currentText() == 'extended':
+            if not key in self.nrPuschTimeAllocDefAExtCp.keys():
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPuschTimeAllocDefAExtCp.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                self.nrMsg3PuschTimeAllocFieldEdit.clear()
+                return
+            
+            val = self.nrPuschTimeAllocDefAExtCp[key]
+        
+        mappingType, k2, s, l = val
+        self.nrMsg3PuschTimeAllocMappingTypeComb.setCurrentText(mappingType)
+        self.nrMsg3PuschTimeAllocK2Edit.setText(str(k2+self.nrPuschTimeAllocK2j[self.nrIniUlBwpGenericScsComb.currentText()]))
+        self.nrMsg3PuschTimeAllocSlivEdit.setText(str(self.toSliv(s, l, sch='pusch', type=mappingType, cp=self.nrIniUlBwpGenericCpComb.currentText())))
+        self.nrMsg3PuschTimeAllocSEdit.setText(str(s))
+        self.nrMsg3PuschTimeAllocLEdit.setText(str(l))
+    
+    def validateDci01PuschTimeAllocField(self):
+        if not self.nrDci01PuschTimeAllocFieldEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside validateDci01PuschTimeAllocField')
+        
+        key = int(self.nrDci01PuschTimeAllocFieldEdit.text()) + 1
+        if key in range(1, 17):
+            #use default time-domain allocation schemes
+            if self.nrDedUlBwpGenericCpComb.currentText() == 'normal':
+                if not key in self.nrPuschTimeAllocDefANormCp.keys():
+                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPuschTimeAllocDefANormCp.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                    self.nrDci01PuschTimeAllocFieldEdit.clear()
+                    return
+                
+                val = self.nrPuschTimeAllocDefANormCp[key]
+            else: #self.nrDedUlBwpGenericCpComb.currentText() == 'extended':
+                if not key in self.nrPuschTimeAllocDefAExtCp.keys():
+                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrPuschTimeAllocDefAExtCp.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                    self.nrDci01PuschTimeAllocFieldEdit.clear()
+                    return
+                
+                val = self.nrPuschTimeAllocDefAExtCp[key]
+            
+            self.nrDci01PuschTimeAllocMappingTypeComb.setEnabled(False)
+            self.nrDci01PuschTimeAllocK2Edit.setEnabled(False)
+            self.nrDci01PuschTimeAllocSlivEdit.setEnabled(False)
+            self.nrDci01PuschTimeAllocSEdit.setEnabled(False)
+            self.nrDci01PuschTimeAllocLEdit.setEnabled(False)
+            
+            mappingType, k2, s, l = val
+            self.nrDci01PuschTimeAllocMappingTypeComb.setCurrentText(mappingType)
+            self.nrDci01PuschTimeAllocK2Edit.setText(str(k2+self.nrPuschTimeAllocK2j[self.nrDedUlBwpGenericScsComb.currentText()]))
+            self.nrDci01PuschTimeAllocSlivEdit.setText(str(self.toSliv(s, l, sch='pusch', type=mappingType, cp=self.nrIniUlBwpGenericCpComb.currentText())))
+            self.nrDci01PuschTimeAllocSEdit.setText(str(s))
+            self.nrDci01PuschTimeAllocLEdit.setText(str(l))
+        else:
+            #use user-defined time-domain allocation scheme
+            self.nrDci01PuschTimeAllocMappingTypeComb.setEnabled(True)
+            self.nrDci01PuschTimeAllocK2Edit.setEnabled(True)
+            self.nrDci01PuschTimeAllocSlivEdit.setEnabled(True)
+            self.nrDci01PuschTimeAllocSEdit.setEnabled(True)
+            self.nrDci01PuschTimeAllocLEdit.setEnabled(True)
             
     def onDci11PdschTimeAllocSlivEditTextChanged(self, text):
         if not text:
@@ -5823,6 +5971,77 @@ class NgNrGridUi(QDialog):
         self.nrDci11PdschTimeAllocSlivEdit.clear()
         self.nrDci11PdschTimeAllocSEdit.clear()
         self.nrDci11PdschTimeAllocLEdit.clear()
+        
+    def onDci01PuschTimeAllocSlivEditTextChanged(self, text):
+        if not text:
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDci01PuschTimeAllocSlivEditTextChanged')
+        sliv = int(self.nrDci01PuschTimeAllocSlivEdit.text())
+        S,L = self.fromSliv(sliv, sch='pusch', type=self.nrDci01PuschTimeAllocMappingTypeComb.currentText(), cp=self.nrDedUlBwpGenericCpComb.currentText())
+        if S is not None and L is not None:
+            self.nrDci01PuschTimeAllocSEdit.setText(str(S))
+            self.nrDci01PuschTimeAllocLEdit.setText(str(L))
+        else:
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid SLIV(=%s) and prefix info: type="%s", cp="%s".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), sliv, self.nrDci01PuschTimeAllocMappingTypeComb.currentText(), self.nrDedUlBwpGenericCpComb.currentText()))
+            self.nrDci01PuschTimeAllocSEdit.clear()
+            self.nrDci01PuschTimeAllocLEdit.clear()
+    
+    def onDci01PuschTimeAllocSOrLEditTextChanged(self, text):
+        if not self.nrDci01PuschTimeAllocSEdit.text() or not self.nrDci01PuschTimeAllocLEdit.text():
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDci01PuschTimeAllocSOrLEditTextChanged')
+        S = int(self.nrDci01PuschTimeAllocSEdit.text())
+        L = int(self.nrDci01PuschTimeAllocLEdit.text())
+        sliv = self.toSliv(S, L, sch='pusch', type=self.nrDci01PuschTimeAllocMappingTypeComb.currentText(), cp=self.nrDedUlBwpGenericCpComb.currentText())
+        if sliv is not None:
+            self.nrDci01PuschTimeAllocSlivEdit.setText(str(sliv))
+        else:
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid S/L combination(S=%s, L=%s) and prefix info: type="%s", cp="%s".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), S, L, self.nrDci01PuschTimeAllocMappingTypeComb.currentText(), self.nrDedUlBwpGenericCpComb.currentText()))
+            self.nrDci01PuschTimeAllocSlivEdit.clear()
+    
+    def onDci01MappingTypeOrDedUlBwpCpCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onDci01MappingTypeOrDedUlBwpCpCombCurIndChanged, index=%d' % index)
+        
+        mappingType = self.nrDci01PuschTimeAllocMappingTypeComb.currentText()
+        cp = self.nrDedUlBwpGenericCpComb.currentText()
+        
+        if mappingType == 'Type A':
+            if cp == 'normal':
+                self.nrDci01PuschTimeAllocSLabel.setText('S(of SLIV)[0]:')
+                self.nrDci01PuschTimeAllocSEdit.setValidator(QIntValidator(0, 0))
+                self.nrDci01PuschTimeAllocLLabel.setText('L(of SLIV)[4-14]:')
+                self.nrDci01PuschTimeAllocLEdit.setValidator(QIntValidator(4, 14))
+            elif cp == 'extended':
+                self.nrDci01PuschTimeAllocSLabel.setText('S(of SLIV)[0]:')
+                self.nrDci01PuschTimeAllocSEdit.setValidator(QIntValidator(0, 0))
+                self.nrDci01PuschTimeAllocLLabel.setText('L(of SLIV)[4-12]:')
+                self.nrDci01PuschTimeAllocLEdit.setValidator(QIntValidator(4, 12))
+            else:
+                return
+        elif mappingType == 'Type B':
+            if cp == 'normal':
+                self.nrDci01PuschTimeAllocSLabel.setText('S(of SLIV)[0-13]:')
+                self.nrDci01PuschTimeAllocSEdit.setValidator(QIntValidator(0, 13))
+                self.nrDci01PuschTimeAllocLLabel.setText('L(of SLIV)[1-14]:')
+                self.nrDci01PuschTimeAllocLEdit.setValidator(QIntValidator(1, 14))
+            elif cp == 'extended':
+                self.nrDci01PuschTimeAllocSLabel.setText('S(of SLIV)[0-12]:')
+                self.nrDci01PuschTimeAllocSEdit.setValidator(QIntValidator(0, 12))
+                self.nrDci01PuschTimeAllocLLabel.setText('L(of SLIV)[1-12]:')
+                self.nrDci01PuschTimeAllocLEdit.setValidator(QIntValidator(1, 12))
+            else:
+                return
+        else:
+            return
+        
+        self.nrDci01PuschTimeAllocSlivEdit.clear()
+        self.nrDci01PuschTimeAllocSEdit.clear()
+        self.nrDci01PuschTimeAllocLEdit.clear()
 
     def onOkBtnClicked(self):
         self.ngwin.logEdit.append('-->inside onOkBtnClicked')
