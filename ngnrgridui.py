@@ -6120,7 +6120,7 @@ class NgNrGridUi(QDialog):
                         keyFromSliv = '%s_%s' % (prefix, sliv)
                         self.nrPdschFromSliv[keyFromSliv] = (S, L)
         
-        #case2: prefix='10'
+        #case3: prefix='10'
         prefix = '10'
         for S in range(13):
             for L in (2,4,7):
@@ -6132,7 +6132,7 @@ class NgNrGridUi(QDialog):
                         keyFromSliv = '%s_%s' % (prefix, sliv)
                         self.nrPdschFromSliv[keyFromSliv] = (S, L)
         
-        #case2: prefix='11'
+        #case4: prefix='11'
         prefix = '11'
         for S in range(11):
             for L in (2,4,6):
@@ -6179,7 +6179,7 @@ class NgNrGridUi(QDialog):
                         keyFromSliv = '%s_%s' % (prefix, sliv)
                         self.nrPuschFromSliv[keyFromSliv] = (S, L)
         
-        #case2: prefix='10'
+        #case3: prefix='10'
         prefix = '10'
         for S in range(14):
             for L in range(1, 15):
@@ -6191,7 +6191,7 @@ class NgNrGridUi(QDialog):
                         keyFromSliv = '%s_%s' % (prefix, sliv)
                         self.nrPuschFromSliv[keyFromSliv] = (S, L)
         
-        #case2: prefix='11'
+        #case4: prefix='11'
         prefix = '11'
         for S in range(13):
             for L in range(1, 13):
