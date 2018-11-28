@@ -116,6 +116,8 @@ class NgNrGridUi(QDialog):
         self.nrMibCoreset0Edit = QLineEdit('0')
         self.nrMibCoreset0Edit.setValidator(QIntValidator(0, 15))
         
+        self.nrMibCoreset0InfoLabel = QLabel()
+        
         self.nrMibCss0Label = QLabel('searchSpaceZero(PDCCH-ConfigSIB1)[0-15]:')
         self.nrMibCss0Edit = QLineEdit('0')
         self.nrMibCss0Edit.setValidator(QIntValidator(0, 15))
@@ -131,8 +133,9 @@ class NgNrGridUi(QDialog):
         mibGrpBoxLayout.addWidget(self.nrMibScsCommonComb, 2, 1)
         mibGrpBoxLayout.addWidget(self.nrMibCoreset0Label, 3, 0)
         mibGrpBoxLayout.addWidget(self.nrMibCoreset0Edit, 3, 1)
-        mibGrpBoxLayout.addWidget(self.nrMibCss0Label, 4, 0)
-        mibGrpBoxLayout.addWidget(self.nrMibCss0Edit, 4, 1)
+        mibGrpBoxLayout.addWidget(self.nrMibCoreset0InfoLabel, 4, 0, 1, 2)
+        mibGrpBoxLayout.addWidget(self.nrMibCss0Label, 5, 0)
+        mibGrpBoxLayout.addWidget(self.nrMibCss0Edit, 5, 1)
         mibGrpBox.setLayout(mibGrpBoxLayout)
         
         #---->(1.4) SSB burst configurations
@@ -471,9 +474,11 @@ class NgNrGridUi(QDialog):
         self.nrDci10Sib1FreqAllocTypeComb = QComboBox()
         self.nrDci10Sib1FreqAllocTypeComb.addItems(['RA Type0', 'RA Type1'])
         self.nrDci10Sib1FreqAllocTypeComb.setCurrentIndex(1)
+        self.nrDci10Sib1FreqAllocTypeComb.setEnabled(False)
         
-        self.nrDci10Sib1FreqAllocFieldLabel = QLabel('Frequency domain resource assignment:')
+        self.nrDci10Sib1FreqAllocFieldLabel = QLabel('Freq domain resource assignment:')
         self.nrDci10Sib1FreqAllocFieldEdit = QLineEdit()
+        self.nrDci10Sib1FreqAllocFieldEdit.setEnabled(False)
         
         self.nrDci10Sib1FreqAllocType1RbStartLabel = QLabel('RB_start(of RIV):')
         self.nrDci10Sib1FreqAllocType1RbStartEdit = QLineEdit()
@@ -600,9 +605,11 @@ class NgNrGridUi(QDialog):
         self.nrDci10Msg2FreqAllocTypeComb = QComboBox()
         self.nrDci10Msg2FreqAllocTypeComb.addItems(['RA Type0', 'RA Type1'])
         self.nrDci10Msg2FreqAllocTypeComb.setCurrentIndex(1)
+        self.nrDci10Msg2FreqAllocTypeComb.setEnabled(False)
         
-        self.nrDci10Msg2FreqAllocFieldLabel = QLabel('Frequency domain resource assignment:')
+        self.nrDci10Msg2FreqAllocFieldLabel = QLabel('Freq domain resource assignment:')
         self.nrDci10Msg2FreqAllocFieldEdit = QLineEdit()
+        self.nrDci10Msg2FreqAllocFieldEdit.setEnabled(False)
         
         self.nrDci10Msg2FreqAllocType1RbStartLabel = QLabel('RB_start(of RIV):')
         self.nrDci10Msg2FreqAllocType1RbStartEdit = QLineEdit()
@@ -735,9 +742,11 @@ class NgNrGridUi(QDialog):
         self.nrDci10Msg4FreqAllocTypeComb = QComboBox()
         self.nrDci10Msg4FreqAllocTypeComb.addItems(['RA Type0', 'RA Type1'])
         self.nrDci10Msg4FreqAllocTypeComb.setCurrentIndex(1)
+        self.nrDci10Msg4FreqAllocTypeComb.setEnabled(False)
         
-        self.nrDci10Msg4FreqAllocFieldLabel = QLabel('Frequency domain resource assignment:')
+        self.nrDci10Msg4FreqAllocFieldLabel = QLabel('Freq domain resource assignment:')
         self.nrDci10Msg4FreqAllocFieldEdit = QLineEdit()
+        self.nrDci10Msg4FreqAllocFieldEdit.setEnabled(False)
         
         self.nrDci10Msg4FreqAllocType1RbStartLabel = QLabel('RB_start(of RIV):')
         self.nrDci10Msg4FreqAllocType1RbStartEdit = QLineEdit()
@@ -884,7 +893,7 @@ class NgNrGridUi(QDialog):
         self.nrDci11PdschFreqAllocTypeComb.addItems(['RA Type0', 'RA Type1'])
         self.nrDci11PdschFreqAllocTypeComb.setCurrentIndex(1)
         
-        self.nrDci11PdschFreqAllocFieldLabel = QLabel('Frequency domain resource assignment:')
+        self.nrDci11PdschFreqAllocFieldLabel = QLabel('Freq domain resource assignment:')
         self.nrDci11PdschFreqAllocFieldEdit = QLineEdit()
         
         self.nrDci11PdschFreqAllocType1RbStartLabel = QLabel('RB_start(of RIV):')
@@ -1052,7 +1061,7 @@ class NgNrGridUi(QDialog):
         self.nrDci01PuschFreqAllocFreqHopComb.addItems(['disabled', 'intra-slot', 'inter-slot'])
         self.nrDci01PuschFreqAllocFreqHopComb.setCurrentIndex(0)
         
-        self.nrDci01PuschFreqAllocFieldLabel = QLabel('Frequency domain resource assignment:')
+        self.nrDci01PuschFreqAllocFieldLabel = QLabel('Freq domain resource assignment:')
         self.nrDci01PuschFreqAllocFieldEdit = QLineEdit()
         
         self.nrDci01PuschFreqAllocType1RbStartLabel = QLabel('RB_start(of RIV):')
@@ -1185,13 +1194,14 @@ class NgNrGridUi(QDialog):
         self.nrMsg3PuschFreqAllocTypeComb = QComboBox()
         self.nrMsg3PuschFreqAllocTypeComb.addItems(['RA Type0', 'RA Type1'])
         self.nrMsg3PuschFreqAllocTypeComb.setCurrentIndex(1)
+        self.nrMsg3PuschFreqAllocTypeComb.setEnabled(False)
         
         self.nrMsg3PuschFreqAllocFreqHopLabel= QLabel('Frequency hopping flag:')
         self.nrMsg3PuschFreqAllocFreqHopComb = QComboBox()
         self.nrMsg3PuschFreqAllocFreqHopComb.addItems(['disabled', 'enabled'])
         self.nrMsg3PuschFreqAllocFreqHopComb.setCurrentIndex(0)
         
-        self.nrMsg3PuschFreqAllocFieldLabel = QLabel('Frequency domain resource assignment:')
+        self.nrMsg3PuschFreqAllocFieldLabel = QLabel('Freq domain resource assignment:')
         self.nrMsg3PuschFreqAllocFieldEdit = QLineEdit()
         
         self.nrMsg3PuschFreqAllocType1RbStartLabel = QLabel('RB_start(of RIV):')
@@ -3190,16 +3200,27 @@ class NgNrGridUi(QDialog):
         self.nrCoreset1CceRegMapComb.currentIndexChanged[int].connect(self.onCoreset1CceRegMapCombCurIndChanged)
         self.nrUssFirstSymbsEdit.textChanged.connect(self.onUssFirstSymbsEditTextChanged)
         
-        #---->signal-slot for dci
+        #---->signal-slot for dcis
         self.nrDci10Sib1TimeAllocFieldEdit.textChanged.connect(self.onDci10Sib1TimeAllocFieldEditTextChanged)
+        self.nrDci10Sib1FreqAllocType1LRbsEdit.textChanged.connect(self.onDci10Sib1Type1LRBsOrRBStartEditTextChanged)
+        self.nrDci10Sib1FreqAllocType1RbStartEdit.textChanged.connect(self.onDci10Sib1Type1LRBsOrRBStartEditTextChanged)
+        
         self.nrDci10Msg2TimeAllocFieldEdit.textChanged.connect(self.onDci10Msg2TimeAllocFieldEditTextChanged)
+        self.nrDci10Msg2FreqAllocType1LRbsEdit.textChanged.connect(self.onDci10Msg2Type1LRBsOrRBStartEditTextChanged)
+        self.nrDci10Msg2FreqAllocType1RbStartEdit.textChanged.connect(self.onDci10Msg2Type1LRBsOrRBStartEditTextChanged)
+        
         self.nrDci10Msg4TimeAllocFieldEdit.textChanged.connect(self.onDci10Msg4TimeAllocFieldEditTextChanged)
+        self.nrDci10Msg4FreqAllocType1LRbsEdit.textChanged.connect(self.onDci10Msg4Type1LRBsOrRBStartEditTextChanged)
+        self.nrDci10Msg4FreqAllocType1RbStartEdit.textChanged.connect(self.onDci10Msg4Type1LRBsOrRBStartEditTextChanged)
+        
         self.nrDci11PdschTimeAllocFieldEdit.textChanged.connect(self.onDci11PdschTimeAllocFieldEditTextChanged)
         self.nrDci11PdschTimeAllocSlivEdit.textChanged.connect(self.onDci11PdschTimeAllocSlivEditTextChanged)
         self.nrDci11PdschTimeAllocSEdit.textChanged.connect(self.onDci11PdschTimeAllocSOrLEditTextChanged)
         self.nrDci11PdschTimeAllocLEdit.textChanged.connect(self.onDci11PdschTimeAllocSOrLEditTextChanged)
         self.nrDci11PdschTimeAllocMappingTypeComb.currentIndexChanged.connect(self.onDci11MappingTypeOrDedDlBwpCpCombCurIndChanged)
+        
         self.nrMsg3PuschTimeAllocFieldEdit.textChanged.connect(self.onMsg3PuschTimeAllocFieldEditTextChanged)
+        
         self.nrDci01PuschTimeAllocFieldEdit.textChanged.connect(self.onDci01PuschTimeAllocFieldEditTextChanged)
         self.nrDci01PuschTimeAllocSlivEdit.textChanged.connect(self.onDci01PuschTimeAllocSlivEditTextChanged)
         self.nrDci01PuschTimeAllocSEdit.textChanged.connect(self.onDci01PuschTimeAllocSOrLEditTextChanged)
@@ -5125,6 +5146,8 @@ class NgNrGridUi(QDialog):
         
         self.ngwin.logEdit.append('-->inside validateCoreset0')
         
+        self.nrMibCoreset0InfoLabel.setText('<font color=green>CORESET0: invalid</font>')
+        
         #(1) validate coresetZero
         key = self.nrSsbScsComb.currentText()[:-3] + '_' + self.nrMibScsCommonComb.currentText()[:-3] + '_' + self.nrMibCoreset0Edit.text()
         if self.freqRange == 'FR1' and self.minChBw in (5, 10):
@@ -5196,13 +5219,48 @@ class NgNrGridUi(QDialog):
                 self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid CORESET0 setting: CORESET0 numRBs=%d, offset=%d, minBw = %d, while numRBs(common scs)=%s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0NumRbs, self.coreset0Offset, minBw, numRbCommonScs))
                 return False
         
-        #print CORESET0 info
-        self.ngwin.logEdit.append('<font color=green><b>[%s]Info</font>: CORESET0 setting: multiplexingPattern = %d, numRBs=%d, numSymbs=%d, offset=%d.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0MultiplexingPat, self.coreset0NumRbs, self.coreset0NumSymbs, self.coreset0Offset))
-        
         #(4) validate self.coreset0NumSymbs against 'dmrs-pointA-Position'
         if self.coreset0NumSymbs == 3 and int(self.nrMibDmRsTypeAPosComb.currentText()[3:]) != 3:
             self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: CORESET numSymbs = 3 is only supported when dmrs-TypeA-Position = 3!' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
             return False
+        
+        #print CORESET0 info
+        #self.ngwin.logEdit.append('<font color=green><b>[%s]Info</font>: CORESET0 setting: multiplexingPattern = %d, numRBs=%d, numSymbs=%d, offset=%d.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.coreset0MultiplexingPat, self.coreset0NumRbs, self.coreset0NumSymbs, self.coreset0Offset))
+        
+        self.nrMibCoreset0InfoLabel.setText('<font color=green>CORESET0: multiplexingPattern=%d, numRBs=%d, numSymbs=%d, offset=%d.</font>' % (self.coreset0MultiplexingPat, self.coreset0NumRbs, self.coreset0NumSymbs, self.coreset0Offset))
+        
+        #update 'frequency domain assignment' bitwidth for SIB1/Msg2/Msg4 w.r.t CORESET0 bandwidth
+        self.bitwidthCoreset0 = math.ceil(math.log2(self.coreset0NumRbs * (self.coreset0NumRbs + 1) / 2))
+        
+        self.nrDci10Sib1FreqAllocFieldLabel.setText('Freq domain resource assignment[%dbits]:' % self.bitwidthCoreset0)
+        self.nrDci10Sib1FreqAllocFieldEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{%d}' % self.bitwidthCoreset0)))
+        self.nrDci10Sib1FreqAllocType1RbStartLabel.setText('RB_start(of RIV)[0-%d]:' % (self.coreset0NumRbs - 1))
+        self.nrDci10Sib1FreqAllocType1RbStartEdit.setValidator(QIntValidator(0, self.coreset0NumRbs-1))
+        self.nrDci10Sib1FreqAllocType1LRbsLabel.setText('L_RBs(of RIV)[1-%d]:' % self.coreset0NumRbs)
+        self.nrDci10Sib1FreqAllocType1LRbsEdit.setValidator(QIntValidator(1, self.coreset0NumRbs))
+        self.nrDci10Sib1FreqAllocType1RbStartEdit.setText('0')
+        self.nrDci10Sib1FreqAllocType1LRbsEdit.setText(str(self.coreset0NumRbs))
+        self.nrDci10Sib1FreqAllocFieldEdit.setText('{:0{width}b}'.format(self.makeRiv(self.coreset0NumRbs, 0, self.coreset0NumRbs), width=self.bitwidthCoreset0))
+        
+        self.nrDci10Msg2FreqAllocFieldLabel.setText('Freq domain resource assignment[%dbits]:' % self.bitwidthCoreset0)
+        self.nrDci10Msg2FreqAllocFieldEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{%d}' % self.bitwidthCoreset0)))
+        self.nrDci10Msg2FreqAllocType1RbStartLabel.setText('RB_start(of RIV)[0-%d]:' % (self.coreset0NumRbs - 1))
+        self.nrDci10Msg2FreqAllocType1RbStartEdit.setValidator(QIntValidator(0, self.coreset0NumRbs-1))
+        self.nrDci10Msg2FreqAllocType1LRbsLabel.setText('L_RBs(of RIV)[1-%d]:' % self.coreset0NumRbs)
+        self.nrDci10Msg2FreqAllocType1LRbsEdit.setValidator(QIntValidator(1, self.coreset0NumRbs))
+        self.nrDci10Msg2FreqAllocType1RbStartEdit.setText('0')
+        self.nrDci10Msg2FreqAllocType1LRbsEdit.setText(str(self.coreset0NumRbs))
+        self.nrDci10Msg2FreqAllocFieldEdit.setText('{:0{width}b}'.format(self.makeRiv(self.coreset0NumRbs, 0, self.coreset0NumRbs), width=self.bitwidthCoreset0))
+        
+        self.nrDci10Msg4FreqAllocFieldLabel.setText('Freq domain resource assignment[%dbits]:' % self.bitwidthCoreset0)
+        self.nrDci10Msg4FreqAllocFieldEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{%d}' % self.bitwidthCoreset0)))
+        self.nrDci10Msg4FreqAllocType1RbStartLabel.setText('RB_start(of RIV)[0-%d]:' % (self.coreset0NumRbs - 1))
+        self.nrDci10Msg4FreqAllocType1RbStartEdit.setValidator(QIntValidator(0, self.coreset0NumRbs-1))
+        self.nrDci10Msg4FreqAllocType1LRbsLabel.setText('L_RBs(of RIV)[1-%d]:' % self.coreset0NumRbs)
+        self.nrDci10Msg4FreqAllocType1LRbsEdit.setValidator(QIntValidator(1, self.coreset0NumRbs))
+        self.nrDci10Msg4FreqAllocType1RbStartEdit.setText('0')
+        self.nrDci10Msg4FreqAllocType1LRbsEdit.setText(str(self.coreset0NumRbs))
+        self.nrDci10Msg4FreqAllocFieldEdit.setText('{:0{width}b}'.format(self.makeRiv(self.coreset0NumRbs, 0, self.coreset0NumRbs), width=self.bitwidthCoreset0))
             
         #when validation passed
         return True
@@ -5266,9 +5324,8 @@ class NgNrGridUi(QDialog):
         #validate coreset1 duration
         coreset1Duration = int(self.nrCoreset1DurationComb.currentText())
         if coreset1Duration == 3 and int(self.nrMibDmRsTypeAPosComb.currentText()[3:]) != 3:
-            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid setting: coreset1Duration = %s but dmrs-TypeA-Position = "%s"! Reset dmrs-TypeA-Position to "pos3".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrCoreset1DurationComb.currentText(), self.nrMibDmRsTypeAPosComb.currentText()))
-            self.nrMibDmRsTypeAPosComb.setCurrentText('pos3')
-            return
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid setting: coreset1Duration = %s but dmrs-TypeA-Position = "%s"! Reset coreset1Duration to "2".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrCoreset1DurationComb.currentText(), self.nrMibDmRsTypeAPosComb.currentText()))
+            self.nrCoreset1DurationComb.setCurrentText('2')
         
         #validate 'time domain resource assignment' of dci
         self.validateDci10Sib1TimeAllocField()
@@ -5279,8 +5336,9 @@ class NgNrGridUi(QDialog):
             if timeAllocFieldDci11 in range(16):
                 self.validateDci11PdschTimeAllocField()
             else:
-                #FIXME
-                pass
+                if self.nrDci11PdschTimeAllocMappingTypeComb.currentText() == 'Type A' and self.nrDci11PdschTimeAllocSEdit.text() and int(self.nrDci11PdschTimeAllocSEdit.text()) == 3 and self.nrMibDmRsTypeAPosComb.currentText() != 'pos3':
+                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid setting: S of SLIV = %s but dmrs-TypeA-Position = "%s" when PDSCH mapping type is "Type A"!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrDci11PdschTimeAllocSEdit.text(), self.nrMibDmRsTypeAPosComb.currentText()))
+                    self.nrDci11PdschTimeAllocSEdit.clear()
         
     def onTddCfgPat2PeriodCombCurIndChanged(self, index):
         if index < 0:
@@ -5366,6 +5424,8 @@ class NgNrGridUi(QDialog):
             else:
                 numRbCommonScs = self.nrNrbFr2[commonScs][self.nrBwSetFr2.index(self.nrCarrierBwComb.currentText())]
             #numRbCarrierScs = int(self.nrCarrierNumRbEdit.text())
+            #FIXME
+            #initial dl bwp need to check against coreset0 bw
             if L_RBs < 1 or L_RBs > (numRbCommonScs - RB_start):
                 self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRbCommonScs))
                 self.nrIniDlBwpGenericLRbsEdit.clear()
@@ -5395,6 +5455,7 @@ class NgNrGridUi(QDialog):
         #numRbCarrierScs = int(self.nrCarrierNumRbEdit.text())
         if L_RBs < 1 or L_RBs > (numRbCommonScs - RB_start):
             self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRbCommonScs))
+            self.nrIniDlBwpGenericLocAndBwEdit.clear()
             return
         
         riv = self.makeRiv(L_RBs, RB_start, 275)
@@ -5437,6 +5498,7 @@ class NgNrGridUi(QDialog):
         numRbCarrierScs = int(self.nrCarrierNumRbEdit.text())
         if L_RBs < 1 or L_RBs > (numRbCarrierScs - RB_start):
             self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRbCarrierScs))
+            self.nrIniUlBwpGenericLocAndBwEdit.clear()
             return
         
         riv = self.makeRiv(L_RBs, RB_start, 275)
@@ -5480,6 +5542,7 @@ class NgNrGridUi(QDialog):
         numRbCarrierScs = int(self.nrCarrierNumRbEdit.text())
         if L_RBs < 1 or L_RBs > (numRbCarrierScs - RB_start):
             self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRbCarrierScs))
+            self.nrDedDlBwpGenericLocAndBwEdit.clear()
             return
         
         riv = self.makeRiv(L_RBs, RB_start, 275)
@@ -5523,6 +5586,7 @@ class NgNrGridUi(QDialog):
         numRbCarrierScs = int(self.nrCarrierNumRbEdit.text())
         if L_RBs < 1 or L_RBs > (numRbCarrierScs - RB_start):
             self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with carrier bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRbCarrierScs))
+            self.nrDedUlBwpGenericLocAndBwEdit.clear()
             return
         
         riv = self.makeRiv(L_RBs, RB_start, 275)
@@ -5922,6 +5986,13 @@ class NgNrGridUi(QDialog):
         
         #self.ngwin.logEdit.append('-->inside onDci11PdschTimeAllocSOrLEditTextChanged')
         S = int(self.nrDci11PdschTimeAllocSEdit.text())
+        
+        #validate S against 'dmrs-TypeA-Position' when mappingType is 'Type A'
+        if self.nrDci11PdschTimeAllocMappingTypeComb.currentText() == 'Type A' and S == 3 and self.nrMibDmRsTypeAPosComb.currentText() != 'pos3':
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid setting: S of SLIV = %s but dmrs-TypeA-Position = "%s" when PDSCH mapping type is "Type A"!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrDci11PdschTimeAllocSEdit.text(), self.nrMibDmRsTypeAPosComb.currentText()))
+            self.nrDci11PdschTimeAllocSEdit.clear()
+            return
+                    
         L = int(self.nrDci11PdschTimeAllocLEdit.text())
         sliv = self.toSliv(S, L, sch='pdsch', type=self.nrDci11PdschTimeAllocMappingTypeComb.currentText(), cp=self.nrDedDlBwpGenericCpComb.currentText())
         if sliv is not None:
@@ -6042,6 +6113,63 @@ class NgNrGridUi(QDialog):
         self.nrDci01PuschTimeAllocSlivEdit.clear()
         self.nrDci01PuschTimeAllocSEdit.clear()
         self.nrDci01PuschTimeAllocLEdit.clear()
+    
+    def onDci10Sib1Type1LRBsOrRBStartEditTextChanged(self, text):
+        if not self.nrDci10Sib1FreqAllocType1LRbsEdit.text() or not self.nrDci10Sib1FreqAllocType1RbStartEdit.text():
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDci10Sib1Type1LRBsOrRBStartEditTextChanged')
+        L_RBs = int(self.nrDci10Sib1FreqAllocType1LRbsEdit.text())
+        RB_start = int(self.nrDci10Sib1FreqAllocType1RbStartEdit.text())
+        if L_RBs < 1 or L_RBs > (self.coreset0NumRbs - RB_start):
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with CORESET0 bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, self.coreset0NumRbs))
+            self.nrDci10Sib1FreqAllocFieldEdit.clear()
+            return
+        
+        riv = self.makeRiv(L_RBs, RB_start, self.coreset0NumRbs)
+        if riv is not None:
+            self.nrDci10Sib1FreqAllocFieldEdit.setText('{:0{width}b}'.format(riv, width=self.bitwidthCoreset0))
+        else:
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
+            self.nrDci10Sib1FreqAllocFieldEdit.clear()
+        
+    def onDci10Msg2Type1LRBsOrRBStartEditTextChanged(self, text):
+        if not self.nrDci10Msg2FreqAllocType1LRbsEdit.text() or not self.nrDci10Msg2FreqAllocType1RbStartEdit.text():
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDci10Msg2Type1LRBsOrRBStartEditTextChanged')
+        L_RBs = int(self.nrDci10Msg2FreqAllocType1LRbsEdit.text())
+        RB_start = int(self.nrDci10Msg2FreqAllocType1RbStartEdit.text())
+        if L_RBs < 1 or L_RBs > (self.coreset0NumRbs - RB_start):
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with CORESET0 bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, self.coreset0NumRbs))
+            self.nrDci10Msg2FreqAllocFieldEdit.clear()
+            return
+        
+        riv = self.makeRiv(L_RBs, RB_start, self.coreset0NumRbs)
+        if riv is not None:
+            self.nrDci10Msg2FreqAllocFieldEdit.setText('{:0{width}b}'.format(riv, width=self.bitwidthCoreset0))
+        else:
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
+            self.nrDci10Msg2FreqAllocFieldEdit.clear()
+    
+    def onDci10Msg4Type1LRBsOrRBStartEditTextChanged(self, text):
+        if not self.nrDci10Msg4FreqAllocType1LRbsEdit.text() or not self.nrDci10Msg4FreqAllocType1RbStartEdit.text():
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDci10Msg4Type1LRBsOrRBStartEditTextChanged')
+        L_RBs = int(self.nrDci10Msg4FreqAllocType1LRbsEdit.text())
+        RB_start = int(self.nrDci10Msg4FreqAllocType1RbStartEdit.text())
+        if L_RBs < 1 or L_RBs > (self.coreset0NumRbs - RB_start):
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with CORESET0 bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, self.coreset0NumRbs))
+            self.nrDci10Msg4FreqAllocFieldEdit.clear()
+            return
+        
+        riv = self.makeRiv(L_RBs, RB_start, self.coreset0NumRbs)
+        if riv is not None:
+            self.nrDci10Msg4FreqAllocFieldEdit.setText('{:0{width}b}'.format(riv, width=self.bitwidthCoreset0))
+        else:
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
+            self.nrDci10Msg4FreqAllocFieldEdit.clear()
 
     def onOkBtnClicked(self):
         self.ngwin.logEdit.append('-->inside onOkBtnClicked')
