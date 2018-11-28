@@ -5890,7 +5890,7 @@ class NgNrGridUi(QDialog):
             mappingType, k2, s, l = val
             self.nrDci01PuschTimeAllocMappingTypeComb.setCurrentText(mappingType)
             self.nrDci01PuschTimeAllocK2Edit.setText(str(k2+self.nrPuschTimeAllocK2j[self.nrDedUlBwpGenericScsComb.currentText()]))
-            self.nrDci01PuschTimeAllocSlivEdit.setText(str(self.toSliv(s, l, sch='pusch', type=mappingType, cp=self.nrIniUlBwpGenericCpComb.currentText())))
+            self.nrDci01PuschTimeAllocSlivEdit.setText(str(self.toSliv(s, l, sch='pusch', type=mappingType, cp=self.nrDedUlBwpGenericCpComb.currentText())))
             self.nrDci01PuschTimeAllocSEdit.setText(str(s))
             self.nrDci01PuschTimeAllocLEdit.setText(str(l))
         else:
