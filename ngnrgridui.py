@@ -1213,6 +1213,10 @@ class NgNrGridUi(QDialog):
         self.nrMsg3PuschFreqAllocType1LRbsLabel = QLabel('L_RBs(of RIV):')
         self.nrMsg3PuschFreqAllocType1LRbsEdit = QLineEdit()
         
+        self.nrMsg3PuschFreqAllocType1SecondHopFreqOffLabel = QLabel('Frequency offset for 2nd hop:')
+        self.nrMsg3PuschFreqAllocType1SecondHopFreqOffEdit = QLineEdit()
+        self.nrMsg3PuschFreqAllocType1SecondHopFreqOffEdit.setEnabled(False)
+        
         self.nrMsg3PuschCw0McsLabel = QLabel('Modulation and coding scheme(CW0)[0-31]:')
         self.nrMsg3PuschCw0McsEdit = QLineEdit()
         self.nrMsg3PuschCw0McsEdit.setValidator(QIntValidator(0, 31))
@@ -1251,6 +1255,8 @@ class NgNrGridUi(QDialog):
         msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocType1RbStartEdit, 3, 1)
         msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocType1LRbsLabel, 4, 0)
         msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocType1LRbsEdit, 4, 1)
+        msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocType1SecondHopFreqOffLabel, 5, 0)
+        msg3PuschFreqAllocLayout.addWidget(self.nrMsg3PuschFreqAllocType1SecondHopFreqOffEdit, 5, 1)
         msg3PuschFreqAllocWidget.setLayout(msg3PuschFreqAllocLayout)
         
         msg3PuschRaTabWidget = QTabWidget()
@@ -5489,11 +5495,11 @@ class NgNrGridUi(QDialog):
             
             self.nrIniUlBwpGenericLRbsEdit.setText(str(L_RBs))
             self.nrIniUlBwpGenericRbStartEdit.setText(str(RB_start))
+            self.updateIniUlBwpInfo()
         else:
             self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid RIV = %d!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv)) 
             self.nrIniUlBwpGenericLRbsEdit.clear()
             self.nrIniUlBwpGenericRbStartEdit.clear()
-            
     
     def onIniUlBwpLRBsOrRBStartEditTextChanged(self, text):
         if not self.nrIniUlBwpGenericLRbsEdit.text() or not self.nrIniUlBwpGenericRbStartEdit.text():
@@ -6297,6 +6303,35 @@ class NgNrGridUi(QDialog):
         else:
             self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
             self.nrDci11PdschFreqAllocFieldEdit.clear()
+            
+    def updateIniUlBwpInfo(self):
+        if not self.nrIniUlBwpGenericLocAndBwEdit.text() or not self.nrIniUlBwpGenericLRbsEdit.text() or not self.nrIniUlBwpGenericRbStartEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside updateIniUlBwpInfo')
+        bwpSize = int(self.nrIniUlBwpGenericLRbsEdit.text())
+        bwpStart = int(self.nrIniUlBwpGenericRbStartEdit.text())
+        
+        self.bitwidthType1IniUlBwp = math.ceil(math.log2(bwpSize * (bwpSize + 1) / 2))
+        self.bitwidthType1Msg3Pusch = max(14, self.bitwidthType1IniUlBwp)
+        
+        #set 'freq domain assignment' of msg3 pusch 
+        #FIXME msg3 pusch riv field interpretation, msg3 tp=enabled then l_rbs needs to be 2^x3^y5^z, and 'freq domain resource assignment' field is 14bits fixed
+        self.nrMsg3PuschFreqAllocFieldLabel.setText('Freq domain resource assignment[%dLSBs]:' % self.bitwidthType1IniUlBwp)
+        self.nrMsg3PuschFreqAllocFieldEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{%d}' % self.bitwidthType1Msg3Pusch)))
+        self.nrMsg3PuschFreqAllocType1RbStartLabel.setText('RB_start(of RIV)[0-%d]:' % (bwpSize-1))
+        self.nrMsg3PuschFreqAllocType1RbStartEdit.setValidator(QIntValidator(0, bwpSize-1))
+        self.nrMsg3PuschFreqAllocType1LRbsLabel.setText('L_RBs(of RIV)[1-%d]:' % bwpSize)
+        self.nrMsg3PuschFreqAllocType1LRbsEdit.setValidator(QIntValidator(1, bwpSize))
+        self.nrMsg3PuschFreqAllocType1RbStartEdit.setText('0')
+        self.nrMsg3PuschFreqAllocType1LRbsEdit.setText(str(bwpSize))
+        self.nrMsg3PuschFreqAllocFieldEdit.setText('{:0{width}b}'.format(self.makeRiv(bwpSize, 0, bwpSize), width=self.bitwidthType1Msg3Pusch))
+        if self.bitwidthType1IniUlBwp >= 14:
+            self.nrMsg3PuschFreqAllocFieldEdit.setEnabled(False)
+        else:
+            self.nrMsg3PuschFreqAllocFieldEdit.setEnabled(True)
+        self.nrMsg3PuschFreqAllocType1LRbsEdit.setEnabled(True)
+        self.nrMsg3PuschFreqAllocType1RbStartEdit.setEnabled(True)
 
     def onOkBtnClicked(self):
         self.ngwin.logEdit.append('-->inside onOkBtnClicked')
