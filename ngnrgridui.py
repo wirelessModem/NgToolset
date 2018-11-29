@@ -1763,7 +1763,7 @@ class NgNrGridUi(QDialog):
         self.nrDedPdschCfgRbgConfigComb.setCurrentIndex(0)
         
         self.nrDedPdschCfgRbgSizeLabel = QLabel('Nominal size of RBG(P):')
-        self.nrDedPdschCfgRbgSizeEdit = QLineEdit()
+        self.nrDedPdschCfgRbgSizeEdit = QLineEdit('4')
         
         self.nrDedPdschCfgMcsTableLabel = QLabel('mcs-Table:')
         self.nrDedPdschCfgMcsTableComb = QComboBox()
@@ -3221,6 +3221,9 @@ class NgNrGridUi(QDialog):
         self.nrDci11PdschTimeAllocSEdit.textChanged.connect(self.onDci11PdschTimeAllocSOrLEditTextChanged)
         self.nrDci11PdschTimeAllocLEdit.textChanged.connect(self.onDci11PdschTimeAllocSOrLEditTextChanged)
         self.nrDci11PdschTimeAllocMappingTypeComb.currentIndexChanged.connect(self.onDci11MappingTypeOrDedDlBwpCpCombCurIndChanged)
+        self.nrDci11PdschFreqAllocTypeComb.currentIndexChanged.connect(self.onDci11PdschFreqRaTypeCombCurIndChanged)
+        self.nrDci11PdschFreqAllocType1LRbsEdit.textChanged.connect(self.onDci11PdschType1LRBsOrRBStartEditTextChanged)
+        self.nrDci11PdschFreqAllocType1RbStartEdit.textChanged.connect(self.onDci11PdschType1LRBsOrRBStartEditTextChanged)
         
         self.nrMsg3PuschTimeAllocFieldEdit.textChanged.connect(self.onMsg3PuschTimeAllocFieldEditTextChanged)
         
@@ -3232,6 +3235,7 @@ class NgNrGridUi(QDialog):
         
         #---->dedicated dl bwp
         self.nrDedDlBwpGenericCpComb.currentIndexChanged.connect(self.onDci11MappingTypeOrDedDlBwpCpCombCurIndChanged)
+        self.nrDedPdschCfgRbgConfigComb.currentIndexChanged.connect(self.onDedPdschCfgRbgConfigCombCurIndChanged)
         #---->dedicated ul bwp
         self.nrDedUlBwpGenericCpComb.currentIndexChanged.connect(self.onDci01MappingTypeOrDedUlBwpCpCombCurIndChanged)
         
@@ -5529,6 +5533,7 @@ class NgNrGridUi(QDialog):
             self.nrDedDlBwpGenericLRbsEdit.setText(str(L_RBs))
             self.nrDedDlBwpGenericRbStartEdit.setText(str(RB_start))
             self.updateCoreset1FreqRes()
+            self.updateDedDlBwpInfo()
         else:
             self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid RIV = %d!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv)) 
             self.nrDedDlBwpGenericLRbsEdit.clear()
@@ -6173,6 +6178,125 @@ class NgNrGridUi(QDialog):
         else:
             self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
             self.nrDci10Msg4FreqAllocFieldEdit.clear()
+    
+    def onDedPdschCfgRbgConfigCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        if not self.nrDedDlBwpGenericLocAndBwEdit.text() or not self.nrDedDlBwpGenericLRbsEdit.text() or not self.nrDedDlBwpGenericRbStartEdit.text():
+            return
+        
+        bwpSize = int(self.nrDedDlBwpGenericLRbsEdit.text())
+        P = self.getNomRbgSizeP(bwpSize, sch='pdsch', config=self.nrDedPdschCfgRbgConfigComb.currentText())
+        if P is None:
+            self.ngwin.logEdit.append('Error: The nominal RBG size P is None!')
+            return
+        
+        self.nrDedPdschCfgRbgSizeEdit.setText(str(P))
+        if self.nrDci11PdschFreqAllocTypeComb.currentText() == 'RA Type0':
+            self.updateDedDlBwpInfo()
+            
+    def onDci11PdschFreqRaTypeCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        if not self.nrDedDlBwpGenericLocAndBwEdit.text() or not self.nrDedDlBwpGenericLRbsEdit.text() or not self.nrDedDlBwpGenericRbStartEdit.text():
+            return
+        
+        self.updateDedDlBwpInfo()
+        
+    def updateDedDlBwpInfo(self):
+        if not self.nrDedDlBwpGenericLocAndBwEdit.text() or not self.nrDedDlBwpGenericLRbsEdit.text() or not self.nrDedDlBwpGenericRbStartEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside updateDedDlBwpInfo')
+        bwpSize = int(self.nrDedDlBwpGenericLRbsEdit.text())
+        bwpStart = int(self.nrDedDlBwpGenericRbStartEdit.text())
+        
+        #update nominal rbg size P
+        P = self.getNomRbgSizeP(bwpSize, sch='pdsch', config=self.nrDedPdschCfgRbgConfigComb.currentText())
+        if P is None:
+            self.ngwin.logEdit.append('Error: The nominal RBG size P is None!')
+            return
+        
+        self.nrDedPdschCfgRbgSizeEdit.setText(str(P))
+        
+        if self.nrDci11PdschFreqAllocTypeComb.currentText() == 'RA Type0':
+            self.bitwidthType0Pdsch = math.ceil((bwpSize + (bwpStart % P)) / P)
+            self.rbgsType0Pdsch = [0]*self.bitwidthType0Pdsch
+            for i in range(self.bitwidthType0Pdsch):
+                if i == 0:
+                    self.rbgsType0Pdsch[i] = P - bwpStart % P
+                elif self.bitwidthType0Pdsch > 1 and i == self.bitwidthType0Pdsch - 1:
+                    self.rbgsType0Pdsch[i] = (bwpStart+bwpSize) % P if (bwpStart+bwpSize) % P > 0 else P
+                else:
+                    self.rbgsType0Pdsch[i] = P
+                    
+            #set 'freq domain assignment' of dci11
+            self.nrDci11PdschFreqAllocFieldLabel.setText('Freq domain resource assignment[%dbits]:' % self.bitwidthType0Pdsch)
+            self.nrDci11PdschFreqAllocFieldEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{%d}' % self.bitwidthType0Pdsch)))
+            self.nrDci11PdschFreqAllocFieldEdit.setText('1'*self.bitwidthType0Pdsch)
+            self.nrDci11PdschFreqAllocFieldEdit.setEnabled(True)
+            self.nrDci11PdschFreqAllocType1LRbsEdit.setEnabled(False)
+            self.nrDci11PdschFreqAllocType1RbStartEdit.setEnabled(False)
+            self.nrDci11PdschFreqAllocType1LRbsEdit.clear()
+            self.nrDci11PdschFreqAllocType1RbStartEdit.clear()
+        else:
+            self.bitwidthType1Pdsch = math.ceil(math.log2(bwpSize * (bwpSize + 1) / 2))
+            #set 'freq domain assignment' of dci11
+            self.nrDci11PdschFreqAllocFieldLabel.setText('Freq domain resource assignment[%dbits]:' % self.bitwidthType1Pdsch)
+            self.nrDci11PdschFreqAllocFieldEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{%d}' % self.bitwidthType1Pdsch)))
+            self.nrDci11PdschFreqAllocType1RbStartLabel.setText('RB_start(of RIV)[0-%d]:' % (bwpSize-1))
+            self.nrDci11PdschFreqAllocType1RbStartEdit.setValidator(QIntValidator(0, bwpSize-1))
+            self.nrDci11PdschFreqAllocType1LRbsLabel.setText('L_RBs(of RIV)[1-%d]:' % bwpSize)
+            self.nrDci11PdschFreqAllocType1LRbsEdit.setValidator(QIntValidator(1, bwpSize))
+            self.nrDci11PdschFreqAllocType1RbStartEdit.setText('0')
+            self.nrDci11PdschFreqAllocType1LRbsEdit.setText(str(bwpSize))
+            self.nrDci11PdschFreqAllocFieldEdit.setText('{:0{width}b}'.format(self.makeRiv(bwpSize, 0, bwpSize), width=self.bitwidthType1Pdsch))
+            self.nrDci11PdschFreqAllocFieldEdit.setEnabled(False)
+            self.nrDci11PdschFreqAllocType1LRbsEdit.setEnabled(True)
+            self.nrDci11PdschFreqAllocType1RbStartEdit.setEnabled(True)
+    
+    def getNomRbgSizeP(self, bwpSize, sch='pdsch', config='config1'):
+        #refer to 3GPP 38.214 vf30
+        #Table 5.1.2.2.1-1: Nominal RBG size P
+        #Table 6.1.2.2.1-1: Nominal RBG size P
+        if sch == 'pdsch' or sch == 'pusch':
+            if bwpSize >= 1 and bwpSize <= 36:
+                return 2 if config == 'config1' else 4
+            elif bwpSize >= 37 and bwpSize <= 72:
+                return 4 if config == 'config1' else 8
+            elif bwpSize >= 73 and bwpSize <= 144:
+                return 8 if config == 'config1' else 16
+            elif bwpSize >= 145 and bwpSize <= 275:
+                return 16
+            else:
+                return None
+        else:
+            return None
+    
+    def onDci11PdschType1LRBsOrRBStartEditTextChanged(self, text):
+        if not self.nrDci11PdschFreqAllocType1LRbsEdit.text() or not self.nrDci11PdschFreqAllocType1RbStartEdit.text():
+            return
+        
+        if not self.nrDedDlBwpGenericLocAndBwEdit.text() or not self.nrDedDlBwpGenericLRbsEdit.text() or not self.nrDedDlBwpGenericRbStartEdit.text():
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDci11PdschType1LRBsOrRBStartEditTextChanged')
+        L_RBs = int(self.nrDci11PdschFreqAllocType1LRbsEdit.text())
+        RB_start = int(self.nrDci11PdschFreqAllocType1RbStartEdit.text())
+        bwpSize = int(self.nrDedDlBwpGenericLRbsEdit.text())
+        if L_RBs < 1 or L_RBs > (bwpSize - RB_start):
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with BWP bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, bwpSize))
+            self.nrDci11PdschFreqAllocFieldEdit.clear()
+            return
+        
+        riv = self.makeRiv(L_RBs, RB_start, bwpSize)
+        if riv is not None:
+            self.nrDci11PdschFreqAllocFieldEdit.setText('{:0{width}b}'.format(riv, width=self.bitwidthType1Pdsch))
+        else:
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
+            self.nrDci11PdschFreqAllocFieldEdit.clear()
 
     def onOkBtnClicked(self):
         self.ngwin.logEdit.append('-->inside onOkBtnClicked')
