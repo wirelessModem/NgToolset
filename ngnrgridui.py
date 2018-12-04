@@ -3235,6 +3235,7 @@ class NgNrGridUi(QDialog):
         self.nrMsg3PuschFreqAllocFieldEdit.textChanged.connect(self.onMsg3PuschFreqAllocFieldEditTextChanged)
         self.nrMsg3PuschFreqAllocType1LRbsEdit.textChanged.connect(self.onMsg3PuschLRBsOrRBStartEditTextChanged)
         self.nrMsg3PuschFreqAllocType1RbStartEdit.textChanged.connect(self.onMsg3PuschLRBsOrRBStartEditTextChanged)
+        self.nrMsg3PuschFreqAllocFreqHopComb.currentIndexChanged.connect(self.onMsg3PuschFreqHopCombCurIndChanged)
         
         self.nrDci01PuschTimeAllocFieldEdit.textChanged.connect(self.onDci01PuschTimeAllocFieldEditTextChanged)
         self.nrDci01PuschTimeAllocSlivEdit.textChanged.connect(self.onDci01PuschTimeAllocSlivEditTextChanged)
@@ -3247,6 +3248,7 @@ class NgNrGridUi(QDialog):
         self.nrDedPdschCfgRbgConfigComb.currentIndexChanged.connect(self.onDedPdschCfgRbgConfigCombCurIndChanged)
         #---->dedicated ul bwp
         self.nrDedUlBwpGenericCpComb.currentIndexChanged.connect(self.onDci01MappingTypeOrDedUlBwpCpCombCurIndChanged)
+        self.nrRachMsg3TpComb.currentIndexChanged.connect(self.onRachMsg3TpCombCurIndChanged)
         
         #---->I am THE driver!
         self.nrCarrierBandComb.setCurrentText('n77')
@@ -4705,6 +4707,10 @@ class NgNrGridUi(QDialog):
             prefix, S, L = key.split('_')
             self.ngwin.logEdit.append('%s,%s,%s,%s'%(prefix,S,L,val))
         '''
+        
+        #valid PUSCH PRB allocations when transforming precoding is enabled
+        self.lrbsMsg3PuschTp = []
+        self.lrbsPuschTp = []
             
         
     def validateScsPerBandFr1(self):
@@ -6195,6 +6201,7 @@ class NgNrGridUi(QDialog):
         if not self.nrDedDlBwpGenericLocAndBwEdit.text() or not self.nrDedDlBwpGenericLRbsEdit.text() or not self.nrDedDlBwpGenericRbStartEdit.text():
             return
         
+        #self.ngwin.logEdit.append('-->inside onDedPdschCfgRbgConfigCombCurIndChanged')
         bwpSize = int(self.nrDedDlBwpGenericLRbsEdit.text())
         P = self.getNomRbgSizeP(bwpSize, sch='pdsch', config=self.nrDedPdschCfgRbgConfigComb.currentText())
         if P is None:
@@ -6212,6 +6219,7 @@ class NgNrGridUi(QDialog):
         if not self.nrDedDlBwpGenericLocAndBwEdit.text() or not self.nrDedDlBwpGenericLRbsEdit.text() or not self.nrDedDlBwpGenericRbStartEdit.text():
             return
         
+        #self.ngwin.logEdit.append('-->inside onDci11PdschFreqRaTypeCombCurIndChanged')
         self.updateDedDlBwpInfo()
         
     def updateDedDlBwpInfo(self):
@@ -6316,21 +6324,7 @@ class NgNrGridUi(QDialog):
         bwpStart = int(self.nrIniUlBwpGenericRbStartEdit.text())
         
         if self.nrRachMsg3TpComb.currentText() == 'enabled':
-            self.lrbsMsg3PuschTp = []
-            for x in range(math.ceil(math.log(bwpSize, 2))):
-                for y in range(math.ceil(math.log(bwpSize, 3))):
-                    for z in range(math.ceil(math.log(bwpSize, 5))):
-                        lrbs = 2 ** x * 3 ** y * 5 ** z
-                        if lrbs <= bwpSize:
-                            self.lrbsMsg3PuschTp.append(lrbs)
-                        else:
-                            break
-            #sort in ascending order
-            self.lrbsMsg3PuschTp.sort()
-            '''
-            for i in self.lrbsMsg3PuschTp:
-                self.ngwin.logEdit.append('%d' % i)
-            '''
+            self.updateLRBsMsg3PuschTp()
         
         self.bitwidthType1IniUlBwp = math.ceil(math.log2(bwpSize * (bwpSize + 1) / 2))
         self.bitwidthType1Msg3Pusch = max(14, self.bitwidthType1IniUlBwp)
@@ -6382,6 +6376,9 @@ class NgNrGridUi(QDialog):
             self.nrMsg3PuschFreqAllocFieldEdit.setEnabled(True)
         self.nrMsg3PuschFreqAllocType1LRbsEdit.setEnabled(True)
         self.nrMsg3PuschFreqAllocType1RbStartEdit.setEnabled(True)
+        
+        if self.nrMsg3PuschFreqAllocFreqHopComb.currentText() == 'enabled':
+            self.updateMsg3Pusch2ndHopFreqOff()
     
     def onMsg3PuschLRBsOrRBStartEditTextChanged(self, text):
         if not self.nrMsg3PuschFreqAllocType1LRbsEdit.text() or not self.nrMsg3PuschFreqAllocType1RbStartEdit.text():
@@ -6435,6 +6432,10 @@ class NgNrGridUi(QDialog):
             #self.ngwin.logEdit.append('Error: The "Freq domain resource assignment" field shall be disabled when self.bitwidthType1IniUlBwp >= 14!')
             return
         
+        if len(self.nrMsg3PuschFreqAllocFieldEdit.text()) != self.bitwidthType1Msg3Pusch:
+            self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: The "Freq domain resource assignment" field is %d bits, which should be %d bits!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), len(self.nrMsg3PuschFreqAllocFieldEdit.text()), self.bitwidthType1Msg3Pusch))
+            return
+        
         #self.ngwin.logEdit.append('-->inside onMsg3PuschFreqAllocFieldEditTextChanged')
         riv = int(self.nrMsg3PuschFreqAllocFieldEdit.text()[14-self.bitwidthType1IniUlBwp:], 2)
         L_RBs = int(self.nrMsg3PuschFreqAllocType1LRbsEdit.text())
@@ -6445,6 +6446,15 @@ class NgNrGridUi(QDialog):
         if riv != riv2:
             self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: Only the [%d] MSBs can be changed! Please refer to 3GPP 38.213 vf30 Section 8.2 for details. Reset to default value.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), min(2, 14-self.bitwidthType1IniUlBwp)))
             self.nrMsg3PuschFreqAllocFieldEdit.setText('{:0{width}b}'.format(riv2, width=self.bitwidthType1Msg3Pusch))
+            return
+        
+        if self.nrMsg3PuschFreqAllocFreqHopComb.currentText() == 'enabled' and bwpSize >= 50 and self.nrMsg3PuschFreqAllocFieldEdit.text()[:2] == '11':
+            self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: UL frequency hop bits "11" is reserved when N_BWP_size >= 50! Please refer to 3GPP 38.213 vf30 Section 8.2 for details. Reset to default value.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+            self.nrMsg3PuschFreqAllocFieldEdit.setText('{:0{width}b}'.format(riv2, width=self.bitwidthType1Msg3Pusch))
+            return
+        
+        if self.nrMsg3PuschFreqAllocFreqHopComb.currentText() == 'enabled':
+            self.updateMsg3Pusch2ndHopFreqOff()
             
     def findNearest(self, arr, val):
         valLargeThan = None
@@ -6462,6 +6472,80 @@ class NgNrGridUi(QDialog):
         
         return (valLessThan, valLargeThan)
     
+    def onMsg3PuschFreqHopCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onMsg3PuschFreqHopCombCurIndChanged')
+        if self.bitwidthType1IniUlBwp < 14 and self.nrMsg3PuschFreqAllocFreqHopComb.currentText() == 'enabled':
+            self.nrMsg3PuschFreqAllocFieldEdit.setEnabled(True)
+        else:
+            self.nrMsg3PuschFreqAllocFieldEdit.setEnabled(False)
+        
+        self.updateMsg3Pusch2ndHopFreqOff()
+            
+    def updateMsg3Pusch2ndHopFreqOff(self):
+        if not self.nrMsg3PuschFreqAllocFieldEdit.text():
+            self.nrMsg3PuschFreqAllocType1SecondHopFreqOffEdit.clear()
+            return
+        if not self.nrIniUlBwpGenericLocAndBwEdit.text() or not self.nrIniUlBwpGenericLRbsEdit.text() or not self.nrIniUlBwpGenericRbStartEdit.text():
+            self.nrMsg3PuschFreqAllocType1SecondHopFreqOffEdit.clear()
+            return
+        
+        self.ngwin.logEdit.append('-->inside updateMsg3Pusch2ndHopFreqOff')
+        bwpSize = int(self.nrIniUlBwpGenericLRbsEdit.text())
+        if self.nrMsg3PuschFreqAllocFreqHopComb.currentText() == 'enabled':
+            nUlHop = 1 if bwpSize < 50 else 2
+            freqHopBits = self.nrMsg3PuschFreqAllocFieldEdit.text()[:nUlHop]
+            if nUlHop == 1 and freqHopBits == '0':
+                self.nrMsg3PuschFreqAllocType1SecondHopFreqOffEdit.setText(str(math.floor(bwpSize / 2)))
+            elif nUlHop == 1 and freqHopBits == '1':
+                self.nrMsg3PuschFreqAllocType1SecondHopFreqOffEdit.setText(str(math.floor(bwpSize / 4)))
+            elif nUlHop == 2 and freqHopBits == '00':
+                self.nrMsg3PuschFreqAllocType1SecondHopFreqOffEdit.setText(str(math.floor(bwpSize / 2)))
+            elif nUlHop == 2 and freqHopBits == '01':
+                self.nrMsg3PuschFreqAllocType1SecondHopFreqOffEdit.setText(str(math.floor(bwpSize / 4)))
+            elif nUlHop == 2 and freqHopBits == '10':
+                self.nrMsg3PuschFreqAllocType1SecondHopFreqOffEdit.setText(str(-1 * math.floor(bwpSize / 4)))
+            else:#nUlHop == 2 and freqHopBits == '11'
+                #'11' is reversed!
+                self.nrMsg3PuschFreqAllocType1SecondHopFreqOffEdit.clear()
+        else:
+            self.nrMsg3PuschFreqAllocType1SecondHopFreqOffEdit.clear()
+                
+                
+    def onRachMsg3TpCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onRachMsg3TpCombCurIndChanged')
+        if self.nrRachMsg3TpComb.currentText() == 'enabled':
+            self.updateLRBsMsg3PuschTp()
+        
+    def updateLRBsMsg3PuschTp(self):
+        if not self.nrIniUlBwpGenericLocAndBwEdit.text() or not self.nrIniUlBwpGenericLRbsEdit.text() or not self.nrIniUlBwpGenericRbStartEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside updateLRBsMsg3PuschTp')
+        bwpSize = int(self.nrIniUlBwpGenericLRbsEdit.text())
+        
+        self.lrbsMsg3PuschTp = []
+        for x in range(math.ceil(math.log(bwpSize, 2))):
+            for y in range(math.ceil(math.log(bwpSize, 3))):
+                for z in range(math.ceil(math.log(bwpSize, 5))):
+                    lrbs = 2 ** x * 3 ** y * 5 ** z
+                    if lrbs <= bwpSize:
+                        self.lrbsMsg3PuschTp.append(lrbs)
+                    else:
+                        break
+        #sort in ascending order
+        self.lrbsMsg3PuschTp.sort()
+        '''
+        for i in self.lrbsMsg3PuschTp:
+            self.ngwin.logEdit.append('%d' % i)
+        '''
+        
+
     def onOkBtnClicked(self):
         self.ngwin.logEdit.append('-->inside onOkBtnClicked')
         #TODO
