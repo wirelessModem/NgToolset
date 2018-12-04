@@ -3242,12 +3242,19 @@ class NgNrGridUi(QDialog):
         self.nrDci01PuschTimeAllocSEdit.textChanged.connect(self.onDci01PuschTimeAllocSOrLEditTextChanged)
         self.nrDci01PuschTimeAllocLEdit.textChanged.connect(self.onDci01PuschTimeAllocSOrLEditTextChanged)
         self.nrDci01PuschTimeAllocMappingTypeComb.currentIndexChanged.connect(self.onDci01MappingTypeOrDedUlBwpCpCombCurIndChanged)
+        self.nrDci01PuschFreqAllocTypeComb.currentIndexChanged.connect(self.onDci01PuschFreqRaTypeCombCurIndChanged)
+        self.nrDci01PuschFreqAllocType1LRbsEdit.textChanged.connect(self.onDci01PuschType1LRBsOrRBStartEditTextChanged)
+        self.nrDci01PuschFreqAllocType1RbStartEdit.textChanged.connect(self.onDci01PuschType1LRBsOrRBStartEditTextChanged)
+        self.nrDci01PuschFreqAllocFreqHopComb.currentIndexChanged.connect(self.onDci01PuschFreqHopCombCurIndChanged)
         
         #---->dedicated dl bwp
         self.nrDedDlBwpGenericCpComb.currentIndexChanged.connect(self.onDci11MappingTypeOrDedDlBwpCpCombCurIndChanged)
         self.nrDedPdschCfgRbgConfigComb.currentIndexChanged.connect(self.onDedPdschCfgRbgConfigCombCurIndChanged)
         #---->dedicated ul bwp
         self.nrDedUlBwpGenericCpComb.currentIndexChanged.connect(self.onDci01MappingTypeOrDedUlBwpCpCombCurIndChanged)
+        self.nrDedPuschCfgRbgConfigComb.currentIndexChanged.connect(self.onDedPuschCfgRbgConfigCombCurIndChanged)
+        self.nrDedPuschCfgTpComb.currentIndexChanged.connect(self.onDedPuschCfgTpCombCurIndChanged)
+        #---->initial ul bwp
         self.nrRachMsg3TpComb.currentIndexChanged.connect(self.onRachMsg3TpCombCurIndChanged)
         
         #---->I am THE driver!
@@ -4710,7 +4717,7 @@ class NgNrGridUi(QDialog):
         
         #valid PUSCH PRB allocations when transforming precoding is enabled
         self.lrbsMsg3PuschTp = []
-        self.lrbsPuschTp = []
+        self.lrbsDedPuschTp = []
             
         
     def validateScsPerBandFr1(self):
@@ -5593,6 +5600,7 @@ class NgNrGridUi(QDialog):
             
             self.nrDedUlBwpGenericLRbsEdit.setText(str(L_RBs))
             self.nrDedUlBwpGenericRbStartEdit.setText(str(RB_start))
+            self.updateDedUlBwpInfo()
         else:
             self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: Invalid RIV = %d!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv)) 
             self.nrDedUlBwpGenericLRbsEdit.clear()
@@ -6520,7 +6528,8 @@ class NgNrGridUi(QDialog):
         
         self.ngwin.logEdit.append('-->inside onRachMsg3TpCombCurIndChanged')
         if self.nrRachMsg3TpComb.currentText() == 'enabled':
-            self.updateLRBsMsg3PuschTp()
+            #self.updateLRBsMsg3PuschTp()
+            self.updateIniUlBwpInfo()
         
     def updateLRBsMsg3PuschTp(self):
         if not self.nrIniUlBwpGenericLocAndBwEdit.text() or not self.nrIniUlBwpGenericLRbsEdit.text() or not self.nrIniUlBwpGenericRbStartEdit.text():
@@ -6545,7 +6554,211 @@ class NgNrGridUi(QDialog):
             self.ngwin.logEdit.append('%d' % i)
         '''
         
+    def updateLRBsDedPuschTp(self):
+        if not self.nrDedUlBwpGenericLocAndBwEdit.text() or not self.nrDedUlBwpGenericLRbsEdit.text() or not self.nrDedUlBwpGenericRbStartEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside updateLRBsDedPuschTp')
+        bwpSize = int(self.nrDedUlBwpGenericLRbsEdit.text())
+        
+        self.lrbsDedPuschTp = []
+        for x in range(math.ceil(math.log(bwpSize, 2))):
+            for y in range(math.ceil(math.log(bwpSize, 3))):
+                for z in range(math.ceil(math.log(bwpSize, 5))):
+                    lrbs = 2 ** x * 3 ** y * 5 ** z
+                    if lrbs <= bwpSize:
+                        self.lrbsDedPuschTp.append(lrbs)
+                    else:
+                        break
+        #sort in ascending order
+        self.lrbsDedPuschTp.sort()
+        '''
+        for i in self.lrbsDedPuschTp:
+            self.ngwin.logEdit.append('%d' % i)
+        '''
+        
+    def onDci01PuschFreqRaTypeCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        if not self.nrDedUlBwpGenericLocAndBwEdit.text() or not self.nrDedUlBwpGenericLRbsEdit.text() or not self.nrDedUlBwpGenericRbStartEdit.text():
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDci01PuschFreqRaTypeCombCurIndChanged')
+        self.updateDedUlBwpInfo()
+        
+    def updateDedUlBwpInfo(self):
+        if not self.nrDedUlBwpGenericLocAndBwEdit.text() or not self.nrDedUlBwpGenericLRbsEdit.text() or not self.nrDedUlBwpGenericRbStartEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside updateDedUlBwpInfo')
+        bwpSize = int(self.nrDedUlBwpGenericLRbsEdit.text())
+        bwpStart = int(self.nrDedUlBwpGenericRbStartEdit.text())
+        
+        #update nominal rbg size P
+        P = self.getNomRbgSizeP(bwpSize, sch='pusch', config=self.nrDedPuschCfgRbgConfigComb.currentText())
+        if P is None:
+            self.ngwin.logEdit.append('Error: The nominal RBG size P is None!')
+            return
+        
+        self.nrDedPuschCfgRbgSizeEdit.setText(str(P))
+        
+        if self.nrDci01PuschFreqAllocTypeComb.currentText() == 'RA Type0':
+            self.bitwidthType0Pusch = math.ceil((bwpSize + (bwpStart % P)) / P)
+            self.rbgsType0Pusch = [0]*self.bitwidthType0Pusch
+            for i in range(self.bitwidthType0Pusch):
+                if i == 0:
+                    self.rbgsType0Pusch[i] = P - bwpStart % P
+                elif self.bitwidthType0Pusch > 1 and i == self.bitwidthType0Pusch - 1:
+                    self.rbgsType0Pusch[i] = (bwpStart+bwpSize) % P if (bwpStart+bwpSize) % P > 0 else P
+                else:
+                    self.rbgsType0Pusch[i] = P
+                    
+            #set 'freq domain assignment' of dci01
+            self.nrDci01PuschFreqAllocFieldLabel.setText('Freq domain resource assignment[%dbits]:' % self.bitwidthType0Pusch)
+            self.nrDci01PuschFreqAllocFieldEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{%d}' % self.bitwidthType0Pusch)))
+            self.nrDci01PuschFreqAllocFieldEdit.setText('1'*self.bitwidthType0Pusch)
+            self.nrDci01PuschFreqAllocFieldEdit.setEnabled(True)
+            self.nrDci01PuschFreqAllocType1LRbsEdit.setEnabled(False)
+            self.nrDci01PuschFreqAllocType1RbStartEdit.setEnabled(False)
+            self.nrDci01PuschFreqAllocType1LRbsEdit.clear()
+            self.nrDci01PuschFreqAllocType1RbStartEdit.clear()
+        else:
+            if self.nrDedPuschCfgTpComb.currentText() == 'enabled':
+                self.updateLRBsDedPuschTp()
+        
+            self.bitwidthType1DedUlBwp = math.ceil(math.log2(bwpSize * (bwpSize + 1) / 2))
+            
+            #set 'freq domain assignment' of dci01 
+            self.nrDci01PuschFreqAllocFieldLabel.setText('Freq domain resource assignment[%dLSBs]:' % self.bitwidthType1DedUlBwp)
+            self.nrDci01PuschFreqAllocFieldEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{%d}' % self.bitwidthType1DedUlBwp)))
+            self.nrDci01PuschFreqAllocType1RbStartLabel.setText('RB_start(of RIV)[0-%d]:' % (bwpSize-1))
+            self.nrDci01PuschFreqAllocType1RbStartEdit.setValidator(QIntValidator(0, bwpSize-1))
+            self.nrDci01PuschFreqAllocType1LRbsLabel.setText('L_RBs(of RIV)[1-%d]:' % bwpSize)
+            self.nrDci01PuschFreqAllocType1LRbsEdit.setValidator(QIntValidator(1, bwpSize))
+            
+            self.nrDci01PuschFreqAllocType1RbStartEdit.setText('0')
+            #refer to 3GPP 38.314 vf30 section 6.3
+            nUlHop = 1 if bwpSize < 50 else 2
+            if self.nrDedPuschCfgTpComb.currentText() == 'enabled':
+                for i in range(1, len(self.lrbsDedPuschTp)+1):
+                    lrbs = self.lrbsDedPuschTp[-i]
+                    bits = '{:0{width}b}'.format(self.makeRiv(lrbs, 0, bwpSize), width=self.bitwidthType1DedUlBwp)
+                    if self.nrDci01PuschFreqAllocFreqHopComb.currentText() != 'disabled':
+                        subBits = bits[:nUlHop]
+                        if int(subBits, 2) == 0:
+                            self.nrDci01PuschFreqAllocType1LRbsEdit.setText(str(lrbs))
+                            self.nrDci01PuschFreqAllocFieldEdit.setText(bits)
+                            break
+                    else:
+                        self.nrDci01PuschFreqAllocType1LRbsEdit.setText(str(lrbs))
+                        self.nrDci01PuschFreqAllocFieldEdit.setText(bits)
+                        break
+            else:
+                for lrbs in range(bwpSize, 0, -1):
+                    bits = '{:0{width}b}'.format(self.makeRiv(lrbs, 0, bwpSize), width=self.bitwidthType1DedUlBwp)
+                    if self.nrDci01PuschFreqAllocFreqHopComb.currentText() != 'disabled':
+                        subBits = bits[:nUlHop]
+                        if int(subBits, 2) == 0:
+                            self.nrDci01PuschFreqAllocType1LRbsEdit.setText(str(lrbs))
+                            self.nrDci01PuschFreqAllocFieldEdit.setText(bits)
+                            break
+                    else:
+                        self.nrDci01PuschFreqAllocType1LRbsEdit.setText(str(lrbs))
+                        self.nrDci01PuschFreqAllocFieldEdit.setText(bits)
+                        break
+                        
+            if self.nrDci01PuschFreqAllocFreqHopComb.currentText() == 'disabled':
+                self.nrDci01PuschFreqAllocFieldEdit.setEnabled(False)
+            else:
+                #for simplicity, N_UL_hop bit(s) are fixed to '0' or '00', that's, 'frequencyHoppingOffset(List)' in PUSCH-Config is explicitly configured in 'dedicated ul bwp'
+                self.nrMsg3PuschFreqAllocFieldEdit.setEnabled(False)
+            self.nrDci01PuschFreqAllocType1LRbsEdit.setEnabled(True)
+            self.nrDci01PuschFreqAllocType1RbStartEdit.setEnabled(True)
 
+    def onDci01PuschType1LRBsOrRBStartEditTextChanged(self, text):
+        if not self.nrDci01PuschFreqAllocType1LRbsEdit.text() or not self.nrDci01PuschFreqAllocType1RbStartEdit.text():
+            return
+        
+        if not self.nrDedUlBwpGenericLocAndBwEdit.text() or not self.nrDedUlBwpGenericLRbsEdit.text() or not self.nrDedUlBwpGenericRbStartEdit.text():
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDci01PuschType1LRBsOrRBStartEditTextChanged')
+        L_RBs = int(self.nrDci01PuschFreqAllocType1LRbsEdit.text())
+        RB_start = int(self.nrDci01PuschFreqAllocType1RbStartEdit.text())
+        bwpSize = int(self.nrDedUlBwpGenericLRbsEdit.text())
+        if L_RBs < 1 or L_RBs > (bwpSize - RB_start):
+            self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with BWP bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, bwpSize))
+            self.nrDci01PuschFreqAllocFieldEdit.clear()
+            return
+        
+        if self.nrDedPuschCfgTpComb.currentText() == 'enabled' and not L_RBs in self.lrbsDedPuschTp:
+            valLessThan, valLargeThan = self.findNearest(self.lrbsDedPuschTp, L_RBs)
+            self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: L_RBs must be 2^x*3^y*5^z, where x/y/z>=0. Nearest values are:[%s, %s].' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if valLessThan is None else valLessThan, 'None' if valLargeThan is None else valLargeThan))
+            self.nrDci01PuschFreqAllocFieldEdit.clear()
+            return
+        
+        riv = self.makeRiv(L_RBs, RB_start, bwpSize)
+        if riv is not None:
+            bits = '{:0{width}b}'.format(riv, width=self.bitwidthType1Pdsch)
+            if self.nrDci01PuschFreqAllocFreqHopComb.currentText() != 'disabled':
+                nUlHop = 1 if bwpSize < 50 else 2
+                if int(bits[:nUlHop], 2) == 0:
+                    self.nrDci01PuschFreqAllocFieldEdit.setText(bits)
+                else:
+                    self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: The %d MSB of "Freq domain resouce assignment" field(="%s") must be all zero when frequency hopping is enabled!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), nUlHop, bits))
+                    self.nrDci01PuschFreqAllocFieldEdit.clear()
+            else:
+                self.nrDci01PuschFreqAllocFieldEdit.setText(bits)
+        else:
+            self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
+            self.nrDci01PuschFreqAllocFieldEdit.clear()
+            
+    def onDci01PuschFreqHopCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        if not self.nrDedUlBwpGenericLocAndBwEdit.text() or not self.nrDedUlBwpGenericLRbsEdit.text() or not self.nrDedUlBwpGenericRbStartEdit.text():
+            return
+        
+        if not self.nrDci01PuschFreqAllocFieldEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside onDci01PuschFreqHopCombCurIndChanged')
+        if self.nrDci01PuschFreqAllocFreqHopComb.currentText() != 'disabled':
+            bwpSize = int(self.nrDedUlBwpGenericLRbsEdit.text())
+            nUlHop = 1 if bwpSize < 50 else 2
+            if int(self.nrDci01PuschFreqAllocFieldEdit.text()[:nUlHop], 2) != 0:
+                self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: The %d MSB of "Freq domain resource assignment" field(="%s") must be all zero when frequency hopping is enabled!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), nUlHop, self.nrDci01PuschFreqAllocFieldEdit.text()))
+        
+    def onDedPuschCfgRbgConfigCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        if not self.nrDedUlBwpGenericLocAndBwEdit.text() or not self.nrDedUlBwpGenericLRbsEdit.text() or not self.nrDedUlBwpGenericRbStartEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside onDedPuschCfgRbgConfigCombCurIndChanged')
+        bwpSize = int(self.nrDedUlBwpGenericLRbsEdit.text())
+        P = self.getNomRbgSizeP(bwpSize, sch='pusch', config=self.nrDedPuschCfgRbgConfigComb.currentText())
+        if P is None:
+            self.ngwin.logEdit.append('Error: The nominal RBG size P is None!')
+            return
+        
+        self.nrDedPuschCfgRbgSizeEdit.setText(str(P))
+        if self.nrDci01PuschFreqAllocTypeComb.currentText() == 'RA Type0':
+            self.updateDedUlBwpInfo()
+    
+    def onDedPuschCfgTpCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onDedPuschCfgTpCombCurIndChanged')
+        if self.nrDedPuschCfgTpComb.currentText() == 'enabled':
+            #FIXME tp is only supported for ra type1
+            #self.updateLRBsDedPuschTp()
+            self.updateDedUlBwpInfo()
+            
     def onOkBtnClicked(self):
         self.ngwin.logEdit.append('-->inside onOkBtnClicked')
         #TODO
