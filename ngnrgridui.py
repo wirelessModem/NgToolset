@@ -922,6 +922,7 @@ class NgNrGridUi(QDialog):
         self.nrDci11PdschCw1McsLabel = QLabel('Modulation and coding scheme(CW1)[0-31]:')
         self.nrDci11PdschCw1McsEdit = QLineEdit()
         self.nrDci11PdschCw1McsEdit.setValidator(QIntValidator(0, 31))
+        self.nrDci11PdschCw1McsEdit.setEnabled(False)
         
         self.nrDci11PdschTbsLabel = QLabel('Transport block size(bits):')
         self.nrDci11PdschTbsEdit = QLineEdit()
@@ -935,8 +936,9 @@ class NgNrGridUi(QDialog):
         self.nrDci11PdschK1Edit = QLineEdit()
         self.nrDci11PdschK1Edit.setValidator(QIntValidator(0, 7))
         
-        self.nrDci11PdschAntPortsFieldLabel = QLabel('Antenna port(s)[0-15/0-31/0-63]:')
-        self.nrDci11PdschAntPortsFieldEdit = QLineEdit('0')
+        self.nrDci11PdschAntPortsFieldLabel = QLabel('Antenna port(s):')
+        self.nrDci11PdschAntPortsFieldEdit = QLineEdit()
+        self.nrDci11PdschAntPortsFieldEdit.setValidator(QIntValidator(0, 15))
         
         dci11PdschTimeAllocWidget = QWidget()
         dci11PdschTimeAllocLayout = QGridLayout()
@@ -3242,6 +3244,9 @@ class NgNrGridUi(QDialog):
         self.nrDci11PdschFreqAllocTypeComb.currentIndexChanged.connect(self.onDci11PdschFreqRaTypeCombCurIndChanged)
         self.nrDci11PdschFreqAllocType1LRbsEdit.textChanged.connect(self.onDci11PdschType1LRBsOrRBStartEditTextChanged)
         self.nrDci11PdschFreqAllocType1RbStartEdit.textChanged.connect(self.onDci11PdschType1LRBsOrRBStartEditTextChanged)
+        self.nrDci11PdschCw0McsEdit.textChanged.connect(self.onDci11PdschCw0McsOrCw1McsEditTextChanged)
+        self.nrDci11PdschCw1McsEdit.textChanged.connect(self.onDci11PdschCw0McsOrCw1McsEditTextChanged)
+        self.nrDci11PdschAntPortsFieldEdit.textChanged.connect(self.onDci11PdschAntPortsEditTextChanged)
         
         self.nrMsg3PuschTimeAllocFieldEdit.textChanged.connect(self.onMsg3PuschTimeAllocFieldEditTextChanged)
         self.nrMsg3PuschFreqAllocFieldEdit.textChanged.connect(self.onMsg3PuschFreqAllocFieldEditTextChanged)
@@ -3264,10 +3269,14 @@ class NgNrGridUi(QDialog):
         #---->dedicated dl bwp
         self.nrDedDlBwpGenericCpComb.currentIndexChanged.connect(self.onDci11MappingTypeOrDedDlBwpCpCombCurIndChanged)
         self.nrDedPdschCfgRbgConfigComb.currentIndexChanged.connect(self.onDedPdschCfgRbgConfigCombCurIndChanged)
+        self.nrDmrsDedPdschMaxLengthComb.currentIndexChanged.connect(self.onDmrsDedPdschMaxLengthCombCurIndChanged)
+        self.nrDmrsDedPdschMaxLengthComb.currentIndexChanged.connect(self.onDmrsDedPdschDmrsTypeOrMaxLengthCombCurIndChanged)
+        self.nrDmrsDedPdschDmrsTypeComb.currentIndexChanged.connect(self.onDmrsDedPdschDmrsTypeOrMaxLengthCombCurIndChanged)
         #---->dedicated ul bwp
         self.nrDedUlBwpGenericCpComb.currentIndexChanged.connect(self.onDci01MappingTypeOrDedUlBwpCpCombCurIndChanged)
         self.nrDedPuschCfgRbgConfigComb.currentIndexChanged.connect(self.onDedPuschCfgRbgConfigCombCurIndChanged)
         self.nrDedPuschCfgTpComb.currentIndexChanged.connect(self.onDedPuschCfgTpCombCurIndChanged)
+        self.nrDmrsDedPuschMaxLengthComb.currentIndexChanged.connect(self.onDmrsDedPuschMaxLengthCombCurIndChanged)
         #---->initial ul bwp
         self.nrRachMsg3TpComb.currentIndexChanged.connect(self.onRachMsg3TpCombCurIndChanged)
         
@@ -4891,7 +4900,310 @@ class NgNrGridUi(QDialog):
             31 : None,
             }
             
-
+        #refer to 3GPP 38.212 vf30
+        #Table 7.3.1.2.2-1: Antenna port(s) (1000 + DMRS port), dmrs-Type=1, maxLength=1
+        self.nrDci11AntPortsDmrsType1MaxLen1OneCw = {
+            0 : (1,(0,),1),
+            1 : (1,(1,),1),
+            2 : (1,(0,1,),1),
+            3 : (2,(0,),1),
+            4 : (2,(1,),1),
+            5 : (2,(2,),1),
+            6 : (2,(3,),1),
+            7 : (2,(0,1,),1),
+            8 : (2,(2,3,),1),
+            9 : (2,(0,1,2,),1),
+            10 : (2,(0,1,2,3,),1),
+            11 : (2,(0,2,),1),
+            12 : None,
+            13 : None,
+            14 : None,
+            15 : None,
+            }
+        self.nrDci11AntPortsDmrsType1MaxLen1OneCwValid = '0-11'
+        
+        #Table 7.3.1.2.2-2: Antenna port(s) (1000 + DMRS port), dmrs-Type=1, maxLength=2
+        self.nrDci11AntPortsDmrsType1MaxLen2OneCw = {
+            0 : (1,(0,),1),
+            1 : (1,(1,),1),
+            2 : (1,(0,1,),1),
+            3 : (2,(0,),1),
+            4 : (2,(1,),1),
+            5 : (2,(2,),1),
+            6 : (2,(3,),1),
+            7 : (2,(0,1,),1),
+            8 : (2,(2,3,),1),
+            9 : (2,(0,1,2,),1),
+            10 : (2,(0,1,2,3,),1),
+            11 : (2,(0,2,),1),
+            12 : (2,(0,),2),
+            13 : (2,(1,),2),
+            14 : (2,(2,),2),
+            15 : (2,(3,),2),
+            16 : (2,(4,),2),
+            17 : (2,(5,),2),
+            18 : (2,(6,),2),
+            19 : (2,(7,),2),
+            20 : (2,(0,1,),2),
+            21 : (2,(2,3,),2),
+            22 : (2,(4,5,),2),
+            23 : (2,(6,7,),2),
+            24 : (2,(0,4,),2),
+            25 : (2,(2,6,),2),
+            26 : (2,(0,1,4,),2),
+            27 : (2,(2,3,6,),2),
+            28 : (2,(0,1,4,5,),2),
+            29 : (2,(2,3,6,7,),2),
+            30 : (2,(0,2,4,6,),2),
+            31 : None,
+            }
+        self.nrDci11AntPortsDmrsType1MaxLen2OneCwValid = '0-30'
+        
+        self.nrDci11AntPortsDmrsType1MaxLen2TwoCws = {
+            0 : (2,(0,1,2,3,4,),2),
+            1 : (2,(0,1,2,3,4,6,),2),
+            2 : (2,(0,1,2,3,4,5,6,),2),
+            3 : (2,(0,1,2,3,4,5,6,7,),2),
+            4 : None,
+            5 : None,
+            6 : None,
+            7 : None,
+            8 : None,
+            9 : None,
+            10 : None,
+            11 : None,
+            12 : None,
+            13 : None,
+            14 : None,
+            15 : None,
+            16 : None,
+            17 : None,
+            18 : None,
+            19 : None,
+            20 : None,
+            21 : None,
+            22 : None,
+            23 : None,
+            24 : None,
+            25 : None,
+            26 : None,
+            27 : None,
+            28 : None,
+            29 : None,
+            30 : None,
+            31 : None,
+            }
+        self.nrDci11AntPortsDmrsType1MaxLen2TwoCwsValid = '0-3'
+        
+        #Table 7.3.1.2.2-3: Antenna port(s) (1000 + DMRS port), dmrs-Type=2, maxLength=1
+        self.nrDci11AntPortsDmrsType2MaxLen1OneCw = {
+            0 : (1,(0,),1),
+            1 : (1,(1,),1),
+            2 : (1,(0,1,),1),
+            3 : (2,(0,),1),
+            4 : (2,(1,),1),
+            5 : (2,(2,),1),
+            6 : (2,(3,),1),
+            7 : (2,(0,1,),1),
+            8 : (2,(2,3,),1),
+            9 : (2,(0,1,2,),1),
+            10 : (2,(0,1,2,3,),1),
+            11 : (3,(0,),1),
+            12 : (3,(1,),1),
+            13 : (3,(2,),1),
+            14 : (3,(3,),1),
+            15 : (3,(4,),1),
+            16 : (3,(5,),1),
+            17 : (3,(0,1,),1),
+            18 : (3,(2,3,),1),
+            19 : (3,(4,5,),1),
+            20 : (3,(0,1,2,),1),
+            21 : (3,(3,4,5,),1),
+            22 : (3,(0,1,2,3,),1),
+            23 : (2,(0,2,),1),
+            24 : None,
+            25 : None,
+            26 : None,
+            27 : None,
+            28 : None,
+            29 : None,
+            30 : None,
+            31 : None,
+            }
+        self.nrDci11AntPortsDmrsType2MaxLen1OneCwValid = '0-23'
+        
+        self.nrDci11AntPortsDmrsType2MaxLen1TwoCws = {
+            0 : (3,(0,1,2,3,4,),1),
+            1 : (3,(0,1,2,3,4,5,),1),
+            2 : None,
+            3 : None,
+            4 : None,
+            5 : None,
+            6 : None,
+            7 : None,
+            8 : None,
+            9 : None,
+            10 : None,
+            11 : None,
+            12 : None,
+            13 : None,
+            14 : None,
+            15 : None,
+            16 : None,
+            17 : None,
+            18 : None,
+            19 : None,
+            20 : None,
+            21 : None,
+            22 : None,
+            23 : None,
+            24 : None,
+            25 : None,
+            26 : None,
+            27 : None,
+            28 : None,
+            29 : None,
+            30 : None,
+            31 : None,
+            }
+        self.nrDci11AntPortsDmrsType2MaxLen1TwoCwsValid = '0-1'
+        
+        #Table 7.3.1.2.2-4: Antenna port(s) (1000 + DMRS port), dmrs-Type=2, maxLength=2
+        self.nrDci11AntPortsDmrsType2MaxLen2OneCw = {
+            0 : (1,(0,),1),
+            1 : (1,(1,),1),
+            2 : (1,(0,1,),1),
+            3 : (2,(0,),1),
+            4 : (2,(1,),1),
+            5 : (2,(2,),1),
+            6 : (2,(3,),1),
+            7 : (2,(0,1,),1),
+            8 : (2,(2,3,),1),
+            9 : (2,(0,1,2,),1),
+            10 : (2,(0,1,2,3,),1),
+            11 : (3,(0,),1),
+            12 : (3,(1,),1),
+            13 : (3,(2,),1),
+            14 : (3,(3,),1),
+            15 : (3,(4,),1),
+            16 : (3,(5,),1),
+            17 : (3,(0,1,),1),
+            18 : (3,(2,3,),1),
+            19 : (3,(4,5,),1),
+            20 : (3,(0,1,2,),1),
+            21 : (3,(3,4,5,),1),
+            22 : (3,(0,1,2,3,),1),
+            23 : (2,(0,2,),1),
+            24 : (3,(0,),2),
+            25 : (3,(1,),2),
+            26 : (3,(2,),2),
+            27 : (3,(3,),2),
+            28 : (3,(4,),2),
+            29 : (3,(5,),2),
+            30 : (3,(6,),2),
+            31 : (3,(7,),2),
+            32 : (3,(8,),2),
+            33 : (3,(9,),2),
+            34 : (3,(10,),2),
+            35 : (3,(11,),2),
+            36 : (3,(0,1,),2),
+            37 : (3,(2,3,),2),
+            38 : (3,(4,5,),2),
+            39 : (3,(6,7,),2),
+            40 : (3,(8,9,),2),
+            41 : (3,(10,11,),2),
+            42 : (3,(0,1,6,),2),
+            43 : (3,(2,3,8,),2),
+            44 : (3,(4,5,10,),2),
+            45 : (3,(0,1,6,7,),2),
+            46 : (3,(2,3,8,9,),2),
+            47 : (3,(4,5,10,11,),2),
+            48 : (1,(0,),2),
+            49 : (1,(1,),2),
+            50 : (1,(6,),2),
+            51 : (1,(7,),2),
+            52 : (1,(0,1,),2),
+            53 : (1,(6,7,),2),
+            54 : (2,(0,1,),2),
+            55 : (2,(2,3,),2),
+            56 : (2,(6,7,),2),
+            57 : (2,(8,9,),2),
+            58 : None,
+            59 : None,
+            60 : None,
+            61 : None,
+            62 : None,
+            63 : None,
+            }
+        self.nrDci11AntPortsDmrsType2MaxLen2OneCwValid = '0-57'
+        
+        self.nrDci11AntPortsDmrsType2MaxLen2TwoCws = {
+            0 : (3,(0,1,2,3,4,),1),
+            1 : (3,(0,1,2,3,4,5,),1),
+            2 : (2,(0,1,2,3,6,),2),
+            3 : (2,(0,1,2,3,6,8,),2),
+            4 : (2,(0,1,2,3,6,7,8,),2),
+            5 : (2,(0,1,2,3,6,7,8,9,),2),
+            6 : None,
+            7 : None,
+            8 : None,
+            9 : None,
+            10 : None,
+            11 : None,
+            12 : None,
+            13 : None,
+            14 : None,
+            15 : None,
+            16 : None,
+            17 : None,
+            18 : None,
+            19 : None,
+            20 : None,
+            21 : None,
+            22 : None,
+            23 : None,
+            24 : None,
+            25 : None,
+            26 : None,
+            27 : None,
+            28 : None,
+            29 : None,
+            30 : None,
+            31 : None,
+            32 : None,
+            33 : None,
+            34 : None,
+            35 : None,
+            36 : None,
+            37 : None,
+            38 : None,
+            39 : None,
+            40 : None,
+            41 : None,
+            42 : None,
+            43 : None,
+            44 : None,
+            45 : None,
+            46 : None,
+            47 : None,
+            48 : None,
+            49 : None,
+            50 : None,
+            51 : None,
+            52 : None,
+            53 : None,
+            54 : None,
+            55 : None,
+            56 : None,
+            57 : None,
+            58 : None,
+            59 : None,
+            60 : None,
+            61 : None,
+            62 : None,
+            63 : None,
+            }
+        self.nrDci11AntPortsDmrsType2MaxLen2TwoCwsValid = '0-5'
         
         
         #offset of CORESET0 w.r.t. SSB
@@ -6471,6 +6783,108 @@ class NgNrGridUi(QDialog):
         if self.nrDci11PdschFreqAllocTypeComb.currentText() == 'RA Type0':
             self.updateDedDlBwpInfo()
             
+    def onDmrsDedPdschMaxLengthCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDmrsDedPdschMaxLengthCombCurIndChanged')
+        if self.nrDmrsDedPdschMaxLengthComb.currentText() == 'len1':
+            self.nrDmrsDedPdschAddPosComb.clear()
+            self.nrDmrsDedPdschAddPosComb.addItems(['pos0', 'pos1', 'pos2', 'pos3'])
+        else:
+            self.nrDmrsDedPdschAddPosComb.clear()
+            self.nrDmrsDedPdschAddPosComb.addItems(['pos0', 'pos1'])
+    
+    def onDmrsDedPdschDmrsTypeOrMaxLengthCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDmrsDedPdschDmrsTypeOrMaxLengthCombCurIndChanged')
+        dmrsType = self.nrDmrsDedPdschDmrsTypeComb.currentText()
+        maxLength = self.nrDmrsDedPdschMaxLengthComb.currentText()
+        
+        if dmrsType == 'Type 1' and maxLength == 'len1':
+            self.nrDci11PdschAntPortsFieldEdit.setValidator(QIntValidator(0, 15))
+            self.nrDci11PdschCw1McsEdit.clear()
+            self.nrDci11PdschCw1McsEdit.setEnabled(False)
+        elif (dmrsType == 'Type 1' and maxLength == 'len2') or (dmrsType == 'Type 2' and maxLength == 'len1'):
+            self.nrDci11PdschAntPortsFieldEdit.setValidator(QIntValidator(0, 31))
+            self.nrDci11PdschCw1McsEdit.setEnabled(True)
+        else:#dmrsType == 'Type 2' and maxLength == 'len2'
+            self.nrDci11PdschAntPortsFieldEdit.setValidator(QIntValidator(0, 63))
+            self.nrDci11PdschCw1McsEdit.setEnabled(True)
+        
+        self.validatePdschCw0McsCw1Mcs()
+    
+    def onDci11PdschCw0McsOrCw1McsEditTextChanged(self, text):
+        if not self.nrDci11PdschCw0McsEdit.text() and not self.nrDci11PdschCw1McsEdit.text():
+            self.nrDci11PdschAntPortsFieldEdit.clear()
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDci11PdschCw0McsOrCw1McsEditTextChanged')
+        self.validatePdschCw0McsCw1Mcs()
+    
+    def validatePdschCw0McsCw1Mcs(self):
+        self.ngwin.logEdit.append('-->inside validatePdschCw0McsCw1Mcs')
+        if not self.nrDci11PdschCw0McsEdit.text() and not self.nrDci11PdschCw1McsEdit.text():
+            self.nrDci11PdschAntPortsFieldEdit.clear()
+            return
+        
+        if not self.nrDci11PdschCw0McsEdit.text() and self.nrDci11PdschCw1McsEdit.text():
+            self.ngwin.logEdit.append('<font color=yellow><b>[%s]Warning</font>: Only MCS(CW0) can be set in case of one codeword transmission for PDSCH!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+            self.nrDci11PdschCw1McsEdit.clear()
+            self.nrDci11PdschAntPortsFieldEdit.clear()
+            return
+        
+        dmrsType = self.nrDmrsDedPdschDmrsTypeComb.currentText()
+        maxLength = self.nrDmrsDedPdschMaxLengthComb.currentText()
+        numCw = 0
+        if self.nrDci11PdschCw0McsEdit.text():
+            numCw = numCw + 1
+        if self.nrDci11PdschCw1McsEdit.text():
+            numCw = numCw + 1
+        
+        if dmrsType == 'Type 1' and maxLength == 'len1' and numCw == 1:
+            self.nrDci11PdschAntPortsFieldLabel.setText('Antenna port(s)[%s]:' % self.nrDci11AntPortsDmrsType1MaxLen1OneCwValid)
+        elif dmrsType == 'Type 1' and maxLength == 'len2' and numCw == 1:
+            self.nrDci11PdschAntPortsFieldLabel.setText('Antenna port(s)[%s]:' % self.nrDci11AntPortsDmrsType1MaxLen2OneCwValid)
+        elif dmrsType == 'Type 1' and maxLength == 'len2' and numCw == 2:
+            self.nrDci11PdschAntPortsFieldLabel.setText('Antenna port(s)[%s]:' % self.nrDci11AntPortsDmrsType1MaxLen2TwoCwsValid)
+        elif dmrsType == 'Type 2' and maxLength == 'len1' and numCw == 1:
+            self.nrDci11PdschAntPortsFieldLabel.setText('Antenna port(s)[%s]:' % self.nrDci11AntPortsDmrsType2MaxLen1OneCwValid)
+        elif dmrsType == 'Type 2' and maxLength == 'len1' and numCw == 2:
+            self.nrDci11PdschAntPortsFieldLabel.setText('Antenna port(s)[%s]:' % self.nrDci11AntPortsDmrsType2MaxLen1TwoCwsValid)
+        elif dmrsType == 'Type 2' and maxLength == 'len2' and numCw == 1:
+            self.nrDci11PdschAntPortsFieldLabel.setText('Antenna port(s)[%s]:' % self.nrDci11AntPortsDmrsType2MaxLen2OneCwValid)
+        elif dmrsType == 'Type 2' and maxLength == 'len2' and numCw == 2:
+            self.nrDci11PdschAntPortsFieldLabel.setText('Antenna port(s)[%s]:' % self.nrDci11AntPortsDmrsType2MaxLen2TwoCwsValid)
+        else:
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid combination of dmrs-Type(="%s"), maxLength(="%s") and numCw(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), dmrsType, maxLength, numCw))
+            return
+            
+    def onDci11PdschAntPortsEditTextChanged(self, text):
+        if not self.nrDci11PdschAntPortsFieldEdit.text():
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDci11PdschAntPortsEditTextChanged')
+        if not self.nrDci11PdschCw0McsEdit.text() and not self.nrDci11PdschCw1McsEdit.text():
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: MCS(CW0) and/or MCS(CW1) must be set before configuring "Antenna port(s)"!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+            self.nrDci11PdschAntPortsFieldEdit.clear()
+            return
+        
+        
+    def onDmrsDedPuschMaxLengthCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onDmrsDedPuschMaxLengthCombCurIndChanged')
+        if self.nrDmrsDedPuschMaxLengthComb.currentText() == 'len1':
+            self.nrDmrsDedPuschAddPosComb.clear()
+            self.nrDmrsDedPuschAddPosComb.addItems(['pos0', 'pos1', 'pos2', 'pos3'])
+        else:
+            self.nrDmrsDedPuschAddPosComb.clear()
+            self.nrDmrsDedPuschAddPosComb.addItems(['pos0', 'pos1'])
+        
     def onDci11PdschFreqRaTypeCombCurIndChanged(self, index):
         if index < 0:
             return
