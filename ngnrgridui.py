@@ -1787,7 +1787,7 @@ class NgNrGridUi(QDialog):
         
         self.nrDedPdschCfgMcsTableLabel = QLabel('mcs-Table:')
         self.nrDedPdschCfgMcsTableComb = QComboBox()
-        self.nrDedPdschCfgMcsTableComb.addItems(['64QAM', '256QAM', '64QAMLowSE'])
+        self.nrDedPdschCfgMcsTableComb.addItems(['qam64', 'qam256', 'qam64LowSE'])
         self.nrDedPdschCfgMcsTableComb.setCurrentIndex(0)
         
         dedPdschCfgWidget = QWidget()
@@ -1840,12 +1840,15 @@ class NgNrGridUi(QDialog):
         
         self.nrDmrsDedPdschDmrsPortsLabel = QLabel('DMRS port(s)[1000+x]:')
         self.nrDmrsDedPdschDmrsPortsEdit = QLineEdit()
+        self.nrDmrsDedPdschDmrsPortsEdit.setEnabled(False)
         
         self.nrDmrsDedPdschCdmGroupsWoDataLabel = QLabel('CDM group(s) without data:')
         self.nrDmrsDedPdschCdmGroupsWoDataEdit = QLineEdit()
+        self.nrDmrsDedPdschCdmGroupsWoDataEdit.setEnabled(False)
         
         self.nrDmrsDedPdschFrontLoadSymbsLabel = QLabel('Number of front-load symbols:')
         self.nrDmrsDedPdschFrontLoadSymbsEdit = QLineEdit()
+        self.nrDmrsDedPdschFrontLoadSymbsEdit.setEnabled(False)
         
         ptrsPdschWidget = QGroupBox()
         ptrsPdschWidget.setTitle('PT-RS for PDSCH')
@@ -1993,7 +1996,7 @@ class NgNrGridUi(QDialog):
         
         self.nrDedPuschCfgMcsTableLabel = QLabel('mcs-Table:')
         self.nrDedPuschCfgMcsTableComb = QComboBox()
-        self.nrDedPuschCfgMcsTableComb.addItems(['64QAM', '256QAM', '64QAMLowSE'])
+        self.nrDedPuschCfgMcsTableComb.addItems(['qam64', 'qam256', 'qam64LowSE'])
         self.nrDedPuschCfgMcsTableComb.setCurrentIndex(0)
         
         dedPuschCfgWidget = QWidget()
@@ -6839,10 +6842,18 @@ class NgNrGridUi(QDialog):
         dmrsType = self.nrDmrsDedPdschDmrsTypeComb.currentText()
         maxLength = self.nrDmrsDedPdschMaxLengthComb.currentText()
         numCw = 0
+        mcsSet = []
         if self.nrDci11PdschCw0McsEdit.text():
             numCw = numCw + 1
+            mcsSet.append(int(self.nrDci11PdschCw0McsEdit.text()))
+        else:
+            mcsSet.append(None)
+            
         if self.nrDci11PdschCw1McsEdit.text():
             numCw = numCw + 1
+            mcsSet.append(int(self.nrDci11PdschCw1McsEdit.text()))
+        else:
+            mcsSet.append(None)
         
         if dmrsType == 'Type 1' and maxLength == 'len1' and numCw == 1:
             self.nrDci11PdschAntPortsFieldLabel.setText('Antenna port(s)[%s]:' % self.nrDci11AntPortsDmrsType1MaxLen1OneCwValid)
@@ -6861,9 +6872,26 @@ class NgNrGridUi(QDialog):
         else:
             self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid combination of dmrs-Type(="%s"), maxLength(="%s") and numCw(=%s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), dmrsType, maxLength, numCw))
             return
+        
+        mcsTable = self.nrDedPdschCfgMcsTableComb.currentText()
+        if mcsTable == 'qam256':
+            if (mcsSet[0] is not None and mcsSet[0] > 27) or (mcsSet[1] is not None and mcsSet[1] > 27): 
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: MCS(CW0/CW1) should be 0-27 when "mcs-Table" of PDSCH-Config is "%s"!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), mcsTable))
+                return
+        else:#mcsTable == 'qam64LowSE' or mcsTable == 'qam64'
+            if (mcsSet[0] is not None and mcsSet[0] > 28) or (mcsSet[1] is not None and mcsSet[1] > 28): 
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: MCS(CW0/CW1) should be 0-28 when "mcs-Table" of PDSCH-Config is "%s"!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), mcsTable))
+                return
+        
+        if self.nrDci11PdschAntPortsFieldEdit.text():
+            self.validatePdschAntPorts()
             
     def onDci11PdschAntPortsEditTextChanged(self, text):
         if not self.nrDci11PdschAntPortsFieldEdit.text():
+            self.nrDmrsDedPdschCdmGroupsWoDataEdit.clear()
+            self.nrDmrsDedPdschDmrsPortsEdit.clear()
+            self.nrDmrsDedPdschFrontLoadSymbsEdit.clear()
+            self.nrPtrsPdschDmrsAntPortEdit.clear()
             return
         
         #self.ngwin.logEdit.append('-->inside onDci11PdschAntPortsEditTextChanged')
@@ -6872,6 +6900,75 @@ class NgNrGridUi(QDialog):
             self.nrDci11PdschAntPortsFieldEdit.clear()
             return
         
+        self.validatePdschAntPorts()
+        
+    def validatePdschAntPorts(self):
+        if not self.nrDci11PdschAntPortsFieldEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside validatePdschAntPorts')
+        dmrsType = self.nrDmrsDedPdschDmrsTypeComb.currentText()
+        maxLength = self.nrDmrsDedPdschMaxLengthComb.currentText()
+        mcsSet = []
+        if self.nrDci11PdschCw0McsEdit.text():
+            mcsSet.append(int(self.nrDci11PdschCw0McsEdit.text()))
+            
+        if self.nrDci11PdschCw1McsEdit.text():
+            mcsSet.append(int(self.nrDci11PdschCw1McsEdit.text()))
+        
+        if dmrsType == 'Type 1' and maxLength == 'len1' and len(mcsSet) == 1:
+            minVal, maxVal = self.nrDci11AntPortsDmrsType1MaxLen1OneCwValid.split('-')
+        elif dmrsType == 'Type 1' and maxLength == 'len2' and len(mcsSet) == 1:
+            minVal, maxVal = self.nrDci11AntPortsDmrsType1MaxLen2OneCwValid.split('-')
+        elif dmrsType == 'Type 1' and maxLength == 'len2' and len(mcsSet) == 2:
+            minVal, maxVal = self.nrDci11AntPortsDmrsType1MaxLen2TwoCwsValid.split('-')
+        elif dmrsType == 'Type 2' and maxLength == 'len1' and len(mcsSet) == 1:
+            minVal, maxVal = self.nrDci11AntPortsDmrsType2MaxLen1OneCwValid.split('-')
+        elif dmrsType == 'Type 2' and maxLength == 'len1' and len(mcsSet) == 2:
+            minVal, maxVal = self.nrDci11AntPortsDmrsType2MaxLen1TwoCwsValid.split('-')
+        elif dmrsType == 'Type 2' and maxLength == 'len2' and len(mcsSet) == 1:
+            minVal, maxVal = self.nrDci11AntPortsDmrsType2MaxLen2OneCwValid.split('-')
+        elif dmrsType == 'Type 2' and maxLength == 'len2' and len(mcsSet) == 2:
+            minVal, maxVal = self.nrDci11AntPortsDmrsType2MaxLen2TwoCwsValid.split('-')
+        else:
+            return
+        
+        ap = int(self.nrDci11PdschAntPortsFieldEdit.text())
+        if ap < int(minVal) or ap > int(maxVal):
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid "Antenna port(s)"(=%s), which must be %s-%s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), ap, minVal, maxVal))
+            self.nrDci11PdschAntPortsFieldEdit.clear()
+            return
+        
+        if dmrsType == 'Type 1' and maxLength == 'len1' and len(mcsSet) == 1:
+            cdmGroups, dmrsPorts, numDmrsSymbs = self.nrDci11AntPortsDmrsType1MaxLen1OneCw[ap]
+        elif dmrsType == 'Type 1' and maxLength == 'len2' and len(mcsSet) == 1:
+            cdmGroups, dmrsPorts, numDmrsSymbs = self.nrDci11AntPortsDmrsType1MaxLen2OneCw[ap]
+        elif dmrsType == 'Type 1' and maxLength == 'len2' and len(mcsSet) == 2:
+            cdmGroups, dmrsPorts, numDmrsSymbs = self.nrDci11AntPortsDmrsType1MaxLen2TwoCws[ap]
+        elif dmrsType == 'Type 2' and maxLength == 'len1' and len(mcsSet) == 1:
+            cdmGroups, dmrsPorts, numDmrsSymbs = self.nrDci11AntPortsDmrsType2MaxLen1OneCw[ap]
+        elif dmrsType == 'Type 2' and maxLength == 'len1' and len(mcsSet) == 2:
+            cdmGroups, dmrsPorts, numDmrsSymbs = self.nrDci11AntPortsDmrsType2MaxLen1TwoCws[ap]
+        elif dmrsType == 'Type 2' and maxLength == 'len2' and len(mcsSet) == 1:
+            cdmGroups, dmrsPorts, numDmrsSymbs = self.nrDci11AntPortsDmrsType2MaxLen2OneCw[ap]
+        elif dmrsType == 'Type 2' and maxLength == 'len2' and len(mcsSet) == 2:
+            cdmGroups, dmrsPorts, numDmrsSymbs = self.nrDci11AntPortsDmrsType2MaxLen2TwoCws[ap]
+        else:
+            return
+        
+        self.nrDmrsDedPdschCdmGroupsWoDataEdit.setText(str(cdmGroups))
+        self.nrDmrsDedPdschDmrsPortsEdit.setText(','.join([str(i) for i in dmrsPorts]))
+        self.nrDmrsDedPdschFrontLoadSymbsEdit.setText(str(numDmrsSymbs))
+        
+        if len(mcsSet) == 1:
+            self.nrPtrsPdschDmrsAntPortEdit.setText(str(dmrsPorts[0]))
+        else:
+            numAntPortsCw0 = math.floor(len(dmrsPorts) / 2)
+            if mcsSet[0] >= mcsSet[1]:
+                self.nrPtrsPdschDmrsAntPortEdit.setText(str(dmrsPorts[0]))
+            else:
+                self.nrPtrsPdschDmrsAntPortEdit.setText(str(dmrsPorts[numAntPortsCw0]))
+                
         
     def onDmrsDedPuschMaxLengthCombCurIndChanged(self, index):
         if index < 0:
