@@ -1313,18 +1313,21 @@ class NgNrGridUi(QDialog):
         self.nrDmrsSib1DmrsTypeComb = QComboBox()
         self.nrDmrsSib1DmrsTypeComb.addItems(['Type 1', 'Type 2'])
         self.nrDmrsSib1DmrsTypeComb.setCurrentIndex(0)
+        self.nrDmrsSib1DmrsTypeComb.setEnabled(False)
         
         self.nrDmrsSib1AddPosLabel = QLabel('dmrs-additionalPosition:')
         self.nrDmrsSib1AddPosComb = QComboBox()
         self.nrDmrsSib1AddPosComb.addItems(['pos0', 'pos1', 'pos2', 'pos3'])
+        self.nrDmrsSib1AddPosComb.setEnabled(False)
         
         self.nrDmrsSib1MaxLengthLabel = QLabel('maxLength:')
         self.nrDmrsSib1MaxLengthComb = QComboBox()
         self.nrDmrsSib1MaxLengthComb.addItems(['len1', 'len2'])
         self.nrDmrsSib1MaxLengthComb.setCurrentIndex(0)
+        self.nrDmrsSib1MaxLengthComb.setEnabled(False)
         
         self.nrDmrsSib1DmrsPortsLabel = QLabel('DMRS port(s)[1000+x]:')
-        self.nrDmrsSib1DmrsPortsEdit = QLineEdit()
+        self.nrDmrsSib1DmrsPortsEdit = QLineEdit('0')
         self.nrDmrsSib1DmrsPortsEdit.setEnabled(False)
         
         self.nrDmrsSib1CdmGroupsWoDataLabel = QLabel('CDM group(s) without data:')
@@ -1359,18 +1362,21 @@ class NgNrGridUi(QDialog):
         self.nrDmrsMsg2DmrsTypeComb = QComboBox()
         self.nrDmrsMsg2DmrsTypeComb.addItems(['Type 1', 'Type 2'])
         self.nrDmrsMsg2DmrsTypeComb.setCurrentIndex(0)
+        self.nrDmrsMsg2DmrsTypeComb.setEnabled(False)
         
         self.nrDmrsMsg2AddPosLabel = QLabel('dmrs-additionalPosition:')
         self.nrDmrsMsg2AddPosComb = QComboBox()
         self.nrDmrsMsg2AddPosComb.addItems(['pos0', 'pos1', 'pos2', 'pos3'])
+        self.nrDmrsMsg2AddPosComb.setEnabled(False)
         
         self.nrDmrsMsg2MaxLengthLabel = QLabel('maxLength:')
         self.nrDmrsMsg2MaxLengthComb = QComboBox()
         self.nrDmrsMsg2MaxLengthComb.addItems(['len1', 'len2'])
         self.nrDmrsMsg2MaxLengthComb.setCurrentIndex(0)
+        self.nrDmrsMsg2MaxLengthComb.setEnabled(False)
         
         self.nrDmrsMsg2DmrsPortsLabel = QLabel('DMRS port(s)[1000+x]:')
-        self.nrDmrsMsg2DmrsPortsEdit = QLineEdit()
+        self.nrDmrsMsg2DmrsPortsEdit = QLineEdit('0')
         self.nrDmrsMsg2DmrsPortsEdit.setEnabled(False)
         
         self.nrDmrsMsg2CdmGroupsWoDataLabel = QLabel('CDM group(s) without data:')
@@ -1405,18 +1411,21 @@ class NgNrGridUi(QDialog):
         self.nrDmrsMsg4DmrsTypeComb = QComboBox()
         self.nrDmrsMsg4DmrsTypeComb.addItems(['Type 1', 'Type 2'])
         self.nrDmrsMsg4DmrsTypeComb.setCurrentIndex(0)
+        self.nrDmrsMsg4DmrsTypeComb.setEnabled(False)
         
         self.nrDmrsMsg4AddPosLabel = QLabel('dmrs-additionalPosition:')
         self.nrDmrsMsg4AddPosComb = QComboBox()
         self.nrDmrsMsg4AddPosComb.addItems(['pos0', 'pos1', 'pos2', 'pos3'])
+        self.nrDmrsMsg4AddPosComb.setEnabled(False)
         
         self.nrDmrsMsg4MaxLengthLabel = QLabel('maxLength:')
         self.nrDmrsMsg4MaxLengthComb = QComboBox()
         self.nrDmrsMsg4MaxLengthComb.addItems(['len1', 'len2'])
         self.nrDmrsMsg4MaxLengthComb.setCurrentIndex(0)
+        self.nrDmrsMsg4MaxLengthComb.setEnabled(False)
         
         self.nrDmrsMsg4DmrsPortsLabel = QLabel('DMRS port(s)[1000+x]:')
-        self.nrDmrsMsg4DmrsPortsEdit = QLineEdit()
+        self.nrDmrsMsg4DmrsPortsEdit = QLineEdit('0')
         self.nrDmrsMsg4DmrsPortsEdit.setEnabled(False)
         
         self.nrDmrsMsg4CdmGroupsWoDataLabel = QLabel('CDM group(s) without data:')
@@ -1615,18 +1624,21 @@ class NgNrGridUi(QDialog):
         self.nrDmrsMsg3DmrsTypeComb = QComboBox()
         self.nrDmrsMsg3DmrsTypeComb.addItems(['Type 1', 'Type 2'])
         self.nrDmrsMsg3DmrsTypeComb.setCurrentIndex(0)
+        self.nrDmrsMsg3DmrsTypeComb.setEnabled(False)
         
         self.nrDmrsMsg3AddPosLabel = QLabel('dmrs-additionalPosition:')
         self.nrDmrsMsg3AddPosComb = QComboBox()
         self.nrDmrsMsg3AddPosComb.addItems(['pos0', 'pos1', 'pos2', 'pos3'])
+        self.nrDmrsMsg3AddPosComb.setEnabled(False)
         
         self.nrDmrsMsg3MaxLengthLabel = QLabel('maxLength:')
         self.nrDmrsMsg3MaxLengthComb = QComboBox()
         self.nrDmrsMsg3MaxLengthComb.addItems(['len1', 'len2'])
         self.nrDmrsMsg3MaxLengthComb.setCurrentIndex(0)
+        self.nrDmrsMsg3MaxLengthComb.setEnabled(False)
         
         self.nrDmrsMsg3DmrsPortsLabel = QLabel('DMRS port(s)[x]:')
-        self.nrDmrsMsg3DmrsPortsEdit = QLineEdit()
+        self.nrDmrsMsg3DmrsPortsEdit = QLineEdit('0')
         self.nrDmrsMsg3DmrsPortsEdit.setEnabled(False)
         
         self.nrDmrsMsg3CdmGroupsWoDataLabel = QLabel('CDM group(s) without data:')
@@ -3247,6 +3259,8 @@ class NgNrGridUi(QDialog):
         self.nrDci01PuschFreqAllocType1RbStartEdit.textChanged.connect(self.onDci01PuschType1LRBsOrRBStartEditTextChanged)
         self.nrDci01PuschFreqAllocFreqHopComb.currentIndexChanged.connect(self.onDci01PuschFreqHopCombCurIndChanged)
         
+        #---->initial dl bwp
+        self.nrIniDlBwpGenericCpComb.currentIndexChanged.connect(self.onIniDlBwpCpCombCurIndChanged)
         #---->dedicated dl bwp
         self.nrDedDlBwpGenericCpComb.currentIndexChanged.connect(self.onDci11MappingTypeOrDedDlBwpCpCombCurIndChanged)
         self.nrDedPdschCfgRbgConfigComb.currentIndexChanged.connect(self.onDedPdschCfgRbgConfigCombCurIndChanged)
@@ -4692,7 +4706,191 @@ class NgNrGridUi(QDialog):
         
         #Table 6.1.2.1.1-5: Definition of value Δ
         self.nrPuschTimeAllocMsg3K2Delta = { '15KHz':2, '30KHz':3, '60KHz':4, '120KHz':6 }
+        
+        #refer to 3GPP 38.214 vf30
+        #Table 5.1.3.1-1: MCS index table 1 for PDSCH
+        self.nrPdschMcsTabQam64 = {
+            0 : (2,120),
+            1 : (2,157),
+            2 : (2,193),
+            3 : (2,251),
+            4 : (2,308),
+            5 : (2,379),
+            6 : (2,449),
+            7 : (2,526),
+            8 : (2,602),
+            9 : (2,679),
+            10 : (4,340),
+            11 : (4,378),
+            12 : (4,434),
+            13 : (4,490),
+            14 : (4,553),
+            15 : (4,616),
+            16 : (4,658),
+            17 : (6,438),
+            18 : (6,466),
+            19 : (6,517),
+            20 : (6,567),
+            21 : (6,616),
+            22 : (6,666),
+            23 : (6,719),
+            24 : (6,772),
+            25 : (6,822),
+            26 : (6,873),
+            27 : (6,910),
+            28 : (6,948),
+            29 : None,
+            30 : None,
+            31 : None,
+            }
+        
+        #Table 5.1.3.1-2: MCS index table 2 for PDSCH
+        self.nrPdschMcsTabQam256 = {
+            0 : (2,120),
+            1 : (2,193),
+            2 : (2,308),
+            3 : (2,449),
+            4 : (2,602),
+            5 : (4,378),
+            6 : (4,434),
+            7 : (4,490),
+            8 : (4,553),
+            9 : (4,616),
+            10 : (4,658),
+            11 : (6,466),
+            12 : (6,517),
+            13 : (6,567),
+            14 : (6,616),
+            15 : (6,666),
+            16 : (6,719),
+            17 : (6,772),
+            18 : (6,822),
+            19 : (6,873),
+            20 : (8,682.5),
+            21 : (8,711),
+            22 : (8,754),
+            23 : (8,797),
+            24 : (8,841),
+            25 : (8,885),
+            26 : (8,916.5),
+            27 : (8,948),
+            28 : None,
+            29 : None,
+            30 : None,
+            31 : None,
+            }
+        
+        #Table 5.1.3.1-3: MCS index table 3 for PDSCH
+        self.nrPdschMcsTabQam64LowSE = {
+            0 : (2,30),
+            1 : (2,40),
+            2 : (2,50),
+            3 : (2,64),
+            4 : (2,78),
+            5 : (2,99),
+            6 : (2,120),
+            7 : (2,157),
+            8 : (2,193),
+            9 : (2,251),
+            10 : (2,308),
+            11 : (2,379),
+            12 : (2,449),
+            13 : (2,526),
+            14 : (2,602),
+            15 : (4,340),
+            16 : (4,378),
+            17 : (4,434),
+            18 : (4,490),
+            19 : (4,553),
+            20 : (4,616),
+            21 : (6,438),
+            22 : (6,466),
+            23 : (6,517),
+            24 : (6,567),
+            25 : (6,616),
+            26 : (6,666),
+            27 : (6,719),
+            28 : (6,772),
+            29 : None,
+            30 : None,
+            31 : None,
+            }
 
+        #Table 5.1.3.2-1: TBS for N_info <= 3824
+        self.nrTbsTabLessThan3824 = [24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 208, 224, 240, 256, 272, 288, 304, 320, 336, 352, 368, 384, 408, 432, 456, 480, 504, 528, 552, 576, 608, 640, 672, 704, 736, 768, 808, 848, 888, 928, 984, 1032, 1064, 1128, 1160, 1192, 1224, 1256, 1288, 1320, 1352, 1416, 1480, 1544, 1608, 1672, 1736, 1800, 1864, 1928, 2024, 2088, 2152, 2216, 2280, 2408, 2472, 2536, 2600, 2664, 2728, 2792, 2856, 2976, 3104, 3240, 3368, 3496, 3624, 3752, 3824,]
+        
+        #Table 6.1.4.1-1: MCS index table for PUSCH with transform precoding and 64QAM
+        self.nrPuschTpMcsTabQam64 = {
+            0 : (2,120),
+            1 : (2,157),
+            2 : (2,193),
+            3 : (2,251),
+            4 : (2,308),
+            5 : (2,379),
+            6 : (2,449),
+            7 : (2,526),
+            8 : (2,602),
+            9 : (2,679),
+            10 : (4,340),
+            11 : (4,378),
+            12 : (4,434),
+            13 : (4,490),
+            14 : (4,553),
+            15 : (4,616),
+            16 : (4,658),
+            17 : (6,466),
+            18 : (6,517),
+            19 : (6,567),
+            20 : (6,616),
+            21 : (6,666),
+            22 : (6,719),
+            23 : (6,772),
+            24 : (6,822),
+            25 : (6,873),
+            26 : (6,910),
+            27 : (6,948),
+            28 : None,
+            29 : None,
+            30 : None,
+            31 : None,
+            }
+        
+        #Table 6.1.4.1-2: MCS index table 2 for PUSCH with transform precoding and 64QAM
+        self.nrPuschTpMcsTabQam64LowSE = {
+            0 : (2,30),
+            1 : (2,40),
+            2 : (2,50),
+            3 : (2,64),
+            4 : (2,78),
+            5 : (2,99),
+            6 : (2,120),
+            7 : (2,157),
+            8 : (2,193),
+            9 : (2,251),
+            10 : (2,308),
+            11 : (2,379),
+            12 : (2,449),
+            13 : (2,526),
+            14 : (2,602),
+            15 : (2,679),
+            16 : (4,378),
+            17 : (4,434),
+            18 : (4,490),
+            19 : (4,553),
+            20 : (4,616),
+            21 : (4,658),
+            22 : (4,699),
+            23 : (4,772),
+            24 : (6,567),
+            25 : (6,616),
+            26 : (6,666),
+            27 : (6,772),
+            28 : None,
+            29 : None,
+            30 : None,
+            31 : None,
+            }
+            
 
         
         
@@ -5493,6 +5691,14 @@ class NgNrGridUi(QDialog):
         else:
             self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
             self.nrIniDlBwpGenericLocAndBwEdit.clear()
+            
+    def onIniDlBwpCpCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        #self.ngwin.logEdit.append('-->inside onIniDlBwpCpCombCurIndChanged')
+        self.validateDci10Msg2TimeAllocField()
+        self.validateDci10Msg4TimeAllocField()
     
     def onIniUlBwpLocAndBwEditTextChanged(self, text):
         if not text:
@@ -5776,7 +5982,6 @@ class NgNrGridUi(QDialog):
             return
         
         self.ngwin.logEdit.append('-->inside validateDci10Sib1TimeAllocField')
-        
         row = int(self.nrDci10Sib1TimeAllocFieldEdit.text()) + 1
         key = '%s_%s' % (row, self.nrMibDmRsTypeAPosComb.currentText()[3:])
         if self.coreset0MultiplexingPat == 1:
@@ -5818,12 +6023,26 @@ class NgNrGridUi(QDialog):
         self.nrDci10Sib1TimeAllocSEdit.setText(str(s))
         self.nrDci10Sib1TimeAllocLEdit.setText(str(l))
         
+        #set 'number of cdm group(s) without data' of dmrs for sib1
+        if l == 2:
+            self.nrDmrsSib1CdmGroupsWoDataEdit.setText('1')
+        else:
+            self.nrDmrsSib1CdmGroupsWoDataEdit.setText('2')
+            
+        #set 'dmrs-additionalPosition' of dmrs for sib1
+        if mappingType == 'Type A':
+            self.nrDmrsSib1AddPosComb.setCurrentText('pos2')
+        else:
+            if l == 7:#always normal cp for sib1
+                self.nrDmrsSib1AddPosComb.setCurrentText('pos1')
+            else:
+                self.nrDmrsSib1AddPosComb.setCurrentText('pos0')
+        
     def validateDci10Msg2TimeAllocField(self):
         if not self.nrDci10Msg2TimeAllocFieldEdit.text():
             return
         
         self.ngwin.logEdit.append('-->inside validateDci10Msg2TimeAllocField')
-        
         row = int(self.nrDci10Msg2TimeAllocFieldEdit.text()) + 1
         key = '%s_%s' % (row, self.nrMibDmRsTypeAPosComb.currentText()[3:])
         if self.nrIniDlBwpGenericCpComb.currentText() == 'normal':
@@ -5848,12 +6067,26 @@ class NgNrGridUi(QDialog):
         self.nrDci10Msg2TimeAllocSEdit.setText(str(s))
         self.nrDci10Msg2TimeAllocLEdit.setText(str(l))
         
+        #set 'number of cdm group(s) without data' of dmrs for msg2 
+        if l == 2:
+            self.nrDmrsMsg2CdmGroupsWoDataEdit.setText('1')
+        else:
+            self.nrDmrsMsg2CdmGroupsWoDataEdit.setText('2')
+            
+        #set 'dmrs-additionalPosition' of dmrs for msg2 
+        if mappingType == 'Type A':
+            self.nrDmrsMsg2AddPosComb.setCurrentText('pos2')
+        else:
+            if (l == 7 and self.nrIniDlBwpGenericCpComb.currentText() == 'normal') or (l == 6 and self.nrIniDlBwpGenericCpComb.currentText() == 'extended'):
+                self.nrDmrsMsg2AddPosComb.setCurrentText('pos1')
+            else:
+                self.nrDmrsMsg2AddPosComb.setCurrentText('pos0')
+        
     def validateDci10Msg4TimeAllocField(self):
         if not self.nrDci10Msg4TimeAllocFieldEdit.text():
             return
         
         self.ngwin.logEdit.append('-->inside validateDci10Msg4TimeAllocField')
-        
         row = int(self.nrDci10Msg4TimeAllocFieldEdit.text()) + 1
         key = '%s_%s' % (row, self.nrMibDmRsTypeAPosComb.currentText()[3:])
         if self.nrIniDlBwpGenericCpComb.currentText() == 'normal':
@@ -5877,13 +6110,27 @@ class NgNrGridUi(QDialog):
         self.nrDci10Msg4TimeAllocSlivEdit.setText(str(self.toSliv(s, l, sch='pdsch', type=mappingType, cp=self.nrIniDlBwpGenericCpComb.currentText())))
         self.nrDci10Msg4TimeAllocSEdit.setText(str(s))
         self.nrDci10Msg4TimeAllocLEdit.setText(str(l))
+        
+        #set 'number of cdm group(s) without data' of dmrs for msg4 
+        if l == 2:
+            self.nrDmrsMsg4CdmGroupsWoDataEdit.setText('1')
+        else:
+            self.nrDmrsMsg4CdmGroupsWoDataEdit.setText('2')
+            
+        #set 'dmrs-additionalPosition' of dmrs for msg4 
+        if mappingType == 'Type A':
+            self.nrDmrsMsg4AddPosComb.setCurrentText('pos2')
+        else:
+            if (l == 7 and self.nrIniDlBwpGenericCpComb.currentText() == 'normal') or (l == 6 and self.nrIniDlBwpGenericCpComb.currentText() == 'extended'):
+                self.nrDmrsMsg4AddPosComb.setCurrentText('pos1')
+            else:
+                self.nrDmrsMsg4AddPosComb.setCurrentText('pos0')
     
     def validateDci11PdschTimeAllocField(self):
         if not self.nrDci11PdschTimeAllocFieldEdit.text():
             return
         
         self.ngwin.logEdit.append('-->inside validateDci11PdschTimeAllocField')
-        
         row = int(self.nrDci11PdschTimeAllocFieldEdit.text()) + 1
         if row in range(1, 17):
             #use default time-domain allocation schemes
@@ -5928,7 +6175,6 @@ class NgNrGridUi(QDialog):
             return
         
         self.ngwin.logEdit.append('-->inside validateMsg3PuschTimeAllocField')
-        
         key = int(self.nrMsg3PuschTimeAllocFieldEdit.text()) + 1
         if self.nrIniUlBwpGenericCpComb.currentText() == 'normal':
             if not key in self.nrPuschTimeAllocDefANormCp.keys():
@@ -5951,13 +6197,18 @@ class NgNrGridUi(QDialog):
         self.nrMsg3PuschTimeAllocSlivEdit.setText(str(self.toSliv(s, l, sch='pusch', type=mappingType, cp=self.nrIniUlBwpGenericCpComb.currentText())))
         self.nrMsg3PuschTimeAllocSEdit.setText(str(s))
         self.nrMsg3PuschTimeAllocLEdit.setText(str(l))
+        
+        #set 'number of cdm group(s) without data' of dmrs for msg3
+        if l <= 2 and self.nrRachMsg3TpComb.currentText() == 'disabled':
+            self.nrDmrsMsg3CdmGroupsWoDataEdit.setText('1')
+        else:
+            self.nrDmrsMsg3CdmGroupsWoDataEdit.setText('2')
     
     def validateDci01PuschTimeAllocField(self):
         if not self.nrDci01PuschTimeAllocFieldEdit.text():
             return
         
         self.ngwin.logEdit.append('-->inside validateDci01PuschTimeAllocField')
-        
         key = int(self.nrDci01PuschTimeAllocFieldEdit.text()) + 1
         if key in range(1, 17):
             #use default time-domain allocation schemes
@@ -6491,6 +6742,12 @@ class NgNrGridUi(QDialog):
             self.nrMsg3PuschFreqAllocFieldEdit.setEnabled(False)
         
         self.updateMsg3Pusch2ndHopFreqOff()
+        
+        #set 'dmrs-additionalPosition' of dmrs for msg3
+        if self.nrMsg3PuschFreqAllocFreqHopComb.currentText() == 'disabled':
+            self.nrDmrsMsg3AddPosComb.setCurrentText('pos2')
+        else:
+            self.nrDmrsMsg3AddPosComb.setCurrentText('pos1')
             
     def updateMsg3Pusch2ndHopFreqOff(self):
         if not self.nrMsg3PuschFreqAllocFieldEdit.text():
