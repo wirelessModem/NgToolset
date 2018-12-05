@@ -6585,6 +6585,10 @@ class NgNrGridUi(QDialog):
             return
         
         #self.ngwin.logEdit.append('-->inside onDci01PuschFreqRaTypeCombCurIndChanged')
+        if self.nrDci01PuschFreqAllocTypeComb.currentText() == 'RA Type0' and self.nrDedPuschCfgTpComb.currentText() == 'enabled':
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Transform precoding of PUSCH can only be enabled for resource allocation Type 1!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+            return
+        
         self.updateDedUlBwpInfo()
         
     def updateDedUlBwpInfo(self):
@@ -6755,7 +6759,10 @@ class NgNrGridUi(QDialog):
         
         self.ngwin.logEdit.append('-->inside onDedPuschCfgTpCombCurIndChanged')
         if self.nrDedPuschCfgTpComb.currentText() == 'enabled':
-            #FIXME tp is only supported for ra type1
+            if self.nrDci01PuschFreqAllocTypeComb.currentText() == 'RA Type0':
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Transform precoding of PUSCH can only be enabled for resource allocation Type 1!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+                return
+            
             #self.updateLRBsDedPuschTp()
             self.updateDedUlBwpInfo()
             
