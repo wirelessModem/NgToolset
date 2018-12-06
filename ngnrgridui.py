@@ -634,7 +634,7 @@ class NgNrGridUi(QDialog):
         self.nrDci10Msg2McsEdit.setValidator(QIntValidator(0, 31))
         
         self.nrDci10Msg2TbScalingLabel = QLabel('TB Scaling[0-3]:')
-        self.nrDci10Msg2TbScalingEdit = QLineEdit()
+        self.nrDci10Msg2TbScalingEdit = QLineEdit('0')
         self.nrDci10Msg2TbScalingEdit.setValidator(QIntValidator(0, 3))
         
         self.nrDci10Msg2TbsLabel = QLabel('Transport block size(bits):')
@@ -1790,6 +1790,11 @@ class NgNrGridUi(QDialog):
         self.nrDedPdschCfgMcsTableComb.addItems(['qam64', 'qam256', 'qam64LowSE'])
         self.nrDedPdschCfgMcsTableComb.setCurrentIndex(0)
         
+        self.nrDedPdschCfgXOverheadLabel = QLabel('xOverhead:')
+        self.nrDedPdschCfgXOverheadComb = QComboBox()
+        self.nrDedPdschCfgXOverheadComb.addItems(['xOh0', 'xOh6', 'xOh12', 'xOh18'])
+        self.nrDedPdschCfgXOverheadComb.setCurrentIndex(0)
+        
         dedPdschCfgWidget = QWidget()
         dedPdschCfgGridLayout = QGridLayout()
         dedPdschCfgGridLayout.addWidget(self.nrDedPdschCfgAggFactorLabel, 0, 0)
@@ -1800,6 +1805,8 @@ class NgNrGridUi(QDialog):
         dedPdschCfgGridLayout.addWidget(self.nrDedPdschCfgRbgSizeEdit, 2, 1)
         dedPdschCfgGridLayout.addWidget(self.nrDedPdschCfgMcsTableLabel, 3, 0)
         dedPdschCfgGridLayout.addWidget(self.nrDedPdschCfgMcsTableComb, 3, 1)
+        dedPdschCfgGridLayout.addWidget(self.nrDedPdschCfgXOverheadLabel, 4, 0)
+        dedPdschCfgGridLayout.addWidget(self.nrDedPdschCfgXOverheadComb, 4, 1)
         dedPdschCfgLayout = QVBoxLayout()
         dedPdschCfgLayout.addLayout(dedPdschCfgGridLayout)
         dedPdschCfgLayout.addStretch()
@@ -1821,6 +1828,11 @@ class NgNrGridUi(QDialog):
         self.nrDmrsDedPdschMaxLengthComb.setCurrentIndex(0)
         
         #start ptrs
+        self.nrPtrsPdschSwitchLabel = QLabel('Enable PT-RS:')
+        self.nrPtrsPdschSwitchComb = QComboBox()
+        self.nrPtrsPdschSwitchComb.addItems(['yes', 'no'])
+        self.nrPtrsPdschSwitchComb.setCurrentIndex(1)
+        
         self.nrPtrsPdschTimeDensityLabel = QLabel('timeDensity(L_PTRS):')
         self.nrPtrsPdschTimeDensityComb = QComboBox()
         self.nrPtrsPdschTimeDensityComb.addItems(['1', '2', '4'])
@@ -1853,14 +1865,16 @@ class NgNrGridUi(QDialog):
         ptrsPdschWidget = QGroupBox()
         ptrsPdschWidget.setTitle('PT-RS for PDSCH')
         ptrsPdschWidgetGridLayout = QGridLayout()
-        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschTimeDensityLabel, 0, 0)
-        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschTimeDensityComb, 0, 1)
-        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschFreqDensityLabel, 1, 0)
-        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschFreqDensityComb, 1, 1)
-        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschReOffsetLabel, 2, 0)
-        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschReOffsetComb, 2, 1)
-        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschDmrsAntPortLabel, 3, 0)
-        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschDmrsAntPortEdit, 3, 1)
+        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschSwitchLabel, 0, 0)
+        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschSwitchComb, 0, 1)
+        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschTimeDensityLabel, 1, 0)
+        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschTimeDensityComb, 1, 1)
+        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschFreqDensityLabel, 2, 0)
+        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschFreqDensityComb, 2, 1)
+        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschReOffsetLabel, 3, 0)
+        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschReOffsetComb, 3, 1)
+        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschDmrsAntPortLabel, 4, 0)
+        ptrsPdschWidgetGridLayout.addWidget(self.nrPtrsPdschDmrsAntPortEdit, 4, 1)
         ptrsPdschWidget.setLayout(ptrsPdschWidgetGridLayout)
         
         dmrsDedPdschWidget = QWidget()
@@ -1999,6 +2013,11 @@ class NgNrGridUi(QDialog):
         self.nrDedPuschCfgMcsTableComb.addItems(['qam64', 'qam256', 'qam64LowSE'])
         self.nrDedPuschCfgMcsTableComb.setCurrentIndex(0)
         
+        self.nrDedPuschCfgXOverheadLabel = QLabel('xOverhead:')
+        self.nrDedPuschCfgXOverheadComb = QComboBox()
+        self.nrDedPuschCfgXOverheadComb.addItems(['xOh0', 'xOh6', 'xOh12', 'xOh18'])
+        self.nrDedPuschCfgXOverheadComb.setCurrentIndex(0)
+        
         dedPuschCfgWidget = QWidget()
         dedPuschCfgGridLayout = QGridLayout()
         dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgTxCfgLabel, 0, 0)
@@ -2021,6 +2040,8 @@ class NgNrGridUi(QDialog):
         dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgRbgSizeEdit, 8, 1)
         dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgMcsTableLabel, 9, 0)
         dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgMcsTableComb, 9, 1)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgXOverheadLabel, 10, 0)
+        dedPuschCfgGridLayout.addWidget(self.nrDedPuschCfgXOverheadComb, 10, 1)
         dedPuschCfgLayout = QVBoxLayout()
         dedPuschCfgLayout.addLayout(dedPuschCfgGridLayout)
         dedPuschCfgLayout.addStretch()
@@ -2045,6 +2066,11 @@ class NgNrGridUi(QDialog):
         self.nrDmrsDedPuschRankEdit = QLineEdit()
         
         #start ptrs
+        self.nrPtrsPuschSwitchLabel = QLabel('Enable PT-RS:')
+        self.nrPtrsPuschSwitchComb = QComboBox()
+        self.nrPtrsPuschSwitchComb.addItems(['yes', 'no'])
+        self.nrPtrsPuschSwitchComb.setCurrentIndex(1)
+        
         self.nrPtrsPuschTimeDensityLabel = QLabel('timeDensity(L_PTRS):')
         self.nrPtrsPuschTimeDensityComb = QComboBox()
         self.nrPtrsPuschTimeDensityComb.addItems(['1', '2', '4'])
@@ -2099,16 +2125,18 @@ class NgNrGridUi(QDialog):
         
         ptrsPuschWidget = QWidget()
         ptrsPuschGridLayout = QGridLayout()
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschTimeDensityLabel, 0, 0)
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschTimeDensityComb, 0, 1)
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschFreqDensityLabel, 1, 0)
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschFreqDensityComb, 1, 1)
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschReOffsetLabel, 2, 0)
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschReOffsetComb, 2, 1)
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschMaxNumPortsLabel, 3, 0)
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschMaxNumPortsComb, 3, 1)
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschDmrsAntPortsLabel, 4, 0)
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschDmrsAntPortsEdit, 4, 1)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschSwitchLabel, 0, 0)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschSwitchComb, 0, 1)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschTimeDensityLabel, 1, 0)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschTimeDensityComb, 1, 1)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschFreqDensityLabel, 2, 0)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschFreqDensityComb, 2, 1)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschReOffsetLabel, 3, 0)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschReOffsetComb, 3, 1)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschMaxNumPortsLabel, 4, 0)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschMaxNumPortsComb, 4, 1)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschDmrsAntPortsLabel, 5, 0)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschDmrsAntPortsEdit, 5, 1)
         ptrsPuschLayout = QVBoxLayout()
         ptrsPuschLayout.addLayout(ptrsPuschGridLayout)
         ptrsPuschLayout.addStretch()
@@ -5231,6 +5259,9 @@ class NgNrGridUi(QDialog):
         #valid PUSCH PRB allocations when transforming precoding is enabled
         self.lrbsMsg3PuschTp = []
         self.lrbsDedPuschTp = []
+        
+        #constants
+        self.numScPerPrb = 12
             
         
     def validateScsPerBandFr1(self):
@@ -6962,13 +6993,42 @@ class NgNrGridUi(QDialog):
         
         if len(mcsSet) == 1:
             self.nrPtrsPdschDmrsAntPortEdit.setText(str(dmrsPorts[0]))
-        else:
+        elif len(mcsSet) == 2:
             numAntPortsCw0 = math.floor(len(dmrsPorts) / 2)
             if mcsSet[0] >= mcsSet[1]:
                 self.nrPtrsPdschDmrsAntPortEdit.setText(str(dmrsPorts[0]))
             else:
                 self.nrPtrsPdschDmrsAntPortEdit.setText(str(dmrsPorts[numAntPortsCw0]))
-                
+        else:
+            return
+        
+        #call getTbs
+        if not self.nrDci11PdschTimeAllocLEdit.text() or not self.nrDci11PdschTimeAllocSEdit.text() or not self.nrDci11PdschTimeAllocSlivEdit.text():
+            return
+        
+        if self.nrDci11PdschFreqAllocTypeComb.currentText() == 'RA Type1' and (not self.nrDci11PdschFreqAllocType1LRbsEdit.text() or not self.nrDci11PdschFreqAllocType1RbStartEdit.text() or not self.nrDci11PdschFreqAllocFieldEdit.text()):
+            return
+        
+        if self.nrDci11PdschFreqAllocTypeComb.currentText() == 'RA Type0' and (not self.nrDci11PdschFreqAllocFieldEdit.text() or len(self.nrDci11PdschFreqAllocFieldEdit.text()) != self.bitwidthType0Pdsch or int(self.nrDci11PdschFreqAllocFieldEdit.text(), 2) == 0):
+            return
+                                                                                  
+        td = int(self.nrDci11PdschTimeAllocLEdit.text())
+        if self.nrDci11PdschFreqAllocTypeComb.currentText() == 'RA Type1':
+            fd = int(self.nrDci11PdschFreqAllocType1LRbsEdit.text())
+        else:
+            fd = sum([self.rbgsType0Pdsch[i] for i in range(self.bitwidthType0Pdsch) if self.nrDci11PdschFreqAllocFieldEdit.text()[i] == '1'])
+            
+        tbs = []
+        if len(mcsSet) == 1:
+            tbs.append(self.getTbs(sch='pdsch', tp=0, rnti='c-rnti', tab=self.nrDedPdschCfgMcsTableComb.currentText(), td=td, fd=fd, mcs=mcsSet[0], layer=len(dmrsPorts), xoh=int(self.nrDedPdschCfgXOverheadComb.currentText()[3:]), scale=1))
+        elif len(mcsSet) == 2:
+            numAntPortsCw0 = math.floor(len(dmrsPorts) / 2)
+            tbs.append(self.getTbs(sch='pdsch', tp=0, rnti='c-rnti', tab=self.nrDedPdschCfgMcsTableComb.currentText(), td=td, fd=fd, mcs=mcsSet[0], layer=numAntPortsCw0, dmrs = 0, xoh=int(self.nrDedPdschCfgXOverheadComb.currentText()[3:]), scale=1))
+            tbs.append(self.getTbs(sch='pdsch', tp=0, rnti='c-rnti', tab=self.nrDedPdschCfgMcsTableComb.currentText(), td=td, fd=fd, mcs=mcsSet[1], layer=len(dmrsPorts)-numAntPortsCw0, dmrs = 0, xoh=int(self.nrDedPdschCfgXOverheadComb.currentText()[3:]), scale=1))
+        else:
+            return
+        
+        self.nrDci11PdschTbsEdit.setText(','.join([str(i) for i in tbs if i is not None]))
         
     def onDmrsDedPuschMaxLengthCombCurIndChanged(self, index):
         if index < 0:
@@ -7534,6 +7594,99 @@ class NgNrGridUi(QDialog):
             #self.updateLRBsDedPuschTp()
             self.updateDedUlBwpInfo()
             
+    def getTbs(self, sch='pdsch', tp=0, rnti='c-rnti', tab='qam64', td=1, fd=1, mcs=0, layer=1, dmrs=0, xoh=0, scale=1):
+        self.ngwin.logEdit.append('---->inside getTbs: sch="%s", tp=%d, rnti="%s", tab="%s", td=%d, fd=%d, mcs=%d, layer=%d, dmrs=%d, xoh=%d, scale=%.2f' % (sch, tp, rnti, tab, td, fd, mcs, layer, dmrs, xoh, scale)) 
+        
+        if rnti not in ('c-rnti', 'si-rnti', 'ra-rnti', 'tc-rnti', 'msg3'):
+            return None
+        
+        if tab not in ('qam256', 'qam64', 'qam64LowSE'):
+            return None
+        
+        #reset xoh to 0 for PDSCH when rnti='SI-RNTI', 'RA-RNTI' and for Msg3 PUSCH
+        if rnti in ('si-rnti', 'ra-rnti', 'msg3'):
+            xoh = 0
+        
+        #reset scale to 1 for PDSCH when rnti is not 'RA-RNTI' and for PUSCH
+        if rnti != 'ra-rnti':
+            scale = 1
+        
+        #refer to 3GPP 38.214 vf30
+        #5.1.3	Modulation order, target code rate, redundancy version and transport block size determination
+        #6.1.4	Modulation order, redundancy version and transport block size determination
+        
+        #1st step: get Qm and R(x1024)
+        if sch == 'pdsch' or (sch == 'pusch' and tp == 0):
+            if rnti == 'c-rnti' and tab == 'qam256':
+                val = self.nrPdschMcsTabQam256[mcs]
+                if val is None:
+                    return None
+            elif rnti == 'c-rnti' and tab == 'qam64LowSE':
+                val = self.nrPdschMcsTabQam64LowSE[mcs]
+                if val is None:
+                    return None
+            else:
+                val = self.nrPdschMcsTabQam64[mcs]
+                if val is None:
+                    return None
+            pass
+        elif sch == 'pusch' and tp == 1:
+            if rnti == 'c-rnti' and tab == 'qam256':
+                val = self.nrPdschMcsTabQam256[mcs]
+                if val is None:
+                    return None
+            elif rnti == 'c-rnti' and tab == 'qam64LowSE':
+                val = self.nrPuschTpMcsTabQam64LowSE[mcs]
+                if val is None:
+                    return None
+            else:
+                val = self.nrPuschTpMcsTabQam64[mcs]
+                if val is None:
+                    return None
+        else:
+            return None
+        
+        Qm, R = val
+        if rnti in ('si-rnti', 'ra-rnti') and Qm > 2:
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: The UE is not expected to decode a PDSCH scheduled with P-RNTI, RA-RNTI, SI-RNTI and Qm > 2!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+            return None
+        
+        #2nd step: get N_RE
+        N_RE = self.numScPerPrb * td - dmrs - xoh
+        N_RE = min(156, N_RE) * fd
+        
+        #3rd step: get N_info
+        N_info = math.ceil(scale * N_RE * R * Qm * layer / 1024)
+        if N_info <= 3824:
+            #4th step: get TBS
+            n = max(3, math.floor(math.log2(N_info)) - 6)
+            N_info = max(24, 2 ** n * math.floor(N_info / 2 ** n))
+            
+            tbs = None
+            for i in self.nrTbsTabLessThan3824:
+                if i >= N_info:
+                    tbs = i
+                    break
+        else:
+            #5th step: get TBS
+            n = math.floor(math.log2(N_info - 24)) - 5
+            N_info = max(3840, 2 ** n * math.ceil((N_info - 24) / 2 ** n))
+            if R <= 256:
+                C = math.ceil((N_info + 24) / 3816)
+                tbs = 8 * C * math.ceil((N_info + 24) / (8 * C)) - 24
+            else:
+                if N_info > 8424:
+                    C = math.ceil((N_info + 24) / 8424)
+                    tbs = 8 * C * math.ceil((N_info + 24) / (8 * C)) - 24
+                else:
+                    tbs = 8 * math.ceil((N_info + 24) / 8 ) - 24
+        
+        if rnti == 'si-rnti' and tbs is not None and tbs > 2976:
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: The UE is not expected to receive a PDSCH assigned by a PDCCH with CRC scrambled by SI-RNTI with a TBS exceeding 2976 bits!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+            return None
+        
+        return tbs
+
     def onOkBtnClicked(self):
         self.ngwin.logEdit.append('-->inside onOkBtnClicked')
         #TODO
