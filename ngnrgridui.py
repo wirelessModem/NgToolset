@@ -3304,6 +3304,7 @@ class NgNrGridUi(QDialog):
         self.nrDmrsDedPdschMaxLengthComb.currentIndexChanged.connect(self.onDmrsDedPdschMaxLengthCombCurIndChanged)
         self.nrDmrsDedPdschMaxLengthComb.currentIndexChanged.connect(self.onDmrsDedPdschDmrsTypeOrMaxLengthCombCurIndChanged)
         self.nrDmrsDedPdschDmrsTypeComb.currentIndexChanged.connect(self.onDmrsDedPdschDmrsTypeOrMaxLengthCombCurIndChanged)
+        self.nrDmrsDedPdschAddPosComb.currentIndexChanged.connect(self.onDmrsDedPdschAddPosCombCurIndChanged)
         self.nrDedPdschCfgMcsTableComb.currentIndexChanged.connect(self.onDedPdschCfgMcsTableCombCurIndChanged)
         self.nrDedPdschCfgXOverheadComb.currentIndexChanged.connect(self.onDedPdschCfgXOverheadCombCurIndChanged)
         #---->dedicated ul bwp
@@ -5302,32 +5303,32 @@ class NgNrGridUi(QDialog):
         
         #Table 7.4.1.1.2-4: PDSCH DM-RS positions l- for double-symbol DM-RS.
         self.nrDmrsPdschPosTwoSymbs = {
-            '2_Type A_pos0' : None, '2_Type A_pos1' : None, '2_Type A_pos2' : None, '2_Type A_pos3' : None,
-            '3_Type A_pos0' : None, '3_Type A_pos1' : None, '3_Type A_pos2' : None, '3_Type A_pos3' : None,
-            '4_Type A_pos0' : (0,), '4_Type A_pos1' : (0,), '4_Type A_pos2' : None, '4_Type A_pos3' : None,
-            '5_Type A_pos0' : (0,), '5_Type A_pos1' : (0,), '5_Type A_pos2' : None, '5_Type A_pos3' : None,
-            '6_Type A_pos0' : (0,), '6_Type A_pos1' : (0,), '6_Type A_pos2' : None, '6_Type A_pos3' : None,
-            '7_Type A_pos0' : (0,), '7_Type A_pos1' : (0,), '7_Type A_pos2' : None, '7_Type A_pos3' : None,
-            '8_Type A_pos0' : (0,), '8_Type A_pos1' : (0,), '8_Type A_pos2' : None, '8_Type A_pos3' : None,
-            '9_Type A_pos0' : (0,), '9_Type A_pos1' : (0,), '9_Type A_pos2' : None, '9_Type A_pos3' : None,
-            '10_Type A_pos0' : (0,), '10_Type A_pos1' : (0, 8,), '10_Type A_pos2' : None, '10_Type A_pos3' : None,
-            '11_Type A_pos0' : (0,), '11_Type A_pos1' : (0, 8,), '11_Type A_pos2' : None, '11_Type A_pos3' : None,
-            '12_Type A_pos0' : (0,), '12_Type A_pos1' : (0, 8,), '12_Type A_pos2' : None, '12_Type A_pos3' : None,
-            '13_Type A_pos0' : (0,), '13_Type A_pos1' : (0, 10,), '13_Type A_pos2' : None, '13_Type A_pos3' : None,
-            '14_Type A_pos0' : (0,), '14_Type A_pos1' : (0, 10,), '14_Type A_pos2' : None, '14_Type A_pos3' : None,
-            '2_Type B_pos0' : None, '2_Type B_pos1' : None, '2_Type B_pos2' : None, '2_Type B_pos3' : None,
-            '3_Type B_pos0' : None, '3_Type B_pos1' : None, '3_Type B_pos2' : None, '3_Type B_pos3' : None,
-            '4_Type B_pos0' : None, '4_Type B_pos1' : None, '4_Type B_pos2' : None, '4_Type B_pos3' : None,
-            '5_Type B_pos0' : None, '5_Type B_pos1' : None, '5_Type B_pos2' : None, '5_Type B_pos3' : None,
-            '6_Type B_pos0' : None, '6_Type B_pos1' : (0,), '6_Type B_pos2' : (0,), '6_Type B_pos3' : None,
-            '7_Type B_pos0' : None, '7_Type B_pos1' : (0,), '7_Type B_pos2' : (0,), '7_Type B_pos3' : None,
-            '8_Type B_pos0' : None, '8_Type B_pos1' : None, '8_Type B_pos2' : None, '8_Type B_pos3' : None,
-            '9_Type B_pos0' : None, '9_Type B_pos1' : None, '9_Type B_pos2' : None, '9_Type B_pos3' : None,
-            '10_Type B_pos0' : None, '10_Type B_pos1' : None, '10_Type B_pos2' : None, '10_Type B_pos3' : None,
-            '11_Type B_pos0' : None, '11_Type B_pos1' : None, '11_Type B_pos2' : None, '11_Type B_pos3' : None,
-            '12_Type B_pos0' : None, '12_Type B_pos1' : None, '12_Type B_pos2' : None, '12_Type B_pos3' : None,
-            '13_Type B_pos0' : None, '13_Type B_pos1' : None, '13_Type B_pos2' : None, '13_Type B_pos3' : None,
-            '14_Type B_pos0' : None, '14_Type B_pos1' : None, '14_Type B_pos2' : None, '14_Type B_pos3' : None,
+            '2_Type A_pos0' : None, '2_Type A_pos1' : None,  
+            '3_Type A_pos0' : None, '3_Type A_pos1' : None,  
+            '4_Type A_pos0' : (0,), '4_Type A_pos1' : (0,),  
+            '5_Type A_pos0' : (0,), '5_Type A_pos1' : (0,),  
+            '6_Type A_pos0' : (0,), '6_Type A_pos1' : (0,),  
+            '7_Type A_pos0' : (0,), '7_Type A_pos1' : (0,),  
+            '8_Type A_pos0' : (0,), '8_Type A_pos1' : (0,),  
+            '9_Type A_pos0' : (0,), '9_Type A_pos1' : (0,),  
+            '10_Type A_pos0' : (0,), '10_Type A_pos1' : (0, 8,),  
+            '11_Type A_pos0' : (0,), '11_Type A_pos1' : (0, 8,),  
+            '12_Type A_pos0' : (0,), '12_Type A_pos1' : (0, 8,),  
+            '13_Type A_pos0' : (0,), '13_Type A_pos1' : (0, 10,),  
+            '14_Type A_pos0' : (0,), '14_Type A_pos1' : (0, 10,),  
+            '2_Type B_pos0' : None, '2_Type B_pos1' : None,  
+            '3_Type B_pos0' : None, '3_Type B_pos1' : None,  
+            '4_Type B_pos0' : None, '4_Type B_pos1' : None,  
+            '5_Type B_pos0' : None, '5_Type B_pos1' : None,  
+            '6_Type B_pos0' : (0,), '6_Type B_pos1' : (0,),  
+            '7_Type B_pos0' : (0,), '7_Type B_pos1' : (0,),  
+            '8_Type B_pos0' : None, '8_Type B_pos1' : None,  
+            '9_Type B_pos0' : None, '9_Type B_pos1' : None,  
+            '10_Type B_pos0' : None, '10_Type B_pos1' : None,  
+            '11_Type B_pos0' : None, '11_Type B_pos1' : None,  
+            '12_Type B_pos0' : None, '12_Type B_pos1' : None,  
+            '13_Type B_pos0' : None, '13_Type B_pos1' : None,  
+            '14_Type B_pos0' : None, '14_Type B_pos1' : None,  
             }
         
         #Table 6.4.1.1.3-3: PUSCH DM-RS positions l- within a slot for single-symbol DM-RS and intra-slot frequency hopping disabled.
@@ -5364,34 +5365,34 @@ class NgNrGridUi(QDialog):
         
         #Table 6.4.1.1.3-4: PUSCH DM-RS positions l- within a slot for double-symbol DM-RS and intra-slot frequency hopping disabled.
         self.nrDmrsPuschTwoSymbsWoItraSlotFh = {
-            '1_Type A_pos0' : None, '1_Type A_pos1' : None, '1_Type A_pos2' : None, '1_Type A_pos3' : None,
-            '2_Type A_pos0' : None, '2_Type A_pos1' : None, '2_Type A_pos2' : None, '2_Type A_pos3' : None,
-            '3_Type A_pos0' : None, '3_Type A_pos1' : None, '3_Type A_pos2' : None, '3_Type A_pos3' : None,
-            '4_Type A_pos0' : (0,), '4_Type A_pos1' : (0,), '4_Type A_pos2' : None, '4_Type A_pos3' : None,
-            '5_Type A_pos0' : (0,), '5_Type A_pos1' : (0,), '5_Type A_pos2' : None, '5_Type A_pos3' : None,
-            '6_Type A_pos0' : (0,), '6_Type A_pos1' : (0,), '6_Type A_pos2' : None, '6_Type A_pos3' : None,
-            '7_Type A_pos0' : (0,), '7_Type A_pos1' : (0,), '7_Type A_pos2' : None, '7_Type A_pos3' : None,
-            '8_Type A_pos0' : (0,), '8_Type A_pos1' : (0,), '8_Type A_pos2' : None, '8_Type A_pos3' : None,
-            '9_Type A_pos0' : (0,), '9_Type A_pos1' : (0,), '9_Type A_pos2' : None, '9_Type A_pos3' : None,
-            '10_Type A_pos0' : (0,), '10_Type A_pos1' : (0, 8,), '10_Type A_pos2' : None, '10_Type A_pos3' : None,
-            '11_Type A_pos0' : (0,), '11_Type A_pos1' : (0, 8,), '11_Type A_pos2' : None, '11_Type A_pos3' : None,
-            '12_Type A_pos0' : (0,), '12_Type A_pos1' : (0, 8,), '12_Type A_pos2' : None, '12_Type A_pos3' : None,
-            '13_Type A_pos0' : (0,), '13_Type A_pos1' : (0, 10,), '13_Type A_pos2' : None, '13_Type A_pos3' : None,
-            '14_Type A_pos0' : (0,), '14_Type A_pos1' : (0, 10,), '14_Type A_pos2' : None, '14_Type A_pos3' : None,
-            '1_Type B_pos0' : None, '1_Type B_pos1' : None, '1_Type B_pos2' : None, '1_Type B_pos3' : None,
-            '2_Type B_pos0' : None, '2_Type B_pos1' : None, '2_Type B_pos2' : None, '2_Type B_pos3' : None,
-            '3_Type B_pos0' : None, '3_Type B_pos1' : None, '3_Type B_pos2' : None, '3_Type B_pos3' : None,
-            '4_Type B_pos0' : None, '4_Type B_pos1' : None, '4_Type B_pos2' : None, '4_Type B_pos3' : None,
-            '5_Type B_pos0' : (0,), '5_Type B_pos1' : (0,), '5_Type B_pos2' : None, '5_Type B_pos3' : None,
-            '6_Type B_pos0' : (0,), '6_Type B_pos1' : (0,), '6_Type B_pos2' : None, '6_Type B_pos3' : None,
-            '7_Type B_pos0' : (0,), '7_Type B_pos1' : (0,), '7_Type B_pos2' : None, '7_Type B_pos3' : None,
-            '8_Type B_pos0' : (0,), '8_Type B_pos1' : (0, 5,), '8_Type B_pos2' : None, '8_Type B_pos3' : None,
-            '9_Type B_pos0' : (0,), '9_Type B_pos1' : (0, 5,), '9_Type B_pos2' : None, '9_Type B_pos3' : None,
-            '10_Type B_pos0' : (0,), '10_Type B_pos1' : (0, 7,), '10_Type B_pos2' : None, '10_Type B_pos3' : None,
-            '11_Type B_pos0' : (0,), '11_Type B_pos1' : (0, 7,), '11_Type B_pos2' : None, '11_Type B_pos3' : None,
-            '12_Type B_pos0' : (0,), '12_Type B_pos1' : (0, 9,), '12_Type B_pos2' : None, '12_Type B_pos3' : None,
-            '13_Type B_pos0' : (0,), '13_Type B_pos1' : (0, 9,), '13_Type B_pos2' : None, '13_Type B_pos3' : None,
-            '14_Type B_pos0' : (0,), '14_Type B_pos1' : (0, 9,), '14_Type B_pos2' : None, '14_Type B_pos3' : None,
+            '1_Type A_pos0' : None, '1_Type A_pos1' : None,  
+            '2_Type A_pos0' : None, '2_Type A_pos1' : None,  
+            '3_Type A_pos0' : None, '3_Type A_pos1' : None,  
+            '4_Type A_pos0' : (0,), '4_Type A_pos1' : (0,),  
+            '5_Type A_pos0' : (0,), '5_Type A_pos1' : (0,),  
+            '6_Type A_pos0' : (0,), '6_Type A_pos1' : (0,),  
+            '7_Type A_pos0' : (0,), '7_Type A_pos1' : (0,),  
+            '8_Type A_pos0' : (0,), '8_Type A_pos1' : (0,),  
+            '9_Type A_pos0' : (0,), '9_Type A_pos1' : (0,),  
+            '10_Type A_pos0' : (0,), '10_Type A_pos1' : (0, 8,),  
+            '11_Type A_pos0' : (0,), '11_Type A_pos1' : (0, 8,),  
+            '12_Type A_pos0' : (0,), '12_Type A_pos1' : (0, 8,),  
+            '13_Type A_pos0' : (0,), '13_Type A_pos1' : (0, 10,),  
+            '14_Type A_pos0' : (0,), '14_Type A_pos1' : (0, 10,),  
+            '1_Type B_pos0' : None, '1_Type B_pos1' : None,  
+            '2_Type B_pos0' : None, '2_Type B_pos1' : None,  
+            '3_Type B_pos0' : None, '3_Type B_pos1' : None,  
+            '4_Type B_pos0' : None, '4_Type B_pos1' : None,  
+            '5_Type B_pos0' : (0,), '5_Type B_pos1' : (0,),  
+            '6_Type B_pos0' : (0,), '6_Type B_pos1' : (0,),  
+            '7_Type B_pos0' : (0,), '7_Type B_pos1' : (0,),  
+            '8_Type B_pos0' : (0,), '8_Type B_pos1' : (0, 5,),  
+            '9_Type B_pos0' : (0,), '9_Type B_pos1' : (0, 5,),  
+            '10_Type B_pos0' : (0,), '10_Type B_pos1' : (0, 7,),  
+            '11_Type B_pos0' : (0,), '11_Type B_pos1' : (0, 7,),  
+            '12_Type B_pos0' : (0,), '12_Type B_pos1' : (0, 9,),  
+            '13_Type B_pos0' : (0,), '13_Type B_pos1' : (0, 9,),  
+            '14_Type B_pos0' : (0,), '14_Type B_pos1' : (0, 9,),  
             }
         
         #Table 6.4.1.1.3-6: PUSCH DM-RS positions l- within a slot for single-symbol DM-RS and intra-slot frequency hopping enabled. 
@@ -7199,17 +7200,36 @@ class NgNrGridUi(QDialog):
         self.nrDmrsDedPdschDmrsPortsEdit.setText(','.join([str(i) for i in dmrsPorts]))
         self.nrDmrsDedPdschFrontLoadSymbsEdit.setText(str(numDmrsSymbs))
         
-        #set ptrs for pdsch 
-        if len(mcsSet) == 1:
-            self.nrPtrsPdschDmrsAntPortEdit.setText(str(dmrsPorts[0]))
-        elif len(mcsSet) == 2:
-            numAntPortsCw0 = math.floor(len(dmrsPorts) / 2)
-            if mcsSet[0] >= mcsSet[1]:
-                self.nrPtrsPdschDmrsAntPortEdit.setText(str(dmrsPorts[0]))
-            else:
-                self.nrPtrsPdschDmrsAntPortEdit.setText(str(dmrsPorts[numAntPortsCw0]))
+        #check and set ptrs for pdsch 
+        #refer to 3GPP 38.214 vf30
+        '''
+        If a UE receiving PDSCH is configured with the higher layer parameter PTRS-DownlinkConfig, the UE may assume that the following configurations are not occurring simultaneously for the received PDSCH:
+            -	any DM-RS ports among 1004-1007 or 1006-1011 for DM-RS configurations type 1 and type 2, respectively are scheduled for the UE and the other UE(s) sharing the DM-RS REs on the same CDM group(s), and
+            -	PT-RS is transmitted to the UE.
+        '''
+        dmrsApSetNoPtrs = list(range(4, 8)) if dmrsType == 'Type 1' else list(range(6, 12))
+        noPtrs = False
+        for i in dmrsPorts:
+            if i in dmrsApSetNoPtrs:
+                noPtrs = True
+                break
+        
+        if noPtrs:
+            self.nrPtrsPdschSwitchComb.setCurrentText('no')
+            self.nrPtrsPdschSwitchComb.setEnabled(False)
+            self.nrPtrsPdschDmrsAntPortEdit.clear()
         else:
-            return
+            self.nrPtrsPdschSwitchComb.setEnabled(True)
+            if len(mcsSet) == 1:
+                self.nrPtrsPdschDmrsAntPortEdit.setText(str(dmrsPorts[0]))
+            elif len(mcsSet) == 2:
+                numAntPortsCw0 = math.floor(len(dmrsPorts) / 2)
+                if mcsSet[0] >= mcsSet[1]:
+                    self.nrPtrsPdschDmrsAntPortEdit.setText(str(dmrsPorts[0]))
+                else:
+                    self.nrPtrsPdschDmrsAntPortEdit.setText(str(dmrsPorts[numAntPortsCw0]))
+            else:
+                return
         
         #set tbs by calling getTbs
         if not self.nrDci11PdschTimeAllocLEdit.text() or not self.nrDci11PdschTimeAllocSEdit.text() or not self.nrDci11PdschTimeAllocSlivEdit.text():
@@ -7227,14 +7247,41 @@ class NgNrGridUi(QDialog):
         else:
             fd = sum([self.rbgsType0Pdsch[i] for i in range(self.bitwidthType0Pdsch) if self.nrDci11PdschFreqAllocFieldEdit.text()[i] == '1'])
             
-        #FIXME dmrs overhead calculation
+        #calculate dmrs overhead
+        key = '%s_%s_%s' % (td, self.nrDci11PdschTimeAllocMappingTypeComb.currentText(), self.nrDmrsDedPdschAddPosComb.currentText())
+        if numDmrsSymbs == 1:
+            if not key in self.nrDmrsPdschPosOneSymb.keys() or self.nrDmrsPdschPosOneSymb[key] is None:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(="%s") when referring nrDmrsPdschPosOneSymb!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                return
+            val = self.nrDmrsPdschPosOneSymb[key]
+        else:
+            if not key in self.nrDmrsPdschPosTwoSymbs.keys() or self.nrDmrsPdschPosTwoSymbs[key] is None:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(="%s") when referring nrDmrsPdschPosTwoSymbs!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                return
+            val = self.nrDmrsPdschPosOneSymb[key]
+        
+        #refer to 3GPP 38.211 vf30
+        #For PDSCH mapping type A, duration of 3 and 4 symbols in Tables 7.4.1.1.2-3 and 7.4.1.1.2-4 respectively is only applicable when dmrs-TypeA-Position is equal to 'pos2'.
+        if self.nrDci11PdschTimeAllocMappingTypeComb.currentText() == 'Type A' and len(val) in (3, 4) and self.nrMibDmRsTypeAPosComb.currentText() != 'pos2':
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: For PDSCH mapping type A, duration of 3 and 4 symbols in Tables 7.4.1.1.2-3 and 7.4.1.1.2-4 respectively is only applicable when dmrs-TypeA-Position is equal to "pos2".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+            return
+        
+        #FIXME For PDSCH mapping type B, when PDSCH allocation collides with CORESET/SearchSpace
+        #For PDSCH mapping type B, if the PDSCH duration is 2 or 4 OFDM symbols, only single-symbol DM-RS is supported.
+        if self.nrDci11PdschTimeAllocMappingTypeComb.currentText() == 'Type B' and td in (2, 4) and numDmrsSymbs != 1:
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: For PDSCH mapping type B, if the PDSCH duration is 2 or 4 OFDM symbols, only single-symbol DM-RS is supported.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+            return
+        
+        dmrsOh = (2 * cdmGroups) * len(val)
+        self.ngwin.logEdit.append('DMRS overhead: cdmGroupsWoData=%d, key="%s", val=%s' % (cdmGroups, key, val))
+        
         tbs = []
         if len(mcsSet) == 1:
-            tbs.append(self.getTbs(sch='pdsch', tp=0, rnti='c-rnti', tab=self.nrDedPdschCfgMcsTableComb.currentText(), td=td, fd=fd, mcs=mcsSet[0], layer=len(dmrsPorts), dmrs=0, xoh=int(self.nrDedPdschCfgXOverheadComb.currentText()[3:]), scale=1))
+            tbs.append(self.getTbs(sch='pdsch', tp=0, rnti='c-rnti', tab=self.nrDedPdschCfgMcsTableComb.currentText(), td=td, fd=fd, mcs=mcsSet[0], layer=len(dmrsPorts), dmrs=dmrsOh, xoh=int(self.nrDedPdschCfgXOverheadComb.currentText()[3:]), scale=1))
         elif len(mcsSet) == 2:
             numAntPortsCw0 = math.floor(len(dmrsPorts) / 2)
-            tbs.append(self.getTbs(sch='pdsch', tp=0, rnti='c-rnti', tab=self.nrDedPdschCfgMcsTableComb.currentText(), td=td, fd=fd, mcs=mcsSet[0], layer=numAntPortsCw0, dmrs=0, xoh=int(self.nrDedPdschCfgXOverheadComb.currentText()[3:]), scale=1))
-            tbs.append(self.getTbs(sch='pdsch', tp=0, rnti='c-rnti', tab=self.nrDedPdschCfgMcsTableComb.currentText(), td=td, fd=fd, mcs=mcsSet[1], layer=len(dmrsPorts)-numAntPortsCw0, dmrs=0, xoh=int(self.nrDedPdschCfgXOverheadComb.currentText()[3:]), scale=1))
+            tbs.append(self.getTbs(sch='pdsch', tp=0, rnti='c-rnti', tab=self.nrDedPdschCfgMcsTableComb.currentText(), td=td, fd=fd, mcs=mcsSet[0], layer=numAntPortsCw0, dmrs=dmrsOh, xoh=int(self.nrDedPdschCfgXOverheadComb.currentText()[3:]), scale=1))
+            tbs.append(self.getTbs(sch='pdsch', tp=0, rnti='c-rnti', tab=self.nrDedPdschCfgMcsTableComb.currentText(), td=td, fd=fd, mcs=mcsSet[1], layer=len(dmrsPorts)-numAntPortsCw0, dmrs=dmrsOh, xoh=int(self.nrDedPdschCfgXOverheadComb.currentText()[3:]), scale=1))
         else:
             return
         
@@ -7251,6 +7298,18 @@ class NgNrGridUi(QDialog):
         else:
             self.nrDmrsDedPuschAddPosComb.clear()
             self.nrDmrsDedPuschAddPosComb.addItems(['pos0', 'pos1'])
+            
+    def onDmrsDedPdschAddPosCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onDmrsDedPdschAddPosCombCurIndChanged')
+        #refer to 3GPP 38.211 vf30 7.4.1.1.2
+        #The case dmrs-AdditionalPosition equals to 'pos3' is only supported when dmrs-TypeA-Position is equal to 'pos2'.
+        if self.nrDmrsDedPdschAddPosComb.currentText() == 'pos3' and self.nrMibDmRsTypeAPosComb.currentText() != 'pos2':
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: The case dmrs-AdditionalPosition equals to "pos3" is only supported when dmrs-TypeA-Position is equal to "pos2"! Reset dmrs-AdditionalPosition to "pos0".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+            self.nrDmrsDedPdschAddPosComb.setCurrentText('pos0')
+            return
         
     def onDci11PdschFreqRaTypeCombCurIndChanged(self, index):
         if index < 0:
