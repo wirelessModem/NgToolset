@@ -6119,6 +6119,12 @@ class NgNrGridUi(QDialog):
                     self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid setting: S of SLIV = %s but dmrs-TypeA-Position = "%s" when PDSCH mapping type is "Type A"!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.nrDci11PdschTimeAllocSEdit.text(), self.nrMibDmRsTypeAPosComb.currentText()))
                     self.nrDci11PdschTimeAllocSEdit.clear()
         
+        #validate 'dmrs-AdditionalPosition' of dmrs for pdsch
+        if self.nrDmrsDedPdschAddPosComb.currentText() == 'pos3' and self.nrMibDmRsTypeAPosComb.currentText() != 'pos2':
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: The case dmrs-AdditionalPosition equals to "pos3" is only supported when dmrs-TypeA-Position is equal to "pos2"! Reset dmrs-AdditionalPosition to "pos0".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+            self.nrDmrsDedPdschAddPosComb.setCurrentText('pos0')
+            return
+        
     def onTddCfgPat2PeriodCombCurIndChanged(self, index):
         if index < 0:
             pass
