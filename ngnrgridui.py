@@ -6596,6 +6596,45 @@ class NgNrGridUi(QDialog):
             else:
                 self.nrDmrsSib1AddPosComb.setCurrentText('pos0')
         
+        #update tbs
+        self.updateDci10Sib1Tbs()
+        
+    def updateDci10Sib1Tbs(self):
+        self.ngwin.logEdit.append('-->inside updateDci10Sib1Tbs')
+        if not self.nrDci10Sib1TimeAllocFieldEdit.text() or not self.nrDci10Sib1TimeAllocLEdit.text() or not self.nrDci10Sib1TimeAllocSEdit.text() or not self.nrDci10Sib1TimeAllocSlivEdit.text():
+            return
+        
+        if not self.nrDci10Sib1FreqAllocType1LRbsEdit.text() or not self.nrDci10Sib1FreqAllocType1RbStartEdit.text() or not self.nrDci10Sib1FreqAllocFieldEdit.text():
+            return
+        
+        if not self.nrDci10Sib1McsEdit.text():
+            return
+        
+        td = int(self.nrDci10Sib1TimeAllocLEdit.text())
+        fd = int(self.nrDci10Sib1FreqAllocType1LRbsEdit.text())
+        mcs = int(self.nrDci10Sib1McsEdit.text())
+            
+        #calculate dmrs overhead
+        key = '%s_%s_%s' % (td, self.nrDci10Sib1TimeAllocMappingTypeComb.currentText(), self.nrDmrsSib1AddPosComb.currentText())
+        if not key in self.nrDmrsPdschPosOneSymb.keys() or self.nrDmrsPdschPosOneSymb[key] is None:
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(="%s") when referring nrDmrsPdschPosOneSymb!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+            return
+        val = self.nrDmrsPdschPosOneSymb[key]
+        
+        #refer to 3GPP 38.211 vf30
+        #For PDSCH mapping type A, duration of 3 and 4 symbols in Tables 7.4.1.1.2-3 and 7.4.1.1.2-4 respectively is only applicable when dmrs-TypeA-Position is equal to 'pos2'.
+        if self.nrDci10Sib1TimeAllocMappingTypeComb.currentText() == 'Type A' and len(val) in (3, 4) and self.nrMibDmRsTypeAPosComb.currentText() != 'pos2':
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: For PDSCH mapping type A, duration of 3 and 4 symbols in Tables 7.4.1.1.2-3 and 7.4.1.1.2-4 respectively is only applicable when dmrs-TypeA-Position is equal to "pos2".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+            return
+        
+        #FIXME For PDSCH mapping type B, when PDSCH allocation collides with CORESET/SearchSpace
+        
+        dmrsOh = (2 * int(self.nrDmrsSib1CdmGroupsWoDataEdit.text())) * len(val)
+        self.ngwin.logEdit.append('SIB1 DMRS overhead: cdmGroupsWoData=%s, key="%s", val=%s' % (self.nrDmrsSib1CdmGroupsWoDataEdit.text(), key, val))
+        
+        tbs = self.getTbs(sch='pdsch', tp=0, rnti='si-rnti', tab='qam64', td=td, fd=fd, mcs=mcs, layer=1, dmrs=dmrsOh, xoh=0, scale=1)
+        self.nrDci10Sib1TbsEdit.setText(str(tbs) if tbs is not None else '')
+    
     def validateDci10Msg2TimeAllocField(self):
         if not self.nrDci10Msg2TimeAllocFieldEdit.text():
             return
@@ -6640,6 +6679,45 @@ class NgNrGridUi(QDialog):
             else:
                 self.nrDmrsMsg2AddPosComb.setCurrentText('pos0')
         
+        #update tbs
+        self.updateDci10Msg2Tbs()
+    
+    def updateDci10Msg2Tbs(self):
+        self.ngwin.logEdit.append('-->inside updateDci10Msg2Tbs')
+        if not self.nrDci10Msg2TimeAllocFieldEdit.text() or not self.nrDci10Msg2TimeAllocLEdit.text() or not self.nrDci10Msg2TimeAllocSEdit.text() or not self.nrDci10Msg2TimeAllocSlivEdit.text():
+            return
+        
+        if not self.nrDci10Msg2FreqAllocType1LRbsEdit.text() or not self.nrDci10Msg2FreqAllocType1RbStartEdit.text() or not self.nrDci10Msg2FreqAllocFieldEdit.text():
+            return
+        
+        if not self.nrDci10Msg2McsEdit.text():
+            return
+        
+        td = int(self.nrDci10Msg2TimeAllocLEdit.text())
+        fd = int(self.nrDci10Msg2FreqAllocType1LRbsEdit.text())
+        mcs = int(self.nrDci10Msg2McsEdit.text())
+            
+        #calculate dmrs overhead
+        key = '%s_%s_%s' % (td, self.nrDci10Msg2TimeAllocMappingTypeComb.currentText(), self.nrDmrsMsg2AddPosComb.currentText())
+        if not key in self.nrDmrsPdschPosOneSymb.keys() or self.nrDmrsPdschPosOneSymb[key] is None:
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(="%s") when referring nrDmrsPdschPosOneSymb!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+            return
+        val = self.nrDmrsPdschPosOneSymb[key]
+        
+        #refer to 3GPP 38.211 vf30
+        #For PDSCH mapping type A, duration of 3 and 4 symbols in Tables 7.4.1.1.2-3 and 7.4.1.1.2-4 respectively is only applicable when dmrs-TypeA-Position is equal to 'pos2'.
+        if self.nrDci10Msg2TimeAllocMappingTypeComb.currentText() == 'Type A' and len(val) in (3, 4) and self.nrMibDmRsTypeAPosComb.currentText() != 'pos2':
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: For PDSCH mapping type A, duration of 3 and 4 symbols in Tables 7.4.1.1.2-3 and 7.4.1.1.2-4 respectively is only applicable when dmrs-TypeA-Position is equal to "pos2".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+            return
+        
+        #FIXME For PDSCH mapping type B, when PDSCH allocation collides with CORESET/SearchSpace
+        
+        dmrsOh = (2 * int(self.nrDmrsMsg2CdmGroupsWoDataEdit.text())) * len(val)
+        self.ngwin.logEdit.append('Msg2 DMRS overhead: cdmGroupsWoData=%s, key="%s", val=%s' % (self.nrDmrsMsg2CdmGroupsWoDataEdit.text(), key, val))
+        
+        tbs = self.getTbs(sch='pdsch', tp=0, rnti='ra-rnti', tab='qam64', td=td, fd=fd, mcs=mcs, layer=1, dmrs=dmrsOh, xoh=0, scale=1)
+        self.nrDci10Msg2TbsEdit.setText(str(tbs) if tbs is not None else '')
+        
     def validateDci10Msg4TimeAllocField(self):
         if not self.nrDci10Msg4TimeAllocFieldEdit.text():
             return
@@ -6683,6 +6761,45 @@ class NgNrGridUi(QDialog):
                 self.nrDmrsMsg4AddPosComb.setCurrentText('pos1')
             else:
                 self.nrDmrsMsg4AddPosComb.setCurrentText('pos0')
+        
+        #update tbs
+        self.updateDci10Msg4Tbs()
+    
+    def updateDci10Msg4Tbs(self):
+        self.ngwin.logEdit.append('-->inside updateDci10Msg4Tbs')
+        if not self.nrDci10Msg4TimeAllocFieldEdit.text() or not self.nrDci10Msg4TimeAllocLEdit.text() or not self.nrDci10Msg4TimeAllocSEdit.text() or not self.nrDci10Msg4TimeAllocSlivEdit.text():
+            return
+        
+        if not self.nrDci10Msg4FreqAllocType1LRbsEdit.text() or not self.nrDci10Msg4FreqAllocType1RbStartEdit.text() or not self.nrDci10Msg4FreqAllocFieldEdit.text():
+            return
+        
+        if not self.nrDci10Msg4McsEdit.text():
+            return
+        
+        td = int(self.nrDci10Msg4TimeAllocLEdit.text())
+        fd = int(self.nrDci10Msg4FreqAllocType1LRbsEdit.text())
+        mcs = int(self.nrDci10Msg4McsEdit.text())
+            
+        #calculate dmrs overhead
+        key = '%s_%s_%s' % (td, self.nrDci10Msg4TimeAllocMappingTypeComb.currentText(), self.nrDmrsMsg4AddPosComb.currentText())
+        if not key in self.nrDmrsPdschPosOneSymb.keys() or self.nrDmrsPdschPosOneSymb[key] is None:
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(="%s") when referring nrDmrsPdschPosOneSymb!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+            return
+        val = self.nrDmrsPdschPosOneSymb[key]
+        
+        #refer to 3GPP 38.211 vf30
+        #For PDSCH mapping type A, duration of 3 and 4 symbols in Tables 7.4.1.1.2-3 and 7.4.1.1.2-4 respectively is only applicable when dmrs-TypeA-Position is equal to 'pos2'.
+        if self.nrDci10Msg4TimeAllocMappingTypeComb.currentText() == 'Type A' and len(val) in (3, 4) and self.nrMibDmRsTypeAPosComb.currentText() != 'pos2':
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: For PDSCH mapping type A, duration of 3 and 4 symbols in Tables 7.4.1.1.2-3 and 7.4.1.1.2-4 respectively is only applicable when dmrs-TypeA-Position is equal to "pos2".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+            return
+        
+        #FIXME For PDSCH mapping type B, when PDSCH allocation collides with CORESET/SearchSpace
+        
+        dmrsOh = (2 * int(self.nrDmrsMsg4CdmGroupsWoDataEdit.text())) * len(val)
+        self.ngwin.logEdit.append('Msg4 DMRS overhead: cdmGroupsWoData=%s, key="%s", val=%s' % (self.nrDmrsMsg4CdmGroupsWoDataEdit.text(), key, val))
+        
+        tbs = self.getTbs(sch='pdsch', tp=0, rnti='tc-rnti', tab='qam64', td=td, fd=fd, mcs=mcs, layer=1, dmrs=dmrsOh, xoh=0, scale=1)
+        self.nrDci10Msg4TbsEdit.setText(str(tbs) if tbs is not None else '')
     
     def validateDci11PdschTimeAllocField(self):
         if not self.nrDci11PdschTimeAllocFieldEdit.text():
@@ -6971,6 +7088,8 @@ class NgNrGridUi(QDialog):
         riv = self.makeRiv(L_RBs, RB_start, self.coreset0NumRbs)
         if riv is not None:
             self.nrDci10Sib1FreqAllocFieldEdit.setText('{:0{width}b}'.format(riv, width=self.bitwidthCoreset0))
+            #update tbs
+            #TODO
         else:
             self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
             self.nrDci10Sib1FreqAllocFieldEdit.clear()
@@ -6990,6 +7109,8 @@ class NgNrGridUi(QDialog):
         riv = self.makeRiv(L_RBs, RB_start, self.coreset0NumRbs)
         if riv is not None:
             self.nrDci10Msg2FreqAllocFieldEdit.setText('{:0{width}b}'.format(riv, width=self.bitwidthCoreset0))
+            #update tbs
+            #TODO
         else:
             self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
             self.nrDci10Msg2FreqAllocFieldEdit.clear()
@@ -7009,6 +7130,8 @@ class NgNrGridUi(QDialog):
         riv = self.makeRiv(L_RBs, RB_start, self.coreset0NumRbs)
         if riv is not None:
             self.nrDci10Msg4FreqAllocFieldEdit.setText('{:0{width}b}'.format(riv, width=self.bitwidthCoreset0))
+            #update tbs
+            #TODO
         else:
             self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
             self.nrDci10Msg4FreqAllocFieldEdit.clear()
@@ -7238,7 +7361,7 @@ class NgNrGridUi(QDialog):
                 return
         
         #set tbs by calling getTbs
-        if not self.nrDci11PdschTimeAllocLEdit.text() or not self.nrDci11PdschTimeAllocSEdit.text() or not self.nrDci11PdschTimeAllocSlivEdit.text():
+        if not self.nrDci11PdschTimeAllocFieldEdit.text() or not self.nrDci11PdschTimeAllocLEdit.text() or not self.nrDci11PdschTimeAllocSEdit.text() or not self.nrDci11PdschTimeAllocSlivEdit.text():
             return
         
         if self.nrDci11PdschFreqAllocTypeComb.currentText() == 'RA Type1' and (not self.nrDci11PdschFreqAllocType1LRbsEdit.text() or not self.nrDci11PdschFreqAllocType1RbStartEdit.text() or not self.nrDci11PdschFreqAllocFieldEdit.text()):
@@ -7279,7 +7402,7 @@ class NgNrGridUi(QDialog):
             return
         
         dmrsOh = (2 * cdmGroups) * len(val)
-        self.ngwin.logEdit.append('DMRS overhead: cdmGroupsWoData=%d, key="%s", val=%s' % (cdmGroups, key, val))
+        self.ngwin.logEdit.append('PDSCH(DCI 1_1) DMRS overhead: cdmGroupsWoData=%d, key="%s", val=%s' % (cdmGroups, key, val))
         
         tbs = []
         if len(mcsSet) == 1:
