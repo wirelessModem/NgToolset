@@ -188,6 +188,11 @@ class NgNrGridUi(QDialog):
         self.nrSsbPciEdit = QLineEdit('0')
         self.nrSsbPciEdit.setValidator(QIntValidator(0, 1007))
         
+        self.nrUeAntPortsLabel = QLabel('UE antenna ports:')
+        self.nrUeAntPortsComb = QComboBox()
+        self.nrUeAntPortsComb.addItems(['1Tx', '2Tx', '4Tx'])
+        self.nrUeAntPortsComb.setCurrentIndex(2)
+        
         #---->(2.2) TDD UL/DL Configurations
         self.nrTddCfgRefScsLabel = QLabel('referenceSubcarrierSpacing:')
         self.nrTddCfgRefScsComb = QComboBox()
@@ -286,12 +291,23 @@ class NgNrGridUi(QDialog):
         pciLayout.addWidget(self.nrSsbPciEdit)
         pciLayout.addStretch()
         
+        ueApLayout = QHBoxLayout()
+        ueApLayout.addWidget(self.nrUeAntPortsLabel)
+        ueApLayout.addWidget(self.nrUeAntPortsComb)
+        ueApLayout.addStretch()
+        
+        pciGridLayout = QGridLayout()
+        pciGridLayout.addWidget(self.nrSsbPciLabel, 0, 0)
+        pciGridLayout.addWidget(self.nrSsbPciEdit, 0, 1)
+        pciGridLayout.addWidget(self.nrUeAntPortsLabel, 1, 0)
+        pciGridLayout.addWidget(self.nrUeAntPortsComb, 1, 1)
+        
         commonCfgWidget = QWidget()
-        ssbCfgLayout = QVBoxLayout()
-        ssbCfgLayout.addLayout(pciLayout)
-        ssbCfgLayout.addWidget(tddCfgGrpBox)
-        ssbCfgLayout.addStretch()
-        commonCfgWidget.setLayout(ssbCfgLayout)
+        commonCfgLayout = QVBoxLayout()
+        commonCfgLayout.addLayout(pciGridLayout)
+        commonCfgLayout.addWidget(tddCfgGrpBox)
+        commonCfgLayout.addStretch()
+        commonCfgWidget.setLayout(commonCfgLayout)
         
         #-->(3) PDCCH settings tab
         #---->(3.1) CSS0 configurations
@@ -376,13 +392,12 @@ class NgNrGridUi(QDialog):
         self.nrUssPeriodicityComb = QComboBox()
         self.nrUssPeriodicityComb.addItems(['sl1', 'sl2', 'sl4', 'sl5', 'sl8', 'sl10', 'sl16', 'sl20',
                                             'sl40', 'sl80', 'sl160', 'sl320', 'sl640', 'sl1280', 'sl2560'])
-        self.nrUssPeriodicityComb.currentIndexChanged[int].connect(self.onUssPeriodicityCombCurIndChanged)
         self.nrUssPeriodicityComb.setCurrentIndex(0)
         
-        self.nrUssSlotOffsetLabel = QLabel('monitoringSlotOffset:')
+        self.nrUssSlotOffsetLabel = QLabel('monitoringSlotOffset[0]:')
         self.nrUssSlotOffsetEdit = QLineEdit('0')
         
-        self.nrUssDurationLabel = QLabel('duration:')
+        self.nrUssDurationLabel = QLabel('duration[1]:')
         self.nrUssDurationEdit = QLineEdit('1')
         
         self.nrUssFirstSymbsLabel = QLabel('monitoringSymbolsWithinSlot:')
@@ -497,9 +512,9 @@ class NgNrGridUi(QDialog):
         self.nrDci10Sib1FreqAllocType1BundleSizeComb.setCurrentIndex(0)
         self.nrDci10Sib1FreqAllocType1BundleSizeComb.setEnabled(False)
         
-        self.nrDci10Sib1McsLabel = QLabel('Modulation and coding scheme(CW0)[0-31]:')
+        self.nrDci10Sib1McsLabel = QLabel('Modulation and coding scheme(CW0)[0-9]:')
         self.nrDci10Sib1McsEdit = QLineEdit()
-        self.nrDci10Sib1McsEdit.setValidator(QIntValidator(0, 31))
+        self.nrDci10Sib1McsEdit.setValidator(QIntValidator(0, 9))
         
         self.nrDci10Sib1TbsLabel = QLabel('Transport block size(bits):')
         self.nrDci10Sib1TbsEdit = QLineEdit()
@@ -629,13 +644,13 @@ class NgNrGridUi(QDialog):
         self.nrDci10Msg2FreqAllocType1BundleSizeComb.setCurrentIndex(0)
         self.nrDci10Msg2FreqAllocType1BundleSizeComb.setEnabled(False)
         
-        self.nrDci10Msg2McsLabel = QLabel('Modulation and coding scheme(CW0)[0-31]:')
+        self.nrDci10Msg2McsLabel = QLabel('Modulation and coding scheme(CW0)[0-9]:')
         self.nrDci10Msg2McsEdit = QLineEdit()
-        self.nrDci10Msg2McsEdit.setValidator(QIntValidator(0, 31))
+        self.nrDci10Msg2McsEdit.setValidator(QIntValidator(0, 9))
         
-        self.nrDci10Msg2TbScalingLabel = QLabel('TB Scaling[0-3]:')
+        self.nrDci10Msg2TbScalingLabel = QLabel('TB Scaling[0-2]:')
         self.nrDci10Msg2TbScalingEdit = QLineEdit('0')
-        self.nrDci10Msg2TbScalingEdit.setValidator(QIntValidator(0, 3))
+        self.nrDci10Msg2TbScalingEdit.setValidator(QIntValidator(0, 2))
         
         self.nrDci10Msg2TbsLabel = QLabel('Transport block size(bits):')
         self.nrDci10Msg2TbsEdit = QLineEdit()
@@ -1978,16 +1993,16 @@ class NgNrGridUi(QDialog):
         self.nrDedPuschCfgCbSubsetComb.setCurrentIndex(0)
         
         self.nrDedPuschCfgCbMaxRankLabel = QLabel('CB maxRank[1-4]:')
-        self.nrDedPuschCfgCbMaxRankEdit = QLineEdit()
+        self.nrDedPuschCfgCbMaxRankEdit = QLineEdit('4')
         self.nrDedPuschCfgCbMaxRankEdit.setValidator(QIntValidator(1, 4))
         
         #note: Lmax is the number of srs resources transmitted by ue, which is ue capability as defined in 38.306
         self.nrDedPuschCfgNonCbMaxLayersLabel = QLabel('non-CB maxLayers(Lmax)[1-4]:')
-        self.nrDedPuschCfgNonCbMaxLayersEdit = QLineEdit()
+        self.nrDedPuschCfgNonCbMaxLayersEdit = QLineEdit('4')
         self.nrDedPuschCfgNonCbMaxLayersEdit.setValidator(QIntValidator(1, 4))
         
         self.nrDedPuschCfgFreqHopOffsetLabel = QLabel('frequencyHoppingOffset[0-274]:')
-        self.nrDedPuschCfgFreqHopOffsetEdit = QLineEdit()
+        self.nrDedPuschCfgFreqHopOffsetEdit = QLineEdit('0')
         self.nrDedPuschCfgFreqHopOffsetEdit.setValidator(QIntValidator(0, 274))
         
         self.nrDedPuschCfgTpLabel = QLabel('transformPrecoder:')
@@ -2064,6 +2079,7 @@ class NgNrGridUi(QDialog):
         
         self.nrDmrsDedPuschRankLabel = QLabel('Transmission rank:')
         self.nrDmrsDedPuschRankEdit = QLineEdit()
+        self.nrDmrsDedPuschRankEdit.setEnabled(False)
         
         #start ptrs
         self.nrPtrsPuschSwitchLabel = QLabel('Enable PT-RS:')
@@ -2116,12 +2132,15 @@ class NgNrGridUi(QDialog):
         
         self.nrDmrsDedPuschDmrsPortsLabel = QLabel('DMRS port(s)[x]:')
         self.nrDmrsDedPuschDmrsPortsEdit = QLineEdit()
+        self.nrDmrsDedPuschDmrsPortsEdit.setEnabled(False)
         
         self.nrDmrsDedPuschCdmGroupsWoDataLabel = QLabel('CDM group(s) without data:')
         self.nrDmrsDedPuschCdmGroupsWoDataEdit = QLineEdit()
+        self.nrDmrsDedPuschCdmGroupsWoDataEdit.setEnabled(False)
         
         self.nrDmrsDedPuschFrontLoadSymbsLabel = QLabel('Number of front-load symbols:')
         self.nrDmrsDedPuschFrontLoadSymbsEdit = QLineEdit()
+        self.nrDmrsDedPuschFrontLoadSymbsEdit.setEnabled(False)
         
         ptrsPuschWidget = QWidget()
         ptrsPuschGridLayout = QGridLayout()
@@ -2657,7 +2676,7 @@ class NgNrGridUi(QDialog):
         self.nrSrsResSet0ResourceSetIdEdit.setText('0')
         self.nrSrsResSet0ResourceSetIdEdit.setEnabled(False)
         
-        self.nrSrsResSet0ResourceIdListLabel = QLabel('srs-ResourceIdList:')
+        self.nrSrsResSet0ResourceIdListLabel = QLabel('srs-ResourceIdList[max=2]:')
         self.nrSrsResSet0ResourceIdListEdit = QLineEdit()
         self.nrSrsResSet0ResourceIdListEdit.setText('0')
         
@@ -2694,7 +2713,7 @@ class NgNrGridUi(QDialog):
         self.nrSrsResSet1ResourceSetIdEdit.setText('1')
         self.nrSrsResSet1ResourceSetIdEdit.setEnabled(False)
         
-        self.nrSrsResSet1ResourceIdListLabel = QLabel('srs-ResourceIdList:')
+        self.nrSrsResSet1ResourceIdListLabel = QLabel('srs-ResourceIdList[max=4]:')
         self.nrSrsResSet1ResourceIdListEdit = QLineEdit()
         self.nrSrsResSet1ResourceIdListEdit.setText('0,1,2,3')
         
@@ -3250,22 +3269,27 @@ class NgNrGridUi(QDialog):
         self.nrDedUlBwpGenericLRbsEdit.textChanged.connect(self.onDedUlBwpLRBsOrRBStartEditTextChanged)
         self.nrDedUlBwpGenericRbStartEdit.textChanged.connect(self.onDedUlBwpLRBsOrRBStartEditTextChanged)
         
-        self.nrCoreset1DurationComb.currentIndexChanged[int].connect(self.onCoreset1DurationCombCurIndChanged)
-        self.nrCoreset1CceRegMapComb.currentIndexChanged[int].connect(self.onCoreset1CceRegMapCombCurIndChanged)
+        self.nrCoreset1DurationComb.currentIndexChanged.connect(self.onCoreset1DurationCombCurIndChanged)
+        self.nrCoreset1CceRegMapComb.currentIndexChanged.connect(self.onCoreset1CceRegMapCombCurIndChanged)
+        self.nrUssPeriodicityComb.currentIndexChanged.connect(self.onUssPeriodicityCombCurIndChanged)
         self.nrUssFirstSymbsEdit.textChanged.connect(self.onUssFirstSymbsEditTextChanged)
         
         #---->signal-slot for dcis
         self.nrDci10Sib1TimeAllocFieldEdit.textChanged.connect(self.onDci10Sib1TimeAllocFieldEditTextChanged)
         self.nrDci10Sib1FreqAllocType1LRbsEdit.textChanged.connect(self.onDci10Sib1Type1LRBsOrRBStartEditTextChanged)
         self.nrDci10Sib1FreqAllocType1RbStartEdit.textChanged.connect(self.onDci10Sib1Type1LRBsOrRBStartEditTextChanged)
+        self.nrDci10Sib1McsEdit.textChanged.connect(self.onDci10Sib1McsEditTextChanged)
         
         self.nrDci10Msg2TimeAllocFieldEdit.textChanged.connect(self.onDci10Msg2TimeAllocFieldEditTextChanged)
         self.nrDci10Msg2FreqAllocType1LRbsEdit.textChanged.connect(self.onDci10Msg2Type1LRBsOrRBStartEditTextChanged)
         self.nrDci10Msg2FreqAllocType1RbStartEdit.textChanged.connect(self.onDci10Msg2Type1LRBsOrRBStartEditTextChanged)
+        self.nrDci10Msg2McsEdit.textChanged.connect(self.onDci10Msg2McsEditTextChanged)
+        self.nrDci10Msg2TbScalingEdit.textChanged.connect(self.onDci10Msg2TbScalingEditTextChanged)
         
         self.nrDci10Msg4TimeAllocFieldEdit.textChanged.connect(self.onDci10Msg4TimeAllocFieldEditTextChanged)
         self.nrDci10Msg4FreqAllocType1LRbsEdit.textChanged.connect(self.onDci10Msg4Type1LRBsOrRBStartEditTextChanged)
         self.nrDci10Msg4FreqAllocType1RbStartEdit.textChanged.connect(self.onDci10Msg4Type1LRBsOrRBStartEditTextChanged)
+        self.nrDci10Msg4McsEdit.textChanged.connect(self.onDci10Msg4McsEditTextChanged)
         
         self.nrDci11PdschTimeAllocFieldEdit.textChanged.connect(self.onDci11PdschTimeAllocFieldEditTextChanged)
         self.nrDci11PdschTimeAllocSlivEdit.textChanged.connect(self.onDci11PdschTimeAllocSlivEditTextChanged)
@@ -6693,9 +6717,15 @@ class NgNrGridUi(QDialog):
         if not self.nrDci10Msg2McsEdit.text():
             return
         
+        if not self.nrDci10Msg2TbScalingEdit.text():
+            return
+        
         td = int(self.nrDci10Msg2TimeAllocLEdit.text())
         fd = int(self.nrDci10Msg2FreqAllocType1LRbsEdit.text())
         mcs = int(self.nrDci10Msg2McsEdit.text())
+        #refer to 3GPP 38.214 vf30
+        #Table 5.1.3.2-2: Scaling factor of Ninfo for P-RNTI and RA-RNTI
+        scale = {'0':1, '1':0.5, '2':0.25}[self.nrDci10Msg2TbScalingEdit.text()]
             
         #calculate dmrs overhead
         key = '%s_%s_%s' % (td, self.nrDci10Msg2TimeAllocMappingTypeComb.currentText(), self.nrDmrsMsg2AddPosComb.currentText())
@@ -6715,7 +6745,7 @@ class NgNrGridUi(QDialog):
         dmrsOh = (2 * int(self.nrDmrsMsg2CdmGroupsWoDataEdit.text())) * len(val)
         self.ngwin.logEdit.append('Msg2 DMRS overhead: cdmGroupsWoData=%s, key="%s", val=%s' % (self.nrDmrsMsg2CdmGroupsWoDataEdit.text(), key, val))
         
-        tbs = self.getTbs(sch='pdsch', tp=0, rnti='ra-rnti', tab='qam64', td=td, fd=fd, mcs=mcs, layer=1, dmrs=dmrsOh, xoh=0, scale=1)
+        tbs = self.getTbs(sch='pdsch', tp=0, rnti='ra-rnti', tab='qam64', td=td, fd=fd, mcs=mcs, layer=1, dmrs=dmrsOh, xoh=0, scale=scale)
         self.nrDci10Msg2TbsEdit.setText(str(tbs) if tbs is not None else '')
         
     def validateDci10Msg4TimeAllocField(self):
@@ -7089,7 +7119,7 @@ class NgNrGridUi(QDialog):
         if riv is not None:
             self.nrDci10Sib1FreqAllocFieldEdit.setText('{:0{width}b}'.format(riv, width=self.bitwidthCoreset0))
             #update tbs
-            #TODO
+            self.updateDci10Sib1Tbs()
         else:
             self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
             self.nrDci10Sib1FreqAllocFieldEdit.clear()
@@ -7110,7 +7140,7 @@ class NgNrGridUi(QDialog):
         if riv is not None:
             self.nrDci10Msg2FreqAllocFieldEdit.setText('{:0{width}b}'.format(riv, width=self.bitwidthCoreset0))
             #update tbs
-            #TODO
+            self.updateDci10Msg2Tbs()
         else:
             self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
             self.nrDci10Msg2FreqAllocFieldEdit.clear()
@@ -7131,7 +7161,7 @@ class NgNrGridUi(QDialog):
         if riv is not None:
             self.nrDci10Msg4FreqAllocFieldEdit.setText('{:0{width}b}'.format(riv, width=self.bitwidthCoreset0))
             #update tbs
-            #TODO
+            self.updateDci10Msg4Tbs()
         else:
             self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
             self.nrDci10Msg4FreqAllocFieldEdit.clear()
@@ -7186,6 +7216,38 @@ class NgNrGridUi(QDialog):
             self.nrDci11PdschCw1McsEdit.setEnabled(True)
         
         self.validatePdschCw0McsCw1Mcs()
+        
+    def onDci10Sib1McsEditTextChanged(self, text):
+        if not self.nrDci10Sib1McsEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside onDci10Sib1McsEditTextChanged')
+        #update tbs
+        self.updateDci10Sib1Tbs()
+        
+    def onDci10Msg2McsEditTextChanged(self, text):
+        if not self.nrDci10Msg2McsEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside onDci10Msg2McsEditTextChanged')
+        #update tbs
+        self.updateDci10Msg2Tbs()
+        
+    def onDci10Msg2TbScalingEditTextChanged(self, text):
+        if not self.nrDci10Msg2TbScalingEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside onDci10Msg2TbScalingEditTextChanged')
+        #update tbs
+        self.updateDci10Msg2Tbs()
+        
+    def onDci10Msg4McsEditTextChanged(self, text):
+        if not self.nrDci10Msg4McsEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside onDci10Msg4McsEditTextChanged')
+        #update tbs
+        self.updateDci10Msg4Tbs()
     
     def onDci11PdschCw0McsOrCw1McsEditTextChanged(self, text):
         if not self.nrDci11PdschCw0McsEdit.text() and not self.nrDci11PdschCw1McsEdit.text():
@@ -7439,6 +7501,9 @@ class NgNrGridUi(QDialog):
             self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: The case dmrs-AdditionalPosition equals to "pos3" is only supported when dmrs-TypeA-Position is equal to "pos2"! Reset dmrs-AdditionalPosition to "pos0".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
             self.nrDmrsDedPdschAddPosComb.setCurrentText('pos0')
             return
+        
+        if self.nrDci11PdschAntPortsFieldEdit.text():
+            self.validatePdschAntPorts()
         
     def onDci11PdschFreqRaTypeCombCurIndChanged(self, index):
         if index < 0:
