@@ -951,7 +951,7 @@ class NgNrGridUi(QDialog):
         self.nrDci11PdschK1Edit = QLineEdit()
         self.nrDci11PdschK1Edit.setValidator(QIntValidator(0, 7))
         
-        self.nrDci11PdschAntPortsFieldLabel = QLabel('Antenna port(s):')
+        self.nrDci11PdschAntPortsFieldLabel = QLabel('Antenna port(s)[0-15]:')
         self.nrDci11PdschAntPortsFieldEdit = QLineEdit()
         self.nrDci11PdschAntPortsFieldEdit.setValidator(QIntValidator(0, 15))
         
@@ -1098,14 +1098,19 @@ class NgNrGridUi(QDialog):
         self.nrDci01PuschTbsEdit = QLineEdit()
         self.nrDci01PuschTbsEdit.setEnabled(False)
         
-        self.nrDci01PuschSriFieldLabel = QLabel('SRS resource indicator[0-1/0-3/0-7/0-15]:')
-        self.nrDci01PuschSriFieldEdit = QLineEdit('0')
+        self.nrDci01PuschPercodingLayersFieldLabel = QLabel('Percoding info and num of layers[0-63]:')
+        self.nrDci01PuschPercodingLayersFieldEdit = QLineEdit()
+        self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 63))
         
-        self.nrDci01PuschAntPortsFieldLabel = QLabel('Antenna port(s)[0-15/0-31/0-63]:')
-        self.nrDci01PuschAntPortsFieldEdit = QLineEdit('0')
+        self.nrDci01PuschSriFieldLabel = QLabel('SRS resource indicator[0]:')
+        self.nrDci01PuschSriFieldEdit = QLineEdit()
+        self.nrDci01PuschSriFieldEdit.setValidator(QIntValidator(0, 0))
+        
+        self.nrDci01PuschAntPortsFieldLabel = QLabel('Antenna port(s):')
+        self.nrDci01PuschAntPortsFieldEdit = QLineEdit()
         
         self.nrDci01PuschPtrsDmrsMappingLabel = QLabel('PTRS-DMRS association[0-3]:')
-        self.nrDci01PuschPtrsDmrsMappingEdit = QLineEdit('0')
+        self.nrDci01PuschPtrsDmrsMappingEdit = QLineEdit()
         self.nrDci01PuschPtrsDmrsMappingEdit.setValidator(QIntValidator(0, 3))
         
         dci01PuschTimeAllocWidget = QWidget()
@@ -1159,12 +1164,14 @@ class NgNrGridUi(QDialog):
         dci01PuschGridLayout.addWidget(self.nrDci01PuschCw0McsEdit, 6, 1)
         dci01PuschGridLayout.addWidget(self.nrDci01PuschTbsLabel, 7, 0)
         dci01PuschGridLayout.addWidget(self.nrDci01PuschTbsEdit, 7, 1)
-        dci01PuschGridLayout.addWidget(self.nrDci01PuschSriFieldLabel, 8, 0)
-        dci01PuschGridLayout.addWidget(self.nrDci01PuschSriFieldEdit, 8, 1)
-        dci01PuschGridLayout.addWidget(self.nrDci01PuschAntPortsFieldLabel, 9, 0)
-        dci01PuschGridLayout.addWidget(self.nrDci01PuschAntPortsFieldEdit, 9, 1)
-        dci01PuschGridLayout.addWidget(self.nrDci01PuschPtrsDmrsMappingLabel, 10, 0)
-        dci01PuschGridLayout.addWidget(self.nrDci01PuschPtrsDmrsMappingEdit, 10, 1)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschPercodingLayersFieldLabel, 8, 0)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschPercodingLayersFieldEdit, 8, 1)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschSriFieldLabel, 9, 0)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschSriFieldEdit, 9, 1)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschAntPortsFieldLabel, 10, 0)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschAntPortsFieldEdit, 10, 1)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschPtrsDmrsMappingLabel, 11, 0)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschPtrsDmrsMappingEdit, 11, 1)
         dci01PuschLayout = QVBoxLayout()
         dci01PuschLayout.addLayout(dci01PuschGridLayout)
         dci01PuschLayout.addStretch()
@@ -2000,6 +2007,7 @@ class NgNrGridUi(QDialog):
         self.nrDedPuschCfgNonCbMaxLayersLabel = QLabel('non-CB maxLayers(Lmax)[1-4]:')
         self.nrDedPuschCfgNonCbMaxLayersEdit = QLineEdit('4')
         self.nrDedPuschCfgNonCbMaxLayersEdit.setValidator(QIntValidator(1, 4))
+        self.nrDedPuschCfgNonCbMaxLayersEdit.setEnabled(False)
         
         self.nrDedPuschCfgFreqHopOffsetLabel = QLabel('frequencyHoppingOffset[0-274]:')
         self.nrDedPuschCfgFreqHopOffsetEdit = QLineEdit('0')
@@ -2077,9 +2085,11 @@ class NgNrGridUi(QDialog):
         self.nrDmrsDedPuschMaxLengthComb.addItems(['len1', 'len2'])
         self.nrDmrsDedPuschMaxLengthComb.setCurrentIndex(0)
         
+        '''
         self.nrDmrsDedPuschRankLabel = QLabel('Transmission rank:')
         self.nrDmrsDedPuschRankEdit = QLineEdit()
         self.nrDmrsDedPuschRankEdit.setEnabled(False)
+        '''
         
         #start ptrs
         self.nrPtrsPuschSwitchLabel = QLabel('Enable PT-RS:')
@@ -2197,15 +2207,15 @@ class NgNrGridUi(QDialog):
         dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschAddPosComb, 1, 1)
         dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschMaxLengthLabel, 2, 0)
         dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschMaxLengthComb, 2, 1)
-        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschRankLabel, 3, 0)
-        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschRankEdit, 3, 1)
-        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschDmrsPortsLabel, 4, 0)
-        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschDmrsPortsEdit, 4, 1)
-        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschCdmGroupsWoDataLabel, 5, 0)
-        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschCdmGroupsWoDataEdit, 5, 1)
-        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschFrontLoadSymbsLabel, 6, 0)
-        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschFrontLoadSymbsEdit, 6, 1)
-        dmrsDedPuschGridLayout.addWidget(ptrsPuschGrpBox, 7, 0, 1, 2)
+        #dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschRankLabel, 3, 0)
+        #dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschRankEdit, 3, 1)
+        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschDmrsPortsLabel, 3, 0)
+        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschDmrsPortsEdit, 3, 1)
+        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschCdmGroupsWoDataLabel, 4, 0)
+        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschCdmGroupsWoDataEdit, 4, 1)
+        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschFrontLoadSymbsLabel, 5, 0)
+        dmrsDedPuschGridLayout.addWidget(self.nrDmrsDedPuschFrontLoadSymbsEdit, 5, 1)
+        dmrsDedPuschGridLayout.addWidget(ptrsPuschGrpBox, 6, 0, 1, 2)
         dmrsDedPuschLayout = QVBoxLayout()
         dmrsDedPuschLayout.addLayout(dmrsDedPuschGridLayout)
         dmrsDedPuschLayout.addStretch()
@@ -3237,21 +3247,22 @@ class NgNrGridUi(QDialog):
         bwpCfgTabWidget.addTab(dedUlBwpWidget, 'Dedicated UL BWP')
 
         #connect signals to slots
-        self.nrCarrierBwComb.currentIndexChanged[int].connect(self.onCarrierBwCombCurIndChanged)
-        self.nrCarrierScsComb.currentIndexChanged[int].connect(self.onCarrierScsCombCurIndChanged)
-        self.nrCarrierBandComb.currentIndexChanged[int].connect(self.onCarrierBandCombCurIndChanged)
-        self.nrSsbScsComb.currentIndexChanged[int].connect(self.onSsbScsCombCurIndChanged)
-        self.nrMibScsCommonComb.currentIndexChanged[int].connect(self.onMibScsCommonCombCurIndChanged)
-        self.nrMibDmRsTypeAPosComb.currentIndexChanged[int].connect(self.onMibDmrsTypeAPosCombCurIndChanged)
+        self.nrCarrierBwComb.currentIndexChanged.connect(self.onCarrierBwCombCurIndChanged)
+        self.nrCarrierScsComb.currentIndexChanged.connect(self.onCarrierScsCombCurIndChanged)
+        self.nrCarrierBandComb.currentIndexChanged.connect(self.onCarrierBandCombCurIndChanged)
+        self.nrSsbScsComb.currentIndexChanged.connect(self.onSsbScsCombCurIndChanged)
+        self.nrMibScsCommonComb.currentIndexChanged.connect(self.onMibScsCommonCombCurIndChanged)
+        self.nrMibDmRsTypeAPosComb.currentIndexChanged.connect(self.onMibDmrsTypeAPosCombCurIndChanged)
         self.nrMibCoreset0Edit.textChanged.connect(self.onMibCoreset0EditTextChanged)
         self.nrMibCss0Edit.textChanged.connect(self.onMibCss0EditTextChanged)
         self.nrSsbKssbEdit.textChanged.connect(self.onSsbKssbEditTextChanged)
-        self.nrTddCfgPat2PeriodComb.currentIndexChanged[int].connect(self.onTddCfgPat2PeriodCombCurIndChanged)
-        self.nrCss0AggLevelComb.currentIndexChanged[int].connect(self.onCss0AggLevelCombCurIndChanged)
-        self.nrCss0NumCandidatesComb.currentIndexChanged[int].connect(self.onCss0NumCandidatesCombCurIndChanged)
+        self.nrTddCfgPat2PeriodComb.currentIndexChanged.connect(self.onTddCfgPat2PeriodCombCurIndChanged)
+        self.nrUeAntPortsComb.currentIndexChanged.connect(self.onUeAntPortsCombCurIndChanged)
+        self.nrCss0AggLevelComb.currentIndexChanged.connect(self.onCss0AggLevelCombCurIndChanged)
+        self.nrCss0NumCandidatesComb.currentIndexChanged.connect(self.onCss0NumCandidatesCombCurIndChanged)
         self.nrRachGenericPrachConfIdEdit.textChanged.connect(self.onPrachConfIndEditTextChanged)
-        self.nrDsrRes0PeriodicityComb.currentIndexChanged[int].connect(self.onDsrRes0PeriodicityCombCurIndChanged)
-        self.nrDsrRes1PeriodicityComb.currentIndexChanged[int].connect(self.onDsrRes1PeriodicityCombCurIndChanged)
+        self.nrDsrRes0PeriodicityComb.currentIndexChanged.connect(self.onDsrRes0PeriodicityCombCurIndChanged)
+        self.nrDsrRes1PeriodicityComb.currentIndexChanged.connect(self.onDsrRes1PeriodicityCombCurIndChanged)
         #---->signal-slot for initial dl bwp
         self.nrIniDlBwpGenericLocAndBwEdit.textChanged.connect(self.onIniDlBwpLocAndBwEditTextChanged)
         self.nrIniDlBwpGenericLRbsEdit.textChanged.connect(self.onIniDlBwpLRBsOrRBStartEditTextChanged)
@@ -3336,6 +3347,7 @@ class NgNrGridUi(QDialog):
         self.nrDedPuschCfgRbgConfigComb.currentIndexChanged.connect(self.onDedPuschCfgRbgConfigCombCurIndChanged)
         self.nrDedPuschCfgTpComb.currentIndexChanged.connect(self.onDedPuschCfgTpCombCurIndChanged)
         self.nrDmrsDedPuschMaxLengthComb.currentIndexChanged.connect(self.onDmrsDedPuschMaxLengthCombCurIndChanged)
+        self.nrDedPuschCfgTxCfgComb.currentIndexChanged.connect(self.onDedPuschCfgTxCfgCombCurIndChanged)
         #---->initial ul bwp
         self.nrRachMsg3TpComb.currentIndexChanged.connect(self.onRachMsg3TpCombCurIndChanged)
         
@@ -6149,6 +6161,42 @@ class NgNrGridUi(QDialog):
             self.nrDmrsDedPdschAddPosComb.setCurrentText('pos0')
             return
         
+    def onUeAntPortsCombCurIndChanged(self, index):
+        if index < 0:
+            pass
+        
+        self.ngwin.logEdit.append('-->inside onUeAntPortsCombCurIndChanged, index=%d' % index)
+        nap = int(self.nrUeAntPortsComb.currentText()[:-2])
+        if nap == 1:
+            self.nrDedPuschCfgCbMaxRankLabel.setText('CB maxRank[1]:')
+            self.nrDedPuschCfgCbMaxRankEdit.setText('1')
+            self.nrDedPuschCfgCbMaxRankEdit.setEnabled(False)
+            self.nrDedPuschCfgNonCbMaxLayersLabel.setText('non-CB maxLayers(Lmax)[1]:')
+            self.nrDedPuschCfgNonCbMaxLayersEdit.setText('1')
+            self.nrDedPuschCfgNonCbMaxLayersEdit.setEnabled(False)
+            self.nrDci01PuschPercodingLayersFieldEdit.setEnabled(False)
+            self.nrDedPuschCfgCbSubsetComb.setEnabled(False)
+        else:
+            self.nrDedPuschCfgCbMaxRankLabel.setText('CB maxRank[1-%s]:' % nap)
+            self.nrDedPuschCfgCbMaxRankEdit.setText(str(nap))
+            self.nrDedPuschCfgCbMaxRankEdit.setValidator(QIntValidator(1, nap))
+            self.nrDedPuschCfgNonCbMaxLayersLabel.setText('non-CB maxLayers(Lmax)[1-%s]:' % nap)
+            self.nrDedPuschCfgNonCbMaxLayersEdit.setText(str(nap))
+            self.nrDedPuschCfgNonCbMaxLayersEdit.setValidator(QIntValidator(1, nap))
+            if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
+                self.nrDedPuschCfgCbMaxRankEdit.setEnabled(True)
+                self.nrDedPuschCfgCbSubsetComb.setEnabled(True)
+                if nap == 2:
+                    self.nrDedPuschCfgCbSubsetComb.clear()
+                    self.nrDedPuschCfgCbSubsetComb.addItems(['fullyAndPartialAndNonCoherent', 'nonCoherent'])
+                else:
+                    self.nrDedPuschCfgCbSubsetComb.clear()
+                    self.nrDedPuschCfgCbSubsetComb.addItems(['fullyAndPartialAndNonCoherent', 'partialAndNonCoherent', 'nonCoherent'])
+                self.nrDci01PuschPercodingLayersFieldEdit.setEnabled(True)
+            else:
+                self.nrDedPuschCfgNonCbMaxLayersEdit.setEnabled(True)
+                
+        
     def onTddCfgPat2PeriodCombCurIndChanged(self, index):
         if index < 0:
             pass
@@ -7205,13 +7253,16 @@ class NgNrGridUi(QDialog):
         maxLength = self.nrDmrsDedPdschMaxLengthComb.currentText()
         
         if dmrsType == 'Type 1' and maxLength == 'len1':
+            self.nrDci11PdschAntPortsFieldLabel.setText('Antenna port(s)[0-15]:')
             self.nrDci11PdschAntPortsFieldEdit.setValidator(QIntValidator(0, 15))
             self.nrDci11PdschCw1McsEdit.clear()
             self.nrDci11PdschCw1McsEdit.setEnabled(False)
         elif (dmrsType == 'Type 1' and maxLength == 'len2') or (dmrsType == 'Type 2' and maxLength == 'len1'):
+            self.nrDci11PdschAntPortsFieldLabel.setText('Antenna port(s)[0-31]:')
             self.nrDci11PdschAntPortsFieldEdit.setValidator(QIntValidator(0, 31))
             self.nrDci11PdschCw1McsEdit.setEnabled(True)
         else:#dmrsType == 'Type 2' and maxLength == 'len2'
+            self.nrDci11PdschAntPortsFieldLabel.setText('Antenna port(s)[0-63]:')
             self.nrDci11PdschAntPortsFieldEdit.setValidator(QIntValidator(0, 63))
             self.nrDci11PdschCw1McsEdit.setEnabled(True)
         
@@ -8070,6 +8121,32 @@ class NgNrGridUi(QDialog):
             #self.updateLRBsDedPuschTp()
             self.updateDedUlBwpInfo()
             
+            #update 'CB maxRank' and 'non-CB maxLayers'
+            if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
+                self.nrDedPuschCfgCbMaxRankEdit.setText('1')
+            else:
+                self.nrDedPuschCfgNonCbMaxLayersEdit.setText('1')
+        else:
+            pass
+            
+    def onDedPuschCfgTxCfgCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onDedPuschCfgTxCfgCombCurIndChanged')
+        if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
+            if int(self.nrUeAntPortsComb.currentText()[:-2]) > 1:
+                self.nrDci01PuschPercodingLayersFieldEdit.setEnabled(True)
+                self.nrDedPuschCfgCbSubsetComb.setEnabled(True)
+                self.nrDedPuschCfgCbMaxRankEdit.setEnabled(True)
+            self.nrDedPuschCfgNonCbMaxLayersEdit.setEnabled(False)
+        else:
+            self.nrDci01PuschPercodingLayersFieldEdit.setEnabled(False)
+            self.nrDedPuschCfgCbSubsetComb.setEnabled(False)
+            self.nrDedPuschCfgCbMaxRankEdit.setEnabled(False)
+            if int(self.nrUeAntPortsComb.currentText()[:-2]) > 1:
+                self.nrDedPuschCfgNonCbMaxLayersEdit.setEnabled(True)
+        
     def onDedPdschCfgMcsTableCombCurIndChanged(self, index):
         if index < 0:
             return
@@ -8085,6 +8162,75 @@ class NgNrGridUi(QDialog):
         self.ngwin.logEdit.append('-->inside onDedPdschCfgXOverheadCombCurIndChanged')
         #update 'tbs' by calling getTbs when necessary
         self.validatePdschAntPorts()
+    
+    def validatePuschAntPorts(self):
+        self.ngwin.logEdit.append('-->inside validatePuschAntPorts')
+        
+        #reset 'precoding info and number of layers' label
+        if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
+            if not self.nrDedPuschCfgCbMaxRankEdit.text():
+                return
+            numUeAp = int(self.nrUeAntPortsComb.currentText()[:-2])
+            tp = self.nrDedPuschCfgTpComb.currentText()
+            maxRank = int(self.nrDedPuschCfgCbMaxRankEdit.text()) 
+            cbSubset = self.nrDedPuschCfgCbSubsetComb.currentText()
+            if numUeAp == 4 and tp == 'disabled' and maxRank in (2,3,4):
+                if cbSubset == 'fullyAndPartialAndNonCoherent':
+                    self.nrDci01PuschPercodingLayersFieldLabel.setText('Precoding info and num of layers[0-63]')
+                    self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 63))
+                elif cbSubset == 'partialAndNonCoherent':
+                    self.nrDci01PuschPercodingLayersFieldLabel.setText('Precoding info and num of layers[0-31]')
+                    self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 31))
+                else:
+                    self.nrDci01PuschPercodingLayersFieldLabel.setText('Precoding info and num of layers[0-15]')
+                    self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 15))
+            elif numUeAp == 4 and (tp == 'enabled' or (tp == 'disabled' and maxRank == 1)):
+                if cbSubset == 'fullyAndPartialAndNonCoherent':
+                    self.nrDci01PuschPercodingLayersFieldLabel.setText('Precoding info and num of layers[0-31]')
+                    self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 31))
+                elif cbSubset == 'partialAndNonCoherent':
+                    self.nrDci01PuschPercodingLayersFieldLabel.setText('Precoding info and num of layers[0-15]')
+                    self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 15))
+                else:
+                    self.nrDci01PuschPercodingLayersFieldLabel.setText('Precoding info and num of layers[0-3]')
+                    self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 3))
+            elif numUeAp == 2 and tp == 'disabled' and maxRank == 2:
+                if cbSubset == 'fullyAndPartialAndNonCoherent':
+                    self.nrDci01PuschPercodingLayersFieldLabel.setText('Precoding info and num of layers[0-15]')
+                    self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 15))
+                elif cbSubset == 'nonCoherent':
+                    self.nrDci01PuschPercodingLayersFieldLabel.setText('Precoding info and num of layers[0-3]')
+                    self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 3))
+                else:
+                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Codebook subset "partialAndNonCoherent" is not supported for two antenna ports.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+                    return
+            elif numUeAp == 2 and (tp == 'enabled' or (tp == 'disabled' and maxRank == 1)):
+                if cbSubset == 'fullyAndPartialAndNonCoherent':
+                    self.nrDci01PuschPercodingLayersFieldLabel.setText('Precoding info and num of layers[0-7]')
+                    self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 7))
+                elif cbSubset == 'nonCoherent':
+                    self.nrDci01PuschPercodingLayersFieldLabel.setText('Precoding info and num of layers[0-1]')
+                    self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 1))
+                else:
+                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Codebook subset "partialAndNonCoherent" is not supported for two antenna ports.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+                    return
+            else:
+                pass
+        
+        #reset 'srs resouces indicator' label
+        if self.nrDedPuschCfgTxCfgComb.currentText() == 'nonCodebook':
+            if not self.nrDedPuschCfgNonCbMaxLayersEdit.text() or not self.nrSrsResSet1ResourceIdListEdit.text():
+                return
+            Lmax = int(self.nrDedPuschCfgNonCbMaxLayersEdit.text())
+            srsSet1 = [int(i) for i in self.nrSrsResSet1ResourceIdListEdit.text().split(',') if len(i) > 0]
+            Nsrs = len(srsSet1)
+            if Nsrs == 0 or sum([1 for i in srsSet1 if i in range(4)]) != len(srsSet1):
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: srs-ResourceIdList should be a comma-separated string which contains valid srs-ResourceId[0-3], for example, "0,1,2,3".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+                return
+        
+        #reset 'antenna port(s)' label
+        
+        #TODO
             
     def getTbs(self, sch='pdsch', tp=0, rnti='c-rnti', tab='qam64', td=1, fd=1, mcs=0, layer=1, dmrs=0, xoh=0, scale=1):
         self.ngwin.logEdit.append('---->inside getTbs: sch="%s", tp=%d, rnti="%s", tab="%s", td=%d, fd=%d, mcs=%d, layer=%d, dmrs=%d, xoh=%d, scale=%.2f' % (sch, tp, rnti, tab, td, fd, mcs, layer, dmrs, xoh, scale)) 
