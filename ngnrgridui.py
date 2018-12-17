@@ -8503,7 +8503,7 @@ class NgNrGridUi(QDialog):
             self.updateDci01PrecodingLayersFieldLabel()
             
         #update 'srs resource indicator' label
-        self.updateDci01SriFieldLable()
+        self.updateDci01SriFieldLabel()
         
     def onDedPdschCfgMcsTableCombCurIndChanged(self, index):
         if index < 0:
@@ -8581,8 +8581,8 @@ class NgNrGridUi(QDialog):
             else:
                 pass
     
-    def updateDci01SriFieldLable(self):
-        self.ngwin.logEdit.append('-->inside updateDci01SriFieldLable') 
+    def updateDci01SriFieldLabel(self):
+        self.ngwin.logEdit.append('-->inside updateDci01SriFieldLabel') 
         
         if self.nrDedPuschCfgTxCfgComb.currentText() == 'nonCodebook':
             if not self.nrDedPuschCfgNonCbMaxLayersEdit.text() or not self.nrSrsResSet1ResourceIdListEdit.text():
