@@ -1098,15 +1098,15 @@ class NgNrGridUi(QDialog):
         self.nrDci01PuschTbsEdit = QLineEdit()
         self.nrDci01PuschTbsEdit.setEnabled(False)
         
-        self.nrDci01PuschPercodingLayersFieldLabel = QLabel('Percoding info and num of layers[0-63]:')
-        self.nrDci01PuschPercodingLayersFieldEdit = QLineEdit()
-        self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 63))
+        self.nrDci01PuschPrecodingLayersFieldLabel = QLabel('Precoding info and num of layers[0-63]:')
+        self.nrDci01PuschPrecodingLayersFieldEdit = QLineEdit()
+        self.nrDci01PuschPrecodingLayersFieldEdit.setValidator(QIntValidator(0, 63))
         
         self.nrDci01PuschSriFieldLabel = QLabel('SRS resource indicator[0]:')
         self.nrDci01PuschSriFieldEdit = QLineEdit()
         self.nrDci01PuschSriFieldEdit.setValidator(QIntValidator(0, 0))
         
-        self.nrDci01PuschAntPortsFieldLabel = QLabel('Antenna port(s):')
+        self.nrDci01PuschAntPortsFieldLabel = QLabel('Antenna port(s)[0-7]:')
         self.nrDci01PuschAntPortsFieldEdit = QLineEdit()
         
         self.nrDci01PuschPtrsDmrsMappingLabel = QLabel('PTRS-DMRS association[0-3]:')
@@ -1164,8 +1164,8 @@ class NgNrGridUi(QDialog):
         dci01PuschGridLayout.addWidget(self.nrDci01PuschCw0McsEdit, 6, 1)
         dci01PuschGridLayout.addWidget(self.nrDci01PuschTbsLabel, 7, 0)
         dci01PuschGridLayout.addWidget(self.nrDci01PuschTbsEdit, 7, 1)
-        dci01PuschGridLayout.addWidget(self.nrDci01PuschPercodingLayersFieldLabel, 8, 0)
-        dci01PuschGridLayout.addWidget(self.nrDci01PuschPercodingLayersFieldEdit, 8, 1)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschPrecodingLayersFieldLabel, 8, 0)
+        dci01PuschGridLayout.addWidget(self.nrDci01PuschPrecodingLayersFieldEdit, 8, 1)
         dci01PuschGridLayout.addWidget(self.nrDci01PuschSriFieldLabel, 9, 0)
         dci01PuschGridLayout.addWidget(self.nrDci01PuschSriFieldEdit, 9, 1)
         dci01PuschGridLayout.addWidget(self.nrDci01PuschAntPortsFieldLabel, 10, 0)
@@ -5477,7 +5477,322 @@ class NgNrGridUi(QDialog):
             '7_Type B_0_pos1' : ((0, 4,),(0, 4,),),
             }
         
+        #refer to 3GPP 38.212 vf30
+        #note: 1st part of key: 0=fullyAndPartialAndNonCoherent, 1=partialAndNonCoherent, 2=nonCoherent
+        #Table 7.3.1.1.2-2: Precoding information and number of layers, for 4 antenna ports, if transform precoder is disabled and maxRank = 2 or 3 or 4
+        self.nrDci01TpmiAp4Tp0MaxRank234 = {
+            '0_0' : (1,0),
+            '0_1' : (1,1),
+            '0_2' : (1,2),
+            '0_3' : (1,3),
+            '0_4' : (2,0),
+            '0_5' : (2,1),
+            '0_6' : (2,2),
+            '0_7' : (2,3),
+            '0_8' : (2,4),
+            '0_9' : (2,5),
+            '0_10' : (3,0),
+            '0_11' : (4,0),
+            '0_12' : (1,4),
+            '0_13' : (1,5),
+            '0_14' : (1,6),
+            '0_15' : (1,7),
+            '0_16' : (1,8),
+            '0_17' : (1,9),
+            '0_18' : (1,10),
+            '0_19' : (1,11),
+            '0_20' : (2,6),
+            '0_21' : (2,7),
+            '0_22' : (2,8),
+            '0_23' : (2,9),
+            '0_24' : (2,10),
+            '0_25' : (2,11),
+            '0_26' : (2,12),
+            '0_27' : (2,13),
+            '0_28' : (3,1),
+            '0_29' : (3,2),
+            '0_30' : (4,1),
+            '0_31' : (4,2),
+            '0_32' : (1,12),
+            '0_33' : (1,13),
+            '0_34' : (1,14),
+            '0_35' : (1,15),
+            '0_36' : (1,16),
+            '0_37' : (1,17),
+            '0_38' : (1,18),
+            '0_39' : (1,19),
+            '0_40' : (1,20),
+            '0_41' : (1,21),
+            '0_42' : (1,22),
+            '0_43' : (1,23),
+            '0_44' : (1,24),
+            '0_45' : (1,25),
+            '0_46' : (1,26),
+            '0_47' : (1,27),
+            '0_48' : (2,14),
+            '0_49' : (2,15),
+            '0_50' : (2,16),
+            '0_51' : (2,17),
+            '0_52' : (2,18),
+            '0_53' : (2,19),
+            '0_54' : (2,20),
+            '0_55' : (2,21),
+            '0_56' : (3,3),
+            '0_57' : (3,4),
+            '0_58' : (3,5),
+            '0_59' : (3,6),
+            '0_60' : (4,3),
+            '0_61' : (4,4),
+            '0_62' : None,
+            '0_63' : None,
+            '1_0' : (1,0),
+            '1_1' : (1,1),
+            '1_2' : (1,2),
+            '1_3' : (1,3),
+            '1_4' : (2,0),
+            '1_5' : (2,1),
+            '1_6' : (2,2),
+            '1_7' : (2,3),
+            '1_8' : (2,4),
+            '1_9' : (2,5),
+            '1_10' : (3,0),
+            '1_11' : (4,0),
+            '1_12' : (1,4),
+            '1_13' : (1,5),
+            '1_14' : (1,6),
+            '1_15' : (1,7),
+            '1_16' : (1,8),
+            '1_17' : (1,9),
+            '1_18' : (1,10),
+            '1_19' : (1,11),
+            '1_20' : (2,6),
+            '1_21' : (2,7),
+            '1_22' : (2,8),
+            '1_23' : (2,9),
+            '1_24' : (2,10),
+            '1_25' : (2,11),
+            '1_26' : (2,12),
+            '1_27' : (2,13),
+            '1_28' : (3,1),
+            '1_29' : (3,2),
+            '1_30' : (4,1),
+            '1_31' : (4,2),
+            '2_0' : (1,0),
+            '2_1' : (1,1),
+            '2_2' : (1,2),
+            '2_3' : (1,3),
+            '2_4' : (2,0),
+            '2_5' : (2,1),
+            '2_6' : (2,2),
+            '2_7' : (2,3),
+            '2_8' : (2,4),
+            '2_9' : (2,5),
+            '2_10' : (3,0),
+            '2_11' : (4,0),
+            '2_12' : None,
+            '2_13' : None,
+            '2_14' : None,
+            }
         
+        #Table 7.3.1.1.2-3: Precoding information and number of layers for 4 antenna ports, if transform precoder is enabled, or if transform precoder is disabled and maxRank = 1
+        self.nrDci01TpmiAp4Tp1OrTp0MaxRank1 = {
+            '0_0' : (1,0),
+            '0_1' : (1,1),
+            '0_2' : (1,2),
+            '0_3' : (1,3),
+            '0_4' : (1,4),
+            '0_5' : (1,5),
+            '0_6' : (1,6),
+            '0_7' : (1,7),
+            '0_8' : (1,8),
+            '0_9' : (1,9),
+            '0_10' : (1,10),
+            '0_11' : (1,11),
+            '0_12' : (1,12),
+            '0_13' : (1,13),
+            '0_14' : (1,14),
+            '0_15' : (1,15),
+            '0_16' : (1,16),
+            '0_17' : (1,17),
+            '0_18' : (1,18),
+            '0_19' : (1,19),
+            '0_20' : (1,20),
+            '0_21' : (1,21),
+            '0_22' : (1,22),
+            '0_23' : (1,23),
+            '0_24' : (1,24),
+            '0_25' : (1,25),
+            '0_26' : (1,26),
+            '0_27' : (1,27),
+            '0_28' : None,
+            '0_29' : None,
+            '0_30' : None,
+            '0_31' : None,
+            '1_0' : (1,0),
+            '1_1' : (1,1),
+            '1_2' : (1,2),
+            '1_3' : (1,3),
+            '1_4' : (1,4),
+            '1_5' : (1,5),
+            '1_6' : (1,6),
+            '1_7' : (1,7),
+            '1_8' : (1,8),
+            '1_9' : (1,9),
+            '1_10' : (1,10),
+            '1_11' : (1,11),
+            '1_12' : None,
+            '1_13' : None,
+            '1_14' : None,
+            '1_15' : None,
+            '2_0' : (1,0),
+            '2_1' : (1,1),
+            '2_2' : (1,2),
+            '2_3' : (1,3),
+            }
+        
+        #Table 7.3.1.1.2-4: Precoding information and number of layers, for 2 antenna ports, if transform precoder is disabled and maxRank = 2
+        self.nrDci01TpmiAp2Tp0MaxRank2 = {
+            '0_0' : (1,0),
+            '0_1' : (1,1),
+            '0_2' : (2,0),
+            '0_3' : (1,2),
+            '0_4' : (1,3),
+            '0_5' : (1,4),
+            '0_6' : (1,5),
+            '0_7' : (2,1),
+            '0_8' : (2,2),
+            '0_9' : None,
+            '0_10' : None,
+            '0_11' : None,
+            '0_12' : None,
+            '0_13' : None,
+            '0_14' : None,
+            '0_15' : None,
+            '2_0' : (1,0),
+            '2_1' : (1,1),
+            '2_2' : (2,0),
+            '2_3' : None,
+            }
+        
+        #Table 7.3.1.1.2-5: Precoding information and number of layers, for 2 antenna ports, if transform precoder is enabled, or if transform precoder is disabled and maxRank = 1
+        self.nrDci01TpmiAp2Tp1OrTp0MaxRank1 = {
+            '0_0' : (1,0),
+            '0_1' : (1,1),
+            '0_2' : (1,2),
+            '0_3' : (1,3),
+            '0_4' : (1,4),
+            '0_5' : (1,5),
+            '0_6' : None,
+            '0_7' : None,
+            '2_0' : (1,0),
+            '2_1' : (1,1),
+            }
+        
+        #refer to 3GPP 38.212 vf30
+        #Table 7.3.1.1.2-28: SRI indication for non-codebook based PUSCH transmission, Lmax=1
+        #Table 7.3.1.1.2-29: SRI indication for non-codebook based PUSCH transmission, Lmax=2
+        #Table 7.3.1.1.2-30: SRI indication for non-codebook based PUSCH transmission, Lmax=3
+        #Table 7.3.1.1.2-31: SRI indication for non-codebook based PUSCH transmission, Lmax=4
+        self.nrDci01Sri = {
+            #Lmax=1
+            '1_2_0' : (0,),
+            '1_2_1' : (1,),
+            '1_3_0' : (0,),
+            '1_3_1' : (1,),
+            '1_3_2' : (2,),
+            '1_3_3' : None,
+            '1_4_0' : (0,),
+            '1_4_1' : (1,),
+            '1_4_2' : (2,),
+            '1_4_3' : (3,),
+            #Lmax=2
+            '2_2_0' : (0,),
+            '2_2_1' : (1,),
+            '2_2_2' : (0,1,),
+            '2_2_3' : None,
+            '2_3_0' : (0,),
+            '2_3_1' : (1,),
+            '2_3_2' : (2,),
+            '2_3_3' : (0,1,),
+            '2_3_4' : (0,2,),
+            '2_3_5' : (1,2,),
+            '2_3_6' : None,
+            '2_3_7' : None,
+            '2_4_0' : (0,),
+            '2_4_1' : (1,),
+            '2_4_2' : (2,),
+            '2_4_3' : (3,),
+            '2_4_4' : (0,1,),
+            '2_4_5' : (0,2,),
+            '2_4_6' : (0,3,),
+            '2_4_7' : (1,2,),
+            '2_4_8' : (1,3,),
+            '2_4_9' : (2,3,),
+            '2_4_10' : None,
+            '2_4_11' : None,
+            '2_4_12' : None,
+            '2_4_13' : None,
+            '2_4_14' : None,
+            '2_4_15' : None,
+            #Lmax=3
+            '3_2_0' : (0,),
+            '3_2_1' : (1,),
+            '3_2_2' : (0,1,),
+            '3_2_3' : None,
+            '3_3_0' : (0,),
+            '3_3_1' : (1,),
+            '3_3_2' : (2,),
+            '3_3_3' : (0,1,),
+            '3_3_4' : (0,2,),
+            '3_3_5' : (1,2,),
+            '3_3_6' : (0,1,2,),
+            '3_3_7' : None,
+            '3_4_0' : (0,),
+            '3_4_1' : (1,),
+            '3_4_2' : (2,),
+            '3_4_3' : (3,),
+            '3_4_4' : (0,1,),
+            '3_4_5' : (0,2,),
+            '3_4_6' : (0,3,),
+            '3_4_7' : (1,2,),
+            '3_4_8' : (1,3,),
+            '3_4_9' : (2,3,),
+            '3_4_10' : (0,1,2,),
+            '3_4_11' : (0,1,3,),
+            '3_4_12' : (0,2,3,),
+            '3_4_13' : (1,2,3,),
+            '3_4_14' : None,
+            '3_4_15' : None,
+            #Lmax=4
+            '4_2_0' : (0,),
+            '4_2_1' : (1,),
+            '4_2_2' : (0,1,),
+            '4_2_3' : None,
+            '4_3_0' : (0,),
+            '4_3_1' : (1,),
+            '4_3_2' : (2,),
+            '4_3_3' : (0,1,),
+            '4_3_4' : (0,2,),
+            '4_3_5' : (1,2,),
+            '4_3_6' : (0,1,2,),
+            '4_3_7' : None,
+            '4_4_0' : (0,),
+            '4_4_1' : (1,),
+            '4_4_2' : (2,),
+            '4_4_3' : (3,),
+            '4_4_4' : (0,1,),
+            '4_4_5' : (0,2,),
+            '4_4_6' : (0,3,),
+            '4_4_7' : (1,2,),
+            '4_4_8' : (1,3,),
+            '4_4_9' : (2,3,),
+            '4_4_10' : (0,1,2,),
+            '4_4_11' : (0,1,3,),
+            '4_4_12' : (0,2,3,),
+            '4_4_13' : (1,2,3,),
+            '4_4_14' : (0,1,2,3,),
+            '4_4_15' : None,
+            }
         
         #offset of CORESET0 w.r.t. SSB
         self.coreset0Offset = 0
@@ -6166,36 +6481,53 @@ class NgNrGridUi(QDialog):
             pass
         
         self.ngwin.logEdit.append('-->inside onUeAntPortsCombCurIndChanged, index=%d' % index)
-        nap = int(self.nrUeAntPortsComb.currentText()[:-2])
-        if nap == 1:
+        self.updateDedPuschCfgLabel()
+        if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
+            self.updateDci01PrecodingLayersFieldLabel()
+    
+    def updateDedPuschCfgLabel(self):
+        self.ngwin.logEdit.append('-->inside updateDedPuschCfgLabel') 
+        
+        numUeAp = int(self.nrUeAntPortsComb.currentText()[:-2])
+        tp = self.nrDedPuschCfgTpComb.currentText()
+        if numUeAp == 1:
             self.nrDedPuschCfgCbMaxRankLabel.setText('CB maxRank[1]:')
             self.nrDedPuschCfgCbMaxRankEdit.setText('1')
-            self.nrDedPuschCfgCbMaxRankEdit.setEnabled(False)
+            self.nrDedPuschCfgCbMaxRankEdit.setValidator(QIntValidator(1, 1))
             self.nrDedPuschCfgNonCbMaxLayersLabel.setText('non-CB maxLayers(Lmax)[1]:')
             self.nrDedPuschCfgNonCbMaxLayersEdit.setText('1')
-            self.nrDedPuschCfgNonCbMaxLayersEdit.setEnabled(False)
-            self.nrDci01PuschPercodingLayersFieldEdit.setEnabled(False)
+            self.nrDedPuschCfgNonCbMaxLayersEdit.setValidator(QIntValidator(1, 1))
+            
             self.nrDedPuschCfgCbSubsetComb.setEnabled(False)
+            self.nrDci01PuschPrecodingLayersFieldEdit.setEnabled(False)
         else:
-            self.nrDedPuschCfgCbMaxRankLabel.setText('CB maxRank[1-%s]:' % nap)
-            self.nrDedPuschCfgCbMaxRankEdit.setText(str(nap))
-            self.nrDedPuschCfgCbMaxRankEdit.setValidator(QIntValidator(1, nap))
-            self.nrDedPuschCfgNonCbMaxLayersLabel.setText('non-CB maxLayers(Lmax)[1-%s]:' % nap)
-            self.nrDedPuschCfgNonCbMaxLayersEdit.setText(str(nap))
-            self.nrDedPuschCfgNonCbMaxLayersEdit.setValidator(QIntValidator(1, nap))
+            if tp == 'disabled':
+                self.nrDedPuschCfgCbMaxRankLabel.setText('CB maxRank[1-%s]:' % numUeAp)
+                self.nrDedPuschCfgCbMaxRankEdit.setText(str(numUeAp))
+                self.nrDedPuschCfgCbMaxRankEdit.setValidator(QIntValidator(1, numUeAp))
+                self.nrDedPuschCfgNonCbMaxLayersLabel.setText('non-CB maxLayers(Lmax)[1-%s]:' % numUeAp)
+                self.nrDedPuschCfgNonCbMaxLayersEdit.setText(str(numUeAp))
+                self.nrDedPuschCfgNonCbMaxLayersEdit.setValidator(QIntValidator(1, numUeAp))
+            else:
+                self.nrDedPuschCfgCbMaxRankLabel.setText('CB maxRank[1]:')
+                self.nrDedPuschCfgCbMaxRankEdit.setText('1')
+                self.nrDedPuschCfgCbMaxRankEdit.setValidator(QIntValidator(1, 1))
+                self.nrDedPuschCfgNonCbMaxLayersLabel.setText('non-CB maxLayers(Lmax)[1]:')
+                self.nrDedPuschCfgNonCbMaxLayersEdit.setText('1')
+                self.nrDedPuschCfgNonCbMaxLayersEdit.setValidator(QIntValidator(1, 1))
+                
             if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
-                self.nrDedPuschCfgCbMaxRankEdit.setEnabled(True)
                 self.nrDedPuschCfgCbSubsetComb.setEnabled(True)
-                if nap == 2:
+                if numUeAp == 2:
                     self.nrDedPuschCfgCbSubsetComb.clear()
                     self.nrDedPuschCfgCbSubsetComb.addItems(['fullyAndPartialAndNonCoherent', 'nonCoherent'])
                 else:
                     self.nrDedPuschCfgCbSubsetComb.clear()
                     self.nrDedPuschCfgCbSubsetComb.addItems(['fullyAndPartialAndNonCoherent', 'partialAndNonCoherent', 'nonCoherent'])
-                self.nrDci01PuschPercodingLayersFieldEdit.setEnabled(True)
+                self.nrDci01PuschPrecodingLayersFieldEdit.setEnabled(True)
             else:
-                self.nrDedPuschCfgNonCbMaxLayersEdit.setEnabled(True)
-                
+                self.nrDedPuschCfgCbSubsetComb.setEnabled(False)
+                self.nrDci01PuschPrecodingLayersFieldEdit.setEnabled(False)
         
     def onTddCfgPat2PeriodCombCurIndChanged(self, index):
         if index < 0:
@@ -8121,31 +8453,57 @@ class NgNrGridUi(QDialog):
             #self.updateLRBsDedPuschTp()
             self.updateDedUlBwpInfo()
             
-            #update 'CB maxRank' and 'non-CB maxLayers'
-            if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
-                self.nrDedPuschCfgCbMaxRankEdit.setText('1')
-            else:
-                self.nrDedPuschCfgNonCbMaxLayersEdit.setText('1')
+            #only DMRS configuration type 1 is supported when tp is enabled
+            self.nrDmrsDedPuschDmrsTypeComb.setCurrentText('Type 1')
+            self.nrDmrsDedPuschDmrsTypeComb.setEnabled(False)
         else:
-            pass
+            self.nrDmrsDedPuschDmrsTypeComb.setEnabled(True)
+        
+        #update 'CB maxRank' and 'non-CB maxLayers'
+        self.updateDedPuschCfgLabel()
+        
+        #update 'precoding info and num of layers' label
+        if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
+            self.updateDci01PrecodingLayersFieldLabel()
+        
+        #update 'antenna port(s)' label
+        self.updateDci01AntPortsFieldLabel()
             
     def onDedPuschCfgTxCfgCombCurIndChanged(self, index):
         if index < 0:
             return
         
         self.ngwin.logEdit.append('-->inside onDedPuschCfgTxCfgCombCurIndChanged')
-        if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
-            if int(self.nrUeAntPortsComb.currentText()[:-2]) > 1:
-                self.nrDci01PuschPercodingLayersFieldEdit.setEnabled(True)
+        numUeAp = int(self.nrUeAntPortsComb.currentText()[:-2])
+        if numUeAp == 1:
+            pass
+        else:
+            if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
                 self.nrDedPuschCfgCbSubsetComb.setEnabled(True)
-                self.nrDedPuschCfgCbMaxRankEdit.setEnabled(True)
+                if numUeAp == 2:
+                    self.nrDedPuschCfgCbSubsetComb.clear()
+                    self.nrDedPuschCfgCbSubsetComb.addItems(['fullyAndPartialAndNonCoherent', 'nonCoherent'])
+                else:
+                    self.nrDedPuschCfgCbSubsetComb.clear()
+                    self.nrDedPuschCfgCbSubsetComb.addItems(['fullyAndPartialAndNonCoherent', 'partialAndNonCoherent', 'nonCoherent'])
+                self.nrDci01PuschPrecodingLayersFieldEdit.setEnabled(True)
+            else:
+                self.nrDedPuschCfgCbSubsetComb.setEnabled(False)
+                self.nrDci01PuschPrecodingLayersFieldEdit.setEnabled(False)
+        
+        if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
+            self.nrDedPuschCfgCbMaxRankEdit.setEnabled(True)
             self.nrDedPuschCfgNonCbMaxLayersEdit.setEnabled(False)
         else:
-            self.nrDci01PuschPercodingLayersFieldEdit.setEnabled(False)
-            self.nrDedPuschCfgCbSubsetComb.setEnabled(False)
             self.nrDedPuschCfgCbMaxRankEdit.setEnabled(False)
-            if int(self.nrUeAntPortsComb.currentText()[:-2]) > 1:
-                self.nrDedPuschCfgNonCbMaxLayersEdit.setEnabled(True)
+            self.nrDedPuschCfgNonCbMaxLayersEdit.setEnabled(True)
+            
+        #update 'precoding info and num of layers' label
+        if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
+            self.updateDci01PrecodingLayersFieldLabel()
+            
+        #update 'srs resource indicator' label
+        self.updateDci01SriFieldLable()
         
     def onDedPdschCfgMcsTableCombCurIndChanged(self, index):
         if index < 0:
@@ -8163,73 +8521,251 @@ class NgNrGridUi(QDialog):
         #update 'tbs' by calling getTbs when necessary
         self.validatePdschAntPorts()
     
-    def validatePuschAntPorts(self):
-        self.ngwin.logEdit.append('-->inside validatePuschAntPorts')
+    def updateDci01PrecodingLayersFieldLabel(self):
+        self.ngwin.logEdit.append('-->inside updateDci01PrecodingLayersFieldLabel') 
         
-        #reset 'precoding info and number of layers' label
         if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
             if not self.nrDedPuschCfgCbMaxRankEdit.text():
+                self.nrDci01PuschPrecodingLayersFieldLabel.setText('Precoding info and num of layers:')
+                self.nrDci01PuschPrecodingLayersFieldEdit.setValidator(0)
                 return
             numUeAp = int(self.nrUeAntPortsComb.currentText()[:-2])
             tp = self.nrDedPuschCfgTpComb.currentText()
             maxRank = int(self.nrDedPuschCfgCbMaxRankEdit.text()) 
             cbSubset = self.nrDedPuschCfgCbSubsetComb.currentText()
+            #refer to 3GPP 38.212 vf30
+            #Table 7.3.1.1.2-2: Precoding information and number of layers, for 4 antenna ports, if transform precoder is disabled and maxRank = 2 or 3 or 4
+            #Table 7.3.1.1.2-3: Precoding information and number of layers for 4 antenna ports, if transform precoder is enabled, or if transform precoder is disabled and maxRank = 1
+            #Table 7.3.1.1.2-4: Precoding information and number of layers, for 2 antenna ports, if transform precoder is disabled and maxRank = 2
+            #Table 7.3.1.1.2-5: Precoding information and number of layers, for 2 antenna ports, if transform precoder is enabled, or if transform precoder is disabled and maxRank = 1
             if numUeAp == 4 and tp == 'disabled' and maxRank in (2,3,4):
                 if cbSubset == 'fullyAndPartialAndNonCoherent':
-                    self.nrDci01PuschPercodingLayersFieldLabel.setText('Precoding info and num of layers[0-63]')
-                    self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 63))
+                    self.nrDci01PuschPrecodingLayersFieldLabel.setText('Precoding info and num of layers[0-63]:')
+                    self.nrDci01PuschPrecodingLayersFieldEdit.setValidator(QIntValidator(0, 63))
                 elif cbSubset == 'partialAndNonCoherent':
-                    self.nrDci01PuschPercodingLayersFieldLabel.setText('Precoding info and num of layers[0-31]')
-                    self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 31))
+                    self.nrDci01PuschPrecodingLayersFieldLabel.setText('Precoding info and num of layers[0-31]:')
+                    self.nrDci01PuschPrecodingLayersFieldEdit.setValidator(QIntValidator(0, 31))
                 else:
-                    self.nrDci01PuschPercodingLayersFieldLabel.setText('Precoding info and num of layers[0-15]')
-                    self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 15))
+                    self.nrDci01PuschPrecodingLayersFieldLabel.setText('Precoding info and num of layers[0-15]:')
+                    self.nrDci01PuschPrecodingLayersFieldEdit.setValidator(QIntValidator(0, 15))
             elif numUeAp == 4 and (tp == 'enabled' or (tp == 'disabled' and maxRank == 1)):
                 if cbSubset == 'fullyAndPartialAndNonCoherent':
-                    self.nrDci01PuschPercodingLayersFieldLabel.setText('Precoding info and num of layers[0-31]')
-                    self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 31))
+                    self.nrDci01PuschPrecodingLayersFieldLabel.setText('Precoding info and num of layers[0-31]:')
+                    self.nrDci01PuschPrecodingLayersFieldEdit.setValidator(QIntValidator(0, 31))
                 elif cbSubset == 'partialAndNonCoherent':
-                    self.nrDci01PuschPercodingLayersFieldLabel.setText('Precoding info and num of layers[0-15]')
-                    self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 15))
+                    self.nrDci01PuschPrecodingLayersFieldLabel.setText('Precoding info and num of layers[0-15]:')
+                    self.nrDci01PuschPrecodingLayersFieldEdit.setValidator(QIntValidator(0, 15))
                 else:
-                    self.nrDci01PuschPercodingLayersFieldLabel.setText('Precoding info and num of layers[0-3]')
-                    self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 3))
+                    self.nrDci01PuschPrecodingLayersFieldLabel.setText('Precoding info and num of layers[0-3]:')
+                    self.nrDci01PuschPrecodingLayersFieldEdit.setValidator(QIntValidator(0, 3))
             elif numUeAp == 2 and tp == 'disabled' and maxRank == 2:
                 if cbSubset == 'fullyAndPartialAndNonCoherent':
-                    self.nrDci01PuschPercodingLayersFieldLabel.setText('Precoding info and num of layers[0-15]')
-                    self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 15))
+                    self.nrDci01PuschPrecodingLayersFieldLabel.setText('Precoding info and num of layers[0-15]:')
+                    self.nrDci01PuschPrecodingLayersFieldEdit.setValidator(QIntValidator(0, 15))
                 elif cbSubset == 'nonCoherent':
-                    self.nrDci01PuschPercodingLayersFieldLabel.setText('Precoding info and num of layers[0-3]')
-                    self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 3))
+                    self.nrDci01PuschPrecodingLayersFieldLabel.setText('Precoding info and num of layers[0-3]:')
+                    self.nrDci01PuschPrecodingLayersFieldEdit.setValidator(QIntValidator(0, 3))
                 else:
                     self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Codebook subset "partialAndNonCoherent" is not supported for two antenna ports.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
                     return
             elif numUeAp == 2 and (tp == 'enabled' or (tp == 'disabled' and maxRank == 1)):
                 if cbSubset == 'fullyAndPartialAndNonCoherent':
-                    self.nrDci01PuschPercodingLayersFieldLabel.setText('Precoding info and num of layers[0-7]')
-                    self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 7))
+                    self.nrDci01PuschPrecodingLayersFieldLabel.setText('Precoding info and num of layers[0-7]')
+                    self.nrDci01PuschPrecodingLayersFieldEdit.setValidator(QIntValidator(0, 7))
                 elif cbSubset == 'nonCoherent':
-                    self.nrDci01PuschPercodingLayersFieldLabel.setText('Precoding info and num of layers[0-1]')
-                    self.nrDci01PuschPercodingLayersFieldEdit.setValidator(QIntValidator(0, 1))
+                    self.nrDci01PuschPrecodingLayersFieldLabel.setText('Precoding info and num of layers[0-1]')
+                    self.nrDci01PuschPrecodingLayersFieldEdit.setValidator(QIntValidator(0, 1))
                 else:
                     self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Codebook subset "partialAndNonCoherent" is not supported for two antenna ports.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
                     return
             else:
                 pass
+    
+    def updateDci01SriFieldLable(self):
+        self.ngwin.logEdit.append('-->inside updateDci01SriFieldLable') 
         
-        #reset 'srs resouces indicator' label
         if self.nrDedPuschCfgTxCfgComb.currentText() == 'nonCodebook':
             if not self.nrDedPuschCfgNonCbMaxLayersEdit.text() or not self.nrSrsResSet1ResourceIdListEdit.text():
+                self.nrDci01PuschSriFieldLabel.setText('SRS resource indicator:')
+                self.nrDci01PuschSriFieldEdit.setValidator(0)
                 return
+            
             Lmax = int(self.nrDedPuschCfgNonCbMaxLayersEdit.text())
-            srsSet1 = [int(i) for i in self.nrSrsResSet1ResourceIdListEdit.text().split(',') if len(i) > 0]
+            
+            try:
+                srsSet1 = [int(i) for i in self.nrSrsResSet1ResourceIdListEdit.text().split(',') if len(i) > 0]
+            except Exception as e:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Exception raised when parsing srs-resourceSet1: %s.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), e))
+                return
+            
             Nsrs = len(srsSet1)
-            if Nsrs == 0 or sum([1 for i in srsSet1 if i in range(4)]) != len(srsSet1):
+            if Nsrs == 0 or sum([1 for i in srsSet1 if i in range(4)]) != Nsrs:
                 self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: srs-ResourceIdList should be a comma-separated string which contains valid srs-ResourceId[0-3], for example, "0,1,2,3".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
                 return
+            
+            if Nsrs > 4:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: The maximum number of SRS resources that can be configured for non-codebook based uplink transmission is 4.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+                return
+            
+            if ((0 in srsSet1 and self.nrSrsRes0NumAntPortsComb.currentText() != 'port1')
+                or (1 in srsSet1 and self.nrSrsRes1NumAntPortsComb.currentText() != 'port1')
+                or (2 in srsSet1 and self.nrSrsRes2NumAntPortsComb.currentText() != 'port1')
+                or (3 in srsSet1 and self.nrSrsRes3NumAntPortsComb.currentText() != 'port1')):
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Only one SRS port can be configured for each SRS resource of the SRS resource set configured with usage set to "nonCodebook".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+                return
+            
+            if Nsrs == 1:
+                self.nrDci01PuschSriFieldLabel.setText('SRS resource indicator:')
+                self.nrDci01PuschSriFieldEdit.clear()
+                self.nrDci01PuschSriFieldEdit.setEnabled(False)
+            else:
+                self.nrDci01PuschSriFieldEdit.setEnabled(True)
+                #refer to 3GPP 38.212 vf30
+                #Table 7.3.1.1.2-28: SRI indication for non-codebook based PUSCH transmission, Lmax=1
+                #Table 7.3.1.1.2-29: SRI indication for non-codebook based PUSCH transmission, Lmax=2
+                #Table 7.3.1.1.2-30: SRI indication for non-codebook based PUSCH transmission, Lmax=3
+                #Table 7.3.1.1.2-31: SRI indication for non-codebook based PUSCH transmission, Lmax=4
+                nonCbSriRange = {
+                    '1_2' : (0,1),
+                    '1_3' : (0,3),
+                    '1_4' : (0,3),
+                    '2_2' : (0,3),
+                    '2_3' : (0,7),
+                    '2_4' : (0,15),
+                    '3_2' : (0,3),
+                    '3_3' : (0,7),
+                    '3_4' : (0,15),
+                    '4_2' : (0,3),
+                    '4_3' : (0,7),
+                    '4_4' : (0,15),
+                    }
+                key = '%s_%s' % (Lmax, Nsrs)
+                minSri, maxSri = nonCbSriRange[key]
+                self.nrDci01PuschSriFieldLabel.setText('SRS resource indicator[%d-%d]:' % (minSri, maxSri))
+                self.nrDci01PuschSriFieldEdit.setValidator(QIntValidator(minSri, maxSri))
+        else:
+            try:
+                srsSet0 = [int(i) for i in self.nrSrsResSet0ResourceIdListEdit.text().split(',') if len(i) > 0]
+            except Exception as e:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Exception raised when parsing srs-resourceSet0: %s.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), e))
+                return
+            
+            Nsrs = len(srsSet0)
+            if Nsrs == 0 or sum([1 for i in srsSet0 if i in range(4)]) != Nsrs:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: srs-ResourceIdList should be a comma-separated string which contains valid srs-ResourceId[0-3], for example, "0,1,2,3".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+                return
+            
+            if Nsrs > 2:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: The maximum number of SRS resources that can be configured for codebook based uplink transmission is 2.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+                return
+            
+            if Nsrs == 1:
+                self.nrDci01PuschSriFieldLabel.setText('SRS resource indicator:')
+                self.nrDci01PuschSriFieldEdit.clear()
+                self.nrDci01PuschSriFieldEdit.setEnabled(False)
+            else:
+                #refer to 3GPP 38.214 vf30 6.1.1.1
+                #When multiple SRS resources are configured by SRS-ResourceSet with usage set to 'codebook', the UE shall expect that higher layer parameters nrofSRS-Ports in SRS-Resource in SRS-ResourceSet shall be configured with the same value for all these SRS resources.
+                srsApSet = {0:self.nrSrsRes0NumAntPortsComb.currentText(), 1:self.nrSrsRes1NumAntPortsComb.currentText(), 2:self.nrSrsRes2NumAntPortsComb.currentText(), 3:self.nrSrsRes3NumAntPortsComb.currentText()}
+                
+                if srsApSet[srsSet0[0]] != srsApSet[srsSet0[1]]:
+                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Parameter nrOfSRS-Ports must be the same when multiple SRS resources are configured for codebook based uplink transmission.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+                    return
+                
+                self.nrDci01PuschSriFieldLabel.setText('SRS resource indicator[0-1]:')
+                self.nrDci01PuschSriFieldEdit.setValidator(QIntValidator(0, 1))
+                self.nrDci01PuschSriFieldEdit.setEnabled(True)
+    
+    def updateDci01AntPortsFieldLabel(self):
+        self.ngwin.logEdit.append('-->inside updateDci01AntPortsFieldLabel') 
+        
+        tp = self.nrDedPuschCfgTpComb.currentText()
+        dmrsType = self.nrDmrsDedPuschDmrsTypeComb.currentText()
+        maxLen = self.nrDmrsDedPuschMaxLengthComb.currentText()
+        if tp == 'enabled' and dmrsType == 'Type 1' and maxLen == 'len1':#rank=1
+            self.nrDci01PuschAntPortsFieldLabel.setText('Antenna port(s)[0-3]:')
+            self.nrDci01PuschAntPortsFieldEdit.setValidator(QIntValidator(0, 3))
+        elif tp == 'enabled' and dmrsType == 'Type 1' and maxLen == 'len2':#rank=1
+            self.nrDci01PuschAntPortsFieldLabel.setText('Antenna port(s)[0-15]:')
+            self.nrDci01PuschAntPortsFieldEdit.setValidator(QIntValidator(0, 15))
+        elif tp == 'disabled' and dmrsType == 'Type 1' and maxLen == 'len1':#rank=1/2/3/4
+            self.nrDci01PuschAntPortsFieldLabel.setText('Antenna port(s)[0-7]:')
+            self.nrDci01PuschAntPortsFieldEdit.setValidator(QIntValidator(0, 7))
+        elif tp == 'disabled' and dmrsType == 'Type 1' and maxLen == 'len2':#rank=1/2/3/4
+            self.nrDci01PuschAntPortsFieldLabel.setText('Antenna port(s)[0-15]:')
+            self.nrDci01PuschAntPortsFieldEdit.setValidator(QIntValidator(0, 15))
+        elif tp == 'disabled' and dmrsType == 'Type 2' and maxLen == 'len1':#rank=1/2/3/4
+            self.nrDci01PuschAntPortsFieldLabel.setText('Antenna port(s)[0-15]:')
+            self.nrDci01PuschAntPortsFieldEdit.setValidator(QIntValidator(0, 15))
+        elif tp == 'disabled' and dmrsType == 'Type 2' and maxLen == 'len2':#rank=1/2/3/4
+            self.nrDci01PuschAntPortsFieldLabel.setText('Antenna port(s)[0-31]:')
+            self.nrDci01PuschAntPortsFieldEdit.setValidator(QIntValidator(0, 31))
+        else:
+            pass
+    
+    def validatePuschAntPorts(self):
+        self.ngwin.logEdit.append('-->inside validatePuschAntPorts')
         
         #reset 'antenna port(s)' label
-        
+        if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
+            if not self.nrDedPuschCfgCbMaxRankEdit.text() or not self.nrDci01PuschPrecodingLayersFieldEdit.text():
+                return
+            numUeAp = int(self.nrUeAntPortsComb.currentText()[:-2])
+            tp = self.nrDedPuschCfgTpComb.currentText()
+            maxRank = int(self.nrDedPuschCfgCbMaxRankEdit.text()) 
+            cbSubset = self.nrDedPuschCfgCbSubsetComb.currentText()
+            precoding = int(self.nrDci01PuschPrecodingLayersFieldEdit.text())
+            key = '%s_%s' % ({'fullyAndPartialAndNonCoherent':0, 'partialAndNonCoherent':1, 'nonCoherent':2}[cbSubset], precoding) 
+            if numUeAp == 4 and tp == 'disabled' and maxRank in (2,3,4):
+                if key in self.nrDci01TpmiAp4Tp0MaxRank234 and self.nrDci01TpmiAp4Tp0MaxRank234[key] is not None:
+                    rank, tpmi = self.nrDci01TpmiAp4Tp0MaxRank234[key]
+                else:
+                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrDci01TpmiAp4Tp0MaxRank234.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                    return
+            elif numUeAp == 4 and (tp == 'enabled' or (tp == 'disabled' and maxRank == 1)):
+                if key in self.nrDci01TpmiAp4Tp1OrTp0MaxRank1 and self.nrDci01TpmiAp4Tp1OrTp0MaxRank1[key] is not None:
+                    rank, tpmi = self.nrDci01TpmiAp4Tp1OrTp0MaxRank1[key]
+                else:
+                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrDci01TpmiAp4Tp1OrTp0MaxRank1.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                    return
+            elif numUeAp == 2 and tp == 'disabled' and maxRank == 2:
+                if key in self.nrDci01TpmiAp2Tp0MaxRank2 and self.nrDci01TpmiAp2Tp0MaxRank2[key] is not None:
+                    rank, tpmi = self.nrDci01TpmiAp2Tp0MaxRank2[key]
+                else:
+                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrDci01TpmiAp2Tp0MaxRank2.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                    return
+            elif numUeAp == 2 and (tp == 'enabled' or (tp == 'disabled' and maxRank == 1)):
+                if key in self.nrDci01TpmiAp2Tp1OrTp0MaxRank1 and self.nrDci01TpmiAp2Tp1OrTp0MaxRank1[key] is not None:
+                    rank, tpmi = self.nrDci01TpmiAp2Tp1OrTp0MaxRank1[key]
+                else:
+                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrDci01TpmiAp2Tp1OrTp0MaxRank1.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                    return
+            else:
+                rank = 1
+        else:
+            if not self.nrDedPuschCfgNonCbMaxLayersEdit.text() or not self.nrSrsResSet1ResourceIdListEdit.text() or not self.nrDci01PuschSriFieldEdit.text():
+                return
+            
+            Lmax = int(self.nrDedPuschCfgNonCbMaxLayersEdit.text())
+            
+            try:
+                srsSet1 = [int(i) for i in self.nrSrsResSet1ResourceIdListEdit.text().split(',') if len(i) > 0]
+            except Exception as e:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Exception raised: %s.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), e))
+                return
+            Nsrs = len(srsSet1)
+            
+            sri = int(self.nrDci01PuschSriFieldEdit.text())
+            
+            key = '%s_%s_%s' % (Lmax, Nsrs, sri)
+            if Nsrs == 1:
+                rank = 1
+            else:
+                if key in self.nrDci01Sri and self.nrDci01Sri[key] is not None:
+                    rank = len(self.nrDci01Sri[key])
+                else:
+                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrDci01Sri.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                    return
         #TODO
             
     def getTbs(self, sch='pdsch', tp=0, rnti='c-rnti', tab='qam64', td=1, fd=1, mcs=0, layer=1, dmrs=0, xoh=0, scale=1):
