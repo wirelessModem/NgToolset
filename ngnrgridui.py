@@ -5693,7 +5693,7 @@ class NgNrGridUi(QDialog):
         #Table 7.3.1.1.2-29: SRI indication for non-codebook based PUSCH transmission, Lmax=2
         #Table 7.3.1.1.2-30: SRI indication for non-codebook based PUSCH transmission, Lmax=3
         #Table 7.3.1.1.2-31: SRI indication for non-codebook based PUSCH transmission, Lmax=4
-        self.nrDci01Sri = {
+        self.nrDci01NonCbSri = {
             #Lmax=1
             '1_2_0' : (0,),
             '1_2_1' : (1,),
@@ -5793,6 +5793,338 @@ class NgNrGridUi(QDialog):
             '4_4_14' : (0,1,2,3,),
             '4_4_15' : None,
             }
+        
+        #refer to 3GPP 38.212 vf30
+        self.nrDci01AntPorts = {
+            #Table 7.3.1.1.2-6: Antenna port(s), transform precoder is enabled, dmrs-Type=1, maxLength=1
+            #Table 7.3.1.1.2-7: Antenna port(s), transform precoder is enabled, dmrs-Type=1, maxLength=2
+            '1_1_1_1_0' : (2,(0,),1),
+            '1_1_1_1_1' : (2,(1,),1),
+            '1_1_1_1_2' : (2,(2,),1),
+            '1_1_1_1_3' : (2,(3,),1),
+            '1_1_2_1_0' : (2,(0,),1),
+            '1_1_2_1_1' : (2,(1,),1),
+            '1_1_2_1_2' : (2,(2,),1),
+            '1_1_2_1_3' : (2,(3,),1),
+            '1_1_2_1_4' : (2,(0,),2),
+            '1_1_2_1_5' : (2,(1,),2),
+            '1_1_2_1_6' : (2,(2,),2),
+            '1_1_2_1_7' : (2,(3,),2),
+            '1_1_2_1_8' : (2,(4,),2),
+            '1_1_2_1_9' : (2,(5,),2),
+            '1_1_2_1_10' : (2,(6,),2),
+            '1_1_2_1_11' : (2,(7,),2),
+            '1_1_2_1_12' : None,
+            '1_1_2_1_13' : None,
+            '1_1_2_1_14' : None,
+            '1_1_2_1_15' : None,
+            #Table 7.3.1.1.2-8: Antenna port(s), transform precoder is disabled, dmrs-Type=1, maxLength=1, rank = 1
+            #Table 7.3.1.1.2-9: Antenna port(s), transform precoder is disabled, dmrs-Type=1, maxLength=1, rank = 2
+            #Table 7.3.1.1.2-10: Antenna port(s), transform precoder is disabled, dmrs-Type=1, maxLength=1, rank = 3
+            #Table 7.3.1.1.2-11: Antenna port(s), transform precoder is disabled, dmrs-Type=1, maxLength=1, rank = 4
+            '0_1_1_1_0' : (1,(0,),1),
+            '0_1_1_1_1' : (1,(1,),1),
+            '0_1_1_1_2' : (2,(0,),1),
+            '0_1_1_1_3' : (2,(1,),1),
+            '0_1_1_1_4' : (2,(2,),1),
+            '0_1_1_1_5' : (2,(3,),1),
+            '0_1_1_1_6' : None,
+            '0_1_1_1_7' : None,
+            '0_1_1_2_0' : (1,(0,1,),1),
+            '0_1_1_2_1' : (2,(0,1,),1),
+            '0_1_1_2_2' : (2,(2,3,),1),
+            '0_1_1_2_3' : (2,(0,2,),1),
+            '0_1_1_2_4' : None,
+            '0_1_1_2_5' : None,
+            '0_1_1_2_6' : None,
+            '0_1_1_2_7' : None,
+            '0_1_1_3_0' : (2,(0,1,2,),1),
+            '0_1_1_3_1' : None,
+            '0_1_1_3_2' : None,
+            '0_1_1_3_3' : None,
+            '0_1_1_3_4' : None,
+            '0_1_1_3_5' : None,
+            '0_1_1_3_6' : None,
+            '0_1_1_3_7' : None,
+            '0_1_1_4_0' : (2,(0,1,2,3,),1),
+            '0_1_1_4_1' : None,
+            '0_1_1_4_2' : None,
+            '0_1_1_4_3' : None,
+            '0_1_1_4_4' : None,
+            '0_1_1_4_5' : None,
+            '0_1_1_4_6' : None,
+            '0_1_1_4_7' : None,
+            #Table 7.3.1.1.2-12: Antenna port(s), transform precoder is disabled, dmrs-Type=1, maxLength=2, rank = 1
+            #Table 7.3.1.1.2-13: Antenna port(s), transform precoder is disabled, dmrs-Type=1, maxLength=2, rank = 2
+            #Table 7.3.1.1.2-14: Antenna port(s), transform precoder is disabled, dmrs-Type=1, maxLength=2, rank = 3
+            #Table 7.3.1.1.2-15: Antenna port(s), transform precoder is disabled, dmrs-Type=1, maxLength=2, rank = 4
+            '0_1_2_1_0' : (1,(0,),1),
+            '0_1_2_1_1' : (1,(1,),1),
+            '0_1_2_1_2' : (2,(0,),1),
+            '0_1_2_1_3' : (2,(1,),1),
+            '0_1_2_1_4' : (2,(2,),1),
+            '0_1_2_1_5' : (2,(3,),1),
+            '0_1_2_1_6' : (2,(0,),2),
+            '0_1_2_1_7' : (2,(1,),2),
+            '0_1_2_1_8' : (2,(2,),2),
+            '0_1_2_1_9' : (2,(3,),2),
+            '0_1_2_1_10' : (2,(4,),2),
+            '0_1_2_1_11' : (2,(5,),2),
+            '0_1_2_1_12' : (2,(6,),2),
+            '0_1_2_1_13' : (2,(7,),2),
+            '0_1_2_1_14' : None,
+            '0_1_2_1_15' : None,
+            '0_1_2_2_0' : (1,(0,1,),1),
+            '0_1_2_2_1' : (2,(0,1,),1),
+            '0_1_2_2_2' : (2,(2,3,),1),
+            '0_1_2_2_3' : (2,(0,2,),1),
+            '0_1_2_2_4' : (2,(0,1,),2),
+            '0_1_2_2_5' : (2,(2,3,),2),
+            '0_1_2_2_6' : (2,(4,5,),2),
+            '0_1_2_2_7' : (2,(6,7,),2),
+            '0_1_2_2_8' : (2,(0,4,),2),
+            '0_1_2_2_9' : (2,(2,6,),2),
+            '0_1_2_2_10' : None,
+            '0_1_2_2_11' : None,
+            '0_1_2_2_12' : None,
+            '0_1_2_2_13' : None,
+            '0_1_2_2_14' : None,
+            '0_1_2_2_15' : None,
+            '0_1_2_3_0' : (2,(0,1,2,),1),
+            '0_1_2_3_1' : (2,(0,1,4,),2),
+            '0_1_2_3_2' : (2,(2,3,6,),2),
+            '0_1_2_3_3' : None,
+            '0_1_2_3_4' : None,
+            '0_1_2_3_5' : None,
+            '0_1_2_3_6' : None,
+            '0_1_2_3_7' : None,
+            '0_1_2_3_8' : None,
+            '0_1_2_3_9' : None,
+            '0_1_2_3_10' : None,
+            '0_1_2_3_11' : None,
+            '0_1_2_3_12' : None,
+            '0_1_2_3_13' : None,
+            '0_1_2_3_14' : None,
+            '0_1_2_3_15' : None,
+            '0_1_2_4_0' : (2,(0,1,2,3,),1),
+            '0_1_2_4_1' : (2,(0,1,4,5,),2),
+            '0_1_2_4_2' : (2,(2,3,6,7,),2),
+            '0_1_2_4_3' : (2,(0,2,4,6,),2),
+            '0_1_2_4_4' : None,
+            '0_1_2_4_5' : None,
+            '0_1_2_4_6' : None,
+            '0_1_2_4_7' : None,
+            '0_1_2_4_8' : None,
+            '0_1_2_4_9' : None,
+            '0_1_2_4_10' : None,
+            '0_1_2_4_11' : None,
+            '0_1_2_4_12' : None,
+            '0_1_2_4_13' : None,
+            '0_1_2_4_14' : None,
+            '0_1_2_4_15' : None,
+            #Table 7.3.1.1.2-16: Antenna port(s), transform precoder is disabled, dmrs-Type=2, maxLength=1, rank=1
+            #Table 7.3.1.1.2-17: Antenna port(s), transform precoder is disabled, dmrs-Type=2, maxLength=1, rank=2
+            #Table 7.3.1.1.2-18: Antenna port(s), transform precoder is disabled, dmrs-Type=2, maxLength=1, rank=3
+            #Table 7.3.1.1.2-19: Antenna port(s), transform precoder is disabled, dmrs-Type=2, maxLength=1, rank=4
+            '0_2_1_1_0' : (1,(0,),1),
+            '0_2_1_1_1' : (1,(1,),1),
+            '0_2_1_1_2' : (2,(0,),1),
+            '0_2_1_1_3' : (2,(1,),1),
+            '0_2_1_1_4' : (2,(2,),1),
+            '0_2_1_1_5' : (2,(3,),1),
+            '0_2_1_1_6' : (3,(0,),1),
+            '0_2_1_1_7' : (3,(1,),1),
+            '0_2_1_1_8' : (3,(2,),1),
+            '0_2_1_1_9' : (3,(3,),1),
+            '0_2_1_1_10' : (3,(4,),1),
+            '0_2_1_1_11' : (3,(5,),1),
+            '0_2_1_1_12' : None,
+            '0_2_1_1_13' : None,
+            '0_2_1_1_14' : None,
+            '0_2_1_1_15' : None,
+            '0_2_1_2_0' : (1,(0,1,),1),
+            '0_2_1_2_1' : (2,(0,1,),1),
+            '0_2_1_2_2' : (2,(2,3,),1),
+            '0_2_1_2_3' : (3,(0,1,),1),
+            '0_2_1_2_4' : (3,(2,3,),1),
+            '0_2_1_2_5' : (3,(4,5,),1),
+            '0_2_1_2_6' : (2,(0,2,),1),
+            '0_2_1_2_7' : None,
+            '0_2_1_2_8' : None,
+            '0_2_1_2_9' : None,
+            '0_2_1_2_10' : None,
+            '0_2_1_2_11' : None,
+            '0_2_1_2_12' : None,
+            '0_2_1_2_13' : None,
+            '0_2_1_2_14' : None,
+            '0_2_1_2_15' : None,
+            '0_2_1_3_0' : (2,(0,1,2,),1),
+            '0_2_1_3_1' : (3,(0,1,2,),1),
+            '0_2_1_3_2' : (3,(3,4,5,),1),
+            '0_2_1_3_3' : None,
+            '0_2_1_3_4' : None,
+            '0_2_1_3_5' : None,
+            '0_2_1_3_6' : None,
+            '0_2_1_3_7' : None,
+            '0_2_1_3_8' : None,
+            '0_2_1_3_9' : None,
+            '0_2_1_3_10' : None,
+            '0_2_1_3_11' : None,
+            '0_2_1_3_12' : None,
+            '0_2_1_3_13' : None,
+            '0_2_1_3_14' : None,
+            '0_2_1_3_15' : None,
+            '0_2_1_4_0' : (2,(0,1,2,3,),1),
+            '0_2_1_4_1' : (3,(0,1,2,3,),1),
+            '0_2_1_4_2' : None,
+            '0_2_1_4_3' : None,
+            '0_2_1_4_4' : None,
+            '0_2_1_4_5' : None,
+            '0_2_1_4_6' : None,
+            '0_2_1_4_7' : None,
+            '0_2_1_4_8' : None,
+            '0_2_1_4_9' : None,
+            '0_2_1_4_10' : None,
+            '0_2_1_4_11' : None,
+            '0_2_1_4_12' : None,
+            '0_2_1_4_13' : None,
+            '0_2_1_4_14' : None,
+            '0_2_1_4_15' : None,
+            #Table 7.3.1.1.2-20: Antenna port(s), transform precoder is disabled, dmrs-Type=2, maxLength=2, rank=1
+            #Table 7.3.1.1.2-21: Antenna port(s), transform precoder is disabled, dmrs-Type=2, maxLength=2, rank=2
+            #Table 7.3.1.1.2-22: Antenna port(s), transform precoder is disabled, dmrs-Type=2, maxLength=2, rank=3
+            #Table 7.3.1.1.2-23: Antenna port(s), transform precoder is disabled, dmrs-Type=2, maxLength=2, rank=4
+            '0_2_2_1_0' : (1,(0,),1),
+            '0_2_2_1_1' : (1,(1,),1),
+            '0_2_2_1_2' : (2,(0,),1),
+            '0_2_2_1_3' : (2,(1,),1),
+            '0_2_2_1_4' : (2,(2,),1),
+            '0_2_2_1_5' : (2,(3,),1),
+            '0_2_2_1_6' : (3,(0,),1),
+            '0_2_2_1_7' : (3,(1,),1),
+            '0_2_2_1_8' : (3,(2,),1),
+            '0_2_2_1_9' : (3,(3,),1),
+            '0_2_2_1_10' : (3,(4,),1),
+            '0_2_2_1_11' : (3,(5,),1),
+            '0_2_2_1_12' : (3,(0,),2),
+            '0_2_2_1_13' : (3,(1,),2),
+            '0_2_2_1_14' : (3,(2,),2),
+            '0_2_2_1_15' : (3,(3,),2),
+            '0_2_2_1_16' : (3,(4,),2),
+            '0_2_2_1_17' : (3,(5,),2),
+            '0_2_2_1_18' : (3,(6,),2),
+            '0_2_2_1_19' : (3,(7,),2),
+            '0_2_2_1_20' : (3,(8,),2),
+            '0_2_2_1_21' : (3,(9,),2),
+            '0_2_2_1_22' : (3,(10,),2),
+            '0_2_2_1_23' : (3,(11,),2),
+            '0_2_2_1_24' : (1,(0,),2),
+            '0_2_2_1_25' : (1,(1,),2),
+            '0_2_2_1_26' : (1,(6,),2),
+            '0_2_2_1_27' : (1,(7,),2),
+            '0_2_2_1_28' : None,
+            '0_2_2_1_29' : None,
+            '0_2_2_1_30' : None,
+            '0_2_2_1_31' : None,
+            '0_2_2_2_0' : (1,(0,1,),1),
+            '0_2_2_2_1' : (2,(0,1,),1),
+            '0_2_2_2_2' : (2,(2,3,),1),
+            '0_2_2_2_3' : (3,(0,1,),1),
+            '0_2_2_2_4' : (3,(2,3,),1),
+            '0_2_2_2_5' : (3,(4,5,),1),
+            '0_2_2_2_6' : (2,(0,2,),1),
+            '0_2_2_2_7' : (3,(0,1,),2),
+            '0_2_2_2_8' : (3,(2,3,),2),
+            '0_2_2_2_9' : (3,(4,5,),2),
+            '0_2_2_2_10' : (3,(6,7,),2),
+            '0_2_2_2_11' : (3,(8,9,),2),
+            '0_2_2_2_12' : (3,(10,11,),2),
+            '0_2_2_2_13' : (1,(0,1,),2),
+            '0_2_2_2_14' : (1,(6,7,),2),
+            '0_2_2_2_15' : (2,(0,1,),2),
+            '0_2_2_2_16' : (2,(2,3,),2),
+            '0_2_2_2_17' : (2,(6,7,),2),
+            '0_2_2_2_18' : (2,(8,9,),2),
+            '0_2_2_2_19' : None,
+            '0_2_2_2_20' : None,
+            '0_2_2_2_21' : None,
+            '0_2_2_2_22' : None,
+            '0_2_2_2_23' : None,
+            '0_2_2_2_24' : None,
+            '0_2_2_2_25' : None,
+            '0_2_2_2_26' : None,
+            '0_2_2_2_27' : None,
+            '0_2_2_2_28' : None,
+            '0_2_2_2_29' : None,
+            '0_2_2_2_30' : None,
+            '0_2_2_2_31' : None,
+            '0_2_2_3_0' : (2,(0,1,2,),1),
+            '0_2_2_3_1' : (3,(0,1,2,),1),
+            '0_2_2_3_2' : (3,(3,4,5,),1),
+            '0_2_2_3_3' : (3,(0,1,6,),2),
+            '0_2_2_3_4' : (3,(2,3,8,),2),
+            '0_2_2_3_5' : (3,(4,5,10,),2),
+            '0_2_2_3_6' : None,
+            '0_2_2_3_7' : None,
+            '0_2_2_3_8' : None,
+            '0_2_2_3_9' : None,
+            '0_2_2_3_10' : None,
+            '0_2_2_3_11' : None,
+            '0_2_2_3_12' : None,
+            '0_2_2_3_13' : None,
+            '0_2_2_3_14' : None,
+            '0_2_2_3_15' : None,
+            '0_2_2_3_16' : None,
+            '0_2_2_3_17' : None,
+            '0_2_2_3_18' : None,
+            '0_2_2_3_19' : None,
+            '0_2_2_3_20' : None,
+            '0_2_2_3_21' : None,
+            '0_2_2_3_22' : None,
+            '0_2_2_3_23' : None,
+            '0_2_2_3_24' : None,
+            '0_2_2_3_25' : None,
+            '0_2_2_3_26' : None,
+            '0_2_2_3_27' : None,
+            '0_2_2_3_28' : None,
+            '0_2_2_3_29' : None,
+            '0_2_2_3_30' : None,
+            '0_2_2_3_31' : None,
+            '0_2_2_4_0' : (2,(0,1,2,3,),1),
+            '0_2_2_4_1' : (3,(0,1,2,3,),1),
+            '0_2_2_4_2' : (3,(0,1,6,7,),2),
+            '0_2_2_4_3' : (3,(2,3,8,9,),2),
+            '0_2_2_4_4' : (3,(4,5,10,11,),2),
+            '0_2_2_4_5' : None,
+            '0_2_2_4_6' : None,
+            '0_2_2_4_7' : None,
+            '0_2_2_4_8' : None,
+            '0_2_2_4_9' : None,
+            '0_2_2_4_10' : None,
+            '0_2_2_4_11' : None,
+            '0_2_2_4_12' : None,
+            '0_2_2_4_13' : None,
+            '0_2_2_4_14' : None,
+            '0_2_2_4_15' : None,
+            '0_2_2_4_16' : None,
+            '0_2_2_4_17' : None,
+            '0_2_2_4_18' : None,
+            '0_2_2_4_19' : None,
+            '0_2_2_4_20' : None,
+            '0_2_2_4_21' : None,
+            '0_2_2_4_22' : None,
+            '0_2_2_4_23' : None,
+            '0_2_2_4_24' : None,
+            '0_2_2_4_25' : None,
+            '0_2_2_4_26' : None,
+            '0_2_2_4_27' : None,
+            '0_2_2_4_28' : None,
+            '0_2_2_4_29' : None,
+            '0_2_2_4_30' : None,
+            '0_2_2_4_31' : None,
+            }
+        
+        
         
         #offset of CORESET0 w.r.t. SSB
         self.coreset0Offset = 0
@@ -7861,6 +8193,13 @@ class NgNrGridUi(QDialog):
         
         self.nrDci11PdschTbsEdit.setText(','.join([str(i) for i in tbs if i is not None]))
         
+    def onDmrsDedPuschDmrsTypeCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onDmrsDedPuschDmrsTypeCombCurIndChanged')
+        self.updateDci01AntPortsFieldLabel()
+        
     def onDmrsDedPuschMaxLengthCombCurIndChanged(self, index):
         if index < 0:
             return
@@ -7872,6 +8211,8 @@ class NgNrGridUi(QDialog):
         else:
             self.nrDmrsDedPuschAddPosComb.clear()
             self.nrDmrsDedPuschAddPosComb.addItems(['pos0', 'pos1'])
+            
+        self.updateDci01AntPortsFieldLabel()
             
     def onDmrsDedPdschAddPosCombCurIndChanged(self, index):
         if index < 0:
@@ -8505,6 +8846,46 @@ class NgNrGridUi(QDialog):
         #update 'srs resource indicator' label
         self.updateDci01SriFieldLabel()
         
+    def onDedPuschCfgCbMaxRankTextChanged(self):
+        if not self.nrDedPuschCfgCbMaxRankEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside onDedPuschCfgCbMaxRankTextChanged')
+        if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
+            self.updateDci01PrecodingLayersFieldLabel()
+            
+    def onDedPdschCfgCbSubsetCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onDedPdschCfgCbSubsetCombCurIndChanged')
+        if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
+            self.updateDci01PrecodingLayersFieldLabel()
+            
+    def onDedPuschCfgNonCbMaxLayersTextChanged(self):
+        if not self.nrDedPuschCfgNonCbMaxLayersEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside onDedPuschCfgNonCbMaxLayersTextChanged')
+        if self.nrDedPuschCfgTxCfgComb.currentText() == 'nonCodebook':
+            self.updateDci01SriFieldLabel()
+            
+    def onSrsResSet1ResourceIdListTextChanged(self):
+        if not self.nrSrsRes1ResourceIdEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside onSrsResSet1ResourceIdListTextChanged')
+        if self.nrDedPuschCfgTxCfgComb.currentText() == 'nonCodebook':
+            self.updateDci01SriFieldLabel()
+            
+    def onSrsResSet0ResourceIdListTextChanged(self):
+        if not self.nrSrsRes0ResourceIdEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside onSrsResSet0ResourceIdListTextChanged')
+        if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
+            self.updateDci01SriFieldLabel()
+        
     def onDedPdschCfgMcsTableCombCurIndChanged(self, index):
         if index < 0:
             return
@@ -8644,6 +9025,11 @@ class NgNrGridUi(QDialog):
                 self.nrDci01PuschSriFieldLabel.setText('SRS resource indicator[%d-%d]:' % (minSri, maxSri))
                 self.nrDci01PuschSriFieldEdit.setValidator(QIntValidator(minSri, maxSri))
         else:
+            if not self.nrSrsResSet0ResourceIdListEdit.text():
+                self.nrDci01PuschSriFieldLabel.setText('SRS resource indicator:')
+                self.nrDci01PuschSriFieldEdit.setValidator(0)
+                return
+            
             try:
                 srsSet0 = [int(i) for i in self.nrSrsResSet0ResourceIdListEdit.text().split(',') if len(i) > 0]
             except Exception as e:
@@ -8704,9 +9090,12 @@ class NgNrGridUi(QDialog):
             pass
     
     def validatePuschAntPorts(self):
+        if not self.nrDci01PuschAntPortsFieldEdit.text():
+            return
+        
         self.ngwin.logEdit.append('-->inside validatePuschAntPorts')
         
-        #reset 'antenna port(s)' label
+        #determine rank
         if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
             if not self.nrDedPuschCfgCbMaxRankEdit.text() or not self.nrDci01PuschPrecodingLayersFieldEdit.text():
                 return
@@ -8761,12 +9150,32 @@ class NgNrGridUi(QDialog):
             if Nsrs == 1:
                 rank = 1
             else:
-                if key in self.nrDci01Sri and self.nrDci01Sri[key] is not None:
-                    rank = len(self.nrDci01Sri[key])
+                if key in self.nrDci01NonCbSri and self.nrDci01NonCbSri[key] is not None:
+                    rank = len(self.nrDci01NonCbSri[key])
                 else:
-                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrDci01Sri.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrDci01NonCbSri.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
                     return
-        #TODO
+                
+        #set dmrs for pusch
+        tp = self.nrDedPuschCfgTpComb.currentText()
+        dmrsType = self.nrDmrsDedPuschDmrsTypeComb.currentText()
+        maxLen = self.nrDmrsDedPuschMaxLengthComb.currentText()
+        key = '%d_%s_%s_%d' % (1 if tp == 'enabled' else 0, dmrsType[-1], maxLen[-1], rank)
+        if not key in self.nrDci01AntPorts or self.nrDci01AntPorts[key] is None:
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(=%s) when referring nrDci01AntPorts.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+            return
+        
+        cdmGroups, dmrsPorts, numDmrsSymbs = self.nrDci01AntPorts[key]
+        
+        self.nrDmrsDedPuschCdmGroupsWoDataEdit.setText(str(cdmGroups))
+        self.nrDmrsDedPuschDmrsPortsEdit.setText(','.join([str(i) for i in dmrsPorts]))
+        self.nrDmrsDedPuschFrontLoadSymbsEdit.setText(str(numDmrsSymbs))
+        
+        #TODO ptrs for pusch
+        
+        #TODO set tbs by calling getTbs
+        
+        
             
     def getTbs(self, sch='pdsch', tp=0, rnti='c-rnti', tab='qam64', td=1, fd=1, mcs=0, layer=1, dmrs=0, xoh=0, scale=1):
         self.ngwin.logEdit.append('---->inside getTbs: sch="%s", tp=%d, rnti="%s", tab="%s", td=%d, fd=%d, mcs=%d, layer=%d, dmrs=%d, xoh=%d, scale=%.2f' % (sch, tp, rnti, tab, td, fd, mcs, layer, dmrs, xoh, scale)) 
