@@ -3330,6 +3330,7 @@ class NgNrGridUi(QDialog):
         self.nrDci01PuschFreqAllocTypeComb.currentIndexChanged.connect(self.onDci01PuschFreqRaTypeCombCurIndChanged)
         self.nrDci01PuschFreqAllocType1LRbsEdit.textChanged.connect(self.onDci01PuschType1LRBsOrRBStartEditTextChanged)
         self.nrDci01PuschFreqAllocType1RbStartEdit.textChanged.connect(self.onDci01PuschType1LRBsOrRBStartEditTextChanged)
+        self.nrDci01PuschFreqAllocFieldEdit.textChanged.connect(self.onDci01PuschFreqAllocFieldEditTextChanged)
         self.nrDci01PuschFreqAllocFreqHopComb.currentIndexChanged.connect(self.onDci01PuschFreqHopCombCurIndChanged)
         self.nrDci01PuschCw0McsEdit.textChanged.connect(self.onDci01PuschCw0McsEditTextChanged)
         self.nrDci01PuschPrecodingLayersFieldEdit.textChanged.connect(self.onDci01PuschPrecodingLayersEditTextChanged)
@@ -3355,6 +3356,8 @@ class NgNrGridUi(QDialog):
         self.nrDedPuschCfgCbMaxRankEdit.textChanged.connect(self.onDedPuschCfgCbMaxRankTextChanged)
         self.nrDedPuschCfgCbSubsetComb.currentIndexChanged.connect(self.onDedPuschCfgCbSubsetCombCurIndChanged)
         self.nrDedPuschCfgNonCbMaxLayersEdit.textChanged.connect(self.onDedPuschCfgNonCbMaxLayersTextChanged)
+        self.nrDedPuschCfgMcsTableComb.currentIndexChanged.connect(self.onDedPuschCfgMcsTableCombCurIndChanged)
+        self.nrDedPuschCfgXOverheadComb.currentIndexChanged.connect(self.onDedPuschCfgXOverheadCombCurIndChanged)
         self.nrDmrsDedPuschMaxLengthComb.currentIndexChanged.connect(self.onDmrsDedPuschMaxLengthCombCurIndChanged)
         self.nrDmrsDedPuschDmrsTypeComb.currentIndexChanged.connect(self.onDmrsDedPuschDmrsTypeCombCurIndChanged)
         self.nrDmrsDedPuschAddPosComb.currentIndexChanged.connect(self.onDmrsDedPuschAddPosCombCurIndChanged)
@@ -7782,6 +7785,8 @@ class NgNrGridUi(QDialog):
         sliv = self.toSliv(S, L, sch='pusch', type=self.nrDci01PuschTimeAllocMappingTypeComb.currentText(), cp=self.nrDedUlBwpGenericCpComb.currentText())
         if sliv is not None:
             self.nrDci01PuschTimeAllocSlivEdit.setText(str(sliv))
+            #update 'tbs' by calling getTbs when necessary
+            self.validatePuschAntPorts()
         else:
             self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: Invalid S/L combination(S=%s, L=%s) and prefix info: type="%s", cp="%s".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), S, L, self.nrDci01PuschTimeAllocMappingTypeComb.currentText(), self.nrDedUlBwpGenericCpComb.currentText()))
             self.nrDci01PuschTimeAllocSlivEdit.clear()
@@ -8213,6 +8218,9 @@ class NgNrGridUi(QDialog):
         self.ngwin.logEdit.append('-->inside onDmrsDedPuschDmrsTypeCombCurIndChanged, index=%d' % index)
         self.updateDci01AntPortsFieldLabel()
         
+        if self.nrDci01PuschAntPortsFieldEdit.text():
+            self.validatePuschAntPorts()
+        
     def onDmrsDedPuschMaxLengthCombCurIndChanged(self, index):
         if index < 0:
             return
@@ -8226,6 +8234,9 @@ class NgNrGridUi(QDialog):
             self.nrDmrsDedPuschAddPosComb.addItems(['pos0', 'pos1'])
             
         self.updateDci01AntPortsFieldLabel()
+        
+        if self.nrDci01PuschAntPortsFieldEdit.text():
+            self.validatePuschAntPorts()
     
     def onDmrsDedPuschAddPosCombCurIndChanged(self, index):
         if index < 0:
@@ -8238,6 +8249,9 @@ class NgNrGridUi(QDialog):
             self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: For PUSCH mapping type A, the case dmrs-AdditionalPosition equal to "pos3" is only supported when dmrs-TypeA-Position is equal to "pos2". Reset dmrs-additionalPosition to "pos0".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
             self.nrDmrsDedPuschAddPosComb.setCurrentText('pos0')
             return
+        
+        if self.nrDci01PuschAntPortsFieldEdit.text():
+            self.validatePuschAntPorts()
             
     def onDmrsDedPdschAddPosCombCurIndChanged(self, index):
         if index < 0:
@@ -8762,14 +8776,29 @@ class NgNrGridUi(QDialog):
                 nUlHop = 1 if bwpSize < 50 else 2
                 if int(bits[:nUlHop], 2) == 0:
                     self.nrDci01PuschFreqAllocFieldEdit.setText(bits)
+                    #update 'tbs' by calling getTbs when necessary
+                    self.validatePuschAntPorts()
                 else:
                     self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: The %d MSB of "Freq domain resouce assignment" field(="%s") must be all zero when frequency hopping is enabled!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), nUlHop, bits))
                     self.nrDci01PuschFreqAllocFieldEdit.clear()
             else:
                 self.nrDci01PuschFreqAllocFieldEdit.setText(bits)
+                #update 'tbs' by calling getTbs when necessary
+                self.validatePuschAntPorts()
         else:
             self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
             self.nrDci01PuschFreqAllocFieldEdit.clear()
+    
+    def onDci01PuschFreqAllocFieldEditTextChanged(self, text):
+        if not self.nrDci01PuschFreqAllocFieldEdit.text() or self.nrDci01PuschFreqAllocTypeComb.currentText() == 'RA Type1':
+            return
+        
+        self.ngwin.logEdit.append('-->inside onDci01PuschFreqAllocFieldEditTextChanged')
+        if len(self.nrDci01PuschFreqAllocFieldEdit.text()) != self.bitwidthType0Pusch or int(self.nrDci01PuschFreqAllocFieldEdit.text(), 2) == 0:
+            return
+        else:
+            #update 'tbs' by calling getTbs when necessary
+            self.validatePuschAntPorts()
             
     def onDci01PuschFreqHopCombCurIndChanged(self, index):
         if index < 0:
@@ -8787,6 +8816,10 @@ class NgNrGridUi(QDialog):
             nUlHop = 1 if bwpSize < 50 else 2
             if int(self.nrDci01PuschFreqAllocFieldEdit.text()[:nUlHop], 2) != 0:
                 self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: The %d MSB of "Freq domain resource assignment" field(="%s") must be all zero when frequency hopping is enabled!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), nUlHop, self.nrDci01PuschFreqAllocFieldEdit.text()))
+                return
+        
+        if self.nrDci01PuschAntPortsFieldEdit.text():
+            self.validatePuschAntPorts()
                 
     def onDci01PuschCw0McsEditTextChanged(self, text):
         if not self.nrDci01PuschCw0McsEdit.text():
@@ -8953,6 +8986,9 @@ class NgNrGridUi(QDialog):
         
         #update 'antenna port(s)' label
         self.updateDci01AntPortsFieldLabel()
+        
+        if self.nrDci01PuschAntPortsFieldEdit.text():
+            self.validatePuschAntPorts()
             
     def onDedPuschCfgTxCfgCombCurIndChanged(self, index):
         if index < 0:
@@ -8990,6 +9026,9 @@ class NgNrGridUi(QDialog):
         #update 'srs resource indicator' label
         self.updateDci01SriFieldLabel()
         
+        if self.nrDci01PuschAntPortsFieldEdit.text():
+            self.validatePuschAntPorts()
+        
     def onDedPuschCfgCbMaxRankTextChanged(self):
         if not self.nrDedPuschCfgCbMaxRankEdit.text():
             return
@@ -8997,6 +9036,8 @@ class NgNrGridUi(QDialog):
         self.ngwin.logEdit.append('-->inside onDedPuschCfgCbMaxRankTextChanged')
         if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
             self.updateDci01PrecodingLayersFieldLabel()
+            if self.nrDci01PuschAntPortsFieldEdit.text():
+                self.validatePuschAntPorts()
             
     def onDedPuschCfgCbSubsetCombCurIndChanged(self, index):
         if index < 0:
@@ -9005,6 +9046,8 @@ class NgNrGridUi(QDialog):
         self.ngwin.logEdit.append('-->inside onDedPdschCfgCbSubsetCombCurIndChanged, index=%d' % index)
         if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
             self.updateDci01PrecodingLayersFieldLabel()
+            if self.nrDci01PuschAntPortsFieldEdit.text():
+                self.validatePuschAntPorts()
             
     def onDedPuschCfgNonCbMaxLayersTextChanged(self):
         if not self.nrDedPuschCfgNonCbMaxLayersEdit.text():
@@ -9013,6 +9056,8 @@ class NgNrGridUi(QDialog):
         self.ngwin.logEdit.append('-->inside onDedPuschCfgNonCbMaxLayersTextChanged')
         if self.nrDedPuschCfgTxCfgComb.currentText() == 'nonCodebook':
             self.updateDci01SriFieldLabel()
+            if self.nrDci01PuschAntPortsFieldEdit.text():
+                self.validatePuschAntPorts()
             
     def onSrsResSet1ResourceIdListTextChanged(self):
         if not self.nrSrsRes1ResourceIdEdit.text():
@@ -9021,6 +9066,8 @@ class NgNrGridUi(QDialog):
         self.ngwin.logEdit.append('-->inside onSrsResSet1ResourceIdListTextChanged')
         if self.nrDedPuschCfgTxCfgComb.currentText() == 'nonCodebook':
             self.updateDci01SriFieldLabel()
+            if self.nrDci01PuschAntPortsFieldEdit.text():
+                self.validatePuschAntPorts()
             
     def onSrsResSet0ResourceIdListTextChanged(self):
         if not self.nrSrsRes0ResourceIdEdit.text():
@@ -9029,6 +9076,22 @@ class NgNrGridUi(QDialog):
         self.ngwin.logEdit.append('-->inside onSrsResSet0ResourceIdListTextChanged')
         if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
             self.updateDci01SriFieldLabel()
+    
+    def onDedPuschCfgMcsTableCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onDedPuschCfgMcsTableCombCurIndChanged, index=%d' % index)
+        #update 'tbs' by calling getTbs when necessary
+        self.validatePuschCw0Mcs()
+        
+    def onDedPuschCfgXOverheadCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onDedPuschCfgXOverheadCombCurIndChanged, index=%d' % index)
+        #update 'tbs' by calling getTbs when necessary
+        self.validatePuschAntPorts()
         
     def onDedPdschCfgMcsTableCombCurIndChanged(self, index):
         if index < 0:
