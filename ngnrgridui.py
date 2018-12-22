@@ -512,9 +512,9 @@ class NgNrGridUi(QDialog):
         self.nrDci10Sib1FreqAllocType1BundleSizeComb.setCurrentIndex(0)
         self.nrDci10Sib1FreqAllocType1BundleSizeComb.setEnabled(False)
         
-        self.nrDci10Sib1McsLabel = QLabel('Modulation and coding scheme(CW0)[0-9]:')
-        self.nrDci10Sib1McsEdit = QLineEdit()
-        self.nrDci10Sib1McsEdit.setValidator(QIntValidator(0, 9))
+        self.nrDci10Sib1Cw0McsLabel = QLabel('Modulation and coding scheme(CW0)[0-9]:')
+        self.nrDci10Sib1Cw0McsEdit = QLineEdit()
+        self.nrDci10Sib1Cw0McsEdit.setValidator(QIntValidator(0, 9))
         
         self.nrDci10Sib1TbsLabel = QLabel('Transport block size(bits):')
         self.nrDci10Sib1TbsEdit = QLineEdit()
@@ -565,8 +565,8 @@ class NgNrGridUi(QDialog):
         dci10Sib1GridLayout.addWidget(self.nrDci10Sib1MuPdschLabel, 2, 0)
         dci10Sib1GridLayout.addWidget(self.nrDci10Sib1MuPdschEdit, 2, 1)
         dci10Sib1GridLayout.addWidget(dci10Sib1RaTabWidget, 3, 0, 1, 2)
-        dci10Sib1GridLayout.addWidget(self.nrDci10Sib1McsLabel, 4, 0)
-        dci10Sib1GridLayout.addWidget(self.nrDci10Sib1McsEdit, 4, 1)
+        dci10Sib1GridLayout.addWidget(self.nrDci10Sib1Cw0McsLabel, 4, 0)
+        dci10Sib1GridLayout.addWidget(self.nrDci10Sib1Cw0McsEdit, 4, 1)
         dci10Sib1GridLayout.addWidget(self.nrDci10Sib1TbsLabel, 5, 0)
         dci10Sib1GridLayout.addWidget(self.nrDci10Sib1TbsEdit, 5, 1)
         dci10Sib1Layout = QVBoxLayout()
@@ -644,9 +644,9 @@ class NgNrGridUi(QDialog):
         self.nrDci10Msg2FreqAllocType1BundleSizeComb.setCurrentIndex(0)
         self.nrDci10Msg2FreqAllocType1BundleSizeComb.setEnabled(False)
         
-        self.nrDci10Msg2McsLabel = QLabel('Modulation and coding scheme(CW0)[0-9]:')
-        self.nrDci10Msg2McsEdit = QLineEdit()
-        self.nrDci10Msg2McsEdit.setValidator(QIntValidator(0, 9))
+        self.nrDci10Msg2Cw0McsLabel = QLabel('Modulation and coding scheme(CW0)[0-9]:')
+        self.nrDci10Msg2Cw0McsEdit = QLineEdit()
+        self.nrDci10Msg2Cw0McsEdit.setValidator(QIntValidator(0, 9))
         
         self.nrDci10Msg2TbScalingLabel = QLabel('TB Scaling[0-2]:')
         self.nrDci10Msg2TbScalingEdit = QLineEdit('0')
@@ -701,8 +701,8 @@ class NgNrGridUi(QDialog):
         dci10Msg2GridLayout.addWidget(self.nrDci10Msg2MuPdschLabel, 2, 0)
         dci10Msg2GridLayout.addWidget(self.nrDci10Msg2MuPdschEdit, 2, 1)
         dci10Msg2GridLayout.addWidget(dci10Msg2RaTabWidget, 3, 0, 1, 2)
-        dci10Msg2GridLayout.addWidget(self.nrDci10Msg2McsLabel, 4, 0)
-        dci10Msg2GridLayout.addWidget(self.nrDci10Msg2McsEdit, 4, 1)
+        dci10Msg2GridLayout.addWidget(self.nrDci10Msg2Cw0McsLabel, 4, 0)
+        dci10Msg2GridLayout.addWidget(self.nrDci10Msg2Cw0McsEdit, 4, 1)
         dci10Msg2GridLayout.addWidget(self.nrDci10Msg2TbScalingLabel, 5, 0)
         dci10Msg2GridLayout.addWidget(self.nrDci10Msg2TbScalingEdit, 5, 1)
         dci10Msg2GridLayout.addWidget(self.nrDci10Msg2TbsLabel, 6, 0)
@@ -782,9 +782,9 @@ class NgNrGridUi(QDialog):
         self.nrDci10Msg4FreqAllocType1BundleSizeComb.setCurrentIndex(0)
         self.nrDci10Msg4FreqAllocType1BundleSizeComb.setEnabled(False)
         
-        self.nrDci10Msg4McsLabel = QLabel('Modulation and coding scheme(CW0)[0-31]:')
-        self.nrDci10Msg4McsEdit = QLineEdit()
-        self.nrDci10Msg4McsEdit.setValidator(QIntValidator(0, 31))
+        self.nrDci10Msg4Cw0McsLabel = QLabel('Modulation and coding scheme(CW0)[0-31]:')
+        self.nrDci10Msg4Cw0McsEdit = QLineEdit()
+        self.nrDci10Msg4Cw0McsEdit.setValidator(QIntValidator(0, 31))
         
         self.nrDci10Msg4TbsLabel = QLabel('Transport block size(bits):')
         self.nrDci10Msg4TbsEdit = QLineEdit()
@@ -843,8 +843,8 @@ class NgNrGridUi(QDialog):
         dci10Msg4GridLayout.addWidget(self.nrDci10Msg4MuPdschLabel, 2, 0)
         dci10Msg4GridLayout.addWidget(self.nrDci10Msg4MuPdschEdit, 2, 1)
         dci10Msg4GridLayout.addWidget(dci10Msg4RaTabWidget, 3, 0, 1, 2)
-        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4McsLabel, 4, 0)
-        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4McsEdit, 4, 1)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4Cw0McsLabel, 4, 0)
+        dci10Msg4GridLayout.addWidget(self.nrDci10Msg4Cw0McsEdit, 4, 1)
         dci10Msg4GridLayout.addWidget(self.nrDci10Msg4TbsLabel, 5, 0)
         dci10Msg4GridLayout.addWidget(self.nrDci10Msg4TbsEdit, 5, 1)
         dci10Msg4GridLayout.addWidget(self.nrDci10Msg4DeltaPriLabel, 6, 0)
@@ -3290,18 +3290,18 @@ class NgNrGridUi(QDialog):
         self.nrDci10Sib1TimeAllocFieldEdit.textChanged.connect(self.onDci10Sib1TimeAllocFieldEditTextChanged)
         self.nrDci10Sib1FreqAllocType1LRbsEdit.textChanged.connect(self.onDci10Sib1Type1LRBsOrRBStartEditTextChanged)
         self.nrDci10Sib1FreqAllocType1RbStartEdit.textChanged.connect(self.onDci10Sib1Type1LRBsOrRBStartEditTextChanged)
-        self.nrDci10Sib1McsEdit.textChanged.connect(self.onDci10Sib1McsEditTextChanged)
+        self.nrDci10Sib1Cw0McsEdit.textChanged.connect(self.onDci10Sib1Cw0McsEditTextChanged)
         
         self.nrDci10Msg2TimeAllocFieldEdit.textChanged.connect(self.onDci10Msg2TimeAllocFieldEditTextChanged)
         self.nrDci10Msg2FreqAllocType1LRbsEdit.textChanged.connect(self.onDci10Msg2Type1LRBsOrRBStartEditTextChanged)
         self.nrDci10Msg2FreqAllocType1RbStartEdit.textChanged.connect(self.onDci10Msg2Type1LRBsOrRBStartEditTextChanged)
-        self.nrDci10Msg2McsEdit.textChanged.connect(self.onDci10Msg2McsEditTextChanged)
+        self.nrDci10Msg2Cw0McsEdit.textChanged.connect(self.onDci10Msg2Cw0McsEditTextChanged)
         self.nrDci10Msg2TbScalingEdit.textChanged.connect(self.onDci10Msg2TbScalingEditTextChanged)
         
         self.nrDci10Msg4TimeAllocFieldEdit.textChanged.connect(self.onDci10Msg4TimeAllocFieldEditTextChanged)
         self.nrDci10Msg4FreqAllocType1LRbsEdit.textChanged.connect(self.onDci10Msg4Type1LRBsOrRBStartEditTextChanged)
         self.nrDci10Msg4FreqAllocType1RbStartEdit.textChanged.connect(self.onDci10Msg4Type1LRBsOrRBStartEditTextChanged)
-        self.nrDci10Msg4McsEdit.textChanged.connect(self.onDci10Msg4McsEditTextChanged)
+        self.nrDci10Msg4Cw0McsEdit.textChanged.connect(self.onDci10Msg4Cw0McsEditTextChanged)
         
         self.nrDci11PdschTimeAllocFieldEdit.textChanged.connect(self.onDci11PdschTimeAllocFieldEditTextChanged)
         self.nrDci11PdschTimeAllocSlivEdit.textChanged.connect(self.onDci11PdschTimeAllocSlivEditTextChanged)
@@ -3321,6 +3321,7 @@ class NgNrGridUi(QDialog):
         self.nrMsg3PuschFreqAllocType1LRbsEdit.textChanged.connect(self.onMsg3PuschLRBsOrRBStartEditTextChanged)
         self.nrMsg3PuschFreqAllocType1RbStartEdit.textChanged.connect(self.onMsg3PuschLRBsOrRBStartEditTextChanged)
         self.nrMsg3PuschFreqAllocFreqHopComb.currentIndexChanged.connect(self.onMsg3PuschFreqHopCombCurIndChanged)
+        self.nrMsg3PuschCw0McsEdit.textChanged.connect(self.onMsg3PuschCw0McsEditTextChanged)
         
         self.nrDci01PuschTimeAllocFieldEdit.textChanged.connect(self.onDci01PuschTimeAllocFieldEditTextChanged)
         self.nrDci01PuschTimeAllocSlivEdit.textChanged.connect(self.onDci01PuschTimeAllocSlivEditTextChanged)
@@ -5415,7 +5416,7 @@ class NgNrGridUi(QDialog):
             }
         
         #Table 6.4.1.1.3-4: PUSCH DM-RS positions l- within a slot for double-symbol DM-RS and intra-slot frequency hopping disabled.
-        self.nrDmrsPuschPosTwoSymbsWoItraSlotFh = {
+        self.nrDmrsPuschPosTwoSymbsWoIntraSlotFh = {
             '1_Type A_pos0' : None, '1_Type A_pos1' : None,  
             '2_Type A_pos0' : None, '2_Type A_pos1' : None,  
             '3_Type A_pos0' : None, '3_Type A_pos1' : None,  
@@ -5448,48 +5449,90 @@ class NgNrGridUi(QDialog):
         
         #Table 6.4.1.1.3-6: PUSCH DM-RS positions l- within a slot for single-symbol DM-RS and intra-slot frequency hopping enabled. 
         self.nrDmrsPuschPosOneSymbWithIntraSlotFh = {
-            '1_Type A_2_pos0' : None,
-            '2_Type A_2_pos0' : None,
-            '3_Type A_2_pos0' : None,
-            '4_Type A_2_pos0' : ((2,),(0,),),
-            '5_Type A_2_pos0' : ((2,),(0,),),
-            '6_Type A_2_pos0' : ((2,),(0,),),
-            '7_Type A_2_pos0' : ((2,),(0,),),
-            '1_Type A_2_pos1' : None,
-            '2_Type A_2_pos1' : None,
-            '3_Type A_2_pos1' : None,
-            '4_Type A_2_pos1' : ((2,),(0,),),
-            '5_Type A_2_pos1' : ((2,),(0, 4,),),
-            '6_Type A_2_pos1' : ((2,),(0, 4,),),
-            '7_Type A_2_pos1' : ((2, 6,),(0, 4,),),
-            '1_Type A_3_pos0' : None,
-            '2_Type A_3_pos0' : None,
-            '3_Type A_3_pos0' : None,
-            '4_Type A_3_pos0' : ((3,),(0,),),
-            '5_Type A_3_pos0' : ((3,),(0,),),
-            '6_Type A_3_pos0' : ((3,),(0,),),
-            '7_Type A_3_pos0' : ((3,),(0,),),
-            '1_Type A_3_pos1' : None,
-            '2_Type A_3_pos1' : None,
-            '3_Type A_3_pos1' : None,
-            '4_Type A_3_pos1' : ((3,),(0,),),
-            '5_Type A_3_pos1' : ((3,),(0, 4,),),
-            '6_Type A_3_pos1' : ((3,),(0, 4,),),
-            '7_Type A_3_pos1' : ((3,),(0, 4,),),
-            '1_Type B_0_pos0' : ((0,),(0,),),
-            '2_Type B_0_pos0' : ((0,),(0,),),
-            '3_Type B_0_pos0' : ((0,),(0,),),
-            '4_Type B_0_pos0' : ((0,),(0,),),
-            '5_Type B_0_pos0' : ((0,),(0,),),
-            '6_Type B_0_pos0' : ((0,),(0,),),
-            '7_Type B_0_pos0' : ((0,),(0,),),
-            '1_Type B_0_pos1' : ((0,),(0,),),
-            '2_Type B_0_pos1' : ((0,),(0,),),
-            '3_Type B_0_pos1' : ((0,),(0,),),
-            '4_Type B_0_pos1' : ((0,),(0,),),
-            '5_Type B_0_pos1' : ((0, 4,),(0, 4,),),
-            '6_Type B_0_pos1' : ((0, 4,),(0, 4,),),
-            '7_Type B_0_pos1' : ((0, 4,),(0, 4,),),
+            '1_Type A_2_pos0_1st' : None,
+            '2_Type A_2_pos0_1st' : None,
+            '3_Type A_2_pos0_1st' : None,
+            '4_Type A_2_pos0_1st' : (2,),
+            '5_Type A_2_pos0_1st' : (2,),
+            '6_Type A_2_pos0_1st' : (2,),
+            '7_Type A_2_pos0_1st' : (2,),
+            '1_Type A_2_pos0_2nd' : None,
+            '2_Type A_2_pos0_2nd' : None,
+            '3_Type A_2_pos0_2nd' : None,
+            '4_Type A_2_pos0_2nd' : (0,),
+            '5_Type A_2_pos0_2nd' : (0,),
+            '6_Type A_2_pos0_2nd' : (0,),
+            '7_Type A_2_pos0_2nd' : (0,),
+            '1_Type A_2_pos1_1st' : None,
+            '2_Type A_2_pos1_1st' : None,
+            '3_Type A_2_pos1_1st' : None,
+            '4_Type A_2_pos1_1st' : (2,),
+            '5_Type A_2_pos1_1st' : (2,),
+            '6_Type A_2_pos1_1st' : (2,),
+            '7_Type A_2_pos1_1st' : (2, 6,),
+            '1_Type A_2_pos1_2nd' : None,
+            '2_Type A_2_pos1_2nd' : None,
+            '3_Type A_2_pos1_2nd' : None,
+            '4_Type A_2_pos1_2nd' : (0,),
+            '5_Type A_2_pos1_2nd' : (0, 4,),
+            '6_Type A_2_pos1_2nd' : (0, 4,),
+            '7_Type A_2_pos1_2nd' : (0, 4,),
+            '1_Type A_3_pos0_1st' : None,
+            '2_Type A_3_pos0_1st' : None,
+            '3_Type A_3_pos0_1st' : None,
+            '4_Type A_3_pos0_1st' : (3,),
+            '5_Type A_3_pos0_1st' : (3,),
+            '6_Type A_3_pos0_1st' : (3,),
+            '7_Type A_3_pos0_1st' : (3,),
+            '1_Type A_3_pos0_2nd' : None,
+            '2_Type A_3_pos0_2nd' : None,
+            '3_Type A_3_pos0_2nd' : None,
+            '4_Type A_3_pos0_2nd' : (0,),
+            '5_Type A_3_pos0_2nd' : (0,),
+            '6_Type A_3_pos0_2nd' : (0,),
+            '7_Type A_3_pos0_2nd' : (0,),
+            '1_Type A_3_pos1_1st' : None,
+            '2_Type A_3_pos1_1st' : None,
+            '3_Type A_3_pos1_1st' : None,
+            '4_Type A_3_pos1_1st' : (3,),
+            '5_Type A_3_pos1_1st' : (3,),
+            '6_Type A_3_pos1_1st' : (3,),
+            '7_Type A_3_pos1_1st' : (3,),
+            '1_Type A_3_pos1_2nd' : None,
+            '2_Type A_3_pos1_2nd' : None,
+            '3_Type A_3_pos1_2nd' : None,
+            '4_Type A_3_pos1_2nd' : (0,),
+            '5_Type A_3_pos1_2nd' : (0, 4,),
+            '6_Type A_3_pos1_2nd' : (0, 4,),
+            '7_Type A_3_pos1_2nd' : (0, 4,),
+            '1_Type B_0_pos0_1st' : (0,),
+            '2_Type B_0_pos0_1st' : (0,),
+            '3_Type B_0_pos0_1st' : (0,),
+            '4_Type B_0_pos0_1st' : (0,),
+            '5_Type B_0_pos0_1st' : (0,),
+            '6_Type B_0_pos0_1st' : (0,),
+            '7_Type B_0_pos0_1st' : (0,),
+            '1_Type B_0_pos0_2nd' : (0,),
+            '2_Type B_0_pos0_2nd' : (0,),
+            '3_Type B_0_pos0_2nd' : (0,),
+            '4_Type B_0_pos0_2nd' : (0,),
+            '5_Type B_0_pos0_2nd' : (0,),
+            '6_Type B_0_pos0_2nd' : (0,),
+            '7_Type B_0_pos0_2nd' : (0,),
+            '1_Type B_0_pos1_1st' : (0,),
+            '2_Type B_0_pos1_1st' : (0,),
+            '3_Type B_0_pos1_1st' : (0,),
+            '4_Type B_0_pos1_1st' : (0,),
+            '5_Type B_0_pos1_1st' : (0, 4,),
+            '6_Type B_0_pos1_1st' : (0, 4,),
+            '7_Type B_0_pos1_1st' : (0, 4,),
+            '1_Type B_0_pos1_2nd' : (0,),
+            '2_Type B_0_pos1_2nd' : (0,),
+            '3_Type B_0_pos1_2nd' : (0,),
+            '4_Type B_0_pos1_2nd' : (0,),
+            '5_Type B_0_pos1_2nd' : (0, 4,),
+            '6_Type B_0_pos1_2nd' : (0, 4,),
+            '7_Type B_0_pos1_2nd' : (0, 4,),
             }
         
         #refer to 3GPP 38.212 vf30
@@ -7359,12 +7402,12 @@ class NgNrGridUi(QDialog):
         if not self.nrDci10Sib1FreqAllocType1LRbsEdit.text() or not self.nrDci10Sib1FreqAllocType1RbStartEdit.text() or not self.nrDci10Sib1FreqAllocFieldEdit.text():
             return
         
-        if not self.nrDci10Sib1McsEdit.text():
+        if not self.nrDci10Sib1Cw0McsEdit.text():
             return
         
         td = int(self.nrDci10Sib1TimeAllocLEdit.text())
         fd = int(self.nrDci10Sib1FreqAllocType1LRbsEdit.text())
-        mcs = int(self.nrDci10Sib1McsEdit.text())
+        mcs = int(self.nrDci10Sib1Cw0McsEdit.text())
             
         #calculate dmrs overhead
         key = '%s_%s_%s' % (td, self.nrDci10Sib1TimeAllocMappingTypeComb.currentText(), self.nrDmrsSib1AddPosComb.currentText())
@@ -7442,7 +7485,7 @@ class NgNrGridUi(QDialog):
         if not self.nrDci10Msg2FreqAllocType1LRbsEdit.text() or not self.nrDci10Msg2FreqAllocType1RbStartEdit.text() or not self.nrDci10Msg2FreqAllocFieldEdit.text():
             return
         
-        if not self.nrDci10Msg2McsEdit.text():
+        if not self.nrDci10Msg2Cw0McsEdit.text():
             return
         
         if not self.nrDci10Msg2TbScalingEdit.text():
@@ -7450,7 +7493,7 @@ class NgNrGridUi(QDialog):
         
         td = int(self.nrDci10Msg2TimeAllocLEdit.text())
         fd = int(self.nrDci10Msg2FreqAllocType1LRbsEdit.text())
-        mcs = int(self.nrDci10Msg2McsEdit.text())
+        mcs = int(self.nrDci10Msg2Cw0McsEdit.text())
         #refer to 3GPP 38.214 vf30
         #Table 5.1.3.2-2: Scaling factor of Ninfo for P-RNTI and RA-RNTI
         scale = {'0':1, '1':0.5, '2':0.25}[self.nrDci10Msg2TbScalingEdit.text()]
@@ -7531,12 +7574,12 @@ class NgNrGridUi(QDialog):
         if not self.nrDci10Msg4FreqAllocType1LRbsEdit.text() or not self.nrDci10Msg4FreqAllocType1RbStartEdit.text() or not self.nrDci10Msg4FreqAllocFieldEdit.text():
             return
         
-        if not self.nrDci10Msg4McsEdit.text():
+        if not self.nrDci10Msg4Cw0McsEdit.text():
             return
         
         td = int(self.nrDci10Msg4TimeAllocLEdit.text())
         fd = int(self.nrDci10Msg4FreqAllocType1LRbsEdit.text())
-        mcs = int(self.nrDci10Msg4McsEdit.text())
+        mcs = int(self.nrDci10Msg4Cw0McsEdit.text())
             
         #calculate dmrs overhead
         key = '%s_%s_%s' % (td, self.nrDci10Msg4TimeAllocMappingTypeComb.currentText(), self.nrDmrsMsg4AddPosComb.currentText())
@@ -7636,6 +7679,81 @@ class NgNrGridUi(QDialog):
             self.nrDmrsMsg3CdmGroupsWoDataEdit.setText('1')
         else:
             self.nrDmrsMsg3CdmGroupsWoDataEdit.setText('2')
+        
+        #update tbs
+        self.updateMsg3PuschTbs()
+    
+    def updateMsg3PuschTbs(self):
+        self.ngwin.logEdit.append('-->inside updateMsg3PuschTbs')
+        
+        if not self.nrMsg3PuschTimeAllocFieldEdit.text() or not self.nrMsg3PuschTimeAllocLEdit.text() or not self.nrMsg3PuschTimeAllocSEdit.text() or not self.nrMsg3PuschTimeAllocSlivEdit.text():
+            return
+        
+        #update 'cdm groups without data' of dmrs for msg3 pusch
+        td = int(self.nrMsg3PuschTimeAllocLEdit.text())
+        if td <= 2 and self.nrRachMsg3TpComb.currentText() == 'disabled':
+            cdmGroups = 1
+        else:
+            cdmGroups = 2
+        self.nrDmrsMsg3CdmGroupsWoDataEdit.setText(str(cdmGroups))
+        
+        #set tbs by calling getTbs
+        if self.nrMsg3PuschFreqAllocTypeComb.currentText() == 'RA Type1' and (not self.nrMsg3PuschFreqAllocType1LRbsEdit.text() or not self.nrMsg3PuschFreqAllocType1RbStartEdit.text() or not self.nrMsg3PuschFreqAllocFieldEdit.text()):
+            return
+        
+        fd = int(self.nrMsg3PuschFreqAllocType1LRbsEdit.text())
+        
+        if not self.nrMsg3PuschCw0McsEdit.text():
+            return
+            
+        #calculate dmrs overhead
+        mappingType = self.nrMsg3PuschTimeAllocMappingTypeComb.currentText()
+        freqHop = self.nrMsg3PuschFreqAllocFreqHopComb.currentText()
+        #refer to 3GPP 38.214 vf30 6.2.2
+        '''
+        When transmitted PUSCH is not scheduled by PDCCH format 0_1 with CRC scrambled by C-RNTI, CS-RNTI or MCS-RNTI,... 
+        If frequency hopping is disabled:
+            -	The UE shall assume dmrs-AdditionalPosition equals to 'pos2' and up to two additional DM-RS can be transmitted according to PUSCH duration, or
+        If frequency hopping is enabled:
+            -	The UE shall assume dmrs-AdditionalPosition equals to 'pos1' and up to one additional DM-RS can be transmitted according to PUSCH duration.
+        '''
+        if freqHop == 'enabled':
+            #refer to 3GPP 38.211 vf30 6.4.1.1.3
+            #if the higher-layer parameter dmrs-AdditionalPosition is not set to 'pos0' and intra-slot frequency hopping is enabled according to clause 7.3.1.1.2 in [4, TS 38.212] and by higher layer, Tables 6.4.1.1.3-6 shall be used assuming dmrs-AdditionalPosition is equal to 'pos1' for each hop.
+            #refer to 3GPP 38.214 vf30 6.3
+            #In case of intra-slot frequency hopping is configured, the number of symbols in the first hop is given by floor(N_PUSCH_symb/2) , the number of symbols in the second hop is given by N_PUSCH_symb - floor(N_PUSCH_symb/2) , where N_PUSCH_symb is the length of the PUSCH transmission in OFDM symbols in one slot.
+            key1 = '%s_%s_%s_%s_1st' % (math.floor(td / 2), mappingType, self.nrMibDmRsTypeAPosComb.currentText()[3:] if mappingType == 'Type A' else '0', 'pos1' if self.nrDmrsMsg3AddPosComb.currentText() != 'pos0' else 'pos0')
+            key2 = '%s_%s_%s_%s_2nd' % (td - math.floor(td / 2), mappingType, self.nrMibDmRsTypeAPosComb.currentText()[3:] if mappingType == 'Type A' else '0', 'pos1' if self.nrDmrsMsg3AddPosComb.currentText() != 'pos0' else 'pos0')
+            if not key1 in self.nrDmrsPuschPosOneSymbWithIntraSlotFh or not key2 in self.nrDmrsPuschPosOneSymbWithIntraSlotFh or self.nrDmrsPuschPosOneSymbWithIntraSlotFh[key1] is None or self.nrDmrsPuschPosOneSymbWithIntraSlotFh[key2] is None:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(key_1stHop="%s", key_2ndHop="%s") when referring nrDmrsPuschPosOneSymbWithIntraSlotFh!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key1, key2))
+                return
+            val1 = self.nrDmrsPuschPosOneSymbWithIntraSlotFh[key1]
+            val2 = self.nrDmrsPuschPosOneSymbWithIntraSlotFh[key2]
+        else:
+            key = '%s_%s_%s' % (td, self.nrMsg3PuschTimeAllocMappingTypeComb.currentText(), self.nrDmrsMsg3AddPosComb.currentText())
+            if not key in self.nrDmrsPuschPosOneSymbWoIntraSlotFh.keys() or self.nrDmrsPuschPosOneSymbWoIntraSlotFh[key] is None:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(="%s") when referring nrDmrsPuschPosOneSymbWoIntraSlotFh!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                return
+            val = self.nrDmrsPuschPosOneSymbWoIntraSlotFh[key]
+        
+        #refer to 3GPP 38.211 vf30
+        #For PUSCH mapping type A, duration of 4 symbols in Table 6.4.1.1.3-4 is only applicable when dmrs-TypeA-Position is equal to 'pos2'.
+        if self.nrMsg3PuschTimeAllocMappingTypeComb.currentText() == 'Type A' and td == 4 and self.nrMibDmRsTypeAPosComb.currentText() != 'pos2':
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: For PUSCH mapping type A, duration of 4 symbols in Table 6.4.1.1.3-4 is only applicable when dmrs-TypeA-Position is equal to "pos2".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+            return
+        
+        if freqHop == 'enabled':
+            dmrsOh = (2 * cdmGroups) * (len(val1) + len(val2))
+            self.ngwin.logEdit.append('Msg3 PUSCH(RAR UL Grant) DMRS overhead: cdmGroupsWoData=%d, key1="%s", val1=%s, key2="%s", val2=%s' % (cdmGroups, key1, val1, key2, val2))
+        else:
+            dmrsOh = (2 * cdmGroups) * len(val)
+            self.ngwin.logEdit.append('Msg3 PUSCH(RAR UL Grant) DMRS overhead: cdmGroupsWoData=%d, key="%s", val=%s' % (cdmGroups, key, val))
+        
+        tp = 1 if self.nrRachMsg3TpComb.currentText() == 'enabled' else 0
+        mcsCw0 = int(self.nrMsg3PuschCw0McsEdit.text())
+        
+        tbs = self.getTbs(sch='pusch', tp=tp, rnti='msg3', tab='qam64', td=td, fd=fd, mcs=mcsCw0, layer=1, dmrs=dmrsOh, xoh=0, scale=1)
+        self.nrMsg3PuschTbsEdit.setText(str(tbs) if tbs is not None else '')
     
     def validateDci01PuschTimeAllocField(self):
         if not self.nrDci01PuschTimeAllocFieldEdit.text():
@@ -7950,19 +8068,19 @@ class NgNrGridUi(QDialog):
         
         self.validatePdschCw0McsCw1Mcs()
         
-    def onDci10Sib1McsEditTextChanged(self, text):
-        if not self.nrDci10Sib1McsEdit.text():
+    def onDci10Sib1Cw0McsEditTextChanged(self, text):
+        if not self.nrDci10Sib1Cw0McsEdit.text():
             return
         
-        self.ngwin.logEdit.append('-->inside onDci10Sib1McsEditTextChanged')
+        self.ngwin.logEdit.append('-->inside onDci10Sib1Cw0McsEditTextChanged')
         #update tbs
         self.updateDci10Sib1Tbs()
         
-    def onDci10Msg2McsEditTextChanged(self, text):
-        if not self.nrDci10Msg2McsEdit.text():
+    def onDci10Msg2Cw0McsEditTextChanged(self, text):
+        if not self.nrDci10Msg2Cw0McsEdit.text():
             return
         
-        self.ngwin.logEdit.append('-->inside onDci10Msg2McsEditTextChanged')
+        self.ngwin.logEdit.append('-->inside onDci10Msg2Cw0McsEditTextChanged')
         #update tbs
         self.updateDci10Msg2Tbs()
         
@@ -7974,13 +8092,21 @@ class NgNrGridUi(QDialog):
         #update tbs
         self.updateDci10Msg2Tbs()
         
-    def onDci10Msg4McsEditTextChanged(self, text):
-        if not self.nrDci10Msg4McsEdit.text():
+    def onDci10Msg4Cw0McsEditTextChanged(self, text):
+        if not self.nrDci10Msg4Cw0McsEdit.text():
             return
         
-        self.ngwin.logEdit.append('-->inside onDci10Msg4McsEditTextChanged')
+        self.ngwin.logEdit.append('-->inside onDci10Msg4Cw0McsEditTextChanged')
         #update tbs
         self.updateDci10Msg4Tbs()
+    
+    def onMsg3PuschCw0McsEditTextChanged(self, text):
+        if not self.nrMsg3PuschCw0McsEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside onMsg3PuschCw0McsEditTextChanged')
+        #update tbs
+        self.updateMsg3PuschTbs()
     
     def onDci11PdschCw0McsOrCw1McsEditTextChanged(self, text):
         if not self.nrDci11PdschCw0McsEdit.text() and not self.nrDci11PdschCw1McsEdit.text():
@@ -8486,6 +8612,10 @@ class NgNrGridUi(QDialog):
                     
                 if int(subBits, 2) != 0:
                     self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Inserted bits(="%s") must be all zeros! Please refer to 3GPP 38.213 vf30 Section 8.2 for details.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), subBits))
+                    return
+            
+            #update tbs
+            self.updateMsg3PuschTbs()
         else:
             self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
             self.nrMsg3PuschFreqAllocFieldEdit.clear()
@@ -8558,6 +8688,9 @@ class NgNrGridUi(QDialog):
             self.nrDmrsMsg3AddPosComb.setCurrentText('pos2')
         else:
             self.nrDmrsMsg3AddPosComb.setCurrentText('pos1')
+        
+        #update tbs
+        self.updateMsg3PuschTbs()
             
     def updateMsg3Pusch2ndHopFreqOff(self):
         if not self.nrMsg3PuschFreqAllocFieldEdit.text():
@@ -8597,6 +8730,9 @@ class NgNrGridUi(QDialog):
         if self.nrRachMsg3TpComb.currentText() == 'enabled':
             #self.updateLRBsMsg3PuschTp()
             self.updateIniUlBwpInfo()
+            
+        #update tbs
+        self.updateMsg3PuschTbs()
         
     def updateLRBsMsg3PuschTp(self):
         if not self.nrIniUlBwpGenericLocAndBwEdit.text() or not self.nrIniUlBwpGenericLRbsEdit.text() or not self.nrIniUlBwpGenericRbStartEdit.text():
@@ -8815,6 +8951,7 @@ class NgNrGridUi(QDialog):
             bwpSize = int(self.nrDedUlBwpGenericLRbsEdit.text())
             nUlHop = 1 if bwpSize < 50 else 2
             if int(self.nrDci01PuschFreqAllocFieldEdit.text()[:nUlHop], 2) != 0:
+                #FIXME It's better not put constraints of 'The N_UL_HOP MSBs must be all zeros', which limits the RB_start + L_RBs combinations
                 self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: The %d MSB of "Freq domain resource assignment" field(="%s") must be all zero when frequency hopping is enabled!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), nUlHop, self.nrDci01PuschFreqAllocFieldEdit.text()))
                 return
         
@@ -9430,12 +9567,16 @@ class NgNrGridUi(QDialog):
         if freqHop == 'intra-slot':
             #refer to 3GPP 38.211 vf30 6.4.1.1.3
             #if the higher-layer parameter dmrs-AdditionalPosition is not set to 'pos0' and intra-slot frequency hopping is enabled according to clause 7.3.1.1.2 in [4, TS 38.212] and by higher layer, Tables 6.4.1.1.3-6 shall be used assuming dmrs-AdditionalPosition is equal to 'pos1' for each hop.
-            key = '%s_%s_%s_%s' % (td, mappingType, self.nrMibDmRsTypeAPosComb.currentText()[3:] if mappingType == 'Type A' else '0', 'pos1' if self.nrDmrsDedPuschAddPosComb.currentText() != 'pos0' else 'pos0')
+            #refer to 3GPP 38.214 vf30 6.3
+            #In case of intra-slot frequency hopping is configured, the number of symbols in the first hop is given by floor(N_PUSCH_symb/2) , the number of symbols in the second hop is given by N_PUSCH_symb - floor(N_PUSCH_symb/2) , where N_PUSCH_symb is the length of the PUSCH transmission in OFDM symbols in one slot.
+            key1 = '%s_%s_%s_%s_1st' % (math.floor(td / 2), mappingType, self.nrMibDmRsTypeAPosComb.currentText()[3:] if mappingType == 'Type A' else '0', 'pos1' if self.nrDmrsDedPuschAddPosComb.currentText() != 'pos0' else 'pos0')
+            key2 = '%s_%s_%s_%s_2nd' % (td - math.floor(td / 2), mappingType, self.nrMibDmRsTypeAPosComb.currentText()[3:] if mappingType == 'Type A' else '0', 'pos1' if self.nrDmrsDedPuschAddPosComb.currentText() != 'pos0' else 'pos0')
             if numDmrsSymbs == 1:
-                if not key in self.nrDmrsPuschPosOneSymbWithIntraSlotFh.keys() or self.nrDmrsPuschPosOneSymbWithIntraSlotFh[key] is None:
-                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(="%s") when referring nrDmrsPuschPosOneSymbWithIntraSlotFh!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                if not key1 in self.nrDmrsPuschPosOneSymbWithIntraSlotFh or not key2 in self.nrDmrsPuschPosOneSymbWithIntraSlotFh or self.nrDmrsPuschPosOneSymbWithIntraSlotFh[key1] is None or self.nrDmrsPuschPosOneSymbWithIntraSlotFh[key2] is None:
+                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(key_1stHop="%s", key_2ndHop="%s") when referring nrDmrsPuschPosOneSymbWithIntraSlotFh!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key1, key2))
                     return
-                val = self.nrDmrsPuschPosOneSymbWithIntraSlotFh[key]
+                val1 = self.nrDmrsPuschPosOneSymbWithIntraSlotFh[key1]
+                val2 = self.nrDmrsPuschPosOneSymbWithIntraSlotFh[key2]
             else:
                 self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Only single-symbol front-load DM-RS for PUSCH is supported when intra-slot frequency hopping is enabled!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
                 return
@@ -9447,10 +9588,10 @@ class NgNrGridUi(QDialog):
                     return
                 val = self.nrDmrsPuschPosOneSymbWoIntraSlotFh[key]
             else:
-                if not key in self.nrDmrsPuschPosTwoSymbsWoItraSlotFh.keys() or self.nrDmrsPuschPosTwoSymbsWoItraSlotFh[key] is None:
-                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(="%s") when referring nrDmrsPuschPosTwoSymbsWoItraSlotFh!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
+                if not key in self.nrDmrsPuschPosTwoSymbsWoIntraSlotFh.keys() or self.nrDmrsPuschPosTwoSymbsWoIntraSlotFh[key] is None:
+                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(="%s") when referring nrDmrsPuschPosTwoSymbsWoIntraSlotFh!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
                     return
-                val = self.nrDmrsPuschPosTwoSymbsWoItraSlotFh[key]
+                val = self.nrDmrsPuschPosTwoSymbsWoIntraSlotFh[key]
         
         #refer to 3GPP 38.211 vf30
         #For PUSCH mapping type A, duration of 4 symbols in Table 6.4.1.1.3-4 is only applicable when dmrs-TypeA-Position is equal to 'pos2'.
@@ -9459,15 +9600,11 @@ class NgNrGridUi(QDialog):
             return
         
         if freqHop == 'intra-slot':
-            if len(val) == 2:
-                #val[0] for 1st hop, val[1] for 2nd hop
-                dmrsOh = (2 * cdmGroups) * (len(val[0]) + len(val[1]))
-            else:
-                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key-value pair(key="%s", val=%s) when referring nrDmrsPuschPosOneSymbWithIntraSlotFh!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key, val))
-                return
+            dmrsOh = (2 * cdmGroups) * (len(val1) + len(val2))
+            self.ngwin.logEdit.append('PUSCH(DCI 0_1) DMRS overhead: cdmGroupsWoData=%d, key1="%s", val1=%s, key2="%s", val2=%s' % (cdmGroups, key1, val1, key2, val2))
         else:
             dmrsOh = (2 * cdmGroups) * len(val)
-        self.ngwin.logEdit.append('PUSCH(DCI 0_1) DMRS overhead: cdmGroupsWoData=%d, key="%s", val=%s' % (cdmGroups, key, val))
+            self.ngwin.logEdit.append('PUSCH(DCI 0_1) DMRS overhead: cdmGroupsWoData=%d, key="%s", val=%s' % (cdmGroups, key, val))
         
         tp = 1 if self.nrDedPuschCfgTpComb.currentText() == 'enabled' else 0
         mcsCw0 = int(self.nrDci01PuschCw0McsEdit.text())
