@@ -1102,9 +1102,9 @@ class NgNrGridUi(QDialog):
         self.nrDci01PuschPrecodingLayersFieldEdit = QLineEdit()
         self.nrDci01PuschPrecodingLayersFieldEdit.setValidator(QIntValidator(0, 63))
         
-        self.nrDci01PuschSriFieldLabel = QLabel('SRS resource indicator[0]:')
+        self.nrDci01PuschSriFieldLabel = QLabel('SRS resource indicator:')
         self.nrDci01PuschSriFieldEdit = QLineEdit()
-        self.nrDci01PuschSriFieldEdit.setValidator(QIntValidator(0, 0))
+        self.nrDci01PuschSriFieldEdit.setEnabled(False)
         
         self.nrDci01PuschAntPortsFieldLabel = QLabel('Antenna port(s)[0-7]:')
         self.nrDci01PuschAntPortsFieldEdit = QLineEdit()
@@ -2237,7 +2237,7 @@ class NgNrGridUi(QDialog):
         
         self.nrSrsRes0NumAntPortsLabel = QLabel('nrofSRS-Ports:')
         self.nrSrsRes0NumAntPortsComb = QComboBox()
-        self.nrSrsRes0NumAntPortsComb.addItems(['port1', 'port2', 'port4'])
+        self.nrSrsRes0NumAntPortsComb.addItems(['port1', 'ports2', 'ports4'])
         self.nrSrsRes0NumAntPortsComb.setCurrentIndex(0)
         
         self.nrSrsRes0NonCbPtrsPortIndLabel = QLabel('ptrs-PortIndex(non-CB):')
@@ -2357,7 +2357,7 @@ class NgNrGridUi(QDialog):
         
         self.nrSrsRes1NumAntPortsLabel = QLabel('nrofSRS-Ports:')
         self.nrSrsRes1NumAntPortsComb = QComboBox()
-        self.nrSrsRes1NumAntPortsComb.addItems(['port1', 'port2', 'port4'])
+        self.nrSrsRes1NumAntPortsComb.addItems(['port1', 'ports2', 'ports4'])
         self.nrSrsRes1NumAntPortsComb.setCurrentIndex(0)
         
         self.nrSrsRes1NonCbPtrsPortIndLabel = QLabel('ptrs-PortIndex(non-CB):')
@@ -2477,7 +2477,7 @@ class NgNrGridUi(QDialog):
         
         self.nrSrsRes2NumAntPortsLabel = QLabel('nrofSRS-Ports:')
         self.nrSrsRes2NumAntPortsComb = QComboBox()
-        self.nrSrsRes2NumAntPortsComb.addItems(['port1', 'port2', 'port4'])
+        self.nrSrsRes2NumAntPortsComb.addItems(['port1', 'ports2', 'ports4'])
         self.nrSrsRes2NumAntPortsComb.setCurrentIndex(0)
         
         self.nrSrsRes2NonCbPtrsPortIndLabel = QLabel('ptrs-PortIndex(non-CB):')
@@ -2597,7 +2597,7 @@ class NgNrGridUi(QDialog):
         
         self.nrSrsRes3NumAntPortsLabel = QLabel('nrofSRS-Ports:')
         self.nrSrsRes3NumAntPortsComb = QComboBox()
-        self.nrSrsRes3NumAntPortsComb.addItems(['port1', 'port2', 'port4'])
+        self.nrSrsRes3NumAntPortsComb.addItems(['port1', 'ports2', 'ports4'])
         self.nrSrsRes3NumAntPortsComb.setCurrentIndex(0)
         
         self.nrSrsRes3NonCbPtrsPortIndLabel = QLabel('ptrs-PortIndex(non-CB):')
@@ -9485,7 +9485,7 @@ class NgNrGridUi(QDialog):
         
         #determine rank
         if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
-            if not self.nrDedPuschCfgCbMaxRankEdit.text() or not self.nrDci01PuschPrecodingLayersFieldEdit.text():
+            if not self.nrDedPuschCfgCbMaxRankEdit.text() or not self.nrDci01PuschPrecodingLayersFieldEdit.text() or not self.nrSrsResSet0ResourceIdListEdit.text():
                 return
             numUeAp = int(self.nrUeAntPortsComb.currentText()[:-2])
             tp = self.nrDedPuschCfgTpComb.currentText()
@@ -9520,10 +9520,22 @@ class NgNrGridUi(QDialog):
             else:
                 rank = 1
             
-            #FIXME check rank against nrofSRS-Ports of configured SRS when txCfg=codebook
-            #FIXME what about the case when rank=3? ---> For simplicity, assume that TPMI/rank=3 is invalid?
             #refer to 3GPP 38.214 vf30 6.1.1.1
             #The transmission precoder is selected from the uplink codebook that has a number of antenna ports equal to higher layer parameter nrofSRS-Ports in SRS-Config, as defined in Subclause 6.3.1.5 of [4, TS 38.211]. 
+            firstResSrsSet0 = int(self.nrSrsResSet0ResourceIdListEdit.text().split(',')[0])
+            if firstResSrsSet0 == 0:
+                numSrsPorts = int(self.nrSrsRes0NumAntPortsComb.currentText()[-1])
+            elif firstResSrsSet0 == 1:
+                numSrsPorts = int(self.nrSrsRes1NumAntPortsComb.currentText()[-1])
+            elif firstResSrsSet0 == 2:
+                numSrsPorts = int(self.nrSrsRes2NumAntPortsComb.currentText()[-1])
+            elif firstResSrsSet0 == 3:
+                numSrsPorts = int(self.nrSrsRes3NumAntPortsComb.currentText()[-1])
+            else:
+                pass
+            if rank > numSrsPorts:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: TRI = %s while nrofSRS-Ports of the configured SRS resource(s) is "%s" for CB based PUSCH.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), rank, '%s%d' % ('ports' if numSrsPorts > 1 else 'port', numSrsPorts)))
+                return
         else:
             if not self.nrDedPuschCfgNonCbMaxLayersEdit.text() or not self.nrSrsResSet1ResourceIdListEdit.text() or not self.nrDci01PuschSriFieldEdit.text():
                 return
