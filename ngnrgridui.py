@@ -1855,6 +1855,7 @@ class NgNrGridUi(QDialog):
         self.nrPtrsPdschSwitchComb = QComboBox()
         self.nrPtrsPdschSwitchComb.addItems(['yes', 'no'])
         self.nrPtrsPdschSwitchComb.setCurrentIndex(1)
+        self.nrPtrsPdschSwitchComb.setEnabled(False)
         
         self.nrPtrsPdschTimeDensityLabel = QLabel('timeDensity(L_PTRS):')
         self.nrPtrsPdschTimeDensityComb = QComboBox()
@@ -2097,6 +2098,7 @@ class NgNrGridUi(QDialog):
         self.nrPtrsPuschSwitchComb = QComboBox()
         self.nrPtrsPuschSwitchComb.addItems(['yes', 'no'])
         self.nrPtrsPuschSwitchComb.setCurrentIndex(1)
+        self.nrPtrsPuschSwitchComb.setEnabled(False)
         
         self.nrPtrsPuschTimeDensityLabel = QLabel('timeDensity(L_PTRS):')
         self.nrPtrsPuschTimeDensityComb = QComboBox()
@@ -2155,18 +2157,16 @@ class NgNrGridUi(QDialog):
         
         ptrsPuschWidget = QWidget()
         ptrsPuschGridLayout = QGridLayout()
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschSwitchLabel, 0, 0)
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschSwitchComb, 0, 1)
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschTimeDensityLabel, 1, 0)
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschTimeDensityComb, 1, 1)
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschFreqDensityLabel, 2, 0)
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschFreqDensityComb, 2, 1)
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschReOffsetLabel, 3, 0)
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschReOffsetComb, 3, 1)
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschMaxNumPortsLabel, 4, 0)
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschMaxNumPortsComb, 4, 1)
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschDmrsAntPortsLabel, 5, 0)
-        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschDmrsAntPortsEdit, 5, 1)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschTimeDensityLabel, 0, 0)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschTimeDensityComb, 0, 1)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschFreqDensityLabel, 1, 0)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschFreqDensityComb, 1, 1)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschReOffsetLabel, 2, 0)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschReOffsetComb, 2, 1)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschMaxNumPortsLabel, 3, 0)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschMaxNumPortsComb, 3, 1)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschDmrsAntPortsLabel, 4, 0)
+        ptrsPuschGridLayout.addWidget(self.nrPtrsPuschDmrsAntPortsEdit, 4, 1)
         ptrsPuschLayout = QVBoxLayout()
         ptrsPuschLayout.addLayout(ptrsPuschGridLayout)
         ptrsPuschLayout.addStretch()
@@ -2193,9 +2193,15 @@ class NgNrGridUi(QDialog):
         ptrsPuschTabWidget.addTab(ptrsPuschWidget, 'CP-OFDM')
         ptrsPuschTabWidget.addTab(ptrsPuschTpWidget, 'DFT-S-OFDM')
         
+        ptrsPuschSwitchLayout = QHBoxLayout()
+        ptrsPuschSwitchLayout.addWidget(self.nrPtrsPuschSwitchLabel)
+        ptrsPuschSwitchLayout.addWidget(self.nrPtrsPuschSwitchComb)
+        ptrsPuschSwitchLayout.addStretch()
+        
         ptrsPuschGrpBox = QGroupBox()
         ptrsPuschGrpBox.setTitle('PT-RS for PUSCH')
         ptrsPuschGrpBoxLayout = QVBoxLayout()
+        ptrsPuschGrpBoxLayout.addLayout(ptrsPuschSwitchLayout)
         ptrsPuschGrpBoxLayout.addWidget(ptrsPuschTabWidget)
         ptrsPuschGrpBoxLayout.addStretch()
         ptrsPuschGrpBox.setLayout(ptrsPuschGrpBoxLayout)
@@ -2233,6 +2239,11 @@ class NgNrGridUi(QDialog):
         self.nrSrsRes0NumAntPortsComb = QComboBox()
         self.nrSrsRes0NumAntPortsComb.addItems(['port1', 'port2', 'port4'])
         self.nrSrsRes0NumAntPortsComb.setCurrentIndex(0)
+        
+        self.nrSrsRes0NonCbPtrsPortIndLabel = QLabel('ptrs-PortIndex(non-CB):')
+        self.nrSrsRes0NonCbPtrsPortIndComb = QComboBox()
+        self.nrSrsRes0NonCbPtrsPortIndComb.addItems(['n0', 'n1'])
+        self.nrSrsRes0NonCbPtrsPortIndComb.setCurrentIndex(0)
         
         self.nrSrsRes0NumCombLabel = QLabel('transmissionComb:')
         self.nrSrsRes0NumCombComb= QComboBox()
@@ -2299,32 +2310,34 @@ class NgNrGridUi(QDialog):
         srsRes0GridLayout.addWidget(self.nrSrsRes0ResourceIdEdit, 0, 1)
         srsRes0GridLayout.addWidget(self.nrSrsRes0NumAntPortsLabel, 1, 0)
         srsRes0GridLayout.addWidget(self.nrSrsRes0NumAntPortsComb, 1, 1)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0NumCombLabel, 2, 0)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0NumCombComb, 2, 1)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0CombOffsetLabel, 3, 0)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0CombOffsetEdit, 3, 1)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0StartPosLabel, 4, 0)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0StartPosEdit, 4, 1)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0NumSymbsLabel, 5, 0)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0NumSymbsComb, 5, 1)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0RepFactorLabel, 6, 0)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0RepFactorComb, 6, 1)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0FreqPosLabel, 7, 0)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0FreqPosEdit, 7, 1)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0FreqShiftLabel, 8, 0)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0FreqShiftEdit, 8, 1)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0FreqHopCSrsLabel, 9, 0)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0FreqHopCSrsEdit, 9, 1)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0FreqHopBSrsLabel, 10, 0)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0FreqHopBSrsEdit, 10, 1)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0FreqHopBHopLabel, 11, 0)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0FreqHopBHopEdit, 11, 1)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0ResTypeLabel, 12, 0)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0ResTypeComb, 12, 1)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0PeriodLabel, 13, 0)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0PeriodComb, 13, 1)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0OffsetLabel, 14, 0)
-        srsRes0GridLayout.addWidget(self.nrSrsRes0OffsetEdit, 14, 1)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0NonCbPtrsPortIndLabel, 2, 0)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0NonCbPtrsPortIndComb, 2, 1)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0NumCombLabel, 3, 0)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0NumCombComb, 3, 1)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0CombOffsetLabel, 4, 0)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0CombOffsetEdit, 4, 1)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0StartPosLabel, 5, 0)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0StartPosEdit, 5, 1)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0NumSymbsLabel, 6, 0)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0NumSymbsComb, 6, 1)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0RepFactorLabel, 7, 0)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0RepFactorComb, 7, 1)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0FreqPosLabel, 8, 0)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0FreqPosEdit, 8, 1)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0FreqShiftLabel, 9, 0)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0FreqShiftEdit, 9, 1)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0FreqHopCSrsLabel, 10, 0)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0FreqHopCSrsEdit, 10, 1)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0FreqHopBSrsLabel, 11, 0)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0FreqHopBSrsEdit, 11, 1)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0FreqHopBHopLabel, 12, 0)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0FreqHopBHopEdit, 12, 1)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0ResTypeLabel, 13, 0)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0ResTypeComb, 13, 1)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0PeriodLabel, 14, 0)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0PeriodComb, 14, 1)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0OffsetLabel, 15, 0)
+        srsRes0GridLayout.addWidget(self.nrSrsRes0OffsetEdit, 15, 1)
         srsRes0Layout = QVBoxLayout()
         srsRes0Layout.addLayout(srsRes0GridLayout)
         srsRes0Layout.addStretch()
@@ -2346,6 +2359,11 @@ class NgNrGridUi(QDialog):
         self.nrSrsRes1NumAntPortsComb = QComboBox()
         self.nrSrsRes1NumAntPortsComb.addItems(['port1', 'port2', 'port4'])
         self.nrSrsRes1NumAntPortsComb.setCurrentIndex(0)
+        
+        self.nrSrsRes1NonCbPtrsPortIndLabel = QLabel('ptrs-PortIndex(non-CB):')
+        self.nrSrsRes1NonCbPtrsPortIndComb = QComboBox()
+        self.nrSrsRes1NonCbPtrsPortIndComb.addItems(['n0', 'n1'])
+        self.nrSrsRes1NonCbPtrsPortIndComb.setCurrentIndex(0)
         
         self.nrSrsRes1NumCombLabel = QLabel('transmissionComb:')
         self.nrSrsRes1NumCombComb= QComboBox()
@@ -2412,32 +2430,34 @@ class NgNrGridUi(QDialog):
         srsRes1GridLayout.addWidget(self.nrSrsRes1ResourceIdEdit, 0, 1)
         srsRes1GridLayout.addWidget(self.nrSrsRes1NumAntPortsLabel, 1, 0)
         srsRes1GridLayout.addWidget(self.nrSrsRes1NumAntPortsComb, 1, 1)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1NumCombLabel, 2, 0)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1NumCombComb, 2, 1)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1CombOffsetLabel, 3, 0)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1CombOffsetEdit, 3, 1)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1StartPosLabel, 4, 0)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1StartPosEdit, 4, 1)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1NumSymbsLabel, 5, 0)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1NumSymbsComb, 5, 1)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1RepFactorLabel, 6, 0)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1RepFactorComb, 6, 1)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1FreqPosLabel, 7, 0)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1FreqPosEdit, 7, 1)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1FreqShiftLabel, 8, 0)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1FreqShiftEdit, 8, 1)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1FreqHopCSrsLabel, 9, 0)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1FreqHopCSrsEdit, 9, 1)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1FreqHopBSrsLabel, 10, 0)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1FreqHopBSrsEdit, 10, 1)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1FreqHopBHopLabel, 11, 0)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1FreqHopBHopEdit, 11, 1)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1ResTypeLabel, 12, 0)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1ResTypeComb, 12, 1)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1PeriodLabel, 13, 0)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1PeriodComb, 13, 1)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1OffsetLabel, 14, 0)
-        srsRes1GridLayout.addWidget(self.nrSrsRes1OffsetEdit, 14, 1)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1NonCbPtrsPortIndLabel, 2, 0)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1NonCbPtrsPortIndComb, 2, 1)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1NumCombLabel, 3, 0)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1NumCombComb, 3, 1)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1CombOffsetLabel, 4, 0)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1CombOffsetEdit, 4, 1)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1StartPosLabel, 5, 0)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1StartPosEdit, 5, 1)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1NumSymbsLabel, 6, 0)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1NumSymbsComb, 6, 1)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1RepFactorLabel, 7, 0)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1RepFactorComb, 7, 1)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1FreqPosLabel, 8, 0)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1FreqPosEdit, 8, 1)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1FreqShiftLabel, 9, 0)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1FreqShiftEdit, 9, 1)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1FreqHopCSrsLabel, 10, 0)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1FreqHopCSrsEdit, 10, 1)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1FreqHopBSrsLabel, 11, 0)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1FreqHopBSrsEdit, 11, 1)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1FreqHopBHopLabel, 12, 0)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1FreqHopBHopEdit, 12, 1)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1ResTypeLabel, 13, 0)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1ResTypeComb, 13, 1)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1PeriodLabel, 14, 0)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1PeriodComb, 14, 1)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1OffsetLabel, 15, 0)
+        srsRes1GridLayout.addWidget(self.nrSrsRes1OffsetEdit, 15, 1)
         srsRes1Layout = QVBoxLayout()
         srsRes1Layout.addLayout(srsRes1GridLayout)
         srsRes1Layout.addStretch()
@@ -2459,6 +2479,11 @@ class NgNrGridUi(QDialog):
         self.nrSrsRes2NumAntPortsComb = QComboBox()
         self.nrSrsRes2NumAntPortsComb.addItems(['port1', 'port2', 'port4'])
         self.nrSrsRes2NumAntPortsComb.setCurrentIndex(0)
+        
+        self.nrSrsRes2NonCbPtrsPortIndLabel = QLabel('ptrs-PortIndex(non-CB):')
+        self.nrSrsRes2NonCbPtrsPortIndComb = QComboBox()
+        self.nrSrsRes2NonCbPtrsPortIndComb.addItems(['n0', 'n1'])
+        self.nrSrsRes2NonCbPtrsPortIndComb.setCurrentIndex(0)
         
         self.nrSrsRes2NumCombLabel = QLabel('transmissionComb:')
         self.nrSrsRes2NumCombComb= QComboBox()
@@ -2525,32 +2550,34 @@ class NgNrGridUi(QDialog):
         srsRes2GridLayout.addWidget(self.nrSrsRes2ResourceIdEdit, 0, 1)
         srsRes2GridLayout.addWidget(self.nrSrsRes2NumAntPortsLabel, 1, 0)
         srsRes2GridLayout.addWidget(self.nrSrsRes2NumAntPortsComb, 1, 1)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2NumCombLabel, 2, 0)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2NumCombComb, 2, 1)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2CombOffsetLabel, 3, 0)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2CombOffsetEdit, 3, 1)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2StartPosLabel, 4, 0)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2StartPosEdit, 4, 1)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2NumSymbsLabel, 5, 0)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2NumSymbsComb, 5, 1)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2RepFactorLabel, 6, 0)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2RepFactorComb, 6, 1)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2FreqPosLabel, 7, 0)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2FreqPosEdit, 7, 1)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2FreqShiftLabel, 8, 0)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2FreqShiftEdit, 8, 1)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2FreqHopCSrsLabel, 9, 0)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2FreqHopCSrsEdit, 9, 1)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2FreqHopBSrsLabel, 10, 0)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2FreqHopBSrsEdit, 10, 1)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2FreqHopBHopLabel, 11, 0)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2FreqHopBHopEdit, 11, 1)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2ResTypeLabel, 12, 0)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2ResTypeComb, 12, 1)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2PeriodLabel, 13, 0)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2PeriodComb, 13, 1)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2OffsetLabel, 14, 0)
-        srsRes2GridLayout.addWidget(self.nrSrsRes2OffsetEdit, 14, 1)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2NonCbPtrsPortIndLabel, 2, 0)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2NonCbPtrsPortIndComb, 2, 1)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2NumCombLabel, 3, 0)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2NumCombComb, 3, 1)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2CombOffsetLabel, 4, 0)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2CombOffsetEdit, 4, 1)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2StartPosLabel, 5, 0)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2StartPosEdit, 5, 1)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2NumSymbsLabel, 6, 0)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2NumSymbsComb, 6, 1)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2RepFactorLabel, 7, 0)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2RepFactorComb, 7, 1)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2FreqPosLabel, 8, 0)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2FreqPosEdit, 8, 1)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2FreqShiftLabel, 9, 0)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2FreqShiftEdit, 9, 1)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2FreqHopCSrsLabel, 10, 0)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2FreqHopCSrsEdit, 10, 1)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2FreqHopBSrsLabel, 11, 0)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2FreqHopBSrsEdit, 11, 1)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2FreqHopBHopLabel, 12, 0)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2FreqHopBHopEdit, 12, 1)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2ResTypeLabel, 13, 0)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2ResTypeComb, 13, 1)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2PeriodLabel, 14, 0)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2PeriodComb, 14, 1)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2OffsetLabel, 15, 0)
+        srsRes2GridLayout.addWidget(self.nrSrsRes2OffsetEdit, 15, 1)
         srsRes2Layout = QVBoxLayout()
         srsRes2Layout.addLayout(srsRes2GridLayout)
         srsRes2Layout.addStretch()
@@ -2572,6 +2599,11 @@ class NgNrGridUi(QDialog):
         self.nrSrsRes3NumAntPortsComb = QComboBox()
         self.nrSrsRes3NumAntPortsComb.addItems(['port1', 'port2', 'port4'])
         self.nrSrsRes3NumAntPortsComb.setCurrentIndex(0)
+        
+        self.nrSrsRes3NonCbPtrsPortIndLabel = QLabel('ptrs-PortIndex(non-CB):')
+        self.nrSrsRes3NonCbPtrsPortIndComb = QComboBox()
+        self.nrSrsRes3NonCbPtrsPortIndComb.addItems(['n0', 'n1'])
+        self.nrSrsRes3NonCbPtrsPortIndComb.setCurrentIndex(0)
         
         self.nrSrsRes3NumCombLabel = QLabel('transmissionComb:')
         self.nrSrsRes3NumCombComb= QComboBox()
@@ -2638,32 +2670,34 @@ class NgNrGridUi(QDialog):
         srsRes3GridLayout.addWidget(self.nrSrsRes3ResourceIdEdit, 0, 1)
         srsRes3GridLayout.addWidget(self.nrSrsRes3NumAntPortsLabel, 1, 0)
         srsRes3GridLayout.addWidget(self.nrSrsRes3NumAntPortsComb, 1, 1)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3NumCombLabel, 2, 0)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3NumCombComb, 2, 1)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3CombOffsetLabel, 3, 0)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3CombOffsetEdit, 3, 1)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3StartPosLabel, 4, 0)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3StartPosEdit, 4, 1)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3NumSymbsLabel, 5, 0)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3NumSymbsComb, 5, 1)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3RepFactorLabel, 6, 0)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3RepFactorComb, 6, 1)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3FreqPosLabel, 7, 0)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3FreqPosEdit, 7, 1)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3FreqShiftLabel, 8, 0)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3FreqShiftEdit, 8, 1)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3FreqHopCSrsLabel, 9, 0)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3FreqHopCSrsEdit, 9, 1)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3FreqHopBSrsLabel, 10, 0)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3FreqHopBSrsEdit, 10, 1)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3FreqHopBHopLabel, 11, 0)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3FreqHopBHopEdit, 11, 1)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3ResTypeLabel, 12, 0)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3ResTypeComb, 12, 1)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3PeriodLabel, 13, 0)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3PeriodComb, 13, 1)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3OffsetLabel, 14, 0)
-        srsRes3GridLayout.addWidget(self.nrSrsRes3OffsetEdit, 14, 1)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3NonCbPtrsPortIndLabel, 2, 0)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3NonCbPtrsPortIndComb, 2, 1)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3NumCombLabel, 3, 0)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3NumCombComb, 3, 1)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3CombOffsetLabel, 4, 0)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3CombOffsetEdit, 4, 1)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3StartPosLabel, 5, 0)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3StartPosEdit, 5, 1)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3NumSymbsLabel, 6, 0)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3NumSymbsComb, 6, 1)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3RepFactorLabel, 7, 0)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3RepFactorComb, 7, 1)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3FreqPosLabel, 8, 0)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3FreqPosEdit, 8, 1)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3FreqShiftLabel, 9, 0)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3FreqShiftEdit, 9, 1)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3FreqHopCSrsLabel, 10, 0)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3FreqHopCSrsEdit, 10, 1)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3FreqHopBSrsLabel, 11, 0)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3FreqHopBSrsEdit, 11, 1)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3FreqHopBHopLabel, 12, 0)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3FreqHopBHopEdit, 12, 1)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3ResTypeLabel, 13, 0)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3ResTypeComb, 13, 1)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3PeriodLabel, 14, 0)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3PeriodComb, 14, 1)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3OffsetLabel, 15, 0)
+        srsRes3GridLayout.addWidget(self.nrSrsRes3OffsetEdit, 15, 1)
         srsRes3Layout = QVBoxLayout()
         srsRes3Layout.addLayout(srsRes3GridLayout)
         srsRes3Layout.addStretch()
@@ -3337,6 +3371,7 @@ class NgNrGridUi(QDialog):
         self.nrDci01PuschPrecodingLayersFieldEdit.textChanged.connect(self.onDci01PuschPrecodingLayersEditTextChanged)
         self.nrDci01PuschSriFieldEdit.textChanged.connect(self.onDci01PuschSriEditTextChanged)
         self.nrDci01PuschAntPortsFieldEdit.textChanged.connect(self.onDci01PuschAntPortsEditTextChanged)
+        self.nrDci01PuschPtrsDmrsMappingEdit.textChanged.connect(self.onDci01PuschPtrsDmrsMappingEditTextChanged)
         
         #---->initial dl bwp
         self.nrIniDlBwpGenericCpComb.currentIndexChanged.connect(self.onIniDlBwpCpCombCurIndChanged)
@@ -3364,6 +3399,8 @@ class NgNrGridUi(QDialog):
         self.nrDmrsDedPuschAddPosComb.currentIndexChanged.connect(self.onDmrsDedPuschAddPosCombCurIndChanged)
         self.nrSrsResSet0ResourceIdListEdit.textChanged.connect(self.onSrsResSet0ResourceIdListTextChanged)
         self.nrSrsResSet1ResourceIdListEdit.textChanged.connect(self.onSrsResSet1ResourceIdListTextChanged)
+        self.nrPtrsPuschTpGroupPatComb.currentIndexChanged.connect(self.onPtrsPuschTpGroupPatCombCurIndChanged)
+        self.nrPtrsPuschMaxNumPortsComb.currentIndexChanged.connect(self.onPtrsPuschMaxNumPortsCombCurIndChanged)
         #---->initial ul bwp
         self.nrRachMsg3TpComb.currentIndexChanged.connect(self.onRachMsg3TpCombCurIndChanged)
         
@@ -9028,7 +9065,7 @@ class NgNrGridUi(QDialog):
             pass
         
         rank, tpmi = val
-        self.ngwin.logEdit.append('TRI/TPMI(DCI 0_1) info: rank=%s, tpmi=%s' % (rank, tpmi)) 
+        self.ngwin.logEdit.append('TRI/TPMI(DCI 0_1) info: rank=%s, tpmi=%s (key="%s",val=%s)' % (rank, tpmi, key, val)) 
         
         if self.nrDci01PuschAntPortsFieldEdit.text():
             self.validatePuschAntPorts()
@@ -9060,7 +9097,7 @@ class NgNrGridUi(QDialog):
                 else:
                     val = self.nrDci01NonCbSri[key]
             
-            self.ngwin.logEdit.append('SRI(DCI 0_1) info: rank=%s' % (len(val) if Nsrs > 1 else 1))
+            self.ngwin.logEdit.append('SRI(DCI 0_1) info: rank=%s (key="%s",val=%s)' % (len(val) if Nsrs > 1 else 1, key, val))
             
             if self.nrDci01PuschAntPortsFieldEdit.text():
                 self.validatePuschAntPorts()
@@ -9076,6 +9113,13 @@ class NgNrGridUi(QDialog):
         
         self.ngwin.logEdit.append('-->inside onDci01PuschAntPortsEditTextChanged')
         self.validatePuschAntPorts()
+    
+    def onDci01PuschPtrsDmrsMappingEditTextChanged(self, text):
+        if not self.nrDci01PuschPtrsDmrsMappingEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside onDci01PuschPtrsDmrsMappingEditTextChanged')
+        self.updatePtrsPusch()
         
     def onDedPuschCfgRbgConfigCombCurIndChanged(self, index):
         if index < 0:
@@ -9325,7 +9369,7 @@ class NgNrGridUi(QDialog):
             
             Nsrs = len(srsSet1)
             if Nsrs == 0 or sum([1 for i in srsSet1 if i in range(4)]) != Nsrs:
-                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: srs-ResourceIdList should be a comma-separated string which contains valid srs-ResourceId[0-3], for example, "0,1,2,3".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: srs-ResourceIdList of srsSet1 should be a comma-separated string which contains valid srs-ResourceId[0-3], for example, "0,1,2,3".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
                 return
             
             if Nsrs > 4:
@@ -9382,7 +9426,7 @@ class NgNrGridUi(QDialog):
             
             Nsrs = len(srsSet0)
             if Nsrs == 0 or sum([1 for i in srsSet0 if i in range(4)]) != Nsrs:
-                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: srs-ResourceIdList should be a comma-separated string which contains valid srs-ResourceId[0-3], for example, "0,1,2,3".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: srs-ResourceIdList of srsSet0 should be a comma-separated string which contains valid srs-ResourceId[0-3], for example, "0,1,2,3".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
                 return
             
             if Nsrs > 2:
@@ -9496,11 +9540,14 @@ class NgNrGridUi(QDialog):
             sri = int(self.nrDci01PuschSriFieldEdit.text())
             
             key = '%s_%s_%s' % (Lmax, Nsrs, sri)
+            self.dci01NonCbSrsList = None
             if Nsrs == 1:
                 rank = 1
+                self.dci01NonCbSrsList = [srsSet1[0]]
             else:
                 if key in self.nrDci01NonCbSri and self.nrDci01NonCbSri[key] is not None:
                     rank = len(self.nrDci01NonCbSri[key])
+                    self.dci01NonCbSrsList = self.nrDci01NonCbSri[key]
                 else:
                     self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(="%s") when referring nrDci01NonCbSri.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
                     return
@@ -9536,11 +9583,27 @@ class NgNrGridUi(QDialog):
         if noPtrs:
             self.nrPtrsPuschSwitchComb.setCurrentText('no')
             self.nrPtrsPuschSwitchComb.setEnabled(False)
-            self.nrPtrsPuschDmrsAntPortEdit.clear()
+            self.nrPtrsPuschDmrsAntPortsEdit.clear()
+            self.nrPtrsPuschTpDmrsAntPortsEdit.clear()
             self.nrDci01PuschPtrsDmrsMappingEdit.setEnabled(False)
             self.nrDci01PuschPtrsDmrsMappingEdit.clear()
         else:
             self.nrPtrsPuschSwitchComb.setEnabled(True)
+            if rank > 1:
+                self.nrDci01PuschPtrsDmrsMappingEdit.setEnabled(True)
+                self.nrPtrsPuschDmrsAntPortsEdit.clear()
+                self.nrPtrsPuschTpDmrsAntPortsEdit.clear()
+            else:
+                self.nrDci01PuschPtrsDmrsMappingEdit.setEnabled(False)
+                self.nrDci01PuschPtrsDmrsMappingEdit.clear()
+                if tp == 'enabled':
+                    self.nrPtrsPuschTpDmrsAntPortsEdit.setText(str(dmrsPorts[0]))
+                    self.nrPtrsPuschDmrsAntPortsEdit.clear()
+                else:
+                    self.nrPtrsPuschDmrsAntPortsEdit.setText(str(dmrsPorts[0]))
+                    self.nrPtrsPuschTpDmrsAntPortsEdit.clear()
+            
+            self.updatePtrsPusch()
         
         #set tbs by calling getTbs
         if not self.nrDci01PuschTimeAllocFieldEdit.text() or not self.nrDci01PuschTimeAllocLEdit.text() or not self.nrDci01PuschTimeAllocSEdit.text() or not self.nrDci01PuschTimeAllocSlivEdit.text():
@@ -9612,6 +9675,103 @@ class NgNrGridUi(QDialog):
         tbs = self.getTbs(sch='pusch', tp=tp, rnti='c-rnti', tab=self.nrDedPuschCfgMcsTableComb.currentText(), td=td, fd=fd, mcs=mcsCw0, layer=len(dmrsPorts), dmrs=dmrsOh, xoh=int(self.nrDedPuschCfgXOverheadComb.currentText()[3:]), scale=1)
         
         self.nrDci01PuschTbsEdit.setText(str(tbs) if tbs is not None else '')
+        
+    def onPtrsPuschTpGroupPatCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onPtrsPuschTpGroupPatCombCurIndChanged, index=%d' % index)
+        grpPatterns = {'pattern 0':(2,2), 'pattern 1':(2,4), 'pattern 2':(4,2), 'pattern 3':(4,4), 'pattern 4':(8,4)}
+        pattern = grpPatterns[self.nrPtrsPuschTpGroupPatComb.currentText()]
+        self.nrPtrsPuschTpNumGroupsEdit.setText(str(pattern[0]))
+        self.nrPtrsPuschTpSamplesPerGroupEdit.setText(str(pattern[1]))
+        
+    def onPtrsPuschMaxNumPortsCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onPtrsPuschMaxNumPortsCombCurIndChanged, index=%d' % index)
+        self.updatePtrsPusch()
+        
+    def updatePtrsPusch(self): 
+        if self.nrDedPuschCfgTpComb.currentText() == 'enabled':
+            return
+        
+        if not self.nrDci01PuschPtrsDmrsMappingEdit.isEnabled() or not self.nrDci01PuschPtrsDmrsMappingEdit.text():
+            return
+        
+        if not self.nrDmrsDedPuschDmrsPortsEdit.text():
+            return
+        
+        self.ngwin.logEdit.append('-->inside updatePtrsPusch')
+        dmrsPorts = [int(s) for s in self.nrDmrsDedPuschDmrsPortsEdit.text().split(',')]
+        ptrsDmrsMap = int(self.nrDci01PuschPtrsDmrsMappingEdit.text())
+        maxPtrsPorts = int(self.nrPtrsPuschMaxNumPortsComb.currentText()[-1])
+        if maxPtrsPorts == 1:
+            if ptrsDmrsMap in range(len(dmrsPorts)):
+                self.nrPtrsPuschDmrsAntPortsEdit.setText(str(dmrsPorts[ptrsDmrsMap]))
+            else:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Valid "PTRS-DMRS association" field of DCI 0_1 is %s for PTRS port 0.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), '[0]' if len(dmrsPorts) == 1 else '[0-%d]' % (len(dmrsPorts)-1)))
+                self.nrDci01PuschPtrsDmrsMappingEdit.clear()
+                return
+        else:
+            ptrsPortDict = {0:[], 1:[]}
+            if self.nrDedPuschCfgTxCfgComb.currentText() == 'nonCodebook':
+                if self.dci01NonCbSrsList is not None:
+                    for i in self.dci01NonCbSrsList:
+                        if i == 0:
+                            ptrsPortDict[int(self.nrSrsRes0NonCbPtrsPortIndComb.currentText()[-1])].append(dmrsPorts[self.dci01NonCbSrsList.index(i)])
+                        elif i == 1:
+                            ptrsPortDict[int(self.nrSrsRes1NonCbPtrsPortIndComb.currentText()[-1])].append(dmrsPorts[self.dci01NonCbSrsList.index(i)])
+                        elif i == 2:
+                            ptrsPortDict[int(self.nrSrsRes2NonCbPtrsPortIndComb.currentText()[-1])].append(dmrsPorts[self.dci01NonCbSrsList.index(i)])
+                        elif i == 3:
+                            ptrsPortDict[int(self.nrSrsRes3NonCbPtrsPortIndComb.currentText()[-1])].append(dmrsPorts[self.dci01NonCbSrsList.index(i)])
+                        else:
+                            pass
+            else:
+                for i in dmrsPorts:
+                    if i in (0, 2):
+                        ptrsPortDict[0].append(i)
+                    elif i in (1, 3):
+                        ptrsPortDict[1].append(i)
+                    else:
+                        pass
+            
+            if len(ptrsPortDict[0]) >= 1 and len(ptrsPortDict[1]) == 0:
+                #PTRS port 0
+                if ptrsDmrsMap in range(len(dmrsPorts)):
+                    self.nrPtrsPuschDmrsAntPortsEdit.setText(str(dmrsPorts[ptrsDmrsMap]))
+                else:
+                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Valid "PTRS-DMRS association" field of DCI 0_1 is %s for PTRS port 0.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), '[0]' if len(dmrsPorts) == 1 else '[0-%d]' % (len(dmrsPorts)-1)))
+                    self.nrDci01PuschPtrsDmrsMappingEdit.clear()
+                    return
+            elif len(ptrsPortDict[0]) >= 1 and len(ptrsPortDict[1]) >= 1:
+                #PTRS port 0 and port 1
+                if len(ptrsPortDict[0]) == 1 and len(ptrsPortDict[1]) == 1:
+                    validPtrsDmrsMap = [0]
+                elif len(ptrsPortDict[0]) == 1 and len(ptrsPortDict[1]) == 2:
+                    validPtrsDmrsMap = [0, 1]
+                elif len(ptrsPortDict[0]) == 2 and len(ptrsPortDict[1]) == 1:
+                    validPtrsDmrsMap = [0, 2]
+                elif len(ptrsPortDict[0]) == 2 and len(ptrsPortDict[1]) == 2:
+                    validPtrsDmrsMap = [0, 1, 2, 3]
+                else:
+                    pass
+                
+                if ptrsDmrsMap in validPtrsDmrsMap:
+                    bits = '{:02b}'.format(ptrsDmrsMap)
+                    associatedDmrsPorts = []
+                    for i in range(2):
+                        associatedDmrsPorts.append(ptrsPortDict[i][0] if bits[i] == '0' else ptrsPortDict[i][1])
+                        
+                    self.nrPtrsPuschDmrsAntPortsEdit.setText(','.join([str(i) for i in associatedDmrsPorts]))
+                else:
+                    self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Valid "PTRS-DMRS association" field of DCI 0_1 is %s for PTRS port 0/1.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), validPtrsDmrsMap))
+                    return
+            else:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid PTRS port settings with maxNrofPorts of PTRS-UplinkConfig is "n2".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+                return
             
     def getTbs(self, sch='pdsch', tp=0, rnti='c-rnti', tab='qam64', td=1, fd=1, mcs=0, layer=1, dmrs=0, xoh=0, scale=1):
         self.ngwin.logEdit.append('---->inside getTbs: sch="%s", tp=%d, rnti="%s", tab="%s", td=%d, fd=%d, mcs=%d, layer=%d, dmrs=%d, xoh=%d, scale=%.2f' % (sch, tp, rnti, tab, td, fd, mcs, layer, dmrs, xoh, scale)) 
