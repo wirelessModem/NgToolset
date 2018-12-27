@@ -1508,7 +1508,7 @@ class NgNrGridUi(QDialog):
         self.nrIniDlBwpGenericRbStartEdit = QLineEdit('0')
         
         self.nrIniDlBwpGenericLRbsLabel = QLabel('L_RBs:')
-        self.nrIniDlBwpGenericLRbsEdit = QLineEdit('1')
+        self.nrIniDlBwpGenericLRbsEdit = QLineEdit()
         
         iniDlBwpSib1GrpBox = QGroupBox()
         iniDlBwpSib1GrpBox.setTitle('Initial active DL BWP(SIB1)')
@@ -1558,7 +1558,7 @@ class NgNrGridUi(QDialog):
         self.nrIniUlBwpGenericRbStartEdit = QLineEdit('0')
         
         self.nrIniUlBwpGenericLRbsLabel = QLabel('L_RBs:')
-        self.nrIniUlBwpGenericLRbsEdit = QLineEdit('1')
+        self.nrIniUlBwpGenericLRbsEdit = QLineEdit()
         
         iniUlBwpSib1GrpBox = QGroupBox()
         iniUlBwpSib1GrpBox.setTitle('Initial active UL BWP(SIB1)')
@@ -1595,7 +1595,8 @@ class NgNrGridUi(QDialog):
         self.nrRachGenericMsg1FdmComb.addItems(['1', '2', '4', '8'])
         
         self.nrRachGenericMsg1FreqStartLabel = QLabel('msg1-FrequencyStart[0-274]:')
-        self.nrRachGenericMsg1FreqStartEdit = QLineEdit()
+        self.nrRachGenericMsg1FreqStartEdit = QLineEdit('0')
+        self.nrRachGenericMsg1FreqStartEdit.setValidator(QIntValidator(0, 274))
         
         rachGenericGrpBox = QGroupBox()
         rachGenericGrpBox.setTitle('RACH-ConfigGeneric')
@@ -1619,10 +1620,12 @@ class NgNrGridUi(QDialog):
         
         self.nrRachSsbPerRachOccasionLabel = QLabel('ssb-perRACH-Occasion:')
         self.nrRachSsbPerRachOccasionComb = QComboBox()
-        self.nrRachSsbPerRachOccasionComb.addItems(['1/8', '1/4', '1/2', '1', '2', '4', '8', '16'])
+        self.nrRachSsbPerRachOccasionComb.addItems(['oneEighth', 'oneFourth', 'oneHalf', 'one', 'two', 'four', 'eight', 'sixteen'])
+        self.nrRachSsbPerRachOccasionComb.setCurrentIndex(0)
         
         self.nrRachCbPreamblesPerSsbLabel = QLabel('CB-PreamblesPerSSB:')
-        self.nrRachCbPreamblesPerSsbEdit = QLineEdit()
+        self.nrRachCbPreamblesPerSsbComb = QComboBox()
+        self.nrRachCbPreamblesPerSsbComb.addItems([str(i) for i in self.nrSsbPerRachOccasion2CbPreamblesPerSsb['oneEighth']])
         
         self.nrRachMsg3TpLabel = QLabel('msg3-transformPrecoder:')
         self.nrRachMsg3TpComb = QComboBox()
@@ -1639,7 +1642,7 @@ class NgNrGridUi(QDialog):
         prachWidgetGridLayout.addWidget(self.nrRachSsbPerRachOccasionLabel, 2, 0)
         prachWidgetGridLayout.addWidget(self.nrRachSsbPerRachOccasionComb, 2, 1)
         prachWidgetGridLayout.addWidget(self.nrRachCbPreamblesPerSsbLabel, 3, 0)
-        prachWidgetGridLayout.addWidget(self.nrRachCbPreamblesPerSsbEdit, 3, 1)
+        prachWidgetGridLayout.addWidget(self.nrRachCbPreamblesPerSsbComb, 3, 1)
         prachWidgetGridLayout.addWidget(self.nrRachMsg3TpLabel, 4, 0)
         prachWidgetGridLayout.addWidget(self.nrRachMsg3TpComb, 4, 1)
         prachWidget.setLayout(prachWidgetGridLayout)
@@ -1717,7 +1720,7 @@ class NgNrGridUi(QDialog):
         self.nrPucchSib1PrbOffsetEdit.setEnabled(False)
         
         self.nrPucchSib1IniCsIndexesSetLabel = QLabel('Set of initial CS indexes:')
-        self.nrPucchSib1IniCsIndexesSetEdit = QLineEdit('{0, 3}')
+        self.nrPucchSib1IniCsIndexesSetEdit = QLineEdit('(0, 3)')
         self.nrPucchSib1IniCsIndexesSetEdit.setEnabled(False)
         
         pucchSib1Widget = QWidget()
@@ -1730,8 +1733,10 @@ class NgNrGridUi(QDialog):
         pucchSib1WidgetGridLayout.addWidget(self.nrPucchSib1StartingSymbEdit, 2, 1)
         pucchSib1WidgetGridLayout.addWidget(self.nrPucchSib1NumSymbsLabel, 3, 0)
         pucchSib1WidgetGridLayout.addWidget(self.nrPucchSib1NumSymbsEdit, 3, 1)
-        pucchSib1WidgetGridLayout.addWidget(self.nrPucchSib1IniCsIndexesSetLabel, 4, 0)
-        pucchSib1WidgetGridLayout.addWidget(self.nrPucchSib1IniCsIndexesSetEdit, 4, 1)
+        pucchSib1WidgetGridLayout.addWidget(self.nrPucchSib1PrbOffsetLabel, 4, 0)
+        pucchSib1WidgetGridLayout.addWidget(self.nrPucchSib1PrbOffsetEdit, 4, 1)
+        pucchSib1WidgetGridLayout.addWidget(self.nrPucchSib1IniCsIndexesSetLabel, 5, 0)
+        pucchSib1WidgetGridLayout.addWidget(self.nrPucchSib1IniCsIndexesSetEdit, 5, 1)
         pucchSib1WidgetLayout = QVBoxLayout()
         pucchSib1WidgetLayout.addLayout(pucchSib1WidgetGridLayout)
         pucchSib1WidgetLayout.addStretch()
@@ -1773,7 +1778,7 @@ class NgNrGridUi(QDialog):
         self.nrDedDlBwpGenericRbStartEdit = QLineEdit('0')
         
         self.nrDedDlBwpGenericLRbsLabel = QLabel('L_RBs:')
-        self.nrDedDlBwpGenericLRbsEdit = QLineEdit('1')
+        self.nrDedDlBwpGenericLRbsEdit = QLineEdit()
         
         dedDlBwpGrpBox = QGroupBox()
         dedDlBwpGrpBox.setTitle('Dedicated active DL BWP')
@@ -1969,7 +1974,7 @@ class NgNrGridUi(QDialog):
         self.nrDedUlBwpGenericRbStartEdit = QLineEdit('0')
         
         self.nrDedUlBwpGenericLRbsLabel = QLabel('L_RBs:')
-        self.nrDedUlBwpGenericLRbsEdit = QLineEdit('1')
+        self.nrDedUlBwpGenericLRbsEdit = QLineEdit()
         
         dedUlBwpGrpBox = QGroupBox()
         dedUlBwpGrpBox.setTitle('Dedicated active UL BWP')
@@ -3401,8 +3406,27 @@ class NgNrGridUi(QDialog):
         self.nrSrsResSet1ResourceIdListEdit.textChanged.connect(self.onSrsResSet1ResourceIdListTextChanged)
         self.nrPtrsPuschTpGroupPatComb.currentIndexChanged.connect(self.onPtrsPuschTpGroupPatCombCurIndChanged)
         self.nrPtrsPuschMaxNumPortsComb.currentIndexChanged.connect(self.onPtrsPuschMaxNumPortsCombCurIndChanged)
+        self.nrSrsRes0NumAntPortsComb.currentIndexChanged.connect(self.onSrsResNumAntPortsCombCurIndChanged)
+        self.nrSrsRes1NumAntPortsComb.currentIndexChanged.connect(self.onSrsResNumAntPortsCombCurIndChanged)
+        self.nrSrsRes2NumAntPortsComb.currentIndexChanged.connect(self.onSrsResNumAntPortsCombCurIndChanged)
+        self.nrSrsRes3NumAntPortsComb.currentIndexChanged.connect(self.onSrsResNumAntPortsCombCurIndChanged)
+        self.nrSrsRes0NonCbPtrsPortIndComb.currentIndexChanged.connect(self.onSrsResNonCbPtrsPortIndCombCurIndChanged)
+        self.nrSrsRes1NonCbPtrsPortIndComb.currentIndexChanged.connect(self.onSrsResNonCbPtrsPortIndCombCurIndChanged)
+        self.nrSrsRes2NonCbPtrsPortIndComb.currentIndexChanged.connect(self.onSrsResNonCbPtrsPortIndCombCurIndChanged)
+        self.nrSrsRes3NonCbPtrsPortIndComb.currentIndexChanged.connect(self.onSrsResNonCbPtrsPortIndCombCurIndChanged)
+        self.nrSrsRes0NumCombComb.currentIndexChanged.connect(self.onSrsRes0NumCombCombCurIndChanged)
+        self.nrSrsRes1NumCombComb.currentIndexChanged.connect(self.onSrsRes1NumCombCombCurIndChanged)
+        self.nrSrsRes2NumCombComb.currentIndexChanged.connect(self.onSrsRes2NumCombCombCurIndChanged)
+        self.nrSrsRes3NumCombComb.currentIndexChanged.connect(self.onSrsRes3NumCombCombCurIndChanged)
+        self.nrSrsRes0PeriodComb.currentIndexChanged.connect(self.onSrsRes0PeriodCombCurIndChanged)
+        self.nrSrsRes1PeriodComb.currentIndexChanged.connect(self.onSrsRes1PeriodCombCurIndChanged)
+        self.nrSrsRes2PeriodComb.currentIndexChanged.connect(self.onSrsRes2PeriodCombCurIndChanged)
+        self.nrSrsRes3PeriodComb.currentIndexChanged.connect(self.onSrsRes3PeriodCombCurIndChanged)
         #---->initial ul bwp
         self.nrRachMsg3TpComb.currentIndexChanged.connect(self.onRachMsg3TpCombCurIndChanged)
+        self.nrRachSsbPerRachOccasionComb.currentIndexChanged.connect(self.onRachSsbPerRachOccasionCombCurIndChanged)
+        self.nrRachNumRaPreamblesEdit.textChanged.connect(self.onRachNumRaPreamblesTextChanged)
+        self.nrPucchSib1PucchResCommonEdit.textChanged.connect(self.onPucchSib1PucchResCommonTextChanged)
         
         #---->I am THE driver!
         self.nrCarrierBandComb.setCurrentText('n77')
@@ -6219,7 +6243,50 @@ class NgNrGridUi(QDialog):
             '0_2_2_4_31' : None,
             }
         
+        #refer to 3GPP 38.331 vf30
+        #ssb-perRACH-OccasionAndCB-PreamblesPerSSB of RACH-ConfigCommon
+        self.nrSsbPerRachOccasion2Float = {
+            'oneEighth' : 0.125,
+            'oneFourth' : 0.25,
+            'oneHalf' : 0.5,
+            'one' : 1,
+            'two' : 2,
+            'four' : 4,
+            'eight' : 8,
+            'sixteen' : 16,
+            }
+        self.nrSsbPerRachOccasion2CbPreamblesPerSsb = {
+            'oneEighth' : (4,8,12,16,20,24,28,32,36,40,44,48,52,56,60,64),
+            'oneFourth' : (4,8,12,16,20,24,28,32,36,40,44,48,52,56,60,64),
+            'oneHalf' : (4,8,12,16,20,24,28,32,36,40,44,48,52,56,60,64),
+            'one' : (4,8,12,16,20,24,28,32,36,40,44,48,52,56,60,64),
+            'two' : (4,8,12,16,20,24,28,32),
+            'four' : (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16),
+            'eight' : (1,2,3,4,5,6,7,8),
+            'sixteen' : (1,2,3,4),
+            }
         
+        #refer to 3GPP 38.213 vf30
+        #Table 9.2.1-1: PUCCH resource sets before dedicated PUCCH resource configuration
+        self.nrCommonPucchResSets = {
+            0 : (0,12,2,0,(0, 3)),
+            1 : (0,12,2,0,(0, 4, 8)),
+            2 : (0,12,2,3,(0, 4, 8)),
+            3 : (1,10,4,0,(0, 6)),
+            4 : (1,10,4,0,(0, 3, 6, 9)),
+            5 : (1,10,4,2,(0, 3, 6, 9)),
+            6 : (1,10,4,4,(0, 3, 6, 9)),
+            7 : (1,4,10,0,(0, 6)),
+            8 : (1,4,10,0,(0, 3, 6, 9)),
+            9 : (1,4,10,2,(0, 3, 6, 9)),
+            10 : (1,4,10,4,(0, 3, 6, 9)),
+            11 : (1,0,14,0,(0, 6)),
+            12 : (1,0,14,0,(0, 3, 6, 9)),
+            13 : (1,0,14,2,(0, 3, 6, 9)),
+            14 : (1,0,14,4,(0, 3, 6, 9)),
+            #Note: for pucch resource index 15, 'PRB offset' is floor(N_BWP_size/4)
+            15 : (1,0,14,None,(0, 3, 6, 9)),
+            }
         
         #offset of CORESET0 w.r.t. SSB
         self.coreset0Offset = 0
@@ -6605,32 +6672,33 @@ class NgNrGridUi(QDialog):
             self.flagCss0 = self.validateCss0()
         
         #(5) update 'L_RBs' and 'RB_start' labels for initial dl bwp tab
+        #FIXME L_RBs can't be 1, in which case the 'frequency domain assignment' field in DCIs is 0bits.
         self.nrIniDlBwpGenericRbStartLabel.setText('RB_start[0-%d]:' % (numRbCommonScs -1))
-        self.nrIniDlBwpGenericLRbsLabel.setText('L_RBs[1-%d]:' % numRbCommonScs)
+        self.nrIniDlBwpGenericLRbsLabel.setText('L_RBs[2-%d]:' % numRbCommonScs)
         self.nrIniDlBwpGenericRbStartEdit.setText('0')
         self.nrIniDlBwpGenericLRbsEdit.setText(str(numRbCommonScs))
         self.nrIniDlBwpGenericRbStartEdit.setValidator(QIntValidator(0, numRbCommonScs-1))
-        self.nrIniDlBwpGenericLRbsEdit.setValidator(QIntValidator(1, numRbCommonScs))
+        self.nrIniDlBwpGenericLRbsEdit.setValidator(QIntValidator(2, numRbCommonScs))
         
         #(6) update 'L_RBs' and 'RB_start' labels for initial ul bwp and dedicated ul/dl bwp tab
         self.nrIniUlBwpGenericRbStartLabel.setText('RB_start[0-%d]:' % (numRbCarrierScs -1))
-        self.nrIniUlBwpGenericLRbsLabel.setText('L_RBs[1-%d]:' % numRbCarrierScs)
+        self.nrIniUlBwpGenericLRbsLabel.setText('L_RBs[2-%d]:' % numRbCarrierScs)
         self.nrIniUlBwpGenericRbStartEdit.setText('0')
         self.nrIniUlBwpGenericLRbsEdit.setText(str(numRbCarrierScs))
         self.nrIniUlBwpGenericRbStartEdit.setValidator(QIntValidator(0, numRbCarrierScs-1))
-        self.nrIniUlBwpGenericLRbsEdit.setValidator(QIntValidator(1, numRbCarrierScs))
+        self.nrIniUlBwpGenericLRbsEdit.setValidator(QIntValidator(2, numRbCarrierScs))
         self.nrDedDlBwpGenericRbStartLabel.setText('RB_start[0-%d]:' % (numRbCarrierScs -1))
-        self.nrDedDlBwpGenericLRbsLabel.setText('L_RBs[1-%d]:' % numRbCarrierScs)
+        self.nrDedDlBwpGenericLRbsLabel.setText('L_RBs[2-%d]:' % numRbCarrierScs)
         self.nrDedDlBwpGenericRbStartEdit.setText('0')
         self.nrDedDlBwpGenericLRbsEdit.setText(str(numRbCarrierScs))
         self.nrDedDlBwpGenericRbStartEdit.setValidator(QIntValidator(0, numRbCarrierScs-1))
-        self.nrDedDlBwpGenericLRbsEdit.setValidator(QIntValidator(1, numRbCarrierScs))
+        self.nrDedDlBwpGenericLRbsEdit.setValidator(QIntValidator(2, numRbCarrierScs))
         self.nrDedUlBwpGenericRbStartLabel.setText('RB_start[0-%d]:' % (numRbCarrierScs -1))
-        self.nrDedUlBwpGenericLRbsLabel.setText('L_RBs[1-%d]:' % numRbCarrierScs)
+        self.nrDedUlBwpGenericLRbsLabel.setText('L_RBs[2-%d]:' % numRbCarrierScs)
         self.nrDedUlBwpGenericRbStartEdit.setText('0')
         self.nrDedUlBwpGenericLRbsEdit.setText(str(numRbCarrierScs))
         self.nrDedUlBwpGenericRbStartEdit.setValidator(QIntValidator(0, numRbCarrierScs-1))
-        self.nrDedUlBwpGenericLRbsEdit.setValidator(QIntValidator(1, numRbCarrierScs))
+        self.nrDedUlBwpGenericLRbsEdit.setValidator(QIntValidator(2, numRbCarrierScs))
 
     def onSsbScsCombCurIndChanged(self, index):
         if index < 0:
@@ -6793,8 +6861,8 @@ class NgNrGridUi(QDialog):
         self.nrDci10Sib1FreqAllocFieldEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{%d}' % self.bitwidthCoreset0)))
         self.nrDci10Sib1FreqAllocType1RbStartLabel.setText('RB_start(of RIV)[0-%d]:' % (self.coreset0NumRbs - 1))
         self.nrDci10Sib1FreqAllocType1RbStartEdit.setValidator(QIntValidator(0, self.coreset0NumRbs-1))
-        self.nrDci10Sib1FreqAllocType1LRbsLabel.setText('L_RBs(of RIV)[1-%d]:' % self.coreset0NumRbs)
-        self.nrDci10Sib1FreqAllocType1LRbsEdit.setValidator(QIntValidator(1, self.coreset0NumRbs))
+        self.nrDci10Sib1FreqAllocType1LRbsLabel.setText('L_RBs(of RIV)[2-%d]:' % self.coreset0NumRbs)
+        self.nrDci10Sib1FreqAllocType1LRbsEdit.setValidator(QIntValidator(2, self.coreset0NumRbs))
         self.nrDci10Sib1FreqAllocType1RbStartEdit.setText('0')
         self.nrDci10Sib1FreqAllocType1LRbsEdit.setText(str(self.coreset0NumRbs))
         self.nrDci10Sib1FreqAllocFieldEdit.setText('{:0{width}b}'.format(self.makeRiv(self.coreset0NumRbs, 0, self.coreset0NumRbs), width=self.bitwidthCoreset0))
@@ -6803,8 +6871,8 @@ class NgNrGridUi(QDialog):
         self.nrDci10Msg2FreqAllocFieldEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{%d}' % self.bitwidthCoreset0)))
         self.nrDci10Msg2FreqAllocType1RbStartLabel.setText('RB_start(of RIV)[0-%d]:' % (self.coreset0NumRbs - 1))
         self.nrDci10Msg2FreqAllocType1RbStartEdit.setValidator(QIntValidator(0, self.coreset0NumRbs-1))
-        self.nrDci10Msg2FreqAllocType1LRbsLabel.setText('L_RBs(of RIV)[1-%d]:' % self.coreset0NumRbs)
-        self.nrDci10Msg2FreqAllocType1LRbsEdit.setValidator(QIntValidator(1, self.coreset0NumRbs))
+        self.nrDci10Msg2FreqAllocType1LRbsLabel.setText('L_RBs(of RIV)[2-%d]:' % self.coreset0NumRbs)
+        self.nrDci10Msg2FreqAllocType1LRbsEdit.setValidator(QIntValidator(2, self.coreset0NumRbs))
         self.nrDci10Msg2FreqAllocType1RbStartEdit.setText('0')
         self.nrDci10Msg2FreqAllocType1LRbsEdit.setText(str(self.coreset0NumRbs))
         self.nrDci10Msg2FreqAllocFieldEdit.setText('{:0{width}b}'.format(self.makeRiv(self.coreset0NumRbs, 0, self.coreset0NumRbs), width=self.bitwidthCoreset0))
@@ -6813,8 +6881,8 @@ class NgNrGridUi(QDialog):
         self.nrDci10Msg4FreqAllocFieldEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{%d}' % self.bitwidthCoreset0)))
         self.nrDci10Msg4FreqAllocType1RbStartLabel.setText('RB_start(of RIV)[0-%d]:' % (self.coreset0NumRbs - 1))
         self.nrDci10Msg4FreqAllocType1RbStartEdit.setValidator(QIntValidator(0, self.coreset0NumRbs-1))
-        self.nrDci10Msg4FreqAllocType1LRbsLabel.setText('L_RBs(of RIV)[1-%d]:' % self.coreset0NumRbs)
-        self.nrDci10Msg4FreqAllocType1LRbsEdit.setValidator(QIntValidator(1, self.coreset0NumRbs))
+        self.nrDci10Msg4FreqAllocType1LRbsLabel.setText('L_RBs(of RIV)[2-%d]:' % self.coreset0NumRbs)
+        self.nrDci10Msg4FreqAllocType1LRbsEdit.setValidator(QIntValidator(2, self.coreset0NumRbs))
         self.nrDci10Msg4FreqAllocType1RbStartEdit.setText('0')
         self.nrDci10Msg4FreqAllocType1LRbsEdit.setText(str(self.coreset0NumRbs))
         self.nrDci10Msg4FreqAllocFieldEdit.setText('{:0{width}b}'.format(self.makeRiv(self.coreset0NumRbs, 0, self.coreset0NumRbs), width=self.bitwidthCoreset0))
@@ -7061,6 +7129,10 @@ class NgNrGridUi(QDialog):
         if not self.nrIniDlBwpGenericLRbsEdit.text() or not self.nrIniDlBwpGenericRbStartEdit.text():
             return
         
+        if int(self.nrIniDlBwpGenericLRbsEdit.text()) <= 1:
+            self.nrIniDlBwpGenericLocAndBwEdit.clear()
+            return
+        
         self.ngwin.logEdit.append('-->inside onIniDlBwpLRBsOrRBStartEditTextChanged')
         L_RBs = int(self.nrIniDlBwpGenericLRbsEdit.text())
         RB_start = int(self.nrIniDlBwpGenericRbStartEdit.text())
@@ -7117,6 +7189,10 @@ class NgNrGridUi(QDialog):
         if not self.nrIniUlBwpGenericLRbsEdit.text() or not self.nrIniUlBwpGenericRbStartEdit.text():
             return
         
+        if int(self.nrIniUlBwpGenericLRbsEdit.text()) <= 1:
+            self.nrIniUlBwpGenericLocAndBwEdit.clear()
+            return
+        
         self.ngwin.logEdit.append('-->inside onIniUlBwpLRBsOrRBStartEditTextChanged')
         L_RBs = int(self.nrIniUlBwpGenericLRbsEdit.text())
         RB_start = int(self.nrIniUlBwpGenericRbStartEdit.text())
@@ -7129,6 +7205,9 @@ class NgNrGridUi(QDialog):
         riv = self.makeRiv(L_RBs, RB_start, 275)
         if riv is not None and riv in range(37950):
             self.nrIniUlBwpGenericLocAndBwEdit.setText(str(riv))
+            #set 'prb offset' of pucch-sib1 for msg4 harq feedback
+            if self.nrPucchSib1PucchResCommonEdit.text() and int(self.nrPucchSib1PucchResCommonEdit.text()) == 15:
+                self.nrPucchSib1PrbOffsetEdit.setText(str(math.floor(L_RBs / 4)))
         else:
             self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: Invalid RIV = %s(with L_RBs = %s, RB_start = %s)!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), 'None' if riv is None else str(riv), L_RBs, RB_start))
             self.nrIniUlBwpGenericLocAndBwEdit.clear()
@@ -7160,6 +7239,10 @@ class NgNrGridUi(QDialog):
     
     def onDedDlBwpLRBsOrRBStartEditTextChanged(self, text):
         if not self.nrDedDlBwpGenericLRbsEdit.text() or not self.nrDedDlBwpGenericRbStartEdit.text():
+            return
+        
+        if int(self.nrDedDlBwpGenericLRbsEdit.text()) <= 1:
+            self.nrDedDlBwpGenericLocAndBwEdit.clear()
             return
         
         self.ngwin.logEdit.append('-->inside onDedDlBwpLRBsOrRBStartEditTextChanged')
@@ -7205,6 +7288,10 @@ class NgNrGridUi(QDialog):
     
     def onDedUlBwpLRBsOrRBStartEditTextChanged(self, text):
         if not self.nrDedUlBwpGenericLRbsEdit.text() or not self.nrDedUlBwpGenericRbStartEdit.text():
+            return
+        
+        if int(self.nrDedUlBwpGenericLRbsEdit.text()) <= 1:
+            self.nrDedUlBwpGenericLocAndBwEdit.clear()
             return
         
         self.ngwin.logEdit.append('-->inside onDedUlBwpLRBsOrRBStartEditTextChanged')
@@ -8484,8 +8571,8 @@ class NgNrGridUi(QDialog):
             self.nrDci11PdschFreqAllocFieldEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{%d}' % self.bitwidthType1Pdsch)))
             self.nrDci11PdschFreqAllocType1RbStartLabel.setText('RB_start(of RIV)[0-%d]:' % (bwpSize-1))
             self.nrDci11PdschFreqAllocType1RbStartEdit.setValidator(QIntValidator(0, bwpSize-1))
-            self.nrDci11PdschFreqAllocType1LRbsLabel.setText('L_RBs(of RIV)[1-%d]:' % bwpSize)
-            self.nrDci11PdschFreqAllocType1LRbsEdit.setValidator(QIntValidator(1, bwpSize))
+            self.nrDci11PdschFreqAllocType1LRbsLabel.setText('L_RBs(of RIV)[2-%d]:' % bwpSize)
+            self.nrDci11PdschFreqAllocType1LRbsEdit.setValidator(QIntValidator(2, bwpSize))
             self.nrDci11PdschFreqAllocType1RbStartEdit.setText('0')
             self.nrDci11PdschFreqAllocType1LRbsEdit.setText(str(bwpSize))
             self.nrDci11PdschFreqAllocFieldEdit.setText('{:0{width}b}'.format(self.makeRiv(bwpSize, 0, bwpSize), width=self.bitwidthType1Pdsch))
@@ -8566,8 +8653,8 @@ class NgNrGridUi(QDialog):
         self.nrMsg3PuschFreqAllocFieldEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{%d}' % self.bitwidthType1Msg3Pusch)))
         self.nrMsg3PuschFreqAllocType1RbStartLabel.setText('RB_start(of RIV)[0-%d]:' % (bwpSize-1))
         self.nrMsg3PuschFreqAllocType1RbStartEdit.setValidator(QIntValidator(0, bwpSize-1))
-        self.nrMsg3PuschFreqAllocType1LRbsLabel.setText('L_RBs(of RIV)[1-%d]:' % bwpSize)
-        self.nrMsg3PuschFreqAllocType1LRbsEdit.setValidator(QIntValidator(1, bwpSize))
+        self.nrMsg3PuschFreqAllocType1LRbsLabel.setText('L_RBs(of RIV)[2-%d]:' % bwpSize)
+        self.nrMsg3PuschFreqAllocType1LRbsEdit.setValidator(QIntValidator(2, bwpSize))
         
         self.nrMsg3PuschFreqAllocType1RbStartEdit.setText('0')
         if self.nrRachMsg3TpComb.currentText() == 'enabled':
@@ -8878,8 +8965,8 @@ class NgNrGridUi(QDialog):
             self.nrDci01PuschFreqAllocFieldEdit.setValidator(QRegExpValidator(QRegExp('[0-1]{%d}' % self.bitwidthType1DedUlBwp)))
             self.nrDci01PuschFreqAllocType1RbStartLabel.setText('RB_start(of RIV)[0-%d]:' % (bwpSize-1))
             self.nrDci01PuschFreqAllocType1RbStartEdit.setValidator(QIntValidator(0, bwpSize-1))
-            self.nrDci01PuschFreqAllocType1LRbsLabel.setText('L_RBs(of RIV)[1-%d]:' % bwpSize)
-            self.nrDci01PuschFreqAllocType1LRbsEdit.setValidator(QIntValidator(1, bwpSize))
+            self.nrDci01PuschFreqAllocType1LRbsLabel.setText('L_RBs(of RIV)[2-%d]:' % bwpSize)
+            self.nrDci01PuschFreqAllocType1LRbsEdit.setValidator(QIntValidator(2, bwpSize))
             
             self.nrDci01PuschFreqAllocType1RbStartEdit.setText('0')
             #refer to 3GPP 38.314 vf30 section 6.3
@@ -9784,6 +9871,173 @@ class NgNrGridUi(QDialog):
             else:
                 self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid PTRS port settings with maxNrofPorts of PTRS-UplinkConfig is "n2".' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
                 return
+    
+    def onRachSsbPerRachOccasionCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onRachSsbPerRachOccasionCombCurIndChanged, index=%d' % index)
+        #refer to 3GPP 38.331 vf30
+        '''
+        totalNumberOfRA-Preambles
+        Total number of preambles used for contention based and contention free random access in the RACH resources defined in RACH-ConfigCommon, excluding preambles used for other purposes (e.g. for SI request). If the field is absent, the all 64 preambles are available for RA. The setting should be consistent with the setting of ssb-perRACH-OccasionAndCB-PreamblesPerSSB, i.e. it should be a multiple of the number of SSBs per RACH occasion.
+        '''
+        if self.nrRachNumRaPreamblesEdit.text():
+            ssbPerRachOccasion = max(1, self.nrSsbPerRachOccasion2Float[self.nrRachSsbPerRachOccasionComb.currentText()])
+            numRaPreambles = int(self.nrRachNumRaPreamblesEdit.text())
+            if numRaPreambles % ssbPerRachOccasion != 0:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Total number of RA preambles should be a multiple of the number of SSBs per RACH occasion.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+                self.nrRachSsbPerRachOccasionComb.setCurrentIndex(-1)
+                self.nrRachCbPreamblesPerSsbComb.setCurrentIndex(-1)
+                return
+        cbPreamblesPerSsbSet =  self.nrSsbPerRachOccasion2CbPreamblesPerSsb[self.nrRachSsbPerRachOccasionComb.currentText()]
+        self.nrRachCbPreamblesPerSsbComb.clear()
+        self.nrRachCbPreamblesPerSsbComb.addItems([str(i) for i in cbPreamblesPerSsbSet])
+    
+    def onRachNumRaPreamblesTextChanged(self):
+        if not self.nrRachNumRaPreamblesEdit.text() or self.nrRachSsbPerRachOccasionComb.currentIndex() < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onRachNumRaPreamblesTextChanged')
+        #refer to 3GPP 38.331 vf30
+        '''
+        totalNumberOfRA-Preambles
+        Total number of preambles used for contention based and contention free random access in the RACH resources defined in RACH-ConfigCommon, excluding preambles used for other purposes (e.g. for SI request). If the field is absent, the all 64 preambles are available for RA. The setting should be consistent with the setting of ssb-perRACH-OccasionAndCB-PreamblesPerSSB, i.e. it should be a multiple of the number of SSBs per RACH occasion.
+        '''
+        ssbPerRachOccasion = max(1, self.nrSsbPerRachOccasion2Float[self.nrRachSsbPerRachOccasionComb.currentText()])
+        numRaPreambles = int(self.nrRachNumRaPreamblesEdit.text())
+        if numRaPreambles % ssbPerRachOccasion != 0:
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Total number of RA preambles should be a multiple of the number of SSBs per RACH occasion.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+            self.nrRachSsbPerRachOccasionComb.setCurrentIndex(-1)
+            self.nrRachCbPreamblesPerSsbComb.setCurrentIndex(-1)
+            return
+        
+    def onPucchSib1PucchResCommonTextChanged(self):
+        if not self.nrPucchSib1PucchResCommonEdit.text():
+            self.nrPucchSib1PucchFmtComb.setCurrentIndex(-1)
+            self.nrPucchSib1StartingSymbEdit.clear()
+            self.nrPucchSib1NumSymbsEdit.clear()
+            self.nrPucchSib1PrbOffsetEdit.clear()
+            self.nrPucchSib1IniCsIndexesSetEdit.clear()
+            return
+        
+        self.ngwin.logEdit.append('-->inside onPucchSib1PucchResCommonTextChanged')
+        pucchResInd = int(self.nrPucchSib1PucchResCommonEdit.text())
+        pucchFmt, firstSymb, numSymbs, prbOffset, initialCsSet = self.nrCommonPucchResSets[pucchResInd]
+        if pucchResInd == 15:
+            if self.nrIniUlBwpGenericLocAndBwEdit.text() and self.nrIniUlBwpGenericLRbsEdit.text() and self.nrIniUlBwpGenericRbStartEdit.text():
+                prbOffset = math.floor(int(self.nrIniUlBwpGenericLRbsEdit.text()) / 4)
+            else:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Initial UL BWP must be configured properly when pucch-ResourceCommon(SIB1)=15.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+                self.nrPucchSib1PucchResCommonEdit.clear()
+                return
+        
+        self.nrPucchSib1PucchFmtComb.setCurrentText('format %d' % pucchFmt)
+        self.nrPucchSib1StartingSymbEdit.setText(str(firstSymb))
+        self.nrPucchSib1NumSymbsEdit.setText(str(numSymbs))
+        self.nrPucchSib1PrbOffsetEdit.setText(str(prbOffset))
+        self.nrPucchSib1IniCsIndexesSetEdit.setText(str(initialCsSet))
+        
+    def onSrsResNumAntPortsCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onSrsResNumAntPortsCombCurIndChanged, index=%d' % index)
+        self.updateDci01SriFieldLabel()
+        if self.nrDedPuschCfgTxCfgComb.currentText() == 'codebook':
+            self.validatePuschAntPorts()
+            
+    def onSrsResNonCbPtrsPortIndCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onSrsResNonCbPtrsPortIndCombCurIndChanged, index=%d' % index)
+        if self.nrDedPuschCfgTxCfgComb.currentText() == 'nonCodebook':
+            self.updatePtrsPusch()
+            
+    def onSrsRes0NumCombCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onSrsRes0NumCombCombCurIndChanged, index=%d' % index)
+        numComb = int(self.nrSrsRes0NumCombComb.currentText()[-1])
+        self.nrSrsRes0CombOffsetLabel.setText('combOffset[0-%d]:' % (numComb - 1))
+        self.nrSrsRes0CombOffsetEdit.setText('0')
+    
+    def onSrsRes1NumCombCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onSrsRes1NumCombCombCurIndChanged, index=%d' % index)
+        numComb = int(self.nrSrsRes1NumCombComb.currentText()[-1])
+        self.nrSrsRes1CombOffsetLabel.setText('combOffset[0-%d]:' % (numComb - 1))
+        self.nrSrsRes1CombOffsetEdit.setText('0')
+        
+    def onSrsRes2NumCombCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onSrsRes2NumCombCombCurIndChanged, index=%d' % index)
+        numComb = int(self.nrSrsRes2NumCombComb.currentText()[-1])
+        self.nrSrsRes2CombOffsetLabel.setText('combOffset[0-%d]:' % (numComb - 1))
+        self.nrSrsRes2CombOffsetEdit.setText('0')
+        
+    def onSrsRes3NumCombCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onSrsRes3NumCombCombCurIndChanged, index=%d' % index)
+        numComb = int(self.nrSrsRes3NumCombComb.currentText()[-1])
+        self.nrSrsRes3CombOffsetLabel.setText('combOffset[0-%d]:' % (numComb - 1))
+        self.nrSrsRes3CombOffsetEdit.setText('0')
+    
+    def onSrsRes0PeriodCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onSrsRes0PeriodCombCurIndChanged, index=%d' % index)
+        period = int(self.nrSrsRes0PeriodComb.currentText()[2:])
+        if period == 1:
+            self.nrSrsRes0OffsetLabel.setText('SRS-Offset[0]:')
+        else:
+            self.nrSrsRes0OffsetLabel.setText('SRS-Offset[0-%d]:' % (period - 1))
+        self.nrSrsRes0OffsetEdit.setText('0')
+    
+    def onSrsRes1PeriodCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onSrsRes1PeriodCombCurIndChanged, index=%d' % index)
+        period = int(self.nrSrsRes1PeriodComb.currentText()[2:])
+        if period == 1:
+            self.nrSrsRes1OffsetLabel.setText('SRS-Offset[0]:')
+        else:
+            self.nrSrsRes1OffsetLabel.setText('SRS-Offset[0-%d]:' % (period - 1))
+        self.nrSrsRes1OffsetEdit.setText('0')
+        
+    def onSrsRes2PeriodCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onSrsRes2PeriodCombCurIndChanged, index=%d' % index)
+        period = int(self.nrSrsRes2PeriodComb.currentText()[2:])
+        if period == 1:
+            self.nrSrsRes2OffsetLabel.setText('SRS-Offset[0]:')
+        else:
+            self.nrSrsRes2OffsetLabel.setText('SRS-Offset[0-%d]:' % (period - 1))
+        self.nrSrsRes2OffsetEdit.setText('0')
+        
+    def onSrsRes3PeriodCombCurIndChanged(self, index):
+        if index < 0:
+            return
+        
+        self.ngwin.logEdit.append('-->inside onSrsRes3PeriodCombCurIndChanged, index=%d' % index)
+        period = int(self.nrSrsRes3PeriodComb.currentText()[2:])
+        if period == 1:
+            self.nrSrsRes3OffsetLabel.setText('SRS-Offset[0]:')
+        else:
+            self.nrSrsRes3OffsetLabel.setText('SRS-Offset[0-%d]:' % (period - 1))
+        self.nrSrsRes3OffsetEdit.setText('0')
             
     def getTbs(self, sch='pdsch', tp=0, rnti='c-rnti', tab='qam64', td=1, fd=1, mcs=0, layer=1, dmrs=0, xoh=0, scale=1):
         self.ngwin.logEdit.append('---->inside getTbs: sch="%s", tp=%d, rnti="%s", tab="%s", td=%d, fd=%d, mcs=%d, layer=%d, dmrs=%d, xoh=%d, scale=%.2f' % (sch, tp, rnti, tab, td, fd, mcs, layer, dmrs, xoh, scale)) 
