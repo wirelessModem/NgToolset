@@ -3468,42 +3468,42 @@ class NgNrGridUi(QDialog):
         #Table 5.2-1: NR operating bands in FR1
         #Table 5.2-2: NR operating bands in FR2
         self.nrOpBands = OrderedDict((
-            ('n1', ('1920 MHz-1980 MHz', '2110 MHz-2170 MHz', 'FDD',4)),
-            ('n2', ('1850 MHz-1910 MHz', '1930 MHz-1990 MHz', 'FDD',4)),
-            ('n3', ('1710 MHz-1785 MHz', '1805 MHz-1880 MHz', 'FDD',4)),
-            ('n5', ('824 MHz-849 MHz', '869 MHz-894 MHz', 'FDD',4)),
-            ('n7', ('2500 MHz-2570 MHz', '2620 MHz-2690 MHz', 'FDD',4)),
-            ('n8', ('880 MHz-915 MHz', '925 MHz-960 MHz', 'FDD',4)),
-            ('n12', ('699 MHz-716 MHz', '729 MHz-746 MHz', 'FDD',4)),
-            ('n20', ('832 MHz-862 MHz', '791 MHz-821 MHz', 'FDD',4)),
-            ('n25', ('1850 MHz-1915 MHz', '1930 MHz-1995 MHz', 'FDD',4)),
-            ('n28', ('703 MHz-748 MHz', '758 MHz-803 MHz', 'FDD',4)),
-            ('n34', ('2010 MHz-2025 MHz', '2010 MHz-2025 MHz', 'TDD',4)),
-            ('n38', ('2570 MHz-2620 MHz', '2570 MHz-2620 MHz', 'TDD',4)),
-            ('n39', ('1880 MHz-1920 MHz', '1880 MHz-1920 MHz', 'TDD',4)),
-            ('n40', ('2300 MHz-2400 MHz', '2300 MHz-2400 MHz', 'TDD',4)),
-            ('n41', ('2496 MHz-2690 MHz', '2496 MHz-2690 MHz', 'TDD',4)),
-            ('n50', ('1432 MHz-1517 MHz', '1432 MHz-1517 MHz', 'TDD',4)),
-            ('n51', ('1427 MHz-1432 MHz', '1427 MHz-1432 MHz', 'TDD',4)),
-            ('n66', ('1710 MHz-1780 MHz', '2110 MHz-2200 MHz', 'FDD',4)),
-            ('n70', ('1695 MHz-1710 MHz', '1995 MHz-2020 MHz', 'FDD',4)),
-            ('n71', ('663 MHz-698 MHz', '617 MHz-652 MHz', 'FDD',4)),
-            ('n74', ('1427 MHz-1470 MHz', '1475 MHz-1518 MHz', 'FDD',4)),
-            ('n75', ('N/A', '1432 MHz-1517 MHz', 'SDL',4)),
-            ('n76', ('N/A', '1427 MHz-1432 MHz', 'SDL',4)),
-            ('n77', ('3300 MHz-4200 MHz', '3300 MHz-4200 MHz', 'TDD',8)),
-            ('n78', ('3300 MHz-3800 MHz', '3300 MHz-3800 MHz', 'TDD',8)),
-            ('n79', ('4400 MHz-5000 MHz', '4400 MHz-5000 MHz', 'TDD',8)),
-            ('n80', ('1710 MHz-1785 MHz', 'N/A', 'SUL ',0)),
-            ('n81', ('880 MHz-915 MHz', 'N/A', 'SUL ',0)),
-            ('n82', ('832 MHz-862 MHz', 'N/A', 'SUL ',0)),
-            ('n83', ('703 MHz-748 MHz', 'N/A', 'SUL',0)),
-            ('n84', ('1920 MHz-1980 MHz', 'N/A', 'SUL',0)),
-            ('n86', ('1710 MHz-1780 MHz', 'N/A', 'SUL',0)),
-            ('n257', ('26500 MHz-29500 MHz', '26500 MHz-29500 MHz', 'TDD',64)),
-            ('n258', ('24250 MHz-27500 MHz', '24250 MHz-27500 MHz', 'TDD',64)),
-            ('n260', ('37000 MHz-40000 MHz', '37000 MHz-40000 MHz', 'TDD',64)),
-            ('n261', ('27500 MHz-28350 MHz', '27500 MHz-28350 MHz', 'TDD',64)),
+            ('n1', ('1920 MHz-1980 MHz', '2110 MHz-2170 MHz', 'FDD',2170)),
+            ('n2', ('1850 MHz-1910 MHz', '1930 MHz-1990 MHz', 'FDD',1990)),
+            ('n3', ('1710 MHz-1785 MHz', '1805 MHz-1880 MHz', 'FDD',1880)),
+            ('n5', ('824 MHz-849 MHz', '869 MHz-894 MHz', 'FDD',894)),
+            ('n7', ('2500 MHz-2570 MHz', '2620 MHz-2690 MHz', 'FDD',2690)),
+            ('n8', ('880 MHz-915 MHz', '925 MHz-960 MHz', 'FDD',960)),
+            ('n12', ('699 MHz-716 MHz', '729 MHz-746 MHz', 'FDD',746)),
+            ('n20', ('832 MHz-862 MHz', '791 MHz-821 MHz', 'FDD',821)),
+            ('n25', ('1850 MHz-1915 MHz', '1930 MHz-1995 MHz', 'FDD',1995)),
+            ('n28', ('703 MHz-748 MHz', '758 MHz-803 MHz', 'FDD',803)),
+            ('n34', ('2010 MHz-2025 MHz', '2010 MHz-2025 MHz', 'TDD',2025)),
+            ('n38', ('2570 MHz-2620 MHz', '2570 MHz-2620 MHz', 'TDD',2620)),
+            ('n39', ('1880 MHz-1920 MHz', '1880 MHz-1920 MHz', 'TDD',1920)),
+            ('n40', ('2300 MHz-2400 MHz', '2300 MHz-2400 MHz', 'TDD',2400)),
+            ('n41', ('2496 MHz-2690 MHz', '2496 MHz-2690 MHz', 'TDD',2690)),
+            ('n50', ('1432 MHz-1517 MHz', '1432 MHz-1517 MHz', 'TDD',1517)),
+            ('n51', ('1427 MHz-1432 MHz', '1427 MHz-1432 MHz', 'TDD',1432)),
+            ('n66', ('1710 MHz-1780 MHz', '2110 MHz-2200 MHz', 'FDD',2200)),
+            ('n70', ('1695 MHz-1710 MHz', '1995 MHz-2020 MHz', 'FDD',2020)),
+            ('n71', ('663 MHz-698 MHz', '617 MHz-652 MHz', 'FDD',652)),
+            ('n74', ('1427 MHz-1470 MHz', '1475 MHz-1518 MHz', 'FDD',1518)),
+            ('n75', ('N/A', '1432 MHz-1517 MHz', 'SDL',None)),
+            ('n76', ('N/A', '1427 MHz-1432 MHz', 'SDL',None)),
+            ('n77', ('3300 MHz-4200 MHz', '3300 MHz-4200 MHz', 'TDD',4200)),
+            ('n78', ('3300 MHz-3800 MHz', '3300 MHz-3800 MHz', 'TDD',3800)),
+            ('n79', ('4400 MHz-5000 MHz', '4400 MHz-5000 MHz', 'TDD',5000)),
+            ('n80', ('1710 MHz-1785 MHz', 'N/A', 'SUL',None)),
+            ('n81', ('880 MHz-915 MHz', 'N/A', 'SUL',None)),
+            ('n82', ('832 MHz-862 MHz', 'N/A', 'SUL',None)),
+            ('n83', ('703 MHz-748 MHz', 'N/A', 'SUL',None)),
+            ('n84', ('1920 MHz-1980 MHz', 'N/A', 'SUL',None)),
+            ('n86', ('1710 MHz-1780 MHz', 'N/A', 'SUL',None)),
+            ('n257', ('26500 MHz-29500 MHz', '26500 MHz-29500 MHz', 'TDD',29500)),
+            ('n258', ('24250 MHz-27500 MHz', '24250 MHz-27500 MHz', 'TDD',27500)),
+            ('n260', ('37000 MHz-40000 MHz', '37000 MHz-40000 MHz', 'TDD',40000)),
+            ('n261', ('27500 MHz-28350 MHz', '27500 MHz-28350 MHz', 'TDD',28350)),
             ))
         
         self.nrBwSetFr1 = ('5MHz', '10MHz', '15MHz', '20MHz', '25MHz', '30MHz', '40MHz', '50MHz', '60MHz', '70MHz', '80MHz', '90MHz', '100MHz')
@@ -6457,7 +6457,7 @@ class NgNrGridUi(QDialog):
         self.ngwin.logEdit.append('-->inside onCarrierBandCombCurIndChanged, index=%d' % index)
 
         #(1) update band info
-        ulBand, dlBand, self.duplexMode, self.maxL = self.nrOpBands[self.nrCarrierBandComb.currentText()]
+        ulBand, dlBand, self.duplexMode, self.maxDlFreq = self.nrOpBands[self.nrCarrierBandComb.currentText()]
         self.freqRange = 'FR1' if int(self.nrCarrierBandComb.currentText()[1:]) <= 256 else 'FR2'
         if self.duplexMode == 'TDD':
             self.nrCarrierBandInfoLabel.setText('<font color=blue>UL/DL: %s, %s, %s</font>' % (ulBand, self.duplexMode, self.freqRange))
@@ -6492,16 +6492,6 @@ class NgNrGridUi(QDialog):
         self.nrCarrierScsComb.clear()
         self.nrCarrierScsComb.addItems(carrierScsSubset)
         self.nrCarrierScsComb.setCurrentIndex(0)
-        
-        #(5) update ssb-positions-in-burst
-        if self.maxL in (4, 8):
-            self.nrSsbInOneGrpEdit.setText('11110000' if self.maxL == 4 else '11111111')
-            self.nrSsbGrpPresenceEdit.setText('NA')
-            self.nrSsbGrpPresenceEdit.setEnabled(False)
-        else:
-            self.nrSsbInOneGrpEdit.setText('11111111')
-            self.nrSsbGrpPresenceEdit.setText('11111111')
-            self.nrSsbGrpPresenceEdit.setEnabled(True)
         
         #(6) update rach config 
         self.updateRachConfig()
@@ -6638,13 +6628,10 @@ class NgNrGridUi(QDialog):
         #(1) update N_RB w.r.t carrierScs and carrierBw; update N_RB for initial dl bwp w.r.t. commonScs and carrierBw
         carrierScs = int(self.nrCarrierScsComb.currentText()[:-3])
         commonScs = int(self.nrMibScsCommonComb.currentText()[:-3])
-        #FIXME two IFs as below is not necessary?
-        '''
         if not carrierScs in self.nrNrbFr1 and not carrierScs in self.nrNrbFr2:
             return
         if not commonScs in self.nrNrbFr1 and not commonScs in self.nrNrbFr2:
             return
-        '''
 
         if self.freqRange == 'FR1':
             numRbCarrierScs = self.nrNrbFr1[carrierScs][self.nrBwSetFr1.index(self.nrCarrierBwComb.currentText())]
@@ -6712,9 +6699,43 @@ class NgNrGridUi(QDialog):
         
         self.ngwin.logEdit.append('-->inside onSsbScsCombCurIndChanged, index=%d' % index)
         
-        #(1) update SSB pattern
+        #(1.1) update SSB pattern
         ssbScs, ssbPat, ssbGscn = self.nrSsbRasters[self.nrCarrierBandComb.currentText()][self.nrSsbScsComb.currentIndex()]
         self.nrSsbPatternEdit.setText(ssbPat)
+        
+        #(1.2) update ssb-positions-in-burst
+        #refer to 3GPP 38.231 vf30
+        self.maxL = None
+        if ssbPat in ('Case A', 'Case B') or (ssbPat == 'Case C' and self.duplexMode == 'FDD'):
+            if self.maxDlFreq <= 3000:
+                self.maxL = 4
+            elif self.maxDlFreq > 3000 and self.maxDlFreq <= 6000:
+                self.maxL = 8
+            else:
+                pass
+        elif ssbPat == 'Case C' and self.duplexMode == 'TDD':
+            if self.maxDlFreq <= 2400:
+                self.maxL = 4
+            elif self.maxDlFreq > 2400 and self.maxDlFreq <= 6000:
+                self.maxL = 8
+            else:
+                pass
+        elif ssbPat in ('Case D', 'Case E'):
+            if self.maxDlFreq > 6000:
+                self.maxL = 64
+            else:
+                pass
+        else:
+            pass
+        
+        if self.maxL in (4, 8):
+            self.nrSsbInOneGrpEdit.setText('11110000' if self.maxL == 4 else '11111111')
+            self.nrSsbGrpPresenceEdit.setText('NA')
+            self.nrSsbGrpPresenceEdit.setEnabled(False)
+        else:
+            self.nrSsbInOneGrpEdit.setText('11111111')
+            self.nrSsbGrpPresenceEdit.setText('11111111')
+            self.nrSsbGrpPresenceEdit.setEnabled(True)
 
         #(2) update minGuardBandScs240k
         if ssbScs == '240KHz':
@@ -7115,8 +7136,7 @@ class NgNrGridUi(QDialog):
             else:
                 numRbCommonScs = self.nrNrbFr2[commonScs][self.nrBwSetFr2.index(self.nrCarrierBwComb.currentText())]
             #numRbCarrierScs = int(self.nrCarrierNumRbEdit.text())
-            #FIXME
-            #initial dl bwp need to check against coreset0 bw
+            #FIXME initial dl bwp need to check against coreset0 bw
             if L_RBs < 1 or L_RBs > (numRbCommonScs - RB_start):
                 self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: Invalid setting: RIV = %s, L_RBs = %s, RB_start = %s with bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), riv, L_RBs, RB_start, numRbCommonScs))
                 self.nrIniDlBwpGenericLRbsEdit.clear()
@@ -7148,6 +7168,7 @@ class NgNrGridUi(QDialog):
         else:
             numRbCommonScs = self.nrNrbFr2[commonScs][self.nrBwSetFr2.index(self.nrCarrierBwComb.currentText())]
         #numRbCarrierScs = int(self.nrCarrierNumRbEdit.text())
+        #FIXME initial dl bwp need to check against coreset0 bw
         if L_RBs < 1 or L_RBs > (numRbCommonScs - RB_start):
             self.ngwin.logEdit.append('<font color=purple><b>[%s]Warning</font>: Invalid setting: L_RBs = %s, RB_start = %s with bandwidth = %s!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), L_RBs, RB_start, numRbCommonScs))
             self.nrIniDlBwpGenericLocAndBwEdit.clear()
@@ -10101,7 +10122,7 @@ class NgNrGridUi(QDialog):
         Qm, R = val
         #FIXME what's the case for rnti='TC-RNTI'(msg4)?
         if rnti in ('si-rnti', 'ra-rnti', 'tc-rnti') and Qm > 2:
-            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: The UE is not expected to decode a PDSCH scheduled with P-RNTI, RA-RNTI, SI-RNTI and Qm > 2! (FIXME)Assume the same rule applies to PDSCH scheduled with TC-RNTI.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: The UE is not expected to decode a PDSCH scheduled with P-RNTI, RA-RNTI, SI-RNTI and Qm > 2! Assume the same rule applies to PDSCH scheduled with TC-RNTI.' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
             return None
         
         #2nd step: get N_RE
