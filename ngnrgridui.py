@@ -17,6 +17,7 @@ from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QComboBox, QPushButton, 
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QGridLayout
 from PyQt5.QtGui import QColor, QIntValidator, QRegExpValidator
 from PyQt5.QtCore import Qt, QRegExp
+from ngnrgrid import NgNrGrid
 
 class NgNrGridUi(QDialog):
     def __init__(self, ngwin):
@@ -10163,8 +10164,109 @@ class NgNrGridUi(QDialog):
 
     def onOkBtnClicked(self):
         self.ngwin.logEdit.append('-->inside onOkBtnClicked')
+        
+        flag = self.prepNrGrid()
+        
+        if not flag:
+            self.accept()
+            return
+        
         #TODO
+        '''
+        #step 4: call NgNbiotGrid
+        nbGrid = NgNbiotGrid(self.ngwin, self.argsNbiot)
+        hsfn = self.argsNbiot['nbHsfn']
+        sfn = self.argsNbiot['nbSfn']
+
+        #NB DL SU scheduling simulation
+        self.ngwin.logEdit.append('<font color=green><b>Start NB DL SU scheduling simulation</b></font>')
+        self.ngwin.logEdit.append('<font color=green><b>[NB DL SU SIM]recv NPDCCH DCI N1</b></font>')
+        hsfn, sfn, subf = nbGrid.monitorNpdcch(hsfn, sfn)   #recv NPDCCH DCI N1
+        self.ngwin.logEdit.append('<font color=green><b>[NB DL SU SIM]recv NPDSCH w/o BCCH</b></font>')
+        hsfn, sfn, subf = nbGrid.recvNpdschWoBcch(hsfn, sfn, subf)  #recv NPDSCH w/o BCCH
+        self.ngwin.logEdit.append('<font color=green><b>[NB DL SU SIM]send NPUSCH Format 2</b></font>')
+        hsfn, sfn, subf = nbGrid.sendNpuschFormat2(hsfn, sfn, subf) #send NPUSCH format 2
+        
+        self.ngwin.logEdit.append('<font color=green><b>Wait for next NPDCCH candidate</b></font>')
+        hsfn, sfn = incSfn(hsfn, sfn, 1) #wait for next NPDCCH candidate
+        
+        #NB UL SU scheduling simulation
+        self.ngwin.logEdit.append('<font color=green><b>Start NB UL SU scheduling simulation</b></font>')
+        self.ngwin.logEdit.append('<font color=green><b>[NB UL SU SIM]recv NPDCCH DCI N0</b></font>')
+        hsfn, sfn, subf = nbGrid.monitorNpdcch(hsfn, sfn)   #recv NPDCCH DCI N0
+        self.ngwin.logEdit.append('<font color=green><b>[NB UL SU SIM]send NPUSCH Format 1</b></font>')
+        hsfn, sfn, subf = nbGrid.sendNpuschFormat1(hsfn, sfn, subf) #send NPUSCH format 1
+        
+        #hsfn, sfn = incSfn(hsfn, sfn, 1) #wait for next NPDCCH candidate
+        '''
+        nrGrid = NgNrGrid(self.ngwin, self.args)
+        
+        #print dict info
+        for key in self.args.keys():
+            self.ngwin.logEdit.append('contents of ["%s"]: %s' % (key, self.args[key]))
+        
         self.accept()
+    
+    def prepNrGrid(self):
+        self.ngwin.logEdit.append('-->inside prepNrGrid')
+        self.args = dict()
+        
+        #(1) 'grid settings' tab
+        self.args['freqBand'] = dict()
+        self.args['freqBand']['opBand'] = self.nrCarrierBandComb.currentText()
+        self.args['freqBand']['duplexMode'] = self.duplexMode
+        self.args['freqBand']['maxDlFreq'] = self.maxDlFreq
+        self.args['freqBand']['freqRange'] = self.freqRange
+        
+        self.args['ssbGrid'] = dict()
+        self.args['ssbGrid']['scs'] = self.nrSsbScsComb.currentText()
+        self.args['ssbGrid']['pattern'] = self.nrSsbPatternEdit.text()
+        self.args['ssbGrid']['minGuardBand240k'] = self.nrSsbMinGuardBandScs240kEdit.text()
+        self.args['ssbGrid']['kSsb'] = self.nrSsbKssbEdit.text()
+        self.args['ssbGrid']['nCrbSsb'] = self.nrSsbNCrbSsbEdit.text()
+        
+        self.args['ssbBurst'] = dict()
+        self.args['ssbBurst']['maxL'] = self.maxL
+        self.args['ssbBurst']['inOneGroup'] = self.nrSsbInOneGrpEdit.text()
+        self.args['ssbBurst']['groupPresence'] = self.nrSsbGrpPresenceEdit.text()
+        self.args['ssbBurst']['period'] = self.nrSsbPeriodicityComb.currentText()
+        
+        self.args['mib'] = dict()
+        self.args['mib']['sfn'] = self.nrMibSfnEdit.text()
+        self.args['mib']['hrf'] = self.nrMibHrfEdit.text()
+        self.args['mib']['dmrsTypeAPos'] = self.nrMibDmRsTypeAPosComb.currentText()
+        self.args['mib']['commonScs'] = self.nrMibScsCommonComb.currentText()
+        self.args['mib']['rmsiCoreset0'] = self.nrMibCoreset0Edit.text()
+        self.args['mib']['rmsiCss0'] = self.nrMibCss0Edit.text()
+        self.args['mib']['coreset0MultiplexingPat'] = self.coreset0MultiplexingPat
+        self.args['mib']['coreset0NumRbs'] = self.coreset0NumRbs
+        self.args['mib']['coreset0NumSymbs'] = self.coreset0NumSymbs
+        self.args['mib']['coreset0OffsetList'] = self.coreset0OffsetList
+        self.args['mib']['coreset0Offset'] = self.coreset0Offset
+        
+        self.args['carrierGrid'] = dict()
+        self.args['carrierGrid']['scs'] = self.nrCarrierScsComb.currentText()
+        self.args['carrierGrid']['bw'] = self.nrCarrierBwComb.currentText()
+        self.args['carrierGrid']['numRbs'] = self.nrCarrierNumRbEdit.text()
+        self.args['carrierGrid']['minGuardBand'] = self.nrMinGuardBandEdit.text()
+        
+        #(2) 'common settings' tab
+        self.args['pci'] = self.nrSsbPciEdit.text()
+        self.args['numUeAp'] = self.nrUeAntPortsComb.currentText()
+        self.args['tddCfg'] = dict()
+        self.args['tddCfg']['refScs'] = self.nrTddCfgRefScsComb.currentText()
+        self.args['tddCfg']['pat1Period'] = self.nrTddCfgPat1PeriodComb.currentText()
+        self.args['tddCfg']['pat1NumDlSlots'] = self.nrTddCfgPat1NumDlSlotsEdit.text()
+        self.args['tddCfg']['pat1NumDlSymbs'] = self.nrTddCfgPat1NumDlSymbsEdit.text()
+        self.args['tddCfg']['pat1NumUlSymbs'] = self.nrTddCfgPat1NumUlSymbsEdit.text()
+        self.args['tddCfg']['pat1NumUlSlots'] = self.nrTddCfgPat1NumUlSlotsEdit.text()
+        self.args['tddCfg']['pat2Period'] = self.nrTddCfgPat2PeriodComb.currentText()
+        self.args['tddCfg']['pat2NumDlSlots'] = self.nrTddCfgPat2NumDlSlotsEdit.text()
+        self.args['tddCfg']['pat2NumDlSymbs'] = self.nrTddCfgPat2NumDlSymbsEdit.text()
+        self.args['tddCfg']['pat2NumUlSymbs'] = self.nrTddCfgPat2NumUlSymbsEdit.text()
+        self.args['tddCfg']['pat2NumUlSlots'] = self.nrTddCfgPat2NumUlSlotsEdit.text()
+        
+        return True
     
     def parseRiv(self, riv, N_BWP_size):
         div = riv // N_BWP_size
