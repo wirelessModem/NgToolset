@@ -19,9 +19,11 @@ class NgNrGrid(object):
         self.init()
     
     def init(self):
+        self.ngwin.logEdit.append('---->inside init')
         pass
     
     def recvSsb(self):
+        self.ngwin.logEdit.append('---->inside recvSsb')
         pass
     
     def monitorPdcch(self):

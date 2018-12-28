@@ -15,6 +15,7 @@ import math
 from collections import OrderedDict
 from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QComboBox, QPushButton, QGroupBox, QTabWidget, QWidget, QScrollArea
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QGridLayout
+from PyQt5.QtWidgets import qApp
 from PyQt5.QtGui import QColor, QIntValidator, QRegExpValidator
 from PyQt5.QtCore import Qt, QRegExp
 from ngnrgrid import NgNrGrid
@@ -10200,10 +10201,7 @@ class NgNrGridUi(QDialog):
         #hsfn, sfn = incSfn(hsfn, sfn, 1) #wait for next NPDCCH candidate
         '''
         nrGrid = NgNrGrid(self.ngwin, self.args)
-        
-        #print dict info
-        for key in self.args.keys():
-            self.ngwin.logEdit.append('contents of ["%s"]: %s' % (key, self.args[key]))
+        nrGrid.recvSsb()
         
         self.accept()
     
@@ -10265,6 +10263,11 @@ class NgNrGridUi(QDialog):
         self.args['tddCfg']['pat2NumDlSymbs'] = self.nrTddCfgPat2NumDlSymbsEdit.text()
         self.args['tddCfg']['pat2NumUlSymbs'] = self.nrTddCfgPat2NumUlSymbsEdit.text()
         self.args['tddCfg']['pat2NumUlSlots'] = self.nrTddCfgPat2NumUlSlotsEdit.text()
+        
+        #print dict info
+        for key in self.args.keys():
+            self.ngwin.logEdit.append('contents of ["%s"]: %s' % (key, self.args[key]))
+            qApp.processEvents()
         
         return True
     
