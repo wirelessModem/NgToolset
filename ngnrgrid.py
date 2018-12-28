@@ -20,7 +20,12 @@ class NgNrGrid(object):
     
     def init(self):
         self.ngwin.logEdit.append('---->inside init')
-        pass
+        self.nrSubfPerRf = 10
+        self.nrSlotPerSubf = [2 ** mu for mu in range(5)]
+        self.nrSlotPerRf = [self.nrSubfPerRf * 2 ** mu for mu in range(5)]
+        self.nrSymbPerSlotNormCp = 14
+        self.nrSymbPerSlotExtCp = 12
+        self.nrScPerPrb = 12
     
     def recvSsb(self):
         self.ngwin.logEdit.append('---->inside recvSsb')
