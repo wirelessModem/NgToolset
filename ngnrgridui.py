@@ -104,6 +104,10 @@ class NgNrGridUi(QDialog):
         self.nrMibSfnEdit = QLineEdit('0')
         self.nrMibSfnEdit.setValidator(QIntValidator(0, 1023))
         
+        self.nrMibHrfLabel = QLabel('Half frame bit[0/1]:')
+        self.nrMibHrfEdit = QLineEdit('0')
+        self.nrMibHrfEdit.setValidator(QIntValidator(0, 1))
+        
         self.nrMibDmRsTypeAPosLabel = QLabel('dmrs-TypeA-Position:')
         self.nrMibDmRsTypeAPosComb = QComboBox()
         self.nrMibDmRsTypeAPosComb.addItems(['pos2', 'pos3'])
@@ -127,15 +131,17 @@ class NgNrGridUi(QDialog):
         mibGrpBoxLayout = QGridLayout()
         mibGrpBoxLayout.addWidget(self.nrMibSfnLabel, 0, 0)
         mibGrpBoxLayout.addWidget(self.nrMibSfnEdit, 0, 1)
-        mibGrpBoxLayout.addWidget(self.nrMibDmRsTypeAPosLabel, 1, 0)
-        mibGrpBoxLayout.addWidget(self.nrMibDmRsTypeAPosComb, 1, 1)
-        mibGrpBoxLayout.addWidget(self.nrMibScsCommonLabel, 2, 0)
-        mibGrpBoxLayout.addWidget(self.nrMibScsCommonComb, 2, 1)
-        mibGrpBoxLayout.addWidget(self.nrMibCoreset0Label, 3, 0)
-        mibGrpBoxLayout.addWidget(self.nrMibCoreset0Edit, 3, 1)
-        mibGrpBoxLayout.addWidget(self.nrMibCoreset0InfoLabel, 4, 0, 1, 2)
-        mibGrpBoxLayout.addWidget(self.nrMibCss0Label, 5, 0)
-        mibGrpBoxLayout.addWidget(self.nrMibCss0Edit, 5, 1)
+        mibGrpBoxLayout.addWidget(self.nrMibHrfLabel, 1, 0)
+        mibGrpBoxLayout.addWidget(self.nrMibHrfEdit, 1, 1)
+        mibGrpBoxLayout.addWidget(self.nrMibDmRsTypeAPosLabel, 2, 0)
+        mibGrpBoxLayout.addWidget(self.nrMibDmRsTypeAPosComb, 2, 1)
+        mibGrpBoxLayout.addWidget(self.nrMibScsCommonLabel, 3, 0)
+        mibGrpBoxLayout.addWidget(self.nrMibScsCommonComb, 3, 1)
+        mibGrpBoxLayout.addWidget(self.nrMibCoreset0Label, 4, 0)
+        mibGrpBoxLayout.addWidget(self.nrMibCoreset0Edit, 4, 1)
+        mibGrpBoxLayout.addWidget(self.nrMibCoreset0InfoLabel, 5, 0, 1, 2)
+        mibGrpBoxLayout.addWidget(self.nrMibCss0Label, 6, 0)
+        mibGrpBoxLayout.addWidget(self.nrMibCss0Edit, 6, 1)
         mibGrpBox.setLayout(mibGrpBoxLayout)
         
         #---->(1.4) SSB burst configurations
@@ -1486,7 +1492,7 @@ class NgNrGridUi(QDialog):
         iniDlBwpDmrsTabWidget.addTab(dmrsMsg4Widget, 'DM-RS(Msg4)')
         
         #initial dl bwp as indicated in sib1
-        self.nrIniDlBwpGenericBwpIdLabel = QLabel('bwp-Id[0-3]:')
+        self.nrIniDlBwpGenericBwpIdLabel = QLabel('bwp-Id[0-4]:')
         self.nrIniDlBwpGenericBwpIdEdit = QLineEdit('0')
         self.nrIniDlBwpGenericBwpIdEdit.setEnabled(False)
         
@@ -1536,7 +1542,7 @@ class NgNrGridUi(QDialog):
         
         #---->(4.2) initial active ul bwp as specified in SIB1
         #initial ul bwp as indicated in sib1
-        self.nrIniUlBwpGenericBwpIdLabel = QLabel('bwp-Id[0-3]:')
+        self.nrIniUlBwpGenericBwpIdLabel = QLabel('bwp-Id[0-4]:')
         self.nrIniUlBwpGenericBwpIdEdit = QLineEdit('0')
         self.nrIniUlBwpGenericBwpIdEdit.setEnabled(False)
         
@@ -1756,7 +1762,7 @@ class NgNrGridUi(QDialog):
         
         #---->(4.3) dedicated active dl bwp as specified in ServingCellConfig IE
         #dedicated dl bwp
-        self.nrDedDlBwpGenericBwpIdLabel = QLabel('bwp-Id[0-3]:')
+        self.nrDedDlBwpGenericBwpIdLabel = QLabel('bwp-Id[0-4]:')
         self.nrDedDlBwpGenericBwpIdEdit = QLineEdit('1')
         self.nrDedDlBwpGenericBwpIdEdit.setEnabled(False)
         
@@ -1952,7 +1958,7 @@ class NgNrGridUi(QDialog):
         
         #---->(4.4) dedicated active ul bwp as specified in ServingCellConfig IE
         #dedicated ul bwp
-        self.nrDedUlBwpGenericBwpIdLabel = QLabel('bwp-Id[0-3]:')
+        self.nrDedUlBwpGenericBwpIdLabel = QLabel('bwp-Id[0-4]:')
         self.nrDedUlBwpGenericBwpIdEdit = QLineEdit('1')
         self.nrDedUlBwpGenericBwpIdEdit.setEnabled(False)
         
