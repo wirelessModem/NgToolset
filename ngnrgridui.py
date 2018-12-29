@@ -6859,6 +6859,7 @@ class NgNrGridUi(QDialog):
                 self.coreset0Offset = self.coreset0OffsetList[0]
                 
             '''
+            basic assumptions: If offset>0, then 1st RB of CORESET0 aligns with the carrier edge; if offset<=0, then 1st RB of SSB aligns with the carrier edge.
             if offset > 0, min bw = max(self.coreset0NumRbs, offset + 20 * scsSsb / scsPdcch), and n_CRB_SSB needs update w.r.t to offset
             if offset <= 0, min bw = self.coreset0NumRbs - offset, and don't have to update n_CRB_SSB
             '''
