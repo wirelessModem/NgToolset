@@ -62,7 +62,7 @@ class NgNrGrid(object):
     def init(self):
         self.ngwin.logEdit.append('---->inside init')
         
-        #HSFN is not used in NR, but used in 5GNR resource grid for convenience
+        #HSFN not exit in NR specs, but used in 5GNR resource grid for convenience
         self.hsfn = 0
         
         self.nrSubfPerRf = 10
@@ -89,7 +89,9 @@ class NgNrGrid(object):
         dn = '%s_%s' % (self.hsfn, self.args['mib']['sfn'])
         if self.args['freqBand']['duplexMode'] == 'TDD':
             self.gridNrTdd[dn] = np.full((self.nrScTot, self.nrSymbPerRfNormCp), NrResType.NR_RES_F.value)
-            self.initTddUlDlConfig()
+            if not self.initTddUlDlConfig():
+                return False
+            self.initTddGrid(self.hsfn, int(self.args['mib']['sfn']))
         elif self.args['freqBand']['duplexMode'] == 'FDD':
             self.gridNrFddDl[dn] = np.full((self.nrScTot, self.nrSymbPerRfNormCp), NrResType.NR_RES_D.value)
             self.gridNrFddUl[dn] = np.full((self.nrScTot, self.nrSymbPerRfNormCp), NrResType.NR_RES_U.value)
@@ -99,64 +101,144 @@ class NgNrGrid(object):
         return True
         
     def initTddUlDlConfig(self):
+        #refer to 3GPP 38.213 vf30
+        #11.1	Slot configuration
         self.tddCfgRefScsPeriod = {
-            'ms0p5_0' : None,
-            'ms0p5_1' : 1,
-            'ms0p5_2' : 2,
-            'ms0p5_3' : 4,
-            'ms0p625_0' : None,
-            'ms0p625_1' : None,
-            'ms0p625_2' : None,
-            'ms0p625_3' : 5,
-            'ms1_0' : 1,
-            'ms1_1' : 2,
-            'ms1_2' : 4,
-            'ms1_3' : 8,
-            'ms1p25_0' : None,
-            'ms1p25_1' : None,
-            'ms1p25_2' : 5,
-            'ms1p25_3' : 10,
-            'ms2_0' : 2,
-            'ms2_1' : 4,
-            'ms2_2' : 8,
-            'ms2_3' : 16,
-            'ms2p5_0' : None,
-            'ms2p5_1' : 5,
-            'ms2p5_2' : 10,
-            'ms2p5_3' : 20,
-            'ms5_0' : 5,
-            'ms5_1' : 10,
-            'ms5_2' : 20,
-            'ms5_3' : 40,
-            'ms10_0' : 10,
-            'ms10_1' : 20,
-            'ms10_2' : 40,
-            'ms10_3' : 80,
+            '0.5ms_0' : None,
+            '0.5ms_1' : 1,
+            '0.5ms_2' : 2,
+            '0.5ms_3' : 4,
+            '0.625ms_0' : None,
+            '0.625ms_1' : None,
+            '0.625ms_2' : None,
+            '0.625ms_3' : 5,
+            '1ms_0' : 1,
+            '1ms_1' : 2,
+            '1ms_2' : 4,
+            '1ms_3' : 8,
+            '1.25ms_0' : None,
+            '1.25ms_1' : None,
+            '1.25ms_2' : 5,
+            '1.25ms_3' : 10,
+            '2ms_0' : 2,
+            '2ms_1' : 4,
+            '2ms_2' : 8,
+            '2ms_3' : 16,
+            '2.5ms_0' : None,
+            '2.5ms_1' : 5,
+            '2.5ms_2' : 10,
+            '2.5ms_3' : 20,
+            '3ms_0' : 3,
+            '3ms_1' : 6,
+            '3ms_2' : 12,
+            '3ms_3' : 24,
+            '4ms_0' : 4,
+            '4ms_1' : 8,
+            '4ms_2' : 16,
+            '4ms_3' : 32,
+            '5ms_0' : 5,
+            '5ms_1' : 10,
+            '5ms_2' : 20,
+            '5ms_3' : 40,
+            '10ms_0' : 10,
+            '10ms_1' : 20,
+            '10ms_2' : 40,
+            '10ms_3' : 80,
             }
-        self.tddCfgPeriod2Int = {'ms0p5':4, 'ms0p625':5, 'ms1':8, 'ms1p25':10, 'ms2':16, 'ms2p5':20, 'ms5':40, 'ms10':80}
+        #period is x8 of actual value
+        self.tddCfgPeriod2Int = {'0.5ms':4, '0.625ms':5, '1ms':8, '1.25ms':10, '2ms':16, '2.5ms':20, '3ms':24, '4ms':32, '5ms':40, '10ms':80}
         
         self.nrTddCfgRefScs = int(self.args['tddCfg']['refScs'][:-3])
         key = '%s_%s' % (self.args['tddCfg']['pat1Period'], self.nrScs2Mu[self.nrTddCfgRefScs])
         if not key in self.tddCfgRefScsPeriod or self.tddCfgRefScsPeriod[key] is None:
-            #print error
+            self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(="%s") when referring tddCfgRefScsPeriod!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
             return False
-        self.pat1NumSlots = self.tddCfgRefScsPeriod[key]
+        self.pat1NumSlotsPerPeriod = self.tddCfgRefScsPeriod[key]
+        self.nrTddCfgPat1NumDlSlots = int(self.args['tddCfg']['pat1NumDlSlots'])
+        self.nrTddCfgPat1NumDlSymbs = int(self.args['tddCfg']['pat1NumDlSymbs'])
+        self.nrTddCfgPat1NumUlSymbs = int(self.args['tddCfg']['pat1NumUlSymbs'])
+        self.nrTddCfgPat1NumUlSlots = int(self.args['tddCfg']['pat1NumUlSlots'])
         
         if self.args['tddCfg']['pat2Period'] != 'not used':
             key = '%s_%s' % (self.args['tddCfg']['pat2Period'], self.nrScs2Mu[self.nrTddCfgRefScs])
             if not key in self.tddCfgRefScsPeriod or self.tddCfgRefScsPeriod[key] is None:
-                #print error
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid key(="%s") when referring tddCfgRefScsPeriod!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), key))
                 return False
-            self.pat2NumSlots = self.tddCfgRefScsPeriod[key]
+            self.pat2NumSlotsPerPeriod = self.tddCfgRefScsPeriod[key]
+            self.nrTddCfgPat2NumDlSlots = int(self.args['tddCfg']['pat2NumDlSlots'])
+            self.nrTddCfgPat2NumDlSymbs = int(self.args['tddCfg']['pat2NumDlSymbs'])
+            self.nrTddCfgPat2NumUlSymbs = int(self.args['tddCfg']['pat2NumUlSymbs'])
+            self.nrTddCfgPat2NumUlSlots = int(self.args['tddCfg']['pat2NumUlSlots'])
+            
             period = self.tddCfgPeriod2Int[self.args['tddCfg']['pat1Period']] + self.tddCfgPeriod2Int[self.args['tddCfg']['pat2Period']] 
             if 160 % period != 0:
-                #print error
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid TDD-UL-DL-Config periodicity(=%.3fms) with p=%.3fms and p2=%.3fms, which should divide 20ms!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), period/8, self.tddCfgPeriod2Int[self.args['tddCfg']['pat1Period']]/8, self.tddCfgPeriod2Int[self.args['tddCfg']['pat2Period']]/8))
                 return False
-            else:
-                self.periodsPer20ms = 160 // period
         else:
-            self.pat2NumSlots = None
-            self.periodsPer20ms = 160 // self.tddCfgPeriod2Int[self.args['tddCfg']['pat1Period']]
+            self.pat2NumSlotsPerPeriod = None
+            period = self.tddCfgPeriod2Int[self.args['tddCfg']['pat1Period']]
+            if 160 % period != 0:
+                self.ngwin.logEdit.append('<font color=red><b>[%s]Error</font>: Invalid TDD-UL-DL-Config periodicity(=%.3fms), which should divide 20ms!' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), period/8))
+                return False
+            
+        self.periodsPer20ms = 160 // period
+        
+        pattern = []
+        pattern.extend(['D'] * self.nrTddCfgPat1NumDlSlots * self.nrSymbPerSlotNormCp)
+        pattern.extend(['D'] * self.nrTddCfgPat1NumDlSymbs)
+        pattern.extend(['F'] * ((self.pat1NumSlotsPerPeriod - self.nrTddCfgPat1NumDlSlots - self.nrTddCfgPat1NumUlSlots) * self.nrSymbPerSlotNormCp - self.nrTddCfgPat1NumDlSymbs - self.nrTddCfgPat1NumUlSymbs))
+        pattern.extend(['U'] * self.nrTddCfgPat1NumUlSymbs)
+        pattern.extend(['U'] * self.nrTddCfgPat1NumUlSlots * self.nrSymbPerSlotNormCp)
+        
+        if self.pat2NumSlotsPerPeriod is None:
+            numSlotsPerPeriod = self.pat1NumSlotsPerPeriod
+        else:
+            numSlotsPerPeriod = self.pat1NumSlotsPerPeriod + self.pat2NumSlotsPerPeriod
+            
+            pattern.extend(['D'] * self.nrTddCfgPat2NumDlSlots * self.nrSymbPerSlotNormCp)
+            pattern.extend(['D'] * self.nrTddCfgPat2NumDlSymbs)
+            pattern.extend(['F'] * ((self.pat2NumSlotsPerPeriod - self.nrTddCfgPat2NumDlSlots - self.nrTddCfgPat2NumUlSlots) * self.nrSymbPerSlotNormCp - self.nrTddCfgPat2NumDlSymbs - self.nrTddCfgPat2NumUlSymbs))
+            pattern.extend(['U'] * self.nrTddCfgPat2NumUlSymbs)
+            pattern.extend(['U'] * self.nrTddCfgPat2NumUlSlots * self.nrSymbPerSlotNormCp)
+        
+        pattern = pattern * self.periodsPer20ms
+        self.tddPatEvenRf = pattern[:self.nrSlotPerRf[self.nrScs2Mu[self.nrTddCfgRefScs]] * self.nrSymbPerSlotNormCp]
+        self.tddPatOddRf = pattern[self.nrSlotPerRf[self.nrScs2Mu[self.nrTddCfgRefScs]] * self.nrSymbPerSlotNormCp:]
+        
+        self.ngwin.logEdit.append('pattern of even frame:')
+        for i in range(len(self.tddPatEvenRf)):
+            if (i+1) % self.nrSymbPerSlotNormCp == 0:
+                self.ngwin.logEdit.append('-->slot%d: %s' % (i // self.nrSymbPerSlotNormCp, ''.join(self.tddPatEvenRf[i-13:i+1])))
+        self.ngwin.logEdit.append('pattern of odd frame:')
+        for i in range(len(self.tddPatOddRf)):
+            if (i+1) % self.nrSymbPerSlotNormCp == 0:
+                self.ngwin.logEdit.append('-->slot%d: %s' % (i // self.nrSymbPerSlotNormCp, ''.join(self.tddPatOddRf[i-13:i+1])))
+        
+        return True
+    
+    def initTddGrid(self, hsfn, sfn):
+        dn = '%s_%s' % (hsfn, sfn)
+        if not dn in self.gridNrTdd:
+            #report error
+            return
+        
+        tddCfgMap = {'D':NrResType.NR_RES_D.value, 'F':NrResType.NR_RES_F.value, 'U':NrResType.NR_RES_U.value}
+        scale = self.baseScsTd // self.nrTddCfgRefScs
+        self.ngwin.logEdit.append('scale=%d where baseScTd=%dKHz and tddCfgRefScs=%dKHz' % (scale, self.baseScsTd, self.nrTddCfgRefScs))
+        if sfn % 2 == 0:
+            for i in range(len(self.tddPatEvenRf)):
+                for j in range(scale):
+                    self.gridNrTdd[dn][:,i*scale+j] = tddCfgMap[self.tddPatEvenRf[i]] 
+        else:
+            for i in range(len(self.tddPatOddRf)):
+                for j in range(scale):
+                    self.gridNrTdd[dn][:,i*scale+j] = tddCfgMap[self.tddPatOddRf[i]] 
+        
+        '''
+        rows, cols = self.gridNrTdd[dn].shape
+        for i in range(rows):
+            self.ngwin.logEdit.append(','.join([str(self.gridNrTdd[dn][i,j]) for j in range(cols)]))
+        '''
         
     def recvSsb(self):
         self.ngwin.logEdit.append('---->inside recvSsb')
