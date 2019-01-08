@@ -16,6 +16,8 @@ import time
 from enum import Enum
 from collections import OrderedDict
 import numpy as np
+from openpyxl import Workbook
+import xlsxwriter
 import ngmainwin
 
 class NrResType(Enum):
@@ -58,6 +60,7 @@ class NgNrGrid(object):
         self.args = args
         if not self.init():
             return
+        self.exportToExcel()
             
     
     def init(self):
@@ -85,16 +88,17 @@ class NgNrGrid(object):
         self.nrScGb = self.nrScPerPrb * self.nrCarrierMinGuardBand * (self.nrCarrierScs // self.baseScsFd)
         self.nrSymbPerRfNormCp = self.nrSymbPerSlotNormCp * self.nrSlotPerRf[self.nrScs2Mu[self.baseScsTd]]
         
+        self.nrDuplexMode = self.args['freqBand']['duplexMode']
         self.gridNrTdd = OrderedDict()
         self.gridNrFddDl = OrderedDict()
         self.gridNrFddUl = OrderedDict()
         dn = '%s_%s' % (self.hsfn, self.args['mib']['sfn'])
-        if self.args['freqBand']['duplexMode'] == 'TDD':
+        if self.nrDuplexMode == 'TDD':
             self.gridNrTdd[dn] = np.full((self.nrScTot, self.nrSymbPerRfNormCp), NrResType.NR_RES_GB.value)
             if not self.initTddUlDlConfig():
                 return False
             self.initTddGrid(self.hsfn, int(self.args['mib']['sfn']))
-        elif self.args['freqBand']['duplexMode'] == 'FDD':
+        elif self.nrDuplexMode == 'FDD':
             self.gridNrFddDl[dn] = np.full((self.nrScTot, self.nrSymbPerRfNormCp), NrResType.NR_RES_D.value)
             self.gridNrFddUl[dn] = np.full((self.nrScTot, self.nrSymbPerRfNormCp), NrResType.NR_RES_U.value)
             #init 'min guard band'
@@ -102,6 +106,10 @@ class NgNrGrid(object):
             self.gridNrFddUl[dn][:self.nrScGb, :] = NrResType.NR_RES_GB.value
         else:
             return False
+        
+        self.outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+        if not os.path.exists(self.outDir):
+            os.mkdir(self.outDir)
         
         return True
         
@@ -244,6 +252,121 @@ class NgNrGrid(object):
         for i in range(rows):
             self.ngwin.logEdit.append(','.join([str(self.gridNrTdd[dn][i,j]) for j in range(cols)]))
         '''
+        
+    def exportToExcel(self):
+        self.ngwin.logEdit.append('---->exporting to excel(engine=xlsxwriter)...')
+        rowLabels = []
+        for i in range(self.nrScTot):
+            rowLabels.append('crb%dsc%d' % (i // self.nrScPerPrb, i % self.nrScPerPrb))
+        
+        colLabels = ['k/l']
+        if self.nrDuplexMode == 'TDD':
+            for key in self.gridNrTdd.keys():
+                hsfn, sfn = key.split('_')
+                for i in range(self.nrSymbPerRfNormCp//self.nrSymbPerSlotNormCp):
+                    for j in range(self.nrSymbPerSlotNormCp):
+                        colLabels.append('sfn%s\nslot%d\nsymb%d' % (sfn, i, j))
+        else:
+            for key in self.gridNrFddDl.keys():
+                hsfn, sfn = key.split('_')
+                for i in range(self.nrSymbPerRfNormCp//self.nrSymbPerSlotNormCp):
+                    for j in range(self.nrSymbPerSlotNormCp):
+                        colLabels.append('sfn%s\nslot%d\nsymb%d' % (sfn, i, j))
+        
+        wb = xlsxwriter.Workbook(os.path.join(self.outDir, '5gnr_grid_%s.xlsx' % (time.strftime('%Y%m%d%H%M%S', time.localtime()))))
+        fmtHHeader = wb.add_format({'font_name':'Arial', 'font_size':9, 'bold':True, 'align':'center', 'valign':'vcenter', 'text_wrap':True, 'bg_color':'yellow'})
+        fmtVHeader = wb.add_format({'font_name':'Arial', 'font_size':9, 'bold':True, 'align':'center', 'valign':'vcenter', 'shrink':True, 'bg_color':'yellow'})
+        fmtCell = wb.add_format({'font_name':'Arial', 'font_size':9, 'align':'left', 'valign':'vcenter'})
+        if self.nrDuplexMode == 'TDD':
+            ws1 = wb.add_worksheet('TDD Grid')
+            ws1.set_zoom(90)
+            
+            #write headers
+            ws1.write_row(0, 0, colLabels, fmtHHeader)
+            ws1.write_column(1, 0, rowLabels, fmtVHeader)
+            
+            for i in range(self.nrScTot):
+                row = []
+                for key in self.gridNrTdd.keys():
+                    row.extend(self.gridNrTdd[key][i,:])
+                ws1.write_row(1+i, 1, row, fmtCell)
+            ws1.freeze_panes(1, 1)
+        else:
+            ws1 = wb.add_worksheet('FDD UL Grid')
+            ws2 = wb.add_worksheet('FDD DL Grid')
+            ws1.set_zoom(90)
+            ws2.set_zoom(90)
+            
+            #write headers
+            ws1.write_row(0, 0, colLabels, fmtHHeader)
+            ws1.write_column(1, 0, rowLabels, fmtVHeader)
+            ws2.write_row(0, 0, colLabels, fmtHHeader)
+            ws2.write_column(1, 0, rowLabels, fmtVHeader)
+            
+            for i in range(self.nrScTot):
+                row = []
+                for key in self.gridNrFddUl.keys():
+                    row.extend(self.gridNrFddUl[key][i,:])
+                ws1.write_row(1+i, 1, row, fmtCell)
+            for i in range(self.nrScTot):
+                row = []
+                for key in self.gridNrFddDl.keys():
+                    row.extend(self.gridNrFddDl[key][i,:])
+                ws2.write_row(1+i, 1, row, fmtCell)
+            ws1.freeze_panes(1, 1)
+            ws2.freeze_panes(1, 1)
+        
+        wb.close()
+    
+    def exportToExcel2(self):
+        self.ngwin.logEdit.append('---->exporting to excel(engine=openpyxl)...')
+        rowLabels = []
+        for i in range(self.nrScTot):
+            rowLabels.append('crb%dsc%d' % (i // self.nrScPerPrb, i % self.nrScPerPrb))
+        
+        colLabels = ['k/l']
+        if self.nrDuplexMode == 'TDD':
+            for key in self.gridNrTdd.keys():
+                hsfn, sfn = key.split('_')
+                for i in range(self.nrSymbPerRfNormCp//self.nrSymbPerSlotNormCp):
+                    for j in range(self.nrSymbPerSlotNormCp):
+                        colLabels.append('sfn%sslot%dsymb%d' % (sfn, i, j))
+        else:
+            for key in self.gridNrFddDl.keys():
+                hsfn, sfn = key.split('_')
+                for i in range(self.nrSymbPerRfNormCp//self.nrSymbPerSlotNormCp):
+                    for j in range(self.nrSymbPerSlotNormCp):
+                        colLabels.append('sfn%sslot%dsymb%d' % (sfn, i, j))
+        
+        wb = Workbook()
+        ws1 = wb.active
+        if self.nrDuplexMode == 'TDD':
+            ws1.title = 'TDD Grid'
+            ws1.append(colLabels)
+            
+            for i in range(self.nrScTot):
+                row = [rowLabels[i]]
+                for key in self.gridNrTdd.keys():
+                    row.extend(self.gridNrTdd[key][i,:])
+                ws1.append(row)
+            ws1.freeze_panes = 'B2'
+        else:
+            ws1.title = 'FDD UL Grid'
+            ws2 = wb.create_sheet(title='FDD DL Grid')
+            for i in range(self.nrScTot):
+                row = [rowLabels[i]]
+                for key in self.gridNrFddUl.keys():
+                    row.extend(self.gridNrFddUl[key][i,:])
+                ws1.append(row)
+            for i in range(self.nrScTot):
+                row = [rowLabels[i]]
+                for key in self.gridNrFddDl.keys():
+                    row.extend(self.gridNrFddDl[key][i,:])
+                ws2.append(row)
+            ws1.freeze_panes = 'B2'
+            ws2.freeze_panes = 'B2'
+        
+        wb.save(os.path.join(self.outDir, '5gnr_grid_%s.xlsx' % (time.strftime('%Y%m%d%H%M%S', time.localtime()))))
         
     def recvSsb(self):
         self.ngwin.logEdit.append('---->inside recvSsb')
