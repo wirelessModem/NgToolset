@@ -48,6 +48,7 @@ class NrResType(Enum):
     NR_RES_D = 60 
     NR_RES_F = 61 
     NR_RES_U = 62 
+    NR_RES_GB = 63
     
     NR_RES_BUTT = 99
 
@@ -81,6 +82,7 @@ class NgNrGrid(object):
         self.nrCarrierNumRbs = int(self.args['carrierGrid']['numRbs'])
         
         self.nrScTot = self.nrScPerPrb * (self.nrCarrierMinGuardBand + self.nrCarrierNumRbs) * (self.nrCarrierScs // self.baseScsFd)
+        self.nrScGb = self.nrScPerPrb * self.nrCarrierMinGuardBand * (self.nrCarrierScs // self.baseScsFd)
         self.nrSymbPerRfNormCp = self.nrSymbPerSlotNormCp * self.nrSlotPerRf[self.nrScs2Mu[self.baseScsTd]]
         
         self.gridNrTdd = OrderedDict()
@@ -88,13 +90,16 @@ class NgNrGrid(object):
         self.gridNrFddUl = OrderedDict()
         dn = '%s_%s' % (self.hsfn, self.args['mib']['sfn'])
         if self.args['freqBand']['duplexMode'] == 'TDD':
-            self.gridNrTdd[dn] = np.full((self.nrScTot, self.nrSymbPerRfNormCp), NrResType.NR_RES_F.value)
+            self.gridNrTdd[dn] = np.full((self.nrScTot, self.nrSymbPerRfNormCp), NrResType.NR_RES_GB.value)
             if not self.initTddUlDlConfig():
                 return False
             self.initTddGrid(self.hsfn, int(self.args['mib']['sfn']))
         elif self.args['freqBand']['duplexMode'] == 'FDD':
             self.gridNrFddDl[dn] = np.full((self.nrScTot, self.nrSymbPerRfNormCp), NrResType.NR_RES_D.value)
             self.gridNrFddUl[dn] = np.full((self.nrScTot, self.nrSymbPerRfNormCp), NrResType.NR_RES_U.value)
+            #init 'min guard band'
+            self.gridNrFddDl[dn][:self.nrScGb, :] = NrResType.NR_RES_GB.value
+            self.gridNrFddUl[dn][:self.nrScGb, :] = NrResType.NR_RES_GB.value
         else:
             return False
         
@@ -228,11 +233,11 @@ class NgNrGrid(object):
         if sfn % 2 == 0:
             for i in range(len(self.tddPatEvenRf)):
                 for j in range(scale):
-                    self.gridNrTdd[dn][:,i*scale+j] = tddCfgMap[self.tddPatEvenRf[i]] 
+                    self.gridNrTdd[dn][self.nrScGb:,i*scale+j] = tddCfgMap[self.tddPatEvenRf[i]] 
         else:
             for i in range(len(self.tddPatOddRf)):
                 for j in range(scale):
-                    self.gridNrTdd[dn][:,i*scale+j] = tddCfgMap[self.tddPatOddRf[i]] 
+                    self.gridNrTdd[dn][self.nrScGb:,i*scale+j] = tddCfgMap[self.tddPatOddRf[i]] 
         
         '''
         rows, cols = self.gridNrTdd[dn].shape
