@@ -16,7 +16,7 @@ import time
 from enum import Enum
 from collections import OrderedDict
 import numpy as np
-from openpyxl import Workbook
+#from openpyxl import Workbook
 import xlsxwriter
 import ngmainwin
 
@@ -28,19 +28,25 @@ class NrResType(Enum):
     NR_RES_PDCCH = 4
     NR_RES_PDSCH = 5
     NR_RES_CSI_RS = 6
+    NR_RES_MSG2 = 7
+    NR_RES_MSG4 = 8
     
     NR_RES_PRACH = 10
     NR_RES_PUCCH = 11
     NR_RES_PUSCH = 12
     NR_RES_SRS = 13
+    NR_RES_MSG3 = 14 
     
     NR_RES_DMRS_PBCH = 20
     NR_RES_DMRS_SIB1 = 21
     NR_RES_DMRS_PDCCH = 22 
     NR_RES_DMRS_PDSCH = 23
+    NR_RES_DMRS_MSG2 = 24
+    NR_RES_DMRS_MSG4 = 25
     
     NR_RES_DMRS_PUCCH = 30 
     NR_RES_DMRS_PUSCH = 31 
+    NR_RES_DMRS_MSG3 = 32 
     
     NR_RES_PTRS_PDSCH = 40 
     NR_RES_PTRS_PUSCH = 41 
@@ -255,119 +261,119 @@ class NgNrGrid(object):
         
     def exportToExcel(self):
         self.ngwin.logEdit.append('---->exporting to excel(engine=xlsxwriter)...')
-        rowLabels = []
+        verticalHeader = []
         for i in range(self.nrScTot):
-            rowLabels.append('crb%dsc%d' % (i // self.nrScPerPrb, i % self.nrScPerPrb))
+            verticalHeader.append('crb%dsc%d' % (i // self.nrScPerPrb, i % self.nrScPerPrb))
         
-        colLabels = ['k/l']
+        horizontalHeader = ['k/l']
         if self.nrDuplexMode == 'TDD':
             for key in self.gridNrTdd.keys():
                 hsfn, sfn = key.split('_')
                 for i in range(self.nrSymbPerRfNormCp//self.nrSymbPerSlotNormCp):
                     for j in range(self.nrSymbPerSlotNormCp):
-                        colLabels.append('sfn%s\nslot%d\nsymb%d' % (sfn, i, j))
+                        horizontalHeader.append('sfn%s\nslot%d\nsymb%d' % (sfn, i, j))
         else:
             for key in self.gridNrFddDl.keys():
                 hsfn, sfn = key.split('_')
                 for i in range(self.nrSymbPerRfNormCp//self.nrSymbPerSlotNormCp):
                     for j in range(self.nrSymbPerSlotNormCp):
-                        colLabels.append('sfn%s\nslot%d\nsymb%d' % (sfn, i, j))
+                        horizontalHeader.append('sfn%s\nslot%d\nsymb%d' % (sfn, i, j))
         
-        wb = xlsxwriter.Workbook(os.path.join(self.outDir, '5gnr_grid_%s.xlsx' % (time.strftime('%Y%m%d%H%M%S', time.localtime()))))
-        fmtHHeader = wb.add_format({'font_name':'Arial', 'font_size':9, 'bold':True, 'align':'center', 'valign':'vcenter', 'text_wrap':True, 'bg_color':'yellow'})
-        fmtVHeader = wb.add_format({'font_name':'Arial', 'font_size':9, 'bold':True, 'align':'center', 'valign':'vcenter', 'shrink':True, 'bg_color':'yellow'})
-        fmtCell = wb.add_format({'font_name':'Arial', 'font_size':9, 'align':'left', 'valign':'vcenter'})
+        workbook = xlsxwriter.Workbook(os.path.join(self.outDir, '5gnr_grid_%s.xlsx' % (time.strftime('%Y%m%d%H%M%S', time.localtime()))))
+        fmtHHeader = workbook.add_format({'font_name':'Arial', 'font_size':9, 'bold':True, 'align':'center', 'valign':'vcenter', 'text_wrap':True, 'bg_color':'yellow'})
+        fmtVHeader = workbook.add_format({'font_name':'Arial', 'font_size':9, 'bold':True, 'align':'center', 'valign':'vcenter', 'shrink':True, 'bg_color':'yellow'})
+        
+        #key=NrResType, val=(name, font_color, bg_color)
+        resMap = dict()
+        resMap[NrResType.NR_RES_PSS.value] = ('PSS', '#000000', '#00FF00')
+        resMap[NrResType.NR_RES_SSS.value] = ('PSS', '#000000', '#FFFF00')
+        resMap[NrResType.NR_RES_PBCH.value] = ('PBCH', '#000000', '#80FFFF')
+        resMap[NrResType.NR_RES_SIB1.value] = ('SIB1', '#0000FF', '#FFFFFF')
+        resMap[NrResType.NR_RES_PDCCH.value] = ('PDCCH', '#000000', '#00FFFF')
+        resMap[NrResType.NR_RES_PDSCH.value] = ('PDSCH', '#000000', '#FFFFFF')
+        resMap[NrResType.NR_RES_CSI_RS.value] = ('CSI-RS', '#000000', '#FF0000')
+        resMap[NrResType.NR_RES_MSG2.value] = ('MSG2', '#000000', '#FF00FF')
+        resMap[NrResType.NR_RES_MSG4.value] = ('MSG4', '#000000', '#FF00FF')
+        
+        resMap[NrResType.NR_RES_PRACH.value] = ('CSI-RS', '#000000', '#80FFFF')
+        resMap[NrResType.NR_RES_PUCCH.value] = ('PUCCH', '#FFFFFF', '#0000FF')
+        resMap[NrResType.NR_RES_PUSCH.value] = ('PUSCH', '#000000', '#FFFFFF')
+        resMap[NrResType.NR_RES_SRS.value] = ('PUSCH', '#000000', '#FFFF00')
+        resMap[NrResType.NR_RES_MSG3.value] = ('MSG3', '#000000', '#FF00FF')
+        
+        resMap[NrResType.NR_RES_DMRS_PBCH.value] = ('DMRS', '#000000', '#FF0000')
+        resMap[NrResType.NR_RES_DMRS_SIB1.value] = ('DMRS', '#000000', '#FF0000')
+        resMap[NrResType.NR_RES_DMRS_PDCCH.value] = ('DMRS', '#000000', '#FF0000')
+        resMap[NrResType.NR_RES_DMRS_PDSCH.value] = ('DMRS', '#000000', '#FF0000')
+        resMap[NrResType.NR_RES_DMRS_MSG2.value] = ('DMRS', '#000000', '#FF0000')
+        resMap[NrResType.NR_RES_DMRS_MSG4.value] = ('DMRS', '#000000', '#FF0000')
+        resMap[NrResType.NR_RES_DMRS_PUCCH.value] = ('DMRS', '#000000', '#FF0000')
+        resMap[NrResType.NR_RES_DMRS_PUSCH.value] = ('DMRS', '#000000', '#FF0000')
+        resMap[NrResType.NR_RES_DMRS_MSG3.value] = ('DMRS', '#000000', '#FF0000')
+        
+        resMap[NrResType.NR_RES_PTRS_PDSCH.value] = ('PTRS', '#000000', '#FF00FF')
+        resMap[NrResType.NR_RES_PTRS_PUSCH.value] = ('PTRS', '#000000', '#FF00FF')
+        
+        resMap[NrResType.NR_RES_DTX.value] = ('DTX', '#FFFFFF', '#000000')
+        
+        resMap[NrResType.NR_RES_D.value] = ('D', '#FFFFFF', '#000000')
+        resMap[NrResType.NR_RES_F.value] = ('F', '#FFFFFF', '#808080')
+        resMap[NrResType.NR_RES_U.value] = ('U', '#FFFFFF', '#000000')
+        resMap[NrResType.NR_RES_GB.value] = ('GB', '#808080', '#000000')
+        
+        formatMap = dict()
+        for key, val in resMap.items():
+            name, fg, bg = val
+            formatMap[key] = workbook.add_format({'font_name':'Arial', 'font_size':9, 'align':'left', 'valign':'vcenter', 'font_color':fg, 'bg_color':bg})
+            
         if self.nrDuplexMode == 'TDD':
-            ws1 = wb.add_worksheet('TDD Grid')
-            ws1.set_zoom(90)
+            sheet1 = workbook.add_worksheet('TDD Grid')
+            sheet1.set_zoom(90)
+            sheet1.freeze_panes(1, 1)
             
-            #write headers
-            ws1.write_row(0, 0, colLabels, fmtHHeader)
-            ws1.write_column(1, 0, rowLabels, fmtVHeader)
+            #write header
+            sheet1.write_row(0, 0, horizontalHeader, fmtHHeader)
+            sheet1.write_column(1, 0, verticalHeader, fmtVHeader)
             
-            for i in range(self.nrScTot):
-                row = []
-                for key in self.gridNrTdd.keys():
-                    row.extend(self.gridNrTdd[key][i,:])
-                ws1.write_row(1+i, 1, row, fmtCell)
-            ws1.freeze_panes(1, 1)
+            count = 0
+            for key,val in self.gridNrTdd.items():
+                for row in range(val.shape[0]):
+                    for col in range(val.shape[1]):
+                        name, fg, bg = resMap[val[row, col]]
+                        sheet1.write(row+1, col+1+count*val.shape[1], name, formatMap[val[row, col]])
+                count += 1
         else:
-            ws1 = wb.add_worksheet('FDD UL Grid')
-            ws2 = wb.add_worksheet('FDD DL Grid')
-            ws1.set_zoom(90)
-            ws2.set_zoom(90)
+            sheet1 = workbook.add_worksheet('FDD UL Grid')
+            sheet1.set_zoom(90)
+            sheet1.freeze_panes(1, 1)
+            sheet2 = workbook.add_worksheet('FDD DL Grid')
+            sheet2.set_zoom(90)
+            sheet2.freeze_panes(1, 1)
             
-            #write headers
-            ws1.write_row(0, 0, colLabels, fmtHHeader)
-            ws1.write_column(1, 0, rowLabels, fmtVHeader)
-            ws2.write_row(0, 0, colLabels, fmtHHeader)
-            ws2.write_column(1, 0, rowLabels, fmtVHeader)
+            #write header
+            sheet1.write_row(0, 0, horizontalHeader, fmtHHeader)
+            sheet1.write_column(1, 0, verticalHeader, fmtVHeader)
+            sheet2.write_row(0, 0, horizontalHeader, fmtHHeader)
+            sheet2.write_column(1, 0, verticalHeader, fmtVHeader)
+         
+            count = 0
+            for key,val in self.gridNrFddUl.items():
+                for row in range(val.shape[0]):
+                    for col in range(val.shape[1]):
+                        name, fg, bg = resMap[val[row, col]]
+                        sheet1.write(row+1, col+1+count*val.shape[1], name, formatMap[val[row, col]])
+                count += 1
             
-            for i in range(self.nrScTot):
-                row = []
-                for key in self.gridNrFddUl.keys():
-                    row.extend(self.gridNrFddUl[key][i,:])
-                ws1.write_row(1+i, 1, row, fmtCell)
-            for i in range(self.nrScTot):
-                row = []
-                for key in self.gridNrFddDl.keys():
-                    row.extend(self.gridNrFddDl[key][i,:])
-                ws2.write_row(1+i, 1, row, fmtCell)
-            ws1.freeze_panes(1, 1)
-            ws2.freeze_panes(1, 1)
+            count = 0
+            for key,val in self.gridNrFddDl.items():
+                for row in range(val.shape[0]):
+                    for col in range(val.shape[1]):
+                        name, fg, bg = resMap[val[row, col]]
+                        sheet2.write(row+1, col+1+count*val.shape[1], name, formatMap[val[row, col]])
+                count += 1
         
-        wb.close()
+        workbook.close()
     
-    def exportToExcel2(self):
-        self.ngwin.logEdit.append('---->exporting to excel(engine=openpyxl)...')
-        rowLabels = []
-        for i in range(self.nrScTot):
-            rowLabels.append('crb%dsc%d' % (i // self.nrScPerPrb, i % self.nrScPerPrb))
-        
-        colLabels = ['k/l']
-        if self.nrDuplexMode == 'TDD':
-            for key in self.gridNrTdd.keys():
-                hsfn, sfn = key.split('_')
-                for i in range(self.nrSymbPerRfNormCp//self.nrSymbPerSlotNormCp):
-                    for j in range(self.nrSymbPerSlotNormCp):
-                        colLabels.append('sfn%sslot%dsymb%d' % (sfn, i, j))
-        else:
-            for key in self.gridNrFddDl.keys():
-                hsfn, sfn = key.split('_')
-                for i in range(self.nrSymbPerRfNormCp//self.nrSymbPerSlotNormCp):
-                    for j in range(self.nrSymbPerSlotNormCp):
-                        colLabels.append('sfn%sslot%dsymb%d' % (sfn, i, j))
-        
-        wb = Workbook()
-        ws1 = wb.active
-        if self.nrDuplexMode == 'TDD':
-            ws1.title = 'TDD Grid'
-            ws1.append(colLabels)
-            
-            for i in range(self.nrScTot):
-                row = [rowLabels[i]]
-                for key in self.gridNrTdd.keys():
-                    row.extend(self.gridNrTdd[key][i,:])
-                ws1.append(row)
-            ws1.freeze_panes = 'B2'
-        else:
-            ws1.title = 'FDD UL Grid'
-            ws2 = wb.create_sheet(title='FDD DL Grid')
-            for i in range(self.nrScTot):
-                row = [rowLabels[i]]
-                for key in self.gridNrFddUl.keys():
-                    row.extend(self.gridNrFddUl[key][i,:])
-                ws1.append(row)
-            for i in range(self.nrScTot):
-                row = [rowLabels[i]]
-                for key in self.gridNrFddDl.keys():
-                    row.extend(self.gridNrFddDl[key][i,:])
-                ws2.append(row)
-            ws1.freeze_panes = 'B2'
-            ws2.freeze_panes = 'B2'
-        
-        wb.save(os.path.join(self.outDir, '5gnr_grid_%s.xlsx' % (time.strftime('%Y%m%d%H%M%S', time.localtime()))))
-        
     def recvSsb(self):
         self.ngwin.logEdit.append('---->inside recvSsb')
         pass
