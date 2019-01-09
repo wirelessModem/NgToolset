@@ -10206,6 +10206,9 @@ class NgNrGridUi(QDialog):
         self.curSfn = int(self.args['mib']['sfn'])
         nrGrid.recvSsb(self.curHsfn, self.curSfn)
         
+        #export grid to excel
+        nrGrid.exportToExcel()
+        
         self.accept()
     
     def prepNrGrid(self):
