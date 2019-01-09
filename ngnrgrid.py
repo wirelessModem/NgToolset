@@ -66,7 +66,7 @@ class NgNrGrid(object):
         self.args = args
         if not self.init():
             return
-        self.exportToExcel()
+        #self.exportToExcel()
             
     
     def init(self):
@@ -95,15 +95,17 @@ class NgNrGrid(object):
         self.nrSymbPerRfNormCp = self.nrSymbPerSlotNormCp * self.nrSlotPerRf[self.nrScs2Mu[self.baseScsTd]]
         
         self.nrDuplexMode = self.args['freqBand']['duplexMode']
+        self.nrMibSfn = int(self.args['mib']['sfn'])
+        
         self.gridNrTdd = OrderedDict()
         self.gridNrFddDl = OrderedDict()
         self.gridNrFddUl = OrderedDict()
-        dn = '%s_%s' % (self.hsfn, self.args['mib']['sfn'])
+        dn = '%s_%s' % (self.hsfn, self.nrMibSfn)
         if self.nrDuplexMode == 'TDD':
             self.gridNrTdd[dn] = np.full((self.nrScTot, self.nrSymbPerRfNormCp), NrResType.NR_RES_GB.value)
             if not self.initTddUlDlConfig():
                 return False
-            self.initTddGrid(self.hsfn, int(self.args['mib']['sfn']))
+            self.initTddGrid(self.hsfn, self.nrMibSfn)
         elif self.nrDuplexMode == 'FDD':
             self.gridNrFddDl[dn] = np.full((self.nrScTot, self.nrSymbPerRfNormCp), NrResType.NR_RES_D.value)
             self.gridNrFddUl[dn] = np.full((self.nrScTot, self.nrSymbPerRfNormCp), NrResType.NR_RES_U.value)
@@ -116,6 +118,64 @@ class NgNrGrid(object):
         self.outDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
         if not os.path.exists(self.outDir):
             os.mkdir(self.outDir)
+            
+        self.nrSsbPeriod = int(self.args['ssbBurst']['period'][:-2])
+        self.nrMibHrf = int(self.args['mib']['hrf'])
+        self.nrSsbScs = int(self.args['ssbGrid']['scs'][:-3])
+        self.nrSsbPattern = self.args['ssbGrid']['pattern']
+        self.nrSsbMinGuardBand240k = int(self.args['ssbGrid']['minGuardBand240k']) if self.nrSsbScs == 240 else None
+        self.nrSsbKssb = int(self.args['ssbGrid']['kSsb'])
+        self.nrSsbNCrbSsb = int(self.args['ssbGrid']['nCrbSsb'])
+        self.nrSsbMaxL = int(self.args['ssbBurst']['maxL'])
+        self.nrSsbInOneGroup = self.args['ssbBurst']['inOneGroup']
+        self.nrSsbGroupPresence = self.args['ssbBurst']['groupPresence'] if self.nrSsbMaxL == 64 else None
+        self.nrMibCommonScs = int(self.args['mib']['commonScs'][:-3])
+        if self.nrSsbMaxL == 64:
+            self.ssbSet = ''
+            for group in self.nrSsbGroupPresence:
+                if group == '1':
+                    self.ssbSet += self.nrSsbInOneGroup
+                else:
+                    self.ssbSet += '00000000'
+        else:
+            self.ssbSet = self.nrSsbInOneGroup[:self.nrSsbMaxL]
+        
+        self.ngwin.logEdit.append('ssbSet="%s"' % self.ssbSet)
+        
+        if self.nrSsbPattern == 'Case A' and self.nrSsbScs == 15:
+            ssb1 = [2, 8]
+            ssb2 = 14
+            ssb3 = [0, 1] if self.nrSsbMaxL == 4 else [0, 1, 2, 3]
+        elif self.nrSsbPattern == 'Case B' and self.nrSsbScs == 30:
+            ssb1 = [4, 8, 16, 20]
+            ssb2 = 28 
+            ssb3 = [0,] if self.nrSsbMaxL == 4 else [0, 1]
+        elif self.nrSsbPattern == 'Case C' and self.nrSsbScs == 30:
+            ssb1 = [2, 8]
+            ssb2 = 14 
+            ssb3 = [0, 1] if self.nrSsbMaxL == 4 else [0, 1, 2, 3]
+        elif self.nrSsbPattern == 'Case D' and self.nrSsbScs == 120:
+            ssb1 = [4, 8, 16, 20]
+            ssb2 = 28 
+            ssb3 = [0, 1, 2, 3, 5, 6, 7, 8, 10, 11, 12, 13, 15, 16, 17, 18]
+        elif self.nrSsbPattern == 'Case E' and self.nrSsbScs == 240:
+            ssb1 = [8, 12, 16, 20, 32, 36, 40, 44]
+            ssb2 = 56 
+            ssb3 = [0, 1, 2, 3, 5, 6, 7, 8]
+        else:
+            return False
+        
+        self.ssbFirstSymbSet = []
+        for i in ssb1:
+            for j in ssb3:
+                self.ssbFirstSymbSet.append(i + ssb2 * j)
+        self.ssbFirstSymbSet.sort()
+        
+        ssbFirstSymbSetStr = [] 
+        for i in range(len(self.ssbSet)):
+            ssbFirstSymbSetStr.append(str(self.ssbFirstSymbSet[i]) if self.ssbSet[i] == '1' else '-')
+        self.ngwin.logEdit.append('ssb first symbols: "%s"' % ','.join(ssbFirstSymbSetStr))
+                
         
         return True
         
@@ -374,9 +434,32 @@ class NgNrGrid(object):
         
         workbook.close()
     
-    def recvSsb(self):
+    def recvSsb(self, hsfn, sfn):
         self.ngwin.logEdit.append('---->inside recvSsb')
+        
+        if self.nrSsbPeriod >= 10 and self.deltaSfn(self.hsfn, self.nrMibSfn, hsfn, sfn) % (self.nrSsbPeriod // 10) != 0:
+            return
+        
+        ssbHrfSet = [0, 1] if self.nrSsbPeriod < 10 else [self.nrMibHrf]
+        
+        #TODO SSB frequency domain
+        #related to kssb and n_crb_ssb
+        
+        for hrf in ssbHrfSet:
+            for issb in range(len(self.ssbSet)):
+                if self.ssbSet[issb] == '0':
+                    continue
+                #SSB time domain
+                ssbFirstSymb = hrf * (self.nrSymbPerRfNormCp // 2) + self.ssbFirstSymbSet[issb] * (self.baseScsTd // self.nrSsbScs)
+                
+                #TODO update nr grid
+                
+            pass
+        
         pass
+    
+    def deltaSfn(self, hsfn0, sfn0, hsfn1, sfn1):
+        return (1024 * hsfn1 + sfn1) - (1024 * hsfn0 + sfn0)
     
     def monitorPdcch(self):
         pass

@@ -10202,7 +10202,9 @@ class NgNrGridUi(QDialog):
         #hsfn, sfn = incSfn(hsfn, sfn, 1) #wait for next NPDCCH candidate
         '''
         nrGrid = NgNrGrid(self.ngwin, self.args)
-        nrGrid.recvSsb()
+        self.curHsfn = 0
+        self.curSfn = int(self.args['mib']['sfn'])
+        nrGrid.recvSsb(self.curHsfn, self.curSfn)
         
         self.accept()
     
