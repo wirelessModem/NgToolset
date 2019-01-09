@@ -346,7 +346,7 @@ class NgNrGrid(object):
         #key=NrResType, val=(name, font_color, bg_color)
         resMap = dict()
         resMap[NrResType.NR_RES_PSS.value] = ('PSS', '#000000', '#00FF00')
-        resMap[NrResType.NR_RES_SSS.value] = ('PSS', '#000000', '#FFFF00')
+        resMap[NrResType.NR_RES_SSS.value] = ('SSS', '#000000', '#FFFF00')
         resMap[NrResType.NR_RES_PBCH.value] = ('PBCH', '#000000', '#80FFFF')
         resMap[NrResType.NR_RES_SIB1.value] = ('SIB1', '#0000FF', '#FFFFFF')
         resMap[NrResType.NR_RES_PDCCH.value] = ('PDCCH', '#000000', '#00FFFF')
@@ -444,6 +444,7 @@ class NgNrGrid(object):
         ssbHrfSet = [0, 1] if self.nrSsbPeriod < 10 else [self.nrMibHrf]
         
         #SSB frequency domain
+        scaleFd = self.nrSsbScs // self.baseScsFd
         ssbFirstSc = self.nrSsbNCrbSsb * self.nrScPerPrb + self.nrSsbKssb * (self.nrMibCommonScs // self.baseScsFd if self.args['freqBand']['freqRange'] == 'FR2' else 1)
         v = self.nrPci % 4
         
@@ -452,52 +453,68 @@ class NgNrGrid(object):
                 if self.ssbSet[issb] == '0':
                     continue
                 #SSB time domain
-                scale = self.baseScsTd // self.nrSsbScs
-                ssbFirstSymb = hrf * (self.nrSymbPerRfNormCp // 2) + self.ssbFirstSymbSet[issb] * scale
+                scaleTd = self.baseScsTd // self.nrSsbScs
+                ssbFirstSymb = hrf * (self.nrSymbPerRfNormCp // 2) + self.ssbFirstSymbSet[issb] * scaleTd
                 self.ngwin.logEdit.append('ssbFirstSc=%d, v=%d, ssbFirstSymb=%d' % (ssbFirstSc, v, ssbFirstSymb))
                 
                 #update nr grid
                 #refer to 3GPP 38.211 vf30
                 #Table 7.4.3.1-1: Resources within an SS/PBCH block for PSS, SSS, PBCH, and DM-RS for PBCH.
-                #FIXME account freq-domain scale
                 if self.nrDuplexMode == 'TDD':
-                    for i in range(scale):
+                    for i in range(scaleTd):
                         #symbol 0 of SSB, PSS
-                        self.gridNrTdd[dn][ssbFirstSc:ssbFirstSc+56, ssbFirstSymb+i] = NrResType.NR_RES_DTX.value
-                        self.gridNrTdd[dn][ssbFirstSc+56:ssbFirstSc+183, ssbFirstSymb+i] = NrResType.NR_RES_PSS.value
-                        self.gridNrTdd[dn][ssbFirstSc+183:ssbFirstSc+240, ssbFirstSymb+i] = NrResType.NR_RES_DTX.value
+                        self.gridNrTdd[dn][ssbFirstSc:ssbFirstSc+56*scaleFd, ssbFirstSymb+i] = NrResType.NR_RES_DTX.value
+                        self.gridNrTdd[dn][ssbFirstSc+56*scaleFd:ssbFirstSc+183*scaleFd, ssbFirstSymb+i] = NrResType.NR_RES_PSS.value
+                        self.gridNrTdd[dn][ssbFirstSc+183*scaleFd:ssbFirstSc+240*scaleFd, ssbFirstSymb+i] = NrResType.NR_RES_DTX.value
                         #symbol 1/3 of SSB, PBCH
-                        self.gridNrTdd[dn][ssbFirstSc:ssbFirstSc+240, ssbFirstSymb+scale+i] = NrResType.NR_RES_PBCH.value
-                        self.gridNrTdd[dn][ssbFirstSc+v:ssbFirstSc+v+237:4, ssbFirstSymb+scale+i] = NrResType.NR_RES_DMRS_PBCH.value
-                        self.gridNrTdd[dn][ssbFirstSc:ssbFirstSc+240, ssbFirstSymb+3*scale+i] = NrResType.NR_RES_PBCH.value
-                        self.gridNrTdd[dn][ssbFirstSc+v:ssbFirstSc+v+237:4, ssbFirstSymb+3*scale+i] = NrResType.NR_RES_DMRS_PBCH.value
+                        self.gridNrTdd[dn][ssbFirstSc:ssbFirstSc+240*scaleFd, ssbFirstSymb+scaleTd+i] = NrResType.NR_RES_PBCH.value
+                        for j in range(ssbFirstSc+v*scaleFd, ssbFirstSc+(v+237)*scaleFd, 4*scaleFd):
+                            for k in range(scaleFd):
+                                self.gridNrTdd[dn][j+k, ssbFirstSymb+scaleTd+i] = NrResType.NR_RES_DMRS_PBCH.value
+                        self.gridNrTdd[dn][ssbFirstSc:ssbFirstSc+240*scaleFd, ssbFirstSymb+3*scaleTd+i] = NrResType.NR_RES_PBCH.value
+                        for j in range(ssbFirstSc+v*scaleFd, ssbFirstSc+(v+237)*scaleFd, 4*scaleFd):
+                            for k in range(scaleFd):
+                                self.gridNrTdd[dn][j+k, ssbFirstSymb+3*scaleTd+i] = NrResType.NR_RES_DMRS_PBCH.value
                         #symbol 2 of SSB, PBCH and SSS 
-                        self.gridNrTdd[dn][ssbFirstSc:ssbFirstSc+48, ssbFirstSymb+2*scale+i] = NrResType.NR_RES_PBCH.value
-                        self.gridNrTdd[dn][ssbFirstSc+v:ssbFirstSc+v+45:4, ssbFirstSymb+2*scale+i] = NrResType.NR_RES_DMRS_PBCH.value
-                        self.gridNrTdd[dn][ssbFirstSc+48:ssbFirstSc+56, ssbFirstSymb+2*scale+i] = NrResType.NR_RES_DTX.value
-                        self.gridNrTdd[dn][ssbFirstSc+56:ssbFirstSc+183, ssbFirstSymb+2*scale+i] = NrResType.NR_RES_SSS.value
-                        self.gridNrTdd[dn][ssbFirstSc+183:ssbFirstSc+192, ssbFirstSymb+2*scale+i] = NrResType.NR_RES_DTX.value
-                        self.gridNrTdd[dn][ssbFirstSc+192:ssbFirstSc+240, ssbFirstSymb+2*scale+i] = NrResType.NR_RES_PBCH.value
-                        self.gridNrTdd[dn][ssbFirstSc+v+192:ssbFirstSc+v+237:4, ssbFirstSymb+2*scale+i] = NrResType.NR_RES_DMRS_PBCH.value
+                        self.gridNrTdd[dn][ssbFirstSc:ssbFirstSc+48*scaleFd, ssbFirstSymb+2*scaleTd+i] = NrResType.NR_RES_PBCH.value
+                        for j in range(ssbFirstSc+v*scaleFd, ssbFirstSc+(v+45)*scaleFd, 4*scaleFd):
+                            for k in range(scaleFd):
+                                self.gridNrTdd[dn][j+k, ssbFirstSymb+2*scaleTd+i] = NrResType.NR_RES_DMRS_PBCH.value
+                        self.gridNrTdd[dn][ssbFirstSc+48*scaleFd:ssbFirstSc+56*scaleFd, ssbFirstSymb+2*scaleTd+i] = NrResType.NR_RES_DTX.value
+                        self.gridNrTdd[dn][ssbFirstSc+56*scaleFd:ssbFirstSc+183*scaleFd, ssbFirstSymb+2*scaleTd+i] = NrResType.NR_RES_SSS.value
+                        self.gridNrTdd[dn][ssbFirstSc+183*scaleFd:ssbFirstSc+192*scaleFd, ssbFirstSymb+2*scaleTd+i] = NrResType.NR_RES_DTX.value
+                        self.gridNrTdd[dn][ssbFirstSc+192*scaleFd:ssbFirstSc+240*scaleFd, ssbFirstSymb+2*scaleTd+i] = NrResType.NR_RES_PBCH.value
+                        for j in range(ssbFirstSc+(v+192)*scaleFd, ssbFirstSc+(v+237)*scaleFd, 4*scaleFd):
+                            for k in range(scaleFd):
+                                self.gridNrTdd[dn][j+k, ssbFirstSymb+2*scaleTd+i] = NrResType.NR_RES_DMRS_PBCH.value
                 else:
-                    for i in range(scale):
+                    for i in range(scaleTd):
                         #symbol 0 of SSB, PSS
-                        self.gridNrFddDl[dn][ssbFirstSc:ssbFirstSc+56, ssbFirstSymb+i] = NrResType.NR_RES_DTX.value
-                        self.gridNrFddDl[dn][ssbFirstSc+56:ssbFirstSc+183, ssbFirstSymb+i] = NrResType.NR_RES_PSS.value
-                        self.gridNrFddDl[dn][ssbFirstSc+183:ssbFirstSc+240, ssbFirstSymb+i] = NrResType.NR_RES_DTX.value
+                        self.gridNrFddDl[dn][ssbFirstSc:ssbFirstSc+56*scaleFd, ssbFirstSymb+i] = NrResType.NR_RES_DTX.value
+                        self.gridNrFddDl[dn][ssbFirstSc+56*scaleFd:ssbFirstSc+183*scaleFd, ssbFirstSymb+i] = NrResType.NR_RES_PSS.value
+                        self.gridNrFddDl[dn][ssbFirstSc+183*scaleFd:ssbFirstSc+240*scaleFd, ssbFirstSymb+i] = NrResType.NR_RES_DTX.value
                         #symbol 1/3 of SSB, PBCH
-                        self.gridNrFddDl[dn][ssbFirstSc:ssbFirstSc+240, ssbFirstSymb+scale+i] = NrResType.NR_RES_PBCH.value
-                        self.gridNrFddDl[dn][ssbFirstSc+v:ssbFirstSc+v+237:4, ssbFirstSymb+scale+i] = NrResType.NR_RES_DMRS_PBCH.value
-                        self.gridNrFddDl[dn][ssbFirstSc:ssbFirstSc+240, ssbFirstSymb+3*scale+i] = NrResType.NR_RES_PBCH.value
-                        self.gridNrFddDl[dn][ssbFirstSc+v:ssbFirstSc+v+237:4, ssbFirstSymb+3*scale+i] = NrResType.NR_RES_DMRS_PBCH.value
+                        self.gridNrFddDl[dn][ssbFirstSc:ssbFirstSc+240*scaleFd, ssbFirstSymb+scaleTd+i] = NrResType.NR_RES_PBCH.value
+                        for j in range(ssbFirstSc+v*scaleFd, ssbFirstSc+(v+237)*scaleFd, 4*scaleFd):
+                            for k in range(scaleFd):
+                                self.gridNrFddDl[dn][j+k, ssbFirstSymb+scaleTd+i] = NrResType.NR_RES_DMRS_PBCH.value
+                        self.gridNrFddDl[dn][ssbFirstSc:ssbFirstSc+240*scaleFd, ssbFirstSymb+3*scaleTd+i] = NrResType.NR_RES_PBCH.value
+                        for j in range(ssbFirstSc+v*scaleFd, ssbFirstSc+(v+237)*scaleFd, 4*scaleFd):
+                            for k in range(scaleFd):
+                                self.gridNrFddDl[dn][j+k, ssbFirstSymb+3*scaleTd+i] = NrResType.NR_RES_DMRS_PBCH.value
                         #symbol 2 of SSB, PBCH and SSS 
-                        self.gridNrFddDl[dn][ssbFirstSc:ssbFirstSc+48, ssbFirstSymb+2*scale+i] = NrResType.NR_RES_PBCH.value
-                        self.gridNrFddDl[dn][ssbFirstSc+v:ssbFirstSc+v+45:4, ssbFirstSymb+2*scale+i] = NrResType.NR_RES_DMRS_PBCH.value
-                        self.gridNrFddDl[dn][ssbFirstSc+48:ssbFirstSc+56, ssbFirstSymb+2*scale+i] = NrResType.NR_RES_DTX.value
-                        self.gridNrFddDl[dn][ssbFirstSc+56:ssbFirstSc+183, ssbFirstSymb+2*scale+i] = NrResType.NR_RES_SSS.value
-                        self.gridNrFddDl[dn][ssbFirstSc+183:ssbFirstSc+192, ssbFirstSymb+2*scale+i] = NrResType.NR_RES_DTX.value
-                        self.gridNrFddDl[dn][ssbFirstSc+192:ssbFirstSc+240, ssbFirstSymb+2*scale+i] = NrResType.NR_RES_PBCH.value
-                        self.gridNrFddDl[dn][ssbFirstSc+v+192:ssbFirstSc+v+237:4, ssbFirstSymb+2*scale+i] = NrResType.NR_RES_DMRS_PBCH.value
+                        self.gridNrFddDl[dn][ssbFirstSc:ssbFirstSc+48*scaleFd, ssbFirstSymb+2*scaleTd+i] = NrResType.NR_RES_PBCH.value
+                        for j in range(ssbFirstSc+v*scaleFd, ssbFirstSc+(v+45)*scaleFd, 4*scaleFd):
+                            for k in range(scaleFd):
+                                self.gridNrFddDl[dn][j+k, ssbFirstSymb+2*scaleTd+i] = NrResType.NR_RES_DMRS_PBCH.value
+                        self.gridNrFddDl[dn][ssbFirstSc+48*scaleFd:ssbFirstSc+56*scaleFd, ssbFirstSymb+2*scaleTd+i] = NrResType.NR_RES_DTX.value
+                        self.gridNrFddDl[dn][ssbFirstSc+56*scaleFd:ssbFirstSc+183*scaleFd, ssbFirstSymb+2*scaleTd+i] = NrResType.NR_RES_SSS.value
+                        self.gridNrFddDl[dn][ssbFirstSc+183*scaleFd:ssbFirstSc+192*scaleFd, ssbFirstSymb+2*scaleTd+i] = NrResType.NR_RES_DTX.value
+                        self.gridNrFddDl[dn][ssbFirstSc+192*scaleFd:ssbFirstSc+240*scaleFd, ssbFirstSymb+2*scaleTd+i] = NrResType.NR_RES_PBCH.value
+                        for j in range(ssbFirstSc+(v+192)*scaleFd, ssbFirstSc+(v+237)*scaleFd, 4*scaleFd):
+                            for k in range(scaleFd):
+                                self.gridNrFddDl[dn][j+k, ssbFirstSymb+2*scaleTd+i] = NrResType.NR_RES_DMRS_PBCH.value
+                        
     
     def deltaSfn(self, hsfn0, sfn0, hsfn1, sfn1):
         return (1024 * hsfn1 + sfn1) - (1024 * hsfn0 + sfn0)
